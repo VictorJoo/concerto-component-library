@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>콘체르토 매니저 — 로그인 · 회원가입</title>
+<style>
+  :root{
+    /* 콘체르토 공통 레이아웃 팔레트 / 컴포넌트 라이브러리 v0.1 라이트 토큰 기준 */
+    --page:#f4f6fc; --panel:#ffffff; --field:#eef1f9;
+    --border:#dce2f1; --border-soft:#e9edf7;
+    --text:#171d33; --muted:#565f7e;
+    --primary:#3346c9; --accent:#4f6fe6;
+    --ring:rgba(79,111,230,.22); --danger:#d64a51; --success:#2f9e6f;
+    --radius:8px;
+  }
+  /* 다크 테마 — 컴포넌트 라이브러리 v0.1 .dark 역할 토큰 매핑 */
+  body.dark{
+    --page:#0d0f14; --panel:#16181f; --field:#1c1f27;
+    --border:#262a33; --border-soft:#20242c;
+    --text:#e6e8ee; --muted:#969ba6;
+    --primary:#4159d6; --accent:#7d97f0;
+    --ring:rgba(125,151,240,.28); --danger:#e0585f; --success:#46b17f;
+    color-scheme:dark;
+  }
+  body.dark .input:focus{background:#1c1f27;}
+  body.dark .btn-check{background:var(--border);}
+  body.dark .form-error{background:rgba(224,88,95,.12);border-color:rgba(224,88,95,.35);color:#e0585f;}
+  body.dark .form-error.info{background:rgba(125,151,240,.12);border-color:rgba(125,151,240,.3);color:#aab8f0;}
+  body.dark .toast{background:#262a33;}
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    font-family:"Pretendard","Apple SD Gothic Neo",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:var(--page);color:var(--text);-webkit-font-smoothing:antialiased;
+  }
+
+  /* 프로토타입 안내 바 (실제 화면엔 없음) */
+  .proto-bar{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    background:#fffbe6;border-bottom:1px solid #ffe58f;color:#7a5300;
+    font-size:12px;line-height:1.5;padding:7px 20px;
+  }
+  .proto-bar b{color:#5c3d00;}
+
+  .wrap{display:flex;min-height:100vh;}
+
+  /* ── 좌: 브랜드/비주얼 영역 (공통 셸) ── */
+  .brand{
+    flex:1.55;position:relative;overflow:hidden;
+    background:linear-gradient(150deg,#0a1023 0%,#111c3c 52%,#0c1230 100%);
+    color:#fff;display:flex;flex-direction:column;justify-content:center;
+    padding:72px;border-right:1px solid #23252e;
+  }
+  .brand .glow{position:absolute;border-radius:50%;pointer-events:none;filter:blur(46px);}
+  .brand .glow-a{width:280px;height:96px;background:#5f7ce0;opacity:.55;left:3%;top:22%;transform:rotate(-34deg);}
+  .brand .glow-b{width:110px;height:80px;background:#8ea6f2;opacity:.6;left:14%;top:35%;}
+  .brand .rings{position:absolute;left:74%;top:60%;width:0;height:0;pointer-events:none;}
+  .brand .rings .r{position:absolute;border-radius:50%;}
+  .brand .r1{width:920px;height:920px;transform:translate(-50%,-50%);background:radial-gradient(circle at 43% 39%,rgba(150,168,228,.30),rgba(120,140,205,.15) 60%,rgba(120,140,205,.04) 78%,transparent 80%);}
+  .brand .r2{width:560px;height:560px;transform:translate(-44%,-42%);background:radial-gradient(circle at 43% 38%,rgba(162,180,240,.44),rgba(130,150,215,.22) 62%,transparent 80%);}
+  .brand .r3{width:250px;height:250px;transform:translate(-34%,-30%);background:radial-gradient(circle at 40% 36%,rgba(184,200,248,.62),rgba(150,170,235,.34) 72%,rgba(150,170,235,.18));}
+  .brand .hint-label{position:absolute;top:24px;left:24px;font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.02em;z-index:2;}
+  .brand .brand-title,.brand .tagline{position:relative;z-index:1;}
+  .brand-title{font-size:76px;font-weight:800;line-height:1.0;letter-spacing:-.01em;color:#fff;margin:0;}
+  .brand-title .ai{color:#c3cff7;}
+  .tagline{margin-top:20px;font-size:16px;color:rgba(255,255,255,.75);max-width:440px;line-height:1.6;}
+
+  /* ── 우: 폼 영역 ── */
+  .login{
+    flex:0 0 480px;max-width:480px;background:var(--panel);
+    display:flex;align-items:center;justify-content:center;padding:40px;
+    box-shadow:-1px 0 0 var(--border);
+  }
+  .form{width:100%;max-width:320px;display:none;}
+  .form.active{display:block;}
+  .form h1{font-size:24px;font-weight:700;margin:0 0 6px;}
+  .form .sub{font-size:13px;color:var(--muted);margin:0 0 26px;}
+  #loginView h1{margin-bottom:28px;}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:7px;}
+  .field label .req{color:var(--danger);margin-left:2px;}
+  .input-shell{position:relative;display:flex;gap:8px;}
+  .input{
+    width:100%;height:44px;padding:0 12px;border-radius:var(--radius);
+    background:var(--field);border:1px solid var(--border);color:var(--text);
+    font-size:14px;outline:none;transition:border-color .15s, box-shadow .15s, background .15s;
+  }
+  .input::placeholder{color:var(--muted);}
+  .input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px var(--ring);}
+  .input.has-error{border-color:var(--danger);}
+  .input.is-ok{border-color:var(--success);}
+  /* 표시 토글이 있는 필드는 타입(password/text)과 무관하게 눈 아이콘용 여백 유지 */
+  .input-shell:has(.toggle-pw) .input{padding-right:40px;}
+  .toggle-pw{
+    position:absolute;right:6px;top:50%;transform:translateY(-50%);
+    width:32px;height:32px;border:0;background:transparent;color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:6px;
+  }
+  .toggle-pw:hover{color:var(--muted);}
+  /* 비밀번호 강도 (계정 정책 2.2 — 안전 이상부터 사용 가능) */
+  .pw-meter{display:flex;align-items:center;gap:8px;margin-top:7px;}
+  .pw-meter[hidden]{display:none;}   /* hidden 속성이 display:flex에 눌리지 않도록 명시 */
+  .pw-bars{display:flex;gap:4px;flex:1;}
+  .pw-bars span{height:4px;flex:1;border-radius:2px;background:var(--border);transition:background .15s;}
+  .pw-label{font-size:12px;font-weight:600;white-space:nowrap;}
+  .pw-meter[data-level="0"] .pw-bars span:nth-child(-n+1){background:#e5484d;}
+  .pw-meter[data-level="0"] .pw-label{color:#e5484d;}
+  .pw-meter[data-level="1"] .pw-bars span:nth-child(-n+2){background:#f5a623;}
+  .pw-meter[data-level="1"] .pw-label{color:#d98e00;}
+  .pw-meter[data-level="2"] .pw-bars span:nth-child(-n+3){background:#3aa76d;}
+  .pw-meter[data-level="2"] .pw-label{color:#2f9160;}
+  .pw-meter[data-level="3"] .pw-bars span{background:#2a8f5f;}
+  .pw-meter[data-level="3"] .pw-label{color:#2a8f5f;}
+  .btn-check{
+    flex:0 0 auto;height:44px;padding:0 14px;border-radius:var(--radius);
+    background:#fff;border:1px solid var(--border);color:var(--muted);
+    font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:border-color .15s,color .15s;
+  }
+  .btn-check:hover{border-color:var(--accent);color:var(--accent);}
+  .err{display:none;color:var(--danger);font-size:12px;margin-top:6px;}
+  .err.show{display:block;}
+  .ok-msg{display:none;color:var(--success);font-size:12px;margin-top:6px;}
+  .ok-msg.show{display:block;}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:6px;}
+
+  /* 폼 상단 통합 오류(9.1) — 로그인 */
+  .form-error{
+    display:none;align-items:center;gap:8px;
+    background:#fdecec;border:1px solid #f5c2c2;color:#c0353a;
+    font-size:13px;padding:10px 12px;border-radius:var(--radius);margin-bottom:18px;
+  }
+  .form-error.show{display:flex;}
+
+  .row-remember{display:flex;align-items:center;gap:8px;margin:14px 0 22px;}
+  .row-remember input{width:16px;height:16px;accent-color:var(--accent);}
+  .row-remember label{font-size:13px;color:var(--muted);cursor:pointer;}
+
+  .btn{
+    width:100%;height:46px;border:0;border-radius:var(--radius);
+    background:var(--primary);color:#fff;font-size:15px;font-weight:600;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;
+  }
+  #signupBtn{margin-top:8px;}
+  .btn:hover:not(:disabled){opacity:.9;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .spinner{
+    width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;
+    border-radius:50%;animation:spin .7s linear infinite;display:none;
+  }
+  .btn.loading .spinner{display:inline-block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .links{display:flex;justify-content:center;gap:20px;margin-top:20px;font-size:13px;}
+  .links a{color:var(--muted);text-decoration:none;cursor:pointer;}
+  .links a:hover{color:var(--accent);}
+  .links.single{gap:6px;color:var(--muted);}
+  .links.single a{color:var(--accent);font-weight:600;}
+  .links.single a:hover{text-decoration:underline;}
+  .copyright{margin-top:34px;text-align:center;color:var(--muted);font-size:12px;}
+
+  /* 가입 완료(승인 대기) 상태 */
+  .done{text-align:center;}
+  .done .badge{
+    width:56px;height:56px;border-radius:50%;margin:0 auto 20px;
+    background:rgba(47,158,111,.12);color:var(--success);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .done h1{font-size:22px;font-weight:700;margin:0 0 12px;}
+  .done p{font-size:14px;color:var(--muted);line-height:1.65;margin:0 0 28px;}
+
+  /* 비밀번호 재설정 안내 모달 (공통정책 4.5) */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;z-index:90;background:rgba(13,15,20,.45);
+    align-items:center;justify-content:center;padding:20px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    width:100%;max-width:400px;padding:24px;box-shadow:0 20px 50px rgba(13,15,20,.25);
+  }
+  .modal h2{font-size:17px;font-weight:700;margin:0 0 10px;color:var(--text);}
+  .modal p{font-size:13.5px;line-height:1.65;color:var(--muted);margin:0 0 20px;}
+  .modal .modal-actions{display:flex;justify-content:flex-end;}
+  .modal .modal-ok{
+    height:40px;padding:0 20px;border:0;border-radius:var(--radius);
+    background:var(--primary);color:#fff;font-size:14px;font-weight:600;cursor:pointer;
+  }
+  .modal .modal-ok:hover{opacity:.9;}
+
+  /* 토스트 (공통정책 7.6·7.7) — 동기 작업 결과 즉시 피드백. 위치는 컴포넌트 라이브러리 확정 전 가안(우측 상단) */
+  .toast{
+    position:fixed;top:24px;right:24px;transform:translateX(24px);
+    background:#171d33;color:#fff;font-size:13.5px;padding:12px 18px;border-radius:10px;
+    box-shadow:0 10px 30px rgba(13,15,20,.3);opacity:0;pointer-events:none;
+    transition:opacity .25s, transform .25s;z-index:70;display:flex;align-items:center;gap:8px;
+  }
+  .toast.show{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .toast svg{width:16px;height:16px;color:#7fd6a8;flex:0 0 auto;}
+  .toast .toast-close{margin-left:8px;border:0;background:transparent;color:rgba(255,255,255,.55);font-size:13px;line-height:1;cursor:pointer;padding:2px 3px;flex:0 0 auto;}
+  .toast .toast-close:hover{color:#fff;}
+
+  /* 시안 상태 미리보기 바 (실제 화면 아님 · 리뷰용) */
+  .demo-bar{position:fixed;left:0;right:0;bottom:0;z-index:80;background:#0f1320;color:#c9cfe0;
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;font-size:12px;border-top:1px solid #2a2f45;}
+  .demo-bar .demo-label{color:#7f88a8;margin-right:4px;}
+  .demo-bar button{background:#1c2136;border:1px solid #2f3654;color:#c9cfe0;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;}
+  .demo-bar button:hover{border-color:var(--accent);color:#fff;}
+  /* 승인 대기 등 계정 상태 안내는 오류가 아니라 정보성 — 중립 배너 */
+  .form-error.info{background:#eef2fd;border-color:#c7d2f0;color:#2f3d7a;}
+
+  @media (max-width:880px){
+    .brand{display:none;}
+    .login{flex:1;max-width:none;box-shadow:none;}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- 좌: 브랜드 영역 (공통) -->
+    <section class="brand">
+      <span class="hint-label">키비주얼 · 제공 이미지 자산으로 교체 예정</span>
+      <div class="glow glow-a"></div><div class="glow glow-b"></div>
+      <div class="rings"><div class="r r1"></div><div class="r r2"></div><div class="r r3"></div></div>
+      <h1 class="brand-title">CONCERTO<br><span class="ai">A.I.</span></h1>
+      <p class="tagline">어떤 인프라에서든, 하나의 AI 추론 플랫폼</p>
+    </section>
+
+    <!-- 우: 인증 폼 영역 (뷰 전환) -->
+    <section class="login">
+
+      <!-- ① 로그인 -->
+      <form class="form active" id="loginView" novalidate>
+        <h1>로그인</h1>
+        <div class="form-error" id="formError"><span>아이디 또는 비밀번호가 일치하지 않습니다.</span></div>
+
+        <div class="field">
+          <label for="li_id">아이디</label>
+          <div class="input-shell"><input class="input" type="text" id="li_id" placeholder="아이디를 입력해주세요." autocomplete="username" /></div>
+          <p class="err" id="li_idErr">아이디를 입력해주세요.</p>
+        </div>
+        <div class="field">
+          <label for="li_pw">비밀번호</label>
+          <div class="input-shell">
+            <input class="input" type="password" id="li_pw" placeholder="비밀번호를 입력해주세요." autocomplete="current-password" />
+            <button type="button" class="toggle-pw" data-target="li_pw" aria-label="비밀번호 표시"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+          <p class="err" id="li_pwErr">비밀번호를 입력해주세요.</p>
+        </div>
+
+        <div class="row-remember"><input type="checkbox" id="remember" checked /><label for="remember">아이디 저장</label></div>
+
+        <button type="submit" class="btn" id="loginBtn"><span class="spinner"></span><span class="btn-label">로그인</span></button>
+
+        <div class="links"><a id="toSignup">회원가입</a><a id="resetLink">비밀번호 재설정</a></div>
+        <p class="copyright">© 2025 OKESTRO Co., Ltd. All Rights Reserved.</p>
+      </form>
+
+      <!-- ② 회원가입 -->
+      <form class="form" id="signupView" novalidate>
+        <h1>회원가입</h1>
+        <p class="sub">계정을 신청하면 관리자 승인 후 로그인할 수 있습니다.</p>
+
+        <div class="field">
+          <label for="su_id">아이디 <span class="req">*</span></label>
+          <div class="input-shell">
+            <input class="input" type="text" id="su_id" placeholder="아이디를 입력해주세요." autocomplete="username" />
+            <button type="button" class="btn-check" id="checkBtn">중복 확인</button>
+          </div>
+          <p class="err" id="su_idErr">아이디를 입력해주세요.</p>
+          <p class="ok-msg" id="su_idOk">사용 가능한 아이디입니다.</p>
+        </div>
+        <div class="field">
+          <label for="su_name">이름 <span class="req">*</span></label>
+          <div class="input-shell"><input class="input" type="text" id="su_name" placeholder="이름을 입력해주세요." autocomplete="name" /></div>
+          <p class="err" id="su_nameErr">이름을 입력해주세요.</p>
+        </div>
+        <div class="field">
+          <label for="su_email">이메일 <span class="req">*</span></label>
+          <div class="input-shell"><input class="input" type="email" id="su_email" placeholder="이메일을 입력해주세요." autocomplete="email" /></div>
+          <p class="err" id="su_emailErr">올바른 이메일 형식이 아닙니다.</p>
+        </div>
+        <div class="field">
+          <label for="su_pw">비밀번호 <span class="req">*</span></label>
+          <div class="input-shell">
+            <input class="input" type="password" id="su_pw" placeholder="비밀번호를 입력해주세요." autocomplete="new-password" />
+            <button type="button" class="toggle-pw" data-target="su_pw" aria-label="비밀번호 표시"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+          <div class="pw-meter" id="pwMeter" hidden>
+            <div class="pw-bars"><span></span><span></span><span></span><span></span></div>
+            <span class="pw-label" id="pwLabel"></span>
+          </div>
+          <p class="err" id="su_pwErr">비밀번호를 입력해주세요.</p>
+        </div>
+        <div class="field">
+          <label for="su_pw2">비밀번호 확인 <span class="req">*</span></label>
+          <div class="input-shell">
+            <input class="input" type="password" id="su_pw2" placeholder="비밀번호를 다시 입력해주세요." autocomplete="new-password" />
+            <button type="button" class="toggle-pw" data-target="su_pw2" aria-label="비밀번호 표시"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+          <p class="err" id="su_pw2Err">비밀번호가 일치하지 않습니다.</p>
+        </div>
+
+        <button type="submit" class="btn" id="signupBtn" disabled><span class="spinner"></span><span class="btn-label">가입 신청</span></button>
+
+        <div class="links single">이미 계정이 있으신가요? <a id="toLogin">로그인</a></div>
+        <p class="copyright">© 2025 OKESTRO Co., Ltd. All Rights Reserved.</p>
+      </form>
+
+      <!-- ③ 가입 완료(승인 대기) -->
+      <div class="form done" id="doneView">
+        <div class="badge"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <h1>가입 신청이 접수되었습니다</h1>
+        <p>관리자 승인 후 로그인할 수 있습니다.<br>승인 전에는 로그인할 수 없습니다.</p>
+        <button type="button" class="btn" id="doneToLogin"><span class="btn-label">로그인 화면으로</span></button>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- 시안 상태 미리보기 (실제 화면 아님 · 리뷰용) -->
+  <div class="demo-bar" id="demoBar">
+    <span class="demo-label">로그인 상태 미리보기 · 시안 확인용:</span>
+    <button data-case="default">기본</button>
+    <button data-case="invalid">자격 불일치</button>
+    <button data-case="pending">승인 대기</button>
+    <button data-case="inactive">비활성</button>
+    <button data-case="rejected">반려</button>
+    <button data-case="locked">계정 잠금</button>
+    <button data-case="expired">세션 만료</button>
+    <span class="demo-label" style="margin-left:12px;">피드백(가입 신청 완료 시):</span>
+    <button data-case="toast">가입 접수 토스트</button>
+    <span class="demo-label" style="margin-left:12px;">테마:</span>
+    <button data-case="theme">다크 / 라이트</button>
+  </div>
+
+  <!-- 토스트 (공통정책 7.6·7.7) -->
+  <div class="toast" id="toast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span id="toastMsg"></span><button type="button" class="toast-close" onclick="hideToast()" aria-label="닫기">✕</button></div>
+
+  <!-- 비밀번호 재설정 안내 모달 (4.5 알림 · 관리자 경유 방식) -->
+  <div class="modal-overlay" id="resetModal" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+    <div class="modal">
+      <h2 id="resetTitle">비밀번호 재설정</h2>
+      <p>비밀번호 재설정은 관리자에게 문의해 주세요.<br>관리자가 임시 비밀번호를 발급합니다.</p>
+      <div class="modal-actions"><button type="button" class="modal-ok" id="resetOk">확인</button></div>
+    </div>
+  </div>
+
+  <!-- 로그인 불가(종료 상태: 비활성·반려) 안내 모달 (4.5 · 보안상 상태 미노출 일반 문구) -->
+  <div class="modal-overlay" id="stateModal" role="dialog" aria-modal="true" aria-labelledby="stateTitle">
+    <div class="modal">
+      <h2 id="stateTitle">로그인할 수 없습니다</h2>
+      <p>로그인할 수 없는 계정입니다.<br>관리자에게 문의해 주세요.</p>
+      <div class="modal-actions"><button type="button" class="modal-ok" id="stateOk">확인</button></div>
+    </div>
+  </div>
+
+  <!-- 세션 만료 안내 모달 (무활동·세션 만료 → 자동 로그아웃, 로그인 시도 실패와 별도) -->
+  <div class="modal-overlay" id="expiredModal" role="dialog" aria-modal="true" aria-labelledby="expiredTitle">
+    <div class="modal">
+      <h2 id="expiredTitle">세션 만료</h2>
+      <p>세션이 만료되어 로그아웃되었습니다.<br>다시 로그인해 주세요.</p>
+      <div class="modal-actions"><button type="button" class="modal-ok" id="expiredOk">확인</button></div>
+    </div>
+  </div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  // 토스트 (공통정책 7.7) — 성공·접수 3초 / 실패 5초 자동 소멸 + 호버 시 정지, 접수형/완료형 문구
+  let toastTimer, toastDur=3000;
+  function showToast(msg, ok){
+    const t=$('toast'); $('toastMsg').textContent=msg;
+    toastDur = (ok===false) ? 5000 : 3000;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>t.classList.remove('show'), toastDur);
+  }
+  function hideToast(){ clearTimeout(toastTimer); $('toast').classList.remove('show'); }   // 공통정책: 사용자가 수동으로 닫을 수 있다
+  // 호버 시 자동 소멸 일시정지(읽는 중 보호). 수동 닫기와 함께 짧은 표시 시간을 보완.
+  (()=>{ const t=$('toast'); if(!t) return;
+    t.addEventListener('mouseenter', ()=>clearTimeout(toastTimer));
+    t.addEventListener('mouseleave', ()=>{ if(t.classList.contains('show')){ clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'), toastDur); } });
+  })();
+
+  // ── 뷰 전환 ──
+  const views = { login:$('loginView'), signup:$('signupView'), done:$('doneView') };
+  function show(name){ Object.values(views).forEach(v=>v.classList.remove('active')); views[name].classList.add('active'); }
+  $('toSignup').addEventListener('click', e=>{ e.preventDefault(); resetLogin(); show('signup'); });
+  $('toLogin').addEventListener('click', e=>{ e.preventDefault(); resetSignup(); show('login'); });
+  $('doneToLogin').addEventListener('click', ()=>{ resetSignup(); show('login'); });
+
+  // ── 비밀번호 표시/숨김 (공통) ──
+  document.querySelectorAll('.toggle-pw').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const t=$(btn.dataset.target); const s=t.type==='password'; t.type=s?'text':'password';
+      btn.querySelector('svg').innerHTML = s
+        ? '<path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3.5 7 10 7a9.12 9.12 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/>'
+        : '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
+    });
+  });
+  function showErr(el, errId, on){ el.classList.toggle('has-error', on); $(errId).classList.toggle('show', on); }
+
+  // ── 입력 문자 필터: 한글 등 허용되지 않는 문자 차단 (공통정책 7.1) ──
+  // 허용 문자셋은 가안(실제 규칙은 계정 정책에서 확정).
+  //  아이디 = 소문자 영문·숫자·_ - . (대문자는 소문자로 자동 변환)
+  //  이메일 = 영문·숫자·@ . _ -  /  비밀번호 = ASCII(특수문자 허용, 대소문자 구분 유지)
+  // IME(한글) 조합 중에는 스트립하지 않아 입력이 끊기지 않게 하고, 조합 완료·필드 이탈 시 정리.
+  function attachFilter(el, cleanFn){
+    if(!el) return;
+    const clean=()=>{ const f=cleanFn(el.value); if(f!==el.value) el.value=f; };
+    // 타이핑 중에는 값을 건드리지 않아 숫자·대문자·Shift·IME 입력이 끊기지 않게 하고,
+    // 한글 조합 완료·필드 이탈(blur) 시점에만 정규화(소문자화·금지문자 제거)한다.
+    el.addEventListener('compositionend', ()=>{ setTimeout(clean, 0); });
+    el.addEventListener('blur', clean);
+  }
+  // 아이디: 대문자는 입력 즉시 소문자로 변환(대문자가 화면에 남지 않게). 대소문자화는 IME와 무관해 숫자·Shift 안전.
+  //         금지문자(한글·@ 등) 제거는 IME 안전을 위해 조합 완료·필드 이탈 시점에만 처리.
+  ['li_id','su_id'].forEach(id=>{
+    const el=$(id); if(!el) return;
+    const norm=()=>{ const f=el.value.toLowerCase().replace(/[^a-z0-9._-]/g,''); if(f!==el.value) el.value=f; };
+    el.addEventListener('keydown', (e)=>{ if(e.key===' ' || e.code==='Space'){ e.preventDefault(); } });   // 스페이스 즉시 차단
+    el.addEventListener('input', (e)=>{ if(e.isComposing) return; norm(); });   // 조합 중이 아닐 때 소문자화 + 금지문자(공백·@·한글 등) 즉시 제거
+    el.addEventListener('compositionend', ()=>{ setTimeout(norm, 0); });
+    el.addEventListener('blur', norm);
+  });
+  // 비밀번호: 한글·공백·비ASCII는 입력 필터로 정리(로그인·비밀번호 변경 화면과 동일 방식, 공통정책 7.1).
+  //   스페이스는 키 입력 자체를 차단하고, 한글·비ASCII는 조합 완료·필드 이탈·붙여넣기 시 제거(IME 안전).
+  //   비밀번호는 ASCII 특수문자를 모두 허용한다(계정 정책 2.2).
+  ['li_pw','su_pw','su_pw2'].forEach(id=>{
+    const el=$(id); if(!el) return;
+    const strip=()=>{ const f=el.value.replace(/[^\x21-\x7E]/g,''); if(f!==el.value) el.value=f; };
+    el.addEventListener('keydown', (e)=>{ if(e.key===' '||e.code==='Space'){ e.preventDefault(); } });
+    el.addEventListener('input', (e)=>{ if(e.isComposing) return; strip(); });
+    el.addEventListener('compositionend', ()=>{ setTimeout(strip,0); });
+    el.addEventListener('blur', strip);
+  });
+
+  // 이메일: 이메일 허용 문자셋(영문·숫자·@ . _ % + -)만 입력(계정 정책 2.3). 그 외 특수문자·공백·비ASCII는 즉시 제거.
+  (()=>{
+    const el=$('su_email'); if(!el) return;
+    const strip=()=>{ const f=el.value.replace(/[^A-Za-z0-9._%+\-@]/g,''); if(f!==el.value) el.value=f; };
+    el.addEventListener('keydown', (e)=>{ if(e.key===' '||e.code==='Space'){ e.preventDefault(); } });
+    el.addEventListener('input', (e)=>{ if(e.isComposing) return; strip(); });
+    el.addEventListener('compositionend', ()=>{ setTimeout(strip,0); });
+    el.addEventListener('blur', strip);
+  })();
+
+  // 이름: 공백 사용 불가(계정 정책 2.4). 스페이스 즉시 차단 + 공백 제거. 한글·다국어는 허용이므로 비ASCII는 제거하지 않는다.
+  (()=>{
+    const el=$('su_name'); if(!el) return;
+    const strip=()=>{ const f=el.value.replace(/\s+/g,''); if(f!==el.value) el.value=f; };
+    el.addEventListener('keydown', (e)=>{ if(e.key===' '||e.code==='Space'){ e.preventDefault(); } });
+    el.addEventListener('input', (e)=>{ if(e.isComposing) return; strip(); });
+    el.addEventListener('compositionend', ()=>{ setTimeout(strip,0); });
+    el.addEventListener('blur', strip);
+  })();
+
+  // ── ① 로그인 (버튼 항상 활성 + 미입력 인라인 에러 7.8, 통합 실패 9.1) ──
+  const li_id=$('li_id'), li_pw=$('li_pw'), loginBtn=$('loginBtn'), formError=$('formError');
+  function vLi(el,errId,msg){ const v=!!el.value.trim(); if(!v){el.classList.add('has-error');const e=$(errId);e.textContent=msg;e.classList.add('show');}else{el.classList.remove('has-error');$(errId).classList.remove('show');} return v; }
+  li_id.addEventListener('blur', ()=>vLi(li_id,'li_idErr','아이디를 입력해주세요.'));
+  li_pw.addEventListener('blur', ()=>vLi(li_pw,'li_pwErr','비밀번호를 입력해주세요.'));
+  [li_id,li_pw].forEach(el=>el.addEventListener('input', ()=>{ el.classList.remove('has-error'); $(el.id+'Err').classList.remove('show'); }));
+  // 회원가입·비밀번호 재설정을 다녀오면 로그인 입력값을 초기화한다(입력 잔존 방지).
+  function resetLogin(){
+    [li_id,li_pw].forEach(el=>{ el.value=''; el.classList.remove('has-error'); });
+    ['li_idErr','li_pwErr'].forEach(id=>$(id).classList.remove('show'));
+    formError.classList.remove('show');
+  }
+  $('loginView').addEventListener('submit', e=>{
+    e.preventDefault(); formError.classList.remove('show');
+    const okId=vLi(li_id,'li_idErr','아이디를 입력해주세요.'), okPw=vLi(li_pw,'li_pwErr','비밀번호를 입력해주세요.');
+    if(!okId){ li_id.focus(); return; } if(!okPw){ li_pw.focus(); return; }
+    loginBtn.classList.add('loading'); loginBtn.disabled=true;
+    setTimeout(()=>{ loginBtn.classList.remove('loading'); loginBtn.disabled=false; formError.classList.add('show'); }, 1100);
+  });
+
+  // ── ② 회원가입 (등록 버튼 활성 조건 7.1, 유효성 7.8, 중복확인 7.1) ──
+  const su_id=$('su_id'), su_name=$('su_name'), su_email=$('su_email'), su_pw=$('su_pw'), su_pw2=$('su_pw2');
+  const signupBtn=$('signupBtn'), checkBtn=$('checkBtn'), su_idOk=$('su_idOk');
+  let idChecked=false; const emailRe=/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+  function idError(v){                                                    // 아이디 규칙별 유효성 (계정 정책 2.1)
+    if(!v) return '아이디를 입력해주세요.';
+    if(v.length<4) return '4자 이상 입력해주세요.';
+    if(v.length>20) return '20자까지 입력할 수 있습니다.';
+    if(!/^[a-z0-9._-]+$/.test(v)) return '영문 소문자·숫자와 특수문자(_ - .)만 사용할 수 있습니다.';
+    if(/^[._-]|[._-]$/.test(v)) return '아이디는 특수문자로 시작하거나 끝날 수 없습니다.';
+    if(/[._-]{2,}/.test(v)) return '연속된 특수문자(_ - .)는 사용할 수 없습니다.';
+    return null;
+  }
+  function vSuId(){ const msg=idError(su_id.value.trim()); const e=$('su_idErr'); if(msg){ e.textContent=msg; su_id.classList.add('has-error'); e.classList.add('show'); return false; } su_id.classList.remove('has-error'); e.classList.remove('show'); return true; }
+  function vName(){ const v=su_name.value.trim(); showErr(su_name,'su_nameErr',!v); return !!v; }
+  function vEmail(){ const ok=emailRe.test(su_email.value.trim()); showErr(su_email,'su_emailErr',!ok); return ok; }
+  // 비밀번호 강도 (계정 정책 2.2) — 0 약함 · 1 보통 · 2 안전 · 3 매우 안전. 안전(2) 이상부터 사용 가능.
+  const PW_LABELS=['약함','보통','안전','매우 안전'];
+  const pwMeter=$('pwMeter'), pwLabel=$('pwLabel');
+  function pwKinds(v){ let k=0; if(/[a-z]/.test(v))k++; if(/[A-Z]/.test(v))k++; if(/[0-9]/.test(v))k++; if(/[^A-Za-z0-9]/.test(v))k++; return k; }
+  function pwHasRun(v){                                                   // 동일·연속·키보드 배열 4자
+    const low=v.toLowerCase();
+    if(/(.)\1\1\1/.test(v)) return true;                                  // 동일 문자·숫자 4연속(aaaa,1111)
+    const seq='abcdefghijklmnopqrstuvwxyz0123456789';
+    for(let i=0;i+4<=low.length;i++){ const s=low.substr(i,4); if(seq.includes(s)||seq.includes([...s].reverse().join(''))) return true; }
+    const rows=['qwertyuiop','asdfghjkl','zxcvbnm','1234567890'];         // 키보드 배열 연속 4자(qwer,1234)
+    for(const r of rows){ for(let i=0;i+4<=r.length;i++){ const s=r.substr(i,4); if(low.includes(s)||low.includes([...s].reverse().join(''))) return true; } }
+    return false;
+  }
+  function pwSameAsId(v){ const id=su_id.value.trim(); return !!id && v.toLowerCase()===id.toLowerCase(); }  // 아이디와 동일
+  function pwBanned(v){ return pwHasRun(v) || pwSameAsId(v); }
+  // 규칙별 유효성 문구 (계정 정책 2.2)
+  function pwError(v){
+    if(!v) return '비밀번호를 입력해주세요.';
+    if(/[^\x21-\x7E]/.test(v)) return '비밀번호에 사용할 수 없는 문자가 있습니다. (한글·공백·이모지 불가)';
+    if(v.length<8) return '8자 이상 입력해주세요.';
+    if(v.length>64) return '64자까지 입력할 수 있습니다.';
+    if(pwKinds(v)<3) return '영문 대문자·소문자·숫자·특수문자 중 3종 이상을 포함해야 합니다.';
+    if(pwSameAsId(v)) return '아이디와 동일한 비밀번호는 사용할 수 없습니다.';
+    if(pwHasRun(v)) return '동일하거나 연속된 문자·숫자는 4자 이상 사용할 수 없습니다.';
+    return null;
+  }
+  function pwLevel(v){
+    if(!v || /[^\x21-\x7E]/.test(v)) return 0;
+    const k=pwKinds(v);
+    if(v.length<8 || pwBanned(v)) return 0;
+    if(k<3) return 1;
+    if(v.length>=12 && k>=4) return 3;
+    return 2;
+  }
+  function updateMeter(){
+    const v=su_pw.value;
+    if(!v){ pwMeter.hidden=true; return; }
+    const lv=pwLevel(v); pwMeter.hidden=false; pwMeter.dataset.level=lv; pwLabel.textContent=PW_LABELS[lv];
+  }
+  function vPw(){
+    const v=su_pw.value; const e=$('su_pwErr'); const msg=pwError(v);
+    if(msg){ e.textContent=msg; su_pw.classList.add('has-error'); e.classList.add('show'); return false; }
+    su_pw.classList.remove('has-error'); e.classList.remove('show'); return true;
+  }
+  function vPw2(){ const ok=su_pw2.value!=='' && su_pw2.value===su_pw.value; showErr(su_pw2,'su_pw2Err',!ok); return ok; }
+  function refreshBtn(){
+    signupBtn.disabled = !(su_id.value.trim() && idChecked && su_name.value.trim()
+      && emailRe.test(su_email.value.trim()) && pwLevel(su_pw.value)>=2 && su_pw2.value!=='' && su_pw2.value===su_pw.value);
+  }
+  // 뷰 전환·제출 후 회원가입 폼 초기화 (입력 잔존·비밀번호 잔류 방지)
+  function resetSignup(){
+    ['su_id','su_name','su_email','su_pw','su_pw2'].forEach(id=>{ const el=$(id); if(el){ el.value=''; el.classList.remove('has-error','is-ok'); } });
+    ['su_idErr','su_nameErr','su_emailErr','su_pwErr','su_pw2Err','su_idOk'].forEach(id=>{ const e=$(id); if(e) e.classList.remove('show'); });
+    if(pwMeter) pwMeter.hidden=true;
+    idChecked=false; refreshBtn();
+  }
+  su_id.addEventListener('input', ()=>{ idChecked=false; su_id.classList.remove('is-ok'); su_idOk.classList.remove('show'); showErr(su_id,'su_idErr',false); updateMeter(); refreshBtn(); });
+  checkBtn.addEventListener('click', ()=>{
+    if(!vSuId()){ su_id.focus(); return; }
+    if(su_id.value.trim().toLowerCase()==='admin'){ idChecked=false; su_id.classList.add('has-error'); su_id.classList.remove('is-ok'); su_idOk.classList.remove('show'); const e=$('su_idErr'); e.textContent='이미 사용 중인 아이디입니다.'; e.classList.add('show'); }
+    else { idChecked=true; su_id.classList.add('is-ok'); su_id.classList.remove('has-error'); $('su_idErr').classList.remove('show'); su_idOk.classList.add('show'); }
+    refreshBtn();
+  });
+  su_name.addEventListener('blur', vName); su_email.addEventListener('blur', vEmail); su_pw.addEventListener('blur', vPw); su_pw2.addEventListener('blur', vPw2);
+  su_id.addEventListener('blur', ()=>{ if(su_id.value.trim()) vSuId(); });   // 형식 유효성(길이·시작끝·연속 특수문자) 안내
+  [su_name,su_email,su_pw,su_pw2].forEach(el=>el.addEventListener('input', ()=>{ showErr(el, el.id+'Err', false); if(el===su_pw){ updateMeter(); if(su_pw2.value) vPw2(); } refreshBtn(); }));
+  $('signupView').addEventListener('submit', e=>{
+    e.preventDefault();
+    const rId=vSuId(), rName=vName(), rEmail=vEmail(), rPw=vPw(), rPw2=vPw2();
+    if(!rId){ su_id.focus(); return; }
+    if(!idChecked){ const el=$('su_idErr'); el.textContent='아이디 중복 확인을 해주세요.'; el.classList.add('show'); su_id.classList.add('has-error'); su_id.focus(); return; }
+    if(!rName){ su_name.focus(); return; } if(!rEmail){ su_email.focus(); return; }
+    if(!rPw){ su_pw.focus(); return; } if(!rPw2){ su_pw2.focus(); return; }
+    signupBtn.classList.add('loading'); signupBtn.disabled=true;
+    setTimeout(()=>{
+      signupBtn.classList.remove('loading');
+      showToast('가입 신청이 접수되었습니다.');   // 폼 위에 먼저 토스트 노출
+      setTimeout(()=>show('done'), 900);          // 잠깐 뒤 완료 화면으로 전환(토스트는 유지)
+    }, 1100);
+  });
+  refreshBtn();
+
+  // ── 비밀번호 재설정 안내 모달 (4.5) ──
+  const resetModal=$('resetModal');
+  $('resetLink').addEventListener('click', e=>{ e.preventDefault(); resetModal.classList.add('show'); });
+  $('resetOk').addEventListener('click', ()=>{ resetModal.classList.remove('show'); resetLogin(); });
+  resetModal.addEventListener('click', e=>{ if(e.target===resetModal){ resetModal.classList.remove('show'); resetLogin(); } });
+
+  // ── 시안 상태 미리보기 (실제 화면 아님) — 로그인 케이스별 조회 ──
+  // 자격 불일치 = 확정 통합 문구(9.1) 배너. 승인 대기 = 가입 직후 안내 배너.
+  // 잠금(실패 누적) = 계정 잠금 안내 배너("계정이 잠겼습니다. 관리자에게 문의").
+  // 비활성·반려(종료 상태) = 상태 미노출 일반 안내 모달(계정 정책 §5).
+  const BANNER_CASES = {
+    invalid: { msg:'아이디 또는 비밀번호가 일치하지 않습니다.' },
+    locked:  { msg:'로그인 시도가 많아 계정이 잠겼습니다. 관리자에게 문의해 주세요.' },
+    pending: { msg:'승인 대기 중인 계정입니다. 관리자 승인 후 로그인할 수 있습니다.', info:true },
+  };
+  const stateModal=$('stateModal');
+  const expiredModal=$('expiredModal');
+  document.querySelectorAll('#demoBar button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const key=btn.dataset.case;
+      if(key==='theme'){ document.body.classList.toggle('dark'); return; }   // 테마 전환(다크/라이트) — 현재 화면·입력값 유지
+      if(key==='toast'){   // 가입 접수 토스트 = 회원가입 화면에서 값이 모두 채워지고 제출된 실제 흐름으로 시연
+        show('signup');
+        su_id.value='yujin'; idChecked=true; su_id.classList.add('is-ok'); su_id.classList.remove('has-error'); $('su_idErr').classList.remove('show'); su_idOk.classList.add('show');
+        su_name.value='성유진'; su_email.value='yujin@okestro.com'; su_pw.value='Ab1!xyzQ9wk'; su_pw2.value='Ab1!xyzQ9wk';
+        updateMeter(); refreshBtn();
+        $('signupView').dispatchEvent(new Event('submit',{cancelable:true}));
+        return;
+      }
+      show('login');
+      li_id.value=''; li_pw.value='';
+      li_id.classList.remove('has-error'); li_pw.classList.remove('has-error');
+      $('li_idErr').classList.remove('show'); $('li_pwErr').classList.remove('show');
+      formError.classList.remove('show','info'); stateModal.classList.remove('show');
+      if(key==='default') return;
+      if(key==='expired'){   // 세션 만료 = 자동 로그아웃 후 빈 로그인 화면 + 안내 모달(로그인 시도 실패와 별도 채널)
+        expiredModal.classList.add('show');
+        return;   // 입력값은 비운 상태 유지
+      }
+      li_id.value='yujin'; li_pw.value='pass1234';   // 케이스는 입력된 상태로 전환
+      if(key==='inactive' || key==='rejected'){
+        stateModal.classList.add('show');            // 비활성·반려(종료 상태)만 일반 모달. 잠금은 잠금 안내 배너
+      } else {
+        const c=BANNER_CASES[key];
+        formError.classList.toggle('info', !!c.info);
+        formError.querySelector('span').textContent=c.msg;
+        formError.classList.add('show');
+      }
+    });
+  });
+  $('stateOk').addEventListener('click', ()=> stateModal.classList.remove('show'));
+  stateModal.addEventListener('click', e=>{ if(e.target===stateModal) stateModal.classList.remove('show'); });
+  $('expiredOk').addEventListener('click', ()=> expiredModal.classList.remove('show'));
+  expiredModal.addEventListener('click', e=>{ if(e.target===expiredModal) expiredModal.classList.remove('show'); });
+</script>
+</body>
+</html>
