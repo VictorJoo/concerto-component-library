@@ -1,288 +1,568 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>콘체르토 매니저 · 컴포넌트 라이브러리 (v0.1)</title>
-<!--
-  콘체르토 매니저 — 컴포넌트 라이브러리 v0.1 (프론트 핸드오프용)
-  탭 1 색상 팔레트 : 표기 규칙 · 원시 램프 · 라이트/다크 역할 토큰 · 대비 검증 · shadcn 정의
-  탭 2 컴포넌트    : 공통정책 조항 매핑(상태 5종 · 배지 · 토스트 · 처리중 · 모달/팝오버 · 테이블)
-  · 색값은 로그인 배너 이미지 근사치. 시각(간격·모션)은 예시이며 디자인 라이브러리로 확정.
--->
-<style>
-  :root{
-    --background:#f4f6fc; --foreground:#171d33;
-    --card:#ffffff; --card-foreground:#171d33;
-    --muted:#eef1f9; --muted-foreground:#565f7e;
-    --border:#dce2f1; --input:#dce2f1;
-    --primary:#3346c9; --primary-foreground:#ffffff;
-    --accent:#4f6fe6; --accent-foreground:#0a1026;
-    --success:#2f9e6a; --warning:#c98a2e; --destructive:#d64a51;
-    --ring:#4f6fe6; --link:#3346c9;
-    --font:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
-    --radius:12px;
-  }
-  .dark{
-    --background:#0d0f14; --foreground:#e6e8ee;
-    --card:#16181f; --card-foreground:#e6e8ee;
-    --muted:#1c1f27; --muted-foreground:#969ba6;
-    --border:#262a33; --input:#262a33;
-    --primary:#4159d6; --primary-foreground:#ffffff;
-    --accent:#7d97f0; --accent-foreground:#0a1026;
-    --success:#46b17f; --warning:#d9a441; --destructive:#e0585f;
-    --ring:#7d97f0; --link:#7d97f0;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0}
-  body{background:var(--background);color:var(--foreground);font-family:var(--font);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s;color-scheme:light}
-  body.dark{color-scheme:dark}
-  code{background:var(--muted);border:1px solid var(--border);border-radius:5px;padding:1px 5px;font-size:11.5px;font-family:ui-monospace,Menlo,monospace}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>콘체르토 매니저 · 컴포넌트 라이브러리 (v0.3)</title>
+  <!--
+    v0.3 (2026-07-29) — 추가·수정
+      · 토큰 신설: --destructive-hover / --card-2 / --active / --flyout / --faint / --shadow
+      · .btn.danger 호버 상태 정의 (없어서 공통 .btn:hover가 적용되던 문제)
+      · 툴팁 pointer-events 및 간격 브리지 (말풍선 위 호버 시 사라지던 문제)
+      · 툴팁 하단 변형 .tip-anchor.below (상단 공간 부족 시 잘리던 문제)
+      · 링크 색 제거 → 밑줄로 구분. --link를 본문색으로, --underline 신설
+      · .btn.danger-line 신설 — 파괴적 액션 진입 버튼은 외곽선, 최종 확인만 채움
+      · --hover · --selected 신설 — 표면(--muted)과 분리. 인접 시 구분이 사라지던 문제
+      · ⭐ 한글 조합 중 재렌더 금지 규칙 — 자모 분리 방지
+      · ⭐ --thead 신설 — 테이블 헤더 전용. --muted 와 분리
+      · ⭐ 목록·드롭다운 호버를 --hover 로 통일 — 선택 상태(--selected)와 구분
+      · ⭐ 모달 안 툴팁은 아래로 열도록 규칙 추가 — 위로 열면 모달 경계에서 잘림
+      · ⭐ 사이드 패널 경계 기준 — 담는 것/담지 않는 것/상세와의 관계
+      · ⭐ 차단 안내 모달 규칙 — 원인+조치를 확인 모달로. 미노출(7.10)과 구분
+      · ⭐ 부가정보 블록(.subbox) 신설 — 참조값·계산 결과를 표면 배경으로 분리
+      · ⭐ 숫자 스테퍼(.stepper) 신설 — 범위를 아는 수치 입력
+      · ⭐ 필수 표시 규칙 — 필수만 * 로 표시. 선택 라벨·안내 문구를 두지 않는다
+      · 다중 선택 목록(.mselect) 신설 — 검색·전체 선택·선택 수. 항목이 늘어도 높이 고정
+      · 알림 박스(.alertbox) 신설 — 조건부 상태 알림
+      · 툴팁 / hint / 알림 박스 구분 기준 정리 — 항목 설명 · 입력 규칙 · 상태 알림
+      · 모달 안 확인 알럿 금지 규칙 — 취소는 즉시 닫고 경고는 인라인
+      · --border-strong 신설 — 버튼·아이콘 버튼 등 클릭 대상의 테두리.
+        면을 나누는 --border를 그대로 쓰면 배경과 대비가 낮아 버튼이 보이지 않던 문제
+      · 신규: 링크·텍스트 버튼 / 사이드 패널·섹션 접기 / 항목 도움말 / 컬럼 헤더 필터 / 검색 조건 칩
+        / 진행률(단계) / 선택지 카드 / 마법사 네비게이터 / 진단 박스 / 로그 뷰 / 접기 버튼
 
-  /* 상단 바 + 탭 */
-  .top{position:sticky;top:0;z-index:50;background:var(--background);border-bottom:1px solid var(--border)}
-  .topin{max-width:1040px;margin:0 auto;padding:16px 28px 0;display:flex;flex-direction:column;gap:12px}
-  .titlerow{display:flex;align-items:center;justify-content:space-between;gap:16px}
-  .titlerow h1{font-size:19px;margin:0;letter-spacing:-.3px}
-  .titlerow h1 span{font-size:12px;color:var(--muted-foreground);font-weight:400;margin-left:6px}
-  .modebtn{display:flex;align-items:center;gap:7px;padding:8px 13px;background:var(--card);border:1px solid var(--border);border-radius:9px;color:var(--muted-foreground);font-size:12.5px;font-family:inherit;cursor:pointer}
-  .modebtn svg{width:15px;height:15px}
-  .tabs{display:flex;gap:2px}
-  .tabs button{padding:10px 16px;background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted-foreground);font-size:13.5px;font-family:inherit;font-weight:600;cursor:pointer}
-  .tabs button.on{color:var(--foreground);border-bottom-color:var(--primary)}
+    콘체르토 매니저 — 컴포넌트 라이브러리 v0.1 (프론트 핸드오프용)
+    탭 1 색상 팔레트 : 표기 규칙 · 원시 램프 · 라이트/다크 역할 토큰 · 대비 검증 · shadcn 정의
+    탭 2 컴포넌트    : 공통정책 조항 매핑(상태 5종 · 배지 · 토스트 · 처리중 · 모달/팝오버 · 테이블)
+    · 색값은 로그인 배너 이미지 근사치. 시각(간격·모션)은 예시이며 디자인 라이브러리로 확정.
+  -->
+  <style>
+    :root{
+      --background:#f4f6fc; --foreground:#171d33;
+      --card:#ffffff; --card-foreground:#171d33;
+      --muted:#eef1f9; --muted-foreground:#565f7e;
+      --surface:#eef1f9; --hover:#fafbfe; --selected:#dde6f8; --thead:#edf0f7;
+      --border:#dce2f1; --border-strong:#b9c3dd; --input:#dce2f1;
+      --primary:#3346c9; --primary-foreground:#ffffff; --primary-hover:#26368f;
+      --accent:#4f6fe6; --accent-foreground:#0a1026;
+      --success:#2f9e6a; --warning:#c98a2e; --destructive:#d64a51; --destructive-hover:#b93b42;
+      --ring:#4f6fe6; --link:#171d33; --underline:#a8b0c8;
+      --card-2:#f8faff; --active:#eaeffc; --flyout:#ffffff; --faint:#8b93ad;
+      --shadow:rgba(23,29,51,.10);
+      --font:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+      --radius:12px;
+    }
+    .dark{
+      --background:#0d0f14; --foreground:#e6e8ee;
+      --card:#16181f; --card-foreground:#e6e8ee;
+      --muted:#1c1f27; --muted-foreground:#969ba6;
+      --surface:#1c1f27; --hover:#1b1e26; --selected:#252b38; --thead:#212530;
+      --border:#262a33; --border-strong:#3d4454; --input:#262a33;
+      --primary:#4159d6; --primary-foreground:#ffffff; --primary-hover:#35489f;
+      --accent:#7d97f0; --accent-foreground:#0a1026;
+      --success:#46b17f; --warning:#d9a441; --destructive:#e0585f; --destructive-hover:#c74a51;
+      --ring:#7d97f0; --link:#e6e8ee; --underline:#4d5566;
+      --card-2:#1a1d25; --active:#222634; --flyout:#1a1d25; --faint:#6f7686;
+      --shadow:rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{background:var(--background);color:var(--foreground);font-family:var(--font);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s;color-scheme:light}
+    body.dark{color-scheme:dark}
+    code{background:var(--muted);border:1px solid var(--border);border-radius:5px;padding:1px 5px;font-size:11.5px;font-family:ui-monospace,Menlo,monospace}
 
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 28px 90px}
-  .pane{display:none}
-  .pane.on{display:block}
+    /* 상단 바 + 탭 */
+    .top{position:sticky;top:0;z-index:50;background:var(--background);border-bottom:1px solid var(--border)}
+    .topin{max-width:1040px;margin:0 auto;padding:16px 28px 0;display:flex;flex-direction:column;gap:12px}
+    .titlerow{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .titlerow h1{font-size:19px;margin:0;letter-spacing:-.3px}
+    .titlerow h1 span{font-size:12px;color:var(--muted-foreground);font-weight:400;margin-left:6px}
+    .modebtn{display:flex;align-items:center;gap:7px;padding:8px 13px;background:var(--card);border:1px solid var(--border);border-radius:9px;color:var(--muted-foreground);font-size:12.5px;font-family:inherit;cursor:pointer}
+    .modebtn svg{width:15px;height:15px}
+    .tabs{display:flex;gap:2px}
+    .tabs button{padding:10px 16px;background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted-foreground);font-size:13.5px;font-family:inherit;font-weight:600;cursor:pointer}
+    .tabs button.on{color:var(--foreground);border-bottom-color:var(--primary)}
 
-  h2{font-size:16px;margin:30px 0 4px;letter-spacing:-.2px}
-  h2:first-child{margin-top:6px}
-  .h2note{color:var(--muted-foreground);font-size:12.5px;margin:0 0 16px;border-left:2px solid var(--border);padding-left:11px;line-height:1.6}
-  .note{font-size:12px;color:var(--muted-foreground);margin-top:14px;line-height:1.7}
-  .note b{color:var(--foreground)}
+    .wrap{max-width:1040px;margin:0 auto;padding:26px 28px 90px}
+    .pane{display:none}
+    .pane.on{display:block}
 
-  /* ---------- 탭1: 팔레트 ---------- */
-  .rules{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .rule{border:1px solid var(--border);border-radius:11px;background:var(--card);padding:12px 14px;font-size:12.5px;color:var(--muted-foreground);line-height:1.6}
-  .rule b{color:var(--foreground);display:block;margin-bottom:3px}
-  @media(max-width:640px){.rules{grid-template-columns:1fr}}
-  .ramp{display:grid;grid-template-columns:repeat(11,1fr);gap:6px;margin-bottom:8px}
-  .ramp .sw{border-radius:9px;border:1px solid var(--border);overflow:hidden}
-  .ramp .sw .chip{height:52px}
-  .ramp .sw .meta{padding:6px;font-size:9px;background:var(--card);color:var(--muted-foreground);line-height:1.35}
-  .ramp .sw .meta b{display:block;color:var(--card-foreground);font-size:9.5px}
-  .rlabel{font-size:12px;color:var(--muted-foreground);margin:14px 0 7px;font-weight:600}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:12px}
-  .tok{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)}
-  .tok .band{height:50px;display:flex;align-items:flex-end;padding:8px 10px}
-  .tok .band .tag{font-size:10px;background:rgba(0,0,0,.28);color:#fff;padding:2px 6px;border-radius:5px;font-family:ui-monospace,Menlo,monospace}
-  .tok .body{padding:10px 12px}
-  .tok .nm{font-size:13px;font-weight:700;font-family:ui-monospace,Menlo,monospace}
-  .tok .use{font-size:11.5px;color:var(--muted-foreground);margin-top:2px}
-  .tok .vals{display:flex;gap:10px;margin-top:9px;font-size:10.5px;color:var(--muted-foreground);font-family:ui-monospace,Menlo,monospace}
-  .tok .vals b{color:var(--card-foreground);font-weight:600}
-  table.ctbl{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden}
-  table.ctbl th{text-align:left;color:var(--muted-foreground);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--muted)}
-  table.ctbl td{padding:10px 12px;border-bottom:1px solid var(--border)}
-  table.ctbl tr:last-child td{border-bottom:0}
-  table.ctbl td.ok{color:var(--success);font-weight:600}
-  table.ctbl td.wa{color:var(--warning);font-weight:600}
-  table.ctbl td.cr{color:var(--destructive);font-weight:600}
-  .code{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted-foreground);white-space:pre;overflow-x:auto;line-height:1.65}
+    h2{font-size:16px;margin:30px 0 4px;letter-spacing:-.2px}
+    h2:first-child{margin-top:6px}
+    .h2note{color:var(--muted-foreground);font-size:12.5px;margin:0 0 16px;border-left:2px solid var(--border);padding-left:11px;line-height:1.6}
+    .note{font-size:12px;color:var(--muted-foreground);margin-top:14px;line-height:1.7}
+    .note b{color:var(--foreground)}
 
-  /* ---------- 탭2: 컴포넌트 ---------- */
-  section.gs{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:18px}
-  .gs-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:4px}
-  .gs-head h3{font-size:16px;margin:0;font-weight:700}
-  .chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;background:rgba(51,70,201,.12);color:var(--primary);border:1px solid rgba(51,70,201,.25);white-space:nowrap}
-  .dark .chip{background:rgba(79,111,230,.14);color:var(--accent);border-color:rgba(79,111,230,.28)}
-  .gs-quote{font-size:12.5px;color:var(--muted-foreground);margin:6px 0 16px;line-height:1.6;border-left:2px solid var(--border);padding-left:11px}
-  .demo{background:var(--muted);border:1px solid var(--border);border-radius:11px;padding:18px}
-  .demo + .demo{margin-top:12px}
-  .demo-lb{font-size:11px;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px;font-weight:600}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    /* ---------- 탭1: 팔레트 ---------- */
+    .rules{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .rule{border:1px solid var(--border);border-radius:11px;background:var(--card);padding:12px 14px;font-size:12.5px;color:var(--muted-foreground);line-height:1.6}
+    .rule b{color:var(--foreground);display:block;margin-bottom:3px}
+    @media(max-width:640px){.rules{grid-template-columns:1fr}}
+    .ramp{display:grid;grid-template-columns:repeat(11,1fr);gap:6px;margin-bottom:8px}
+    .ramp .sw{border-radius:9px;border:1px solid var(--border);overflow:hidden}
+    .ramp .sw .chip{height:52px}
+    .ramp .sw .meta{padding:6px;font-size:9px;background:var(--card);color:var(--muted-foreground);line-height:1.35}
+    .ramp .sw .meta b{display:block;color:var(--card-foreground);font-size:9.5px}
+    .rlabel{font-size:12px;color:var(--muted-foreground);margin:14px 0 7px;font-weight:600}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:12px}
+    .tok{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)}
+    .tok .band{height:50px;display:flex;align-items:flex-end;padding:8px 10px}
+    .tok .band .tag{font-size:10px;background:rgba(0,0,0,.28);color:#fff;padding:2px 6px;border-radius:5px;font-family:ui-monospace,Menlo,monospace}
+    .tok .body{padding:10px 12px}
+    .tok .nm{font-size:13px;font-weight:700;font-family:ui-monospace,Menlo,monospace}
+    .tok .use{font-size:11.5px;color:var(--muted-foreground);margin-top:2px}
+    .tok .vals{display:flex;gap:10px;margin-top:9px;font-size:10.5px;color:var(--muted-foreground);font-family:ui-monospace,Menlo,monospace}
+    .tok .vals b{color:var(--card-foreground);font-weight:600}
+    table.ctbl{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:hidden}
+    table.ctbl th{text-align:left;color:var(--muted-foreground);font-weight:600;padding:10px 12px;
+      border-bottom:1px solid var(--border);background:var(--thead)}
+    table.ctbl td{padding:10px 12px;border-bottom:1px solid var(--border)}
+    table.ctbl tr:last-child td{border-bottom:0}
+    table.ctbl td.ok{color:var(--success);font-weight:600}
+    table.ctbl td.wa{color:var(--warning);font-weight:600}
+    table.ctbl td.cr{color:var(--destructive);font-weight:600}
+    .code{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted-foreground);white-space:pre;overflow-x:auto;line-height:1.65}
 
-  .btn{padding:8px 15px;background:var(--primary);color:var(--primary-foreground);border:0;border-radius:8px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
-  .btn:hover{opacity:.9}
-  .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted-foreground)}
-  .btn.ghost:hover{color:var(--foreground);opacity:1}
-  .btn.danger{background:var(--destructive);color:#fff}
-  .btn[disabled]{opacity:.6;cursor:default}
-  .spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:currentColor;animation:sp .7s linear infinite;display:inline-block}
-  .btn.ghost .spin{border-color:var(--border);border-top-color:var(--muted-foreground)}
-  @keyframes sp{to{transform:rotate(360deg)}}
+    /* ---------- 탭2: 컴포넌트 ---------- */
+    section.gs{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:18px}
+    .gs-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+    .gs-head h3{font-size:16px;margin:0;font-weight:700}
+    .chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;background:rgba(51,70,201,.12);color:var(--primary);border:1px solid rgba(51,70,201,.25);white-space:nowrap}
+    .dark .chip{background:rgba(79,111,230,.14);color:var(--accent);border-color:rgba(79,111,230,.28)}
+    .gs-quote{font-size:12.5px;color:var(--muted-foreground);margin:6px 0 16px;line-height:1.6;border-left:2px solid var(--border);padding-left:11px}
+    .demo{background:var(--muted);border:1px solid var(--border);border-radius:11px;padding:18px}
+    .demo + .demo{margin-top:12px}
+    .demo-lb{font-size:11px;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px;font-weight:600}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
-  .stbadge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 11px;border-radius:20px;border:1px solid var(--border)}
-  .stbadge .d{width:7px;height:7px;border-radius:50%}
-  .stbadge.ok{color:var(--success);border-color:var(--success)}
-  .stbadge.wa{color:var(--warning);border-color:var(--warning)}
-  .stbadge.cr{color:var(--destructive);border-color:var(--destructive)}
-  .stbadge.mu{color:var(--muted-foreground);border-color:var(--border)}
-  .stbadge.ac{color:var(--accent);border-color:var(--accent)}
-  .stbadge.ok .d{background:var(--success)}.stbadge.wa .d{background:var(--warning)}.stbadge.cr .d{background:var(--destructive)}.stbadge.mu .d{background:var(--muted-foreground)}.stbadge.ac .d{background:var(--accent)}
-  .grp{margin-bottom:14px}.grp:last-child{margin-bottom:0}
-  .grp .gl{font-size:12px;color:var(--muted-foreground);margin-bottom:8px}
-  .grp .gl code{font-size:11px}
-  .cbtn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:9px;font-size:13px}
-  .cbadge{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--primary);color:var(--primary-foreground);font-size:12px;font-weight:700;display:inline-grid;place-items:center}
+    .btn{padding:8px 15px;background:var(--primary);color:var(--primary-foreground);border:0;border-radius:8px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+    .btn:hover{opacity:.9}
+    .btn.ghost{background:transparent;border:1px solid var(--border-strong);color:var(--foreground)}
+    .btn.ghost:hover:not(:disabled){background:var(--hover);border-color:var(--foreground)}
+    .btn.ghost:hover{color:var(--foreground);opacity:1}
+    .btn.danger{background:var(--destructive);color:#fff}
+    /* 파괴적 액션 — 진입점은 외곽선, 최종 확인은 채움
+       화면에 상시 노출되는 진입 버튼까지 채우면 그 버튼만 도드라진다 */
+    .btn.danger-line{background:transparent;border:1px solid color-mix(in srgb,var(--destructive) 45%,var(--border));color:var(--destructive)}
+    .btn.danger-line:hover:not(:disabled){background:color-mix(in srgb,var(--destructive) 8%,transparent);border-color:var(--destructive)}
+    .btn.danger:hover:not(:disabled){background:var(--destructive-hover)}
+    .btn[disabled]{opacity:.6;cursor:default}
+    .spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:currentColor;animation:sp .7s linear infinite;display:inline-block}
+    .btn.ghost .spin{border-color:var(--border);border-top-color:var(--muted-foreground)}
+    @keyframes sp{to{transform:rotate(360deg)}}
 
-  /* 상태 stage */
-  .state-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-  .state-tabs button{padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted-foreground);font-size:12px;font-family:inherit;cursor:pointer}
-  .state-tabs button.on{background:var(--card);color:var(--foreground);border-color:var(--muted-foreground)}
-  .stage{min-height:200px;border:1px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;background:var(--card)}
-  .stage .stbar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted-foreground)}
-  .stage .stbar .tb-in{flex:1;height:28px;background:var(--muted);border:1px solid var(--border);border-radius:7px}
-  .stage .stbar .tb-b{padding:5px 12px;background:var(--muted);border:1px solid var(--border);border-radius:7px;color:var(--muted-foreground);font-size:11.5px}
-  .stage .zone{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:11px;padding:22px;color:var(--muted-foreground)}
-  .stage .zone .msg{font-size:13.5px;color:var(--foreground)}
-  .stage .zone .sub{font-size:12px;color:var(--muted-foreground)}
-  .bigspin{width:26px;height:26px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite}
-  .skrow{display:flex;gap:10px;width:100%;padding:0 6px}
-  .sk{height:12px;border-radius:5px;background:var(--muted);position:relative;overflow:hidden}
-  .sk::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(125,125,125,.18),transparent);animation:shim 1.2s infinite}
-  @keyframes shim{to{transform:translateX(100%)}}
+    .stbadge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 11px;border-radius:20px;border:1px solid var(--border)}
+    .stbadge .d{width:7px;height:7px;border-radius:50%}
+    .stbadge.ok{color:var(--success);border-color:var(--success)}
+    .stbadge.wa{color:var(--warning);border-color:var(--warning)}
+    .stbadge.cr{color:var(--destructive);border-color:var(--destructive)}
+    .stbadge.mu{color:var(--muted-foreground);border-color:var(--border)}
+    .stbadge.ac{color:var(--accent);border-color:var(--accent)}
+    .stbadge.ok .d{background:var(--success)}.stbadge.wa .d{background:var(--warning)}.stbadge.cr .d{background:var(--destructive)}.stbadge.mu .d{background:var(--muted-foreground)}.stbadge.ac .d{background:var(--accent)}
+    .grp{margin-bottom:14px}.grp:last-child{margin-bottom:0}
+    .grp .gl{font-size:12px;color:var(--muted-foreground);margin-bottom:8px}
+    .grp .gl code{font-size:11px}
+    .cbtn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:9px;font-size:13px}
+    .cbadge{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--primary);color:var(--primary-foreground);font-size:12px;font-weight:700;display:inline-grid;place-items:center}
 
-  /* 테이블 */
-  table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
-  table.tbl th{text-align:left;color:var(--muted-foreground);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
-  table.tbl th .sar{color:var(--accent);width:11px;height:11px;margin-left:3px;vertical-align:middle}
-  table.tbl td{padding:10px;border-bottom:1px solid var(--border);color:var(--foreground);text-align:left}
-  table.tbl tr:last-child td{border-bottom:0}
-  table.tbl .uid{color:var(--muted-foreground)}
-  table.tbl .dash{color:var(--muted-foreground)}
-  .dots{color:var(--muted-foreground);cursor:pointer;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:6px}
-  .dots:hover{background:var(--muted);color:var(--foreground)}
-  .rowmenu{position:fixed;z-index:200;width:150px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
-  .rowmenu a{display:block;padding:8px 10px;border-radius:7px;color:var(--muted-foreground);font-size:12.5px;text-decoration:none;cursor:pointer}
-  .rowmenu a:hover{background:var(--muted);color:var(--foreground)}
-  .rowmenu a.danger{color:var(--destructive)}
-  .pager{display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:12px;color:var(--muted-foreground);flex-wrap:wrap;gap:10px}
-  .pager .left{display:flex;align-items:center;gap:8px}
-  .pager .pgright{display:flex;align-items:center;gap:14px}
-  .pager select{padding:5px 8px;background:var(--card);border:1px solid var(--border);border-radius:7px;color:var(--foreground);font-family:inherit;font-size:12px}
-  .pager .pg{display:flex;gap:4px}
-  .pager .pg button{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted-foreground);font-size:12px;cursor:pointer}
-  .pager .pg button.on{background:var(--card);color:var(--foreground);border-color:var(--muted-foreground)}
-  .tbltop{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted-foreground);margin-bottom:10px}
-  .tbltop select{padding:5px 8px;background:var(--card);border:1px solid var(--border);border-radius:7px;color:var(--foreground);font-family:inherit;font-size:12px}
-  .pgbottom{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
-  .pgbottom .total{font-size:12px;color:var(--muted-foreground)}
-  .pgbottom .pg{display:flex;gap:4px}
-  .pgbottom .pg button{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted-foreground);font-size:12px;cursor:pointer}
-  .pgbottom .pg button.on{background:rgba(79,111,230,.14);color:var(--foreground);border-color:rgba(79,111,230,.40);font-weight:700}
+    /* 상태 stage */
+    .state-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+    .state-tabs button{padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted-foreground);font-size:12px;font-family:inherit;cursor:pointer}
+    .state-tabs button.on{background:var(--card);color:var(--foreground);border-color:var(--muted-foreground)}
+    .stage{min-height:200px;border:1px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;background:var(--card)}
+    .stage .stbar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted-foreground)}
+    .stage .stbar .tb-in{flex:1;height:28px;background:var(--muted);border:1px solid var(--border);border-radius:7px}
+    .stage .stbar .tb-b{padding:5px 12px;background:var(--muted);border:1px solid var(--border);border-radius:7px;color:var(--muted-foreground);font-size:11.5px}
+    .stage .zone{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:11px;padding:22px;color:var(--muted-foreground)}
+    .stage .zone .msg{font-size:13.5px;color:var(--foreground)}
+    .stage .zone .sub{font-size:12px;color:var(--muted-foreground)}
+    .bigspin{width:26px;height:26px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite}
+    .skrow{display:flex;gap:10px;width:100%;padding:0 6px}
+    .sk{height:12px;border-radius:5px;background:var(--muted);position:relative;overflow:hidden}
+    .sk::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(125,125,125,.18),transparent);animation:shim 1.2s infinite}
+    @keyframes shim{to{transform:translateX(100%)}}
 
-  /* 폼·입력 요소 */
-  .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
-  .field{max-width:420px}
-  .field > label{display:block;font-size:12.5px;color:var(--muted-foreground);margin-bottom:6px}
-  .field > label .req{color:var(--destructive);margin-left:2px}
-  .inp{width:100%;padding:9px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--foreground);font-size:13px;font-family:inherit;color-scheme:light dark}
-  .inp::placeholder{color:var(--muted-foreground)}
-  .inp:focus{outline:none;border-color:var(--ring);box-shadow:0 0 0 3px rgba(79,111,230,.2)}
-  .inp.err{border-color:var(--destructive)}
-  textarea.inp{min-height:76px;resize:vertical;line-height:1.5}
-  .field-foot{display:flex;align-items:baseline;gap:10px;margin-top:5px}
-  .field-foot .cnt{font-size:11px;color:var(--muted-foreground);margin-left:auto;flex:0 0 auto}
-  .field-foot .errmsg{margin-right:auto}
-  .errmsg{font-size:11.5px;color:var(--destructive);display:none}
-  .field.show-err .errmsg{display:block}
-  .selwrap{position:relative}
-  .selwrap .cv{position:absolute;right:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted-foreground);pointer-events:none}
-  .selwrap select{appearance:none;-webkit-appearance:none;padding-right:30px}
-  /* multi-select */
-  .msel{display:flex;flex-wrap:wrap;gap:6px;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:8px;min-height:40px;align-items:center}
-  .msel:focus-within{border-color:var(--ring);box-shadow:0 0 0 3px rgba(79,111,230,.2)}
-  .tag{display:inline-flex;align-items:center;gap:6px;background:var(--muted);border:1px solid var(--border);border-radius:6px;padding:3px 6px 3px 9px;font-size:12px;color:var(--foreground)}
-  .tag button{border:0;background:transparent;color:var(--muted-foreground);cursor:pointer;font-size:14px;line-height:1;padding:0}
-  .tag button:hover{color:var(--foreground)}
-  .msel input{border:0;background:transparent;outline:none;color:var(--foreground);font-family:inherit;font-size:13px;flex:1;min-width:70px;padding:4px}
-  /* check / radio / toggle */
-  .checks{display:flex;flex-direction:column;gap:9px}
-  .check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--foreground);cursor:pointer}
-  .check input{width:16px;height:16px;accent-color:var(--primary);cursor:pointer}
-  .tgrow{display:flex;align-items:center;justify-content:space-between;max-width:260px;font-size:13px;color:var(--foreground)}
-  .tg{width:38px;height:20px;border-radius:11px;background:var(--muted);border:1px solid var(--border);position:relative;cursor:pointer;transition:.15s;flex:0 0 auto}
-  .tg::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--muted-foreground);transition:.15s}
-  .tg.on{background:rgba(79,111,230,.3);border-color:var(--ring)}
-  .tg.on::after{left:20px;background:var(--accent)}
-  .daterange{display:flex;align-items:center;gap:8px}
-  .daterange .datefield{flex:1}
-  .daterange .til{color:var(--muted-foreground)}
-  /* 캘린더 아이콘 인 인풋 */
-  .datefield{position:relative}
-  .datefield input[type=date]{padding-right:34px}
-  .datefield input[type=date]::-webkit-calendar-picker-indicator{opacity:0;position:absolute;right:0;top:0;width:34px;height:100%;margin:0;cursor:pointer}
-  .datefield .cal{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--muted-foreground);pointer-events:none;width:15px;height:15px}
-  /* 드롭다운형 다중 선택 */
-  .msdd{position:relative}
-  .msdd-trig{display:flex;align-items:center;justify-content:space-between;text-align:left;cursor:pointer;gap:8px}
-  .msdd-trig #msddLabel{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .msdd-cv{color:var(--muted-foreground);width:14px;height:14px;flex:0 0 auto;transition:transform .15s}
-  .msdd.open .msdd-cv{transform:rotate(180deg)}
-  .msdd-pop{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:6px;box-shadow:0 12px 30px rgba(0,0,0,.22);z-index:40;display:none}
-  .msdd.open .msdd-pop{display:block}
-  .msdd-pop .check{padding:7px 8px;border-radius:6px}
-  .msdd-pop .check:hover{background:var(--muted)}
-  /* 세그먼트(버튼 나란히) 토글 */
-  .segmented{display:inline-flex;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:3px;gap:3px}
-  .segmented button{border:0;background:transparent;color:var(--muted-foreground);font-family:inherit;font-size:12.5px;font-weight:600;padding:6px 14px;border-radius:6px;cursor:pointer}
-  .segmented button:hover{color:var(--foreground)}
-  .segmented button.on{background:rgba(79,111,230,.14);color:var(--foreground);border:1px solid rgba(79,111,230,.30);font-weight:700}
+    /* 테이블 */
+    table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+    table.tbl th{text-align:left;color:var(--muted-foreground);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+    table.tbl th .sar{color:var(--accent);width:11px;height:11px;margin-left:3px;vertical-align:middle}
+    table.tbl td{padding:10px;border-bottom:1px solid var(--border);color:var(--foreground);text-align:left}
+    table.tbl tr:last-child td{border-bottom:0}
+    table.tbl .uid{color:var(--muted-foreground)}
+    table.tbl .dash{color:var(--muted-foreground)}
+    .dots{color:var(--muted-foreground);cursor:pointer;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:6px}
+    .dots:hover{background:var(--hover);color:var(--foreground)}
+    .rowmenu{position:fixed;z-index:200;width:150px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+    .rowmenu a{display:block;padding:8px 10px;border-radius:7px;color:var(--muted-foreground);font-size:12.5px;text-decoration:none;cursor:pointer}
+    .rowmenu a:hover{background:var(--hover);color:var(--foreground)}
+    .rowmenu a.danger{color:var(--destructive)}
+    .pager{display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:12px;color:var(--muted-foreground);flex-wrap:wrap;gap:10px}
+    .pager .left{display:flex;align-items:center;gap:8px}
+    .pager .pgright{display:flex;align-items:center;gap:14px}
+    .pager select{padding:5px 8px;background:var(--card);border:1px solid var(--border);border-radius:7px;color:var(--foreground);font-family:inherit;font-size:12px}
+    .pager .pg{display:flex;gap:4px}
+    .pager .pg button{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted-foreground);font-size:12px;cursor:pointer}
+    .pager .pg button.on{background:var(--card);color:var(--foreground);border-color:var(--muted-foreground)}
+    .tbltop{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted-foreground);margin-bottom:10px}
+    .tbltop select{padding:5px 8px;background:var(--card);border:1px solid var(--border);border-radius:7px;color:var(--foreground);font-family:inherit;font-size:12px}
+    .pgbottom{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+    .pgbottom .total{font-size:12px;color:var(--muted-foreground)}
+    .pgbottom .pg{display:flex;gap:4px}
+    .pgbottom .pg button{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted-foreground);font-size:12px;cursor:pointer}
+    .pgbottom .pg button.on{background:rgba(79,111,230,.14);color:var(--foreground);border-color:rgba(79,111,230,.40);font-weight:700}
 
-  /* 상태 매트릭스 */
-  .mtxwrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;margin-bottom:18px}
-  .mtx{width:100%;min-width:960px;border-collapse:collapse;font-size:12px;background:var(--card)}
-  .mtx th{background:var(--muted);color:var(--muted-foreground);font-weight:700;font-size:11.5px;padding:11px 10px;border:1px solid var(--border);text-align:center;white-space:nowrap}
-  .mtx td{border:1px solid var(--border);padding:14px 12px;vertical-align:middle;text-align:center}
-  .mtx td.rh{text-align:left;font-weight:700;color:var(--foreground);white-space:nowrap;background:var(--muted);min-width:118px}
-  .mtx td.rh small{display:block;font-weight:400;color:var(--muted-foreground);font-size:10.5px;margin-top:3px}
-  .mtx .var{font-size:11px;color:var(--muted-foreground);text-align:left;line-height:1.55}
-  .mtx .na{color:var(--muted-foreground);font-size:11px;opacity:.6}
-  .miniinp{width:132px;text-align:left}
-  .st-focus{border-color:var(--ring)!important;box-shadow:0 0 0 3px rgba(79,111,230,.2)}
-  .st-hover{border-color:var(--muted-foreground)!important}
-  .mtx .errline{font-size:10.5px;color:var(--destructive);margin-top:4px;text-align:left}
-  .mtx .selwrap,.mtx .miniinp{margin:0 auto}
-  .sizerow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    /* 폼·입력 요소 */
+    .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+    .field{max-width:420px}
+    .field > label{display:block;font-size:12.5px;color:var(--muted-foreground);margin-bottom:6px}
+    .field > label .req{color:var(--destructive);margin-left:2px}
 
-  /* 토스트 */
-  .toast-wrap{position:fixed;top:74px;right:22px;z-index:300;display:flex;flex-direction:column;gap:10px;width:340px;max-width:calc(100vw - 44px)}
-  .toast{display:flex;align-items:flex-start;gap:10px;padding:12px 12px 12px 14px;border-radius:11px;background:var(--card);border:1px solid var(--border);box-shadow:0 12px 30px rgba(0,0,0,.22);animation:tin .22s ease;position:relative;overflow:hidden}
-  @keyframes tin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
-  .toast.out{animation:tout .2s ease forwards}
-  @keyframes tout{to{opacity:0;transform:translateX(16px)}}
-  .toast .ic{font-size:15px}
-  .toast .tx{flex:1;font-size:13px;color:var(--foreground);line-height:1.45}
-  .toast .cl{color:var(--muted-foreground);background:transparent;border:0;font-size:15px;line-height:1;padding:0 2px;cursor:pointer}
-  .toast .cl:hover{color:var(--foreground)}
-  .toast .prog{position:absolute;left:0;bottom:0;height:2px;width:100%;transform-origin:left;animation:bar linear forwards}
-  .toast.ok .prog{background:var(--success)}.toast.err .prog{background:var(--destructive)}.toast.warn .prog{background:var(--warning)}
-  @keyframes bar{to{transform:scaleX(0)}}
+    .inp{width:100%;padding:9px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--foreground);font-size:13px;font-family:inherit;color-scheme:light dark}
+    .inp::placeholder{color:var(--muted-foreground)}
+    .inp:focus{outline:none;border-color:var(--ring);box-shadow:0 0 0 3px rgba(79,111,230,.2)}
+    .inp.err{border-color:var(--destructive)}
+    textarea.inp{min-height:76px;resize:vertical;line-height:1.5}
+    .field-foot{display:flex;align-items:baseline;gap:10px;margin-top:5px}
+    .field-foot .cnt{font-size:11px;color:var(--muted-foreground);margin-left:auto;flex:0 0 auto}
+    .field-foot .errmsg{margin-right:auto}
+    .errmsg{font-size:11.5px;color:var(--destructive);display:none}
+    .field.show-err .errmsg{display:block}
+    .selwrap{position:relative}
+    .selwrap .cv{position:absolute;right:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted-foreground);pointer-events:none}
+    .selwrap select{appearance:none;-webkit-appearance:none;padding-right:30px}
+    /* multi-select */
+    .msel{display:flex;flex-wrap:wrap;gap:6px;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:8px;min-height:40px;align-items:center}
+    .msel:focus-within{border-color:var(--ring);box-shadow:0 0 0 3px rgba(79,111,230,.2)}
+    .tag{display:inline-flex;align-items:center;gap:6px;background:var(--muted);border:1px solid var(--border);border-radius:6px;padding:3px 6px 3px 9px;font-size:12px;color:var(--foreground)}
+    .tag button{border:0;background:transparent;color:var(--muted-foreground);cursor:pointer;font-size:14px;line-height:1;padding:0}
+    .tag button:hover{color:var(--foreground)}
+    .msel input{border:0;background:transparent;outline:none;color:var(--foreground);font-family:inherit;font-size:13px;flex:1;min-width:70px;padding:4px}
+    /* check / radio / toggle */
+    .checks{display:flex;flex-direction:column;gap:9px}
+    .check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--foreground);cursor:pointer}
+    .check input{width:16px;height:16px;accent-color:var(--primary);cursor:pointer}
+    .tgrow{display:flex;align-items:center;justify-content:space-between;max-width:260px;font-size:13px;color:var(--foreground)}
+    .tg{width:38px;height:20px;border-radius:11px;background:var(--muted);border:1px solid var(--border);position:relative;cursor:pointer;transition:.15s;flex:0 0 auto}
+    .tg::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--muted-foreground);transition:.15s}
+    .tg.on{background:rgba(79,111,230,.3);border-color:var(--ring)}
+    .tg.on::after{left:20px;background:var(--accent)}
+    .daterange{display:flex;align-items:center;gap:8px}
+    .daterange .datefield{flex:1}
+    .daterange .til{color:var(--muted-foreground)}
+    /* 캘린더 아이콘 인 인풋 */
+    .datefield{position:relative}
+    .datefield input[type=date]{padding-right:34px}
+    .datefield input[type=date]::-webkit-calendar-picker-indicator{opacity:0;position:absolute;right:0;top:0;width:34px;height:100%;margin:0;cursor:pointer}
+    .datefield .cal{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--muted-foreground);pointer-events:none;width:15px;height:15px}
+    /* 드롭다운형 다중 선택 */
+    .msdd{position:relative}
+    .msdd-trig{display:flex;align-items:center;justify-content:space-between;text-align:left;cursor:pointer;gap:8px}
+    .msdd-trig #msddLabel{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .msdd-cv{color:var(--muted-foreground);width:14px;height:14px;flex:0 0 auto;transition:transform .15s}
+    .msdd.open .msdd-cv{transform:rotate(180deg)}
+    .msdd-pop{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:6px;box-shadow:0 12px 30px rgba(0,0,0,.22);z-index:40;display:none}
+    .msdd.open .msdd-pop{display:block}
+    .msdd-pop .check{padding:7px 8px;border-radius:6px}
+    .msdd-pop .check:hover{background:var(--hover)}
+    /* 세그먼트(버튼 나란히) 토글 */
+    .segmented{display:inline-flex;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:3px;gap:3px}
+    .segmented button{border:0;background:transparent;color:var(--muted-foreground);font-family:inherit;font-size:12.5px;font-weight:600;padding:6px 14px;border-radius:6px;cursor:pointer}
+    .segmented button:hover{color:var(--foreground)}
+    .segmented button.on{background:rgba(79,111,230,.14);color:var(--foreground);border:1px solid rgba(79,111,230,.30);font-weight:700}
 
-  /* 모달 */
-  .overlay{position:fixed;inset:0;background:rgba(10,12,20,.5);z-index:250;display:none;align-items:center;justify-content:center;padding:20px}
-  .overlay.on{display:flex}
-  .modal{width:400px;max-width:100%;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.35);animation:min .18s ease}
-  @keyframes min{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
-  .modal h3{margin:0 0 8px;font-size:16px}
-  .modal p{margin:0 0 20px;font-size:13px;color:var(--muted-foreground);line-height:1.6}
-  .modal .acts{display:flex;justify-content:flex-end;gap:8px}
+    /* 상태 매트릭스 */
+    .mtxwrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;margin-bottom:18px}
+    .mtx{width:100%;min-width:960px;border-collapse:collapse;font-size:12px;background:var(--card)}
+    .mtx th{background:var(--muted);color:var(--muted-foreground);font-weight:700;font-size:11.5px;padding:11px 10px;border:1px solid var(--border);text-align:center;white-space:nowrap}
+    .mtx td{border:1px solid var(--border);padding:14px 12px;vertical-align:middle;text-align:center}
+    .mtx td.rh{text-align:left;font-weight:700;color:var(--foreground);white-space:nowrap;background:var(--muted);min-width:118px}
+    .mtx td.rh small{display:block;font-weight:400;color:var(--muted-foreground);font-size:10.5px;margin-top:3px}
+    .mtx .var{font-size:11px;color:var(--muted-foreground);text-align:left;line-height:1.55}
+    .mtx .na{color:var(--muted-foreground);font-size:11px;opacity:.6}
+    .miniinp{width:132px;text-align:left}
+    .st-focus{border-color:var(--ring)!important;box-shadow:0 0 0 3px rgba(79,111,230,.2)}
+    .st-hover{border-color:var(--muted-foreground)!important}
+    .mtx .errline{font-size:10.5px;color:var(--destructive);margin-top:4px;text-align:left}
+    .mtx .selwrap,.mtx .miniinp{margin:0 auto}
+    .sizerow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 
-  /* 팝오버 */
-  .pop-anchor{position:relative;display:inline-block}
-  .pop{position:absolute;top:calc(100% + 8px);left:0;width:200px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:8px;box-shadow:0 12px 30px rgba(0,0,0,.22);opacity:0;visibility:hidden;transform:translateY(-6px);transition:.13s;z-index:60}
-  .pop.open{opacity:1;visibility:visible;transform:none}
-  .pop a{display:block;padding:8px 10px;border-radius:7px;color:var(--muted-foreground);font-size:13px;text-decoration:none;cursor:pointer}
-  .pop a:hover{background:var(--muted);color:var(--foreground)}
+    /* 토스트 */
+    .toast-wrap{position:fixed;top:74px;right:22px;z-index:300;display:flex;flex-direction:column;gap:10px;width:340px;max-width:calc(100vw - 44px)}
+    .toast{display:flex;align-items:flex-start;gap:10px;padding:12px 12px 12px 14px;border-radius:11px;background:var(--card);border:1px solid var(--border);box-shadow:0 12px 30px rgba(0,0,0,.22);animation:tin .22s ease;position:relative;overflow:hidden}
+    @keyframes tin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+    .toast.out{animation:tout .2s ease forwards}
+    @keyframes tout{to{opacity:0;transform:translateX(16px)}}
+    .toast .ic{font-size:15px}
+    .toast .tx{flex:1;font-size:13px;color:var(--foreground);line-height:1.45}
+    .toast .cl{color:var(--muted-foreground);background:transparent;border:0;font-size:15px;line-height:1;padding:0 2px;cursor:pointer}
+    .toast .cl:hover{color:var(--foreground)}
+    .toast .prog{position:absolute;left:0;bottom:0;height:2px;width:100%;transform-origin:left;animation:bar linear forwards}
+    .toast.ok .prog{background:var(--success)}.toast.err .prog{background:var(--destructive)}.toast.warn .prog{background:var(--warning)}
+    @keyframes bar{to{transform:scaleX(0)}}
 
-  /* 툴팁 */
-  .tip-anchor{position:relative;display:inline-flex;align-items:center}
-  .tip-anchor .tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--foreground);color:var(--card);font-size:12px;line-height:1.4;padding:6px 10px;border-radius:7px;white-space:nowrap;opacity:0;visibility:hidden;transition:.12s;z-index:70;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.25)}
-  .tip-anchor .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--foreground)}
-  .tip-anchor:hover .tip,.tip-anchor:focus-within .tip{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
-  .tip-ic{width:16px;height:16px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);font-size:11px;display:inline-flex;align-items:center;justify-content:center;cursor:help}
-</style>
+    /* 모달 */
+    .overlay{position:fixed;inset:0;background:rgba(10,12,20,.5);z-index:250;display:none;align-items:center;justify-content:center;padding:20px}
+    .overlay.on{display:flex}
+    .modal{width:400px;max-width:100%;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.35);animation:min .18s ease}
+    @keyframes min{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+    .modal h3{margin:0 0 8px;font-size:16px}
+    .modal p{margin:0 0 20px;font-size:13px;color:var(--muted-foreground);line-height:1.6}
+    .modal .acts{display:flex;justify-content:flex-end;gap:8px}
+
+    /* 팝오버 */
+    .pop-anchor{position:relative;display:inline-block}
+    .pop{position:absolute;top:calc(100% + 8px);left:0;width:200px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:8px;box-shadow:0 12px 30px rgba(0,0,0,.22);opacity:0;visibility:hidden;transform:translateY(-6px);transition:.13s;z-index:60}
+    .pop.open{opacity:1;visibility:visible;transform:none}
+    .pop a{display:block;padding:8px 10px;border-radius:7px;color:var(--muted-foreground);font-size:13px;text-decoration:none;cursor:pointer}
+    .pop a:hover{background:var(--hover);color:var(--foreground)}
+
+    /* 툴팁 */
+    .tip-anchor{position:relative;display:inline-flex;align-items:center}
+    /* 말풍선과 트리거 사이 간격을 덮어 호버가 끊기지 않게 한다 */
+    .tip::after{content:"";position:absolute;left:0;right:0;top:100%;height:10px}
+    /* 위쪽 공간이 부족한 경우(페이지 상단 등) 아래로 펼치는 변형 */
+    .tip-anchor.below .tip{bottom:auto;top:calc(100% + 8px);left:0;transform:translateY(-4px)}
+    /* ⭐ 모달 안 툴팁은 아래로 연다. 위로 열면 모달 상단 경계에서 잘린다 */
+    .modal .tip-anchor .tip{top:calc(100% + 8px);bottom:auto;left:0;transform:translateX(0) translateY(-4px);max-width:280px}
+    .modal .tip-anchor:hover .tip,.modal .tip-anchor:focus-within .tip{transform:translateX(0) translateY(0)}
+    .modal .tip-anchor .tip::after{top:auto;bottom:100%;left:14px;transform:none;border-top-color:transparent;border-bottom-color:var(--foreground)}
+    .modal .tip-anchor .tip::before{bottom:auto;top:-10px}
+    .tip-anchor.below:hover .tip,.tip-anchor.below:focus-within .tip{transform:translateY(0)}
+    .tip-anchor.below .tip::after{top:auto;bottom:100%}
+    .tip-anchor .tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--foreground);color:var(--card);font-size:12px;line-height:1.4;padding:6px 10px;border-radius:7px;white-space:nowrap;opacity:0;visibility:hidden;transition:.12s;z-index:70;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.25);pointer-events:auto}
+    .tip-anchor .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--foreground)}
+    .tip-anchor:hover .tip,.tip-anchor:focus-within .tip{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+    .tip-ic{width:16px;height:16px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);font-size:11px;display:inline-flex;align-items:center;justify-content:center;cursor:help}
+
+    /* ═══════════ v0.3 신규 컴포넌트 ═══════════ */
+
+    /* 사이드 패널 — 목록에서 대상을 바꿔가며 확인하는 상세 (공통정책 4.2) */
+    .lib-panel{width:440px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .lib-panel .pn-head{padding:16px 18px 12px;border-bottom:1px solid var(--border)}
+    .lib-panel .pn-r1{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+    .lib-panel .pn-r1 h4{margin:0;font-size:15px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .lib-panel .pn-tags{display:flex;gap:6px;flex-wrap:wrap}
+    .pn-ic{width:28px;height:28px;flex:0 0 auto;display:grid;place-items:center;border:1px solid var(--border);background:transparent;border-radius:7px;color:var(--muted-foreground);cursor:pointer}
+    .pn-ic:hover{border-color:var(--accent);color:var(--foreground)}
+    .pn-ic svg{width:14px;height:14px}
+    .lib-panel .pn-body{padding:6px 18px 16px;max-height:340px;overflow-y:auto}
+
+    /* 패널 섹션 접기 — 기본 펼침, 개별 접기 */
+    .lsec{border-bottom:1px solid var(--border);padding:14px 0}
+    .lsec:last-child{border-bottom:0}
+    .lsec > h5{margin:0 0 10px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+    .lsec > h5 .fold{margin-left:auto;color:var(--muted-foreground);font-size:11px;transition:transform .15s}
+    .lsec.closed > h5 .fold{transform:rotate(-90deg)}
+    .lsec.closed .lsec-body{display:none}
+    .ldl{display:grid;grid-template-columns:118px 1fr;gap:9px 12px;margin:0;font-size:12.5px}
+    .ldl dt{color:var(--muted-foreground);display:flex;align-items:center;gap:5px}
+    .ldl dd{margin:0;color:var(--foreground);word-break:break-all}
+
+    /* 항목 도움말 — 패널 내 용어 설명 (공통정책 4.7) */
+    .dtic{width:14px;height:14px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);font-size:9px;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex:0 0 auto;position:relative}
+    .dtic:hover{border-color:var(--foreground);color:var(--foreground)}
+    .dtic .dtpop{position:absolute;left:-8px;top:calc(100% + 6px);width:210px;background:var(--flyout);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11.5px;font-weight:400;color:var(--foreground);line-height:1.55;box-shadow:0 10px 24px var(--shadow);z-index:95;display:none;white-space:normal;text-align:left}
+    .dtic:hover .dtpop{display:block}
+
+    /* 컬럼 헤더 필터 — 값 선택 (공통정책 3.2) */
+    .thwrap{display:inline-flex;align-items:center;gap:5px}
+    .thic{width:14px;height:14px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);font-size:9px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-weight:400}
+    .thfilter{width:18px;height:18px;display:inline-grid;place-items:center;border:0;background:transparent;color:var(--muted-foreground);cursor:pointer;border-radius:4px;padding:0}
+    .thfilter:hover{background:var(--hover);color:var(--foreground)}
+    .thfilter.on{color:var(--primary)}
+    .dark .thfilter.on{color:var(--accent)}
+    .thfilter svg{width:12px;height:12px}
+    .fdd{position:absolute;top:calc(100% + 4px);left:0;min-width:190px;background:var(--flyout);border:1px solid var(--border);border-radius:9px;box-shadow:0 12px 28px var(--shadow);z-index:60;padding:7px;display:none}
+    .fdd.open{display:block}
+    .fdd label{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;font-size:12.5px;font-weight:400;color:var(--foreground);cursor:pointer;white-space:nowrap}
+    .fdd label:hover{background:var(--hover)}
+    .fdd input{accent-color:var(--primary)}
+    .fdd .fc{margin-left:auto;font-size:11px;color:var(--faint)}
+    .fdd hr{border:0;border-top:1px solid var(--border);margin:5px 0}
+    .fdd .fbtns{display:flex;gap:6px;padding:3px}
+    .fdd .fbtns button{flex:1;padding:6px;border:1px solid var(--border);background:transparent;border-radius:6px;font-size:12px;color:var(--muted-foreground);cursor:pointer;font-family:inherit}
+    .fdd .fbtns button.pri{background:var(--primary);border-color:var(--primary);color:var(--primary-foreground);font-weight:600}
+
+    /* 검색 조건 칩 — 누적 조건 표시 (공통정책 3.3) */
+    .chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+    .schip{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;background:var(--muted);border:1px solid var(--border);border-radius:7px;font-size:12px;color:var(--foreground)}
+    .schip button{border:0;background:transparent;color:var(--faint);cursor:pointer;font-size:12px;padding:0;line-height:1}
+    .schip button:hover{color:var(--destructive)}
+    .andmark{font-size:10.5px;color:var(--faint);font-weight:600;letter-spacing:.4px}
+    .chips .clr{border:0;background:transparent;color:var(--muted-foreground);font-size:12px;cursor:pointer;text-decoration:underline;padding:0 4px}
+
+    /* 진행률 — 단계가 있는 비동기 작업 (공통정책 7.3) */
+    .prog .plabel{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted-foreground);margin-bottom:5px}
+    .prog .pbar{height:5px;border-radius:3px;background:var(--muted);overflow:hidden}
+    .prog .pfill{height:100%;background:var(--primary);border-radius:3px;transition:width .4s}
+    .prog .psteps{display:flex;gap:4px;margin-top:6px}
+    .prog .pstep{flex:1;font-size:10.5px;text-align:center;color:var(--faint);padding:3px 0;border-radius:5px;background:var(--muted)}
+    .prog .pstep.on{color:var(--primary);font-weight:600;background:color-mix(in srgb,var(--primary) 12%,transparent)}
+    .prog .pstep.done{color:var(--success)}
+
+    /* 선택지 카드 — 결과가 갈리는 선택 (라디오·체크 대체) */
+    .optcard{display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border:1px solid var(--border);border-radius:10px;cursor:pointer;background:transparent;margin-bottom:8px}
+    .optcard:hover{border-color:var(--accent)}
+    .optcard.on{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 7%,transparent)}
+    .optcard input{margin-top:3px;accent-color:var(--primary)}
+    .optcard .oc-t{font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:3px}
+    .optcard .oc-d{font-size:11.5px;color:var(--muted-foreground);line-height:1.55}
+    .optcard .oc-tag{display:inline-block;margin-top:6px;font-size:10.5px;padding:2px 7px;border-radius:5px;background:var(--muted);color:var(--faint)}
+    .optcard.on .oc-tag{background:color-mix(in srgb,var(--primary) 14%,transparent);color:var(--primary)}
+    .dark .optcard.on .oc-tag{color:var(--accent)}
+
+    /* 마법사 단계 네비게이터 (공통정책 7.2) */
+    .wnav{width:230px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 12px}
+    .wnav h6{margin:0 0 10px;font-size:11px;font-weight:700;color:var(--muted-foreground);letter-spacing:.4px}
+    .wstep{display:flex;align-items:flex-start;gap:10px;padding:9px 8px;border-radius:8px;cursor:pointer;margin-bottom:2px}
+    .wstep:hover{background:var(--hover)}
+    .wstep .no{width:22px;height:22px;flex:0 0 auto;border-radius:50%;border:1px solid var(--border);display:grid;place-items:center;font-size:10.5px;font-weight:700;color:var(--muted-foreground)}
+    .wstep .tx b{display:block;font-size:12.5px;color:var(--foreground);font-weight:600}
+    .wstep .tx span{font-size:11px;color:var(--faint)}
+    .wstep.on{background:color-mix(in srgb,var(--primary) 10%,transparent)}
+    .wstep.on .no{background:var(--primary);border-color:var(--primary);color:var(--primary-foreground)}
+    .wstep.on .tx b{color:var(--primary)}
+    .dark .wstep.on .tx b{color:var(--accent)}
+    .wstep.done .no{background:color-mix(in srgb,var(--success) 16%,transparent);border-color:var(--success);color:var(--success)}
+    .wstep.err .no{background:color-mix(in srgb,var(--destructive) 14%,transparent);border-color:var(--destructive);color:var(--destructive)}
+    .wstep.lock{opacity:.5;cursor:not-allowed}
+
+    /* 진단 박스 — 원인과 조치를 함께 제시 */
+    .diag{display:flex;gap:12px;padding:14px 16px;border-radius:11px;
+      border:1px solid color-mix(in srgb,var(--destructive) 30%,transparent);
+      background:color-mix(in srgb,var(--destructive) 7%,transparent)}
+    .diag.warn{border-color:color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 8%,transparent)}
+    .diag .dic{width:20px;height:20px;flex:0 0 auto;margin-top:1px;color:var(--destructive)}
+    .diag.warn .dic{color:var(--warning)}
+    .diag .dtt{font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:5px}
+    .diag .dds{font-size:12.5px;color:var(--muted-foreground);line-height:1.65;margin-bottom:8px}
+    .diag .drc{font-size:12.5px;color:var(--foreground);line-height:1.65;padding:8px 11px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+    .diag .drc b{color:var(--muted-foreground);font-size:11px;display:block;margin-bottom:3px}
+
+    /* 로그 뷰 — 실시간 표출 (테이블 아님, 공통정책 1.2) */
+    .logbar{display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+    .chbtn{padding:5px 11px;border:1px solid var(--border);background:transparent;border-radius:20px;font-size:12px;color:var(--muted-foreground);font-family:inherit;cursor:pointer}
+    .chbtn.on{background:color-mix(in srgb,var(--primary) 14%,transparent);border-color:var(--primary);color:var(--primary);font-weight:600}
+    .dark .chbtn.on{color:var(--accent);border-color:var(--accent)}
+    .live{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--success);margin-left:auto}
+    .live .ld{width:6px;height:6px;border-radius:50%;background:var(--success);animation:blinkdot 1.4s infinite}
+    @keyframes blinkdot{0%,100%{opacity:1}50%{opacity:.3}}
+    .logbox{background:var(--muted);border:1px solid var(--border);border-radius:9px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;line-height:1.85;max-height:190px;overflow-y:auto;padding:10px 12px}
+    .logrow{display:flex;gap:9px;white-space:nowrap}
+    .logrow .ch{flex:0 0 62px;font-weight:600}
+    .logrow .ch.app{color:var(--success)}
+    .logrow .ch.infra{color:var(--warning)}
+    .logrow .ch.system{color:var(--accent)}
+    .logrow .tm{color:var(--faint);flex:0 0 74px}
+    .logrow .msg{color:var(--foreground);white-space:pre-wrap}
+
+    /* GNB 접기 — 목록 화면 가로 공간 확보 */
+    .foldbtn{width:26px;height:26px;display:grid;place-items:center;border:1px solid var(--border);background:transparent;border-radius:7px;color:var(--muted-foreground);cursor:pointer}
+    .foldbtn:hover{border-color:var(--accent);color:var(--foreground)}
+    .foldbtn svg{width:14px;height:14px}
+
+    /* ── 링크 · 텍스트 버튼 ─────────────────────────────
+       색으로 구분하지 않고 밑줄로 구분한다. 강조색을 링크에 쓰면
+       화면에서 링크만 도드라져 실제 강조해야 할 요소가 묻힌다. */
+    a{color:inherit;text-decoration:none}
+
+    /* 이동 링크 — 다른 화면으로 넘어간다 */
+    .lnk{color:var(--foreground);cursor:pointer;
+      text-decoration:underline;text-decoration-color:var(--underline);text-underline-offset:3px}
+    .lnk:hover{text-decoration-color:var(--foreground)}
+
+    /* 목록 행 이름 — 행 전체가 클릭 대상이라 평상시 밑줄을 두지 않는다 */
+    .lnk-row{color:var(--foreground);font-weight:600;cursor:pointer;text-decoration:none}
+    .lnk-row:hover{text-decoration:underline;text-decoration-color:var(--underline);text-underline-offset:3px}
+
+    /* 텍스트 버튼 — 이동이 아니라 동작(조건 초기화·전체 선택 등) */
+    .txtbtn{border:0;background:transparent;color:var(--muted-foreground);
+      font-size:12px;font-family:inherit;cursor:pointer;padding:2px 4px}
+    .txtbtn:hover{color:var(--foreground);text-decoration:underline;text-underline-offset:3px}
+
+    /* 경로 — 위치 표시가 주 목적이라 평상시 흐리게 둔다 */
+    .crumb a{color:var(--muted-foreground)}
+    .crumb a:hover{color:var(--foreground);text-decoration:underline;text-underline-offset:3px}
+    .crumb b{color:var(--foreground);font-weight:600}
+    .crumb{font-size:12.5px;color:var(--faint)}
+
+    /* ── 알림 박스 ─────────────────────────────────────
+       조건에 따라 나타나는 상태 알림. 항목 설명(툴팁)과 구분한다.
+       조치가 필요한 알림은 닫을 수 없다 */
+    .alertbox{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;margin-bottom:14px;
+      border:1px solid var(--border);background:var(--muted)}
+    .alertbox.info{border-color:color-mix(in srgb,var(--accent) 30%,transparent);background:color-mix(in srgb,var(--accent) 7%,transparent)}
+    .alertbox.warn{border-color:color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 8%,transparent)}
+    .alertbox.crit{border-color:color-mix(in srgb,var(--destructive) 30%,transparent);background:color-mix(in srgb,var(--destructive) 7%,transparent)}
+    .alertbox .aic{width:17px;height:17px;flex:0 0 auto;margin-top:1px}
+    .alertbox.info .aic{color:var(--accent)}
+    .alertbox.warn .aic{color:var(--warning)}
+    .alertbox.crit .aic{color:var(--destructive)}
+    .alertbox .atx{flex:1;min-width:0;font-size:12.5px;line-height:1.65;color:var(--foreground)}
+    .alertbox .atx b{display:block;margin-bottom:3px}
+    .alertbox .aact{margin-top:9px;display:flex;gap:7px}
+    .alertbox .aclose{width:22px;height:22px;flex:0 0 auto;display:grid;place-items:center;border:0;background:transparent;
+      color:var(--muted-foreground);cursor:pointer;border-radius:5px;font-size:13px;line-height:1}
+    .alertbox .aclose:hover{background:var(--card);color:var(--foreground)}
+
+    /* ── 다중 선택 목록 ────────────────────────────────
+       항목이 늘어도 컨테이너 높이가 고정되도록 검색 + 스크롤 영역으로 둔다.
+       체크박스 나열은 항목 수가 고정되어 있고 적을 때만 쓴다 */
+    .mselect{border:1px solid var(--border-strong);border-radius:9px;overflow:hidden;background:var(--card)}
+    .mselect .mshead{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--muted)}
+    .mselect .mssearch{flex:1;min-width:0;position:relative}
+    .mselect .mssearch svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--muted-foreground);pointer-events:none}
+    .mselect .mssearch input{width:100%;padding:6px 9px 6px 27px;border:1px solid var(--border);border-radius:7px;
+      background:var(--card);color:var(--foreground);font-size:12px;font-family:inherit}
+    .mselect .msall{flex:0 0 auto;border:0;background:transparent;color:var(--muted-foreground);
+      font-size:11.5px;font-family:inherit;cursor:pointer;padding:2px 4px;white-space:nowrap}
+    .mselect .msall:hover{color:var(--foreground);text-decoration:underline;text-underline-offset:3px}
+    .mselect .mslist{max-height:186px;overflow-y:auto}
+    .mselect .msitem{display:flex;align-items:center;gap:9px;padding:9px 11px;cursor:pointer;border-bottom:1px solid var(--border)}
+    .mselect .msitem:last-child{border-bottom:0}
+    .mselect .msitem:hover{background:var(--hover)}
+    .mselect .msitem input{width:15px;height:15px;flex:0 0 auto;accent-color:var(--primary);margin:0}
+    .mselect .msitem .mnm{flex:1;min-width:0;font-size:12.5px;color:var(--foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .mselect .msitem.off{opacity:.5;cursor:default}
+    .mselect .msitem.off:hover{background:transparent}
+    .mselect .msfoot{padding:7px 11px;border-top:1px solid var(--border);background:var(--muted);
+      font-size:11.5px;color:var(--muted-foreground);display:flex;align-items:center;gap:6px}
+    .mselect .msfoot b{color:var(--foreground);font-weight:600}
+    .mselect .msempty{padding:18px 12px;text-align:center;font-size:12px;color:var(--faint)}
+
+    /* ⭐ 숫자 스테퍼 — 하한·상한을 아는 입력에 쓴다 */
+    .stepper{display:inline-flex;align-items:center;flex:0 0 auto;
+      border:1px solid var(--border-strong);border-radius:8px;overflow:hidden;background:var(--card)}
+    .stepper.err{border-color:var(--destructive)}
+    .stepper .stbtn{width:30px;height:32px;flex:0 0 auto;display:grid;place-items:center;border:0;
+      background:transparent;color:var(--muted-foreground);cursor:pointer;padding:0}
+    .stepper .stbtn svg{width:12px;height:12px}
+    .stepper .stbtn:hover:not(:disabled){background:var(--hover);color:var(--foreground)}
+    .stepper .stbtn:disabled{opacity:.3;cursor:default}
+    /* ⭐ 단위는 입력 안 우측에 붙인다. 흐름 배치라 단위 길이에 맞춰 폭이 잡힌다 */
+    .stepper .stfield{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px;
+      border-left:1px solid var(--border);border-right:1px solid var(--border)}
+    .stepper .inp{width:56px;height:auto;border:0;padding:0;border-radius:0;background:transparent;
+      text-align:right;font-variant-numeric:tabular-nums}
+    .stepper .inp:focus{outline:none}
+    .stepper .stfield:focus-within{background:var(--hover)}
+    .stepper .stunit{flex:0 0 auto;font-size:11.5px;color:var(--muted-foreground);pointer-events:none}
+
+    /* ⭐ 부가정보 블록 — 입력이 아닌 참조값·계산 결과 */
+    .subbox{padding:16px;border-radius:10px;background:var(--muted);border:1px solid var(--border);
+      display:flex;flex-direction:column;gap:12px;max-width:520px}
+    .subbox > .sbt{font-size:12px;font-weight:600;color:var(--muted-foreground)}
+    .subbox .sbrow{display:flex;align-items:center;gap:12px;font-size:12px}
+    .subbox .sbl{width:64px;flex:0 0 auto;color:var(--muted-foreground)}
+    .subbox .sbar{flex:1;height:8px;border-radius:4px;overflow:hidden;
+      background:color-mix(in srgb,var(--success) 38%,var(--card));min-width:64px}
+    .subbox .sbar > span{display:block;height:100%;background:var(--primary)}
+    .subbox .sbv{flex:0 0 auto;color:var(--foreground);font-variant-numeric:tabular-nums}
+
+    .mdemo{padding:13px 15px;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+    .mdemo b{display:block;font-size:13px;margin-bottom:5px}
+    .mdemo p{margin:0;font-size:12.5px;color:var(--muted-foreground);line-height:1.65}
+  </style>
 </head>
 <body>
 <div class="top">
@@ -301,37 +581,39 @@
 
 <div class="wrap">
 
-<!-- ================= 탭1: 색상 팔레트 ================= -->
-<div class="pane on" id="paneColor">
-  <div class="note" style="margin:0 0 20px;padding:12px 14px;border:1px solid var(--border);border-radius:11px;background:var(--muted)"><b>시안(Provisional)</b> — 색상 값은 로그인 배너 브랜드 자산에서 뽑은 시작점이다. 기획은 semantic 역할(성공/경고/위험/정상/정보 = 의미 매핑)과 표기 규칙까지 정하며, <b>정확한 hex 확정·최종 승인은 디자인/프론트 소관</b>이다.</div>
-  <h2>1. 표기 규칙 (Convention)</h2>
-  <p class="h2note">본 라이브러리가 따르는 색상 토큰 표기 규칙. 화면·컴포넌트는 아래 규칙을 전제로 색을 참조한다.</p>
-  <div class="rules">
-    <div class="rule"><b>① 2계층 토큰</b> Primitive(원시 램프, <code>indigo-600</code>)는 화면에서 직접 쓰지 않고, Semantic(역할 토큰, <code>--primary</code>)만 참조한다.</div>
-    <div class="rule"><b>② 표기법</b> hex 기본. 형식은 shadcn 관례 — CSS 변수 · <code>:root</code>(라이트) / <code>.dark</code>(다크).</div>
-    <div class="rule"><b>③ 라이트·다크</b> 같은 토큰명에 두 값을 둔다. 별도 이름을 만들지 않는다.</div>
-    <div class="rule"><b>④ 네이밍</b> 소문자·하이픈(kebab), 역할→변형 순(<code>primary</code> / <code>primary-foreground</code>).</div>
-    <div class="rule"><b>⑤ 대비</b> 텍스트/배경은 WCAG AA(본문 4.5:1, 큰 텍스트 3:1)로 검증하고 결과를 표기한다(4장).</div>
-    <div class="rule"><b>⑥ 값 출처</b> 로그인 배너 원본에서 픽셀 추출로 확정한다(현재값은 이미지 근사치).</div>
-    <div class="rule"><b>⑦ 문서화 항목</b> 토큰당 이름 / 라이트값 / 다크값 / 용도 / 대비 결과.</div>
-  </div>
+  <!-- ================= 탭1: 색상 팔레트 ================= -->
+  <div class="pane on" id="paneColor">
+    <div class="note" style="margin:0 0 20px;padding:12px 14px;border:1px solid var(--border);border-radius:11px;background:var(--muted)"><b>시안(Provisional)</b> — 색상 값은 로그인 배너 브랜드 자산에서 뽑은 시작점이다. 기획은 semantic 역할(성공/경고/위험/정상/정보 = 의미 매핑)과 표기 규칙까지 정하며, <b>정확한 hex 확정·최종 승인은 디자인/프론트 소관</b>이다.</div>
+    <h2>1. 표기 규칙 (Convention)</h2>
+    <p class="h2note">본 라이브러리가 따르는 색상 토큰 표기 규칙. 화면·컴포넌트는 아래 규칙을 전제로 색을 참조한다.</p>
+    <div class="rules">
+      <div class="rule"><b>① 2계층 토큰</b> Primitive(원시 램프, <code>indigo-600</code>)는 화면에서 직접 쓰지 않고, Semantic(역할 토큰, <code>--primary</code>)만 참조한다.</div>
+      <div class="rule"><b>② 표기법</b> hex 기본. 형식은 shadcn 관례 — CSS 변수 · <code>:root</code>(라이트) / <code>.dark</code>(다크).</div>
+      <div class="rule"><b>③ 라이트·다크</b> 같은 토큰명에 두 값을 둔다. 별도 이름을 만들지 않는다.</div>
+      <div class="rule"><b>④ 네이밍</b> 소문자·하이픈(kebab), 역할→변형 순(<code>primary</code> / <code>primary-foreground</code>).</div>
+      <div class="rule"><b>⑤ 대비</b> 텍스트/배경은 WCAG AA(본문 4.5:1, 큰 텍스트 3:1)로 검증하고 결과를 표기한다(4장).</div>
+      <div class="rule"><b>⑥ 상태별 표면 분리</b> 표면(<code>--muted</code>) · 호버(<code>--hover</code>) · 선택(<code>--selected</code>) · 테이블 헤더(<code>--thead</code>)를 한 토큰으로 쓰지 않는다. ⭐ 라이트 모드에서 페이지 배경·카드·헤더·호버가 모두 밝은 회청색이라 값을 가까이 두면 구분이 사라진다. 카드(#ffffff) → 호버 → 헤더 → 선택 순으로 단계를 벌린다. ⭐ 목록·드롭다운 항목도 같다 — 호버에 <code>--selected</code>를 쓰면 마우스를 올린 항목이 이미 선택된 것처럼 보인다.</div>
 
-  <h2>2. 원시 색상 (Primitive) — 브랜드 인디고/페리윙클</h2>
-  <p class="h2note">로그인 배너·GNB 키비주얼에서 추출한 브랜드 램프. 화면에는 직접 쓰지 않고 역할 토큰이 이 값을 참조한다.</p>
-  <div class="rlabel">indigo (brand)</div>
-  <div class="ramp" id="rampIndigo"></div>
-  <div class="rlabel">slate (neutral · cool)</div>
-  <div class="ramp" id="rampSlate"></div>
+      <div class="rule"><b>⑥ 값 출처</b> 로그인 배너 원본에서 픽셀 추출로 확정한다(현재값은 이미지 근사치).</div>
+      <div class="rule"><b>⑦ 문서화 항목</b> 토큰당 이름 / 라이트값 / 다크값 / 용도 / 대비 결과.</div>
+    </div>
 
-  <h2>3. 역할 토큰 (Semantic) — 라이트 / 다크</h2>
-  <p class="h2note">화면에서 실제로 참조하는 토큰. 각 토큰은 라이트·다크 두 값을 가진다. 기능색(성공·경고·위험)은 상태 구분을 위해 브랜드 블루에서 분리한다.</p>
-  <div class="grid" id="tokGrid"></div>
+    <h2>2. 원시 색상 (Primitive) — 브랜드 인디고/페리윙클</h2>
+    <p class="h2note">로그인 배너·GNB 키비주얼에서 추출한 브랜드 램프. 화면에는 직접 쓰지 않고 역할 토큰이 이 값을 참조한다.</p>
+    <div class="rlabel">indigo (brand)</div>
+    <div class="ramp" id="rampIndigo"></div>
+    <div class="rlabel">slate (neutral · cool)</div>
+    <div class="ramp" id="rampSlate"></div>
 
-  <h2>4. 대비 검증 (WCAG AA)</h2>
-  <p class="h2note">주요 텍스트/배경 조합의 실제 대비비. 본문 4.5:1, 큰 텍스트 3:1 이상이면 통과.</p>
-  <table class="ctbl">
-    <thead><tr><th>조합</th><th>모드</th><th>대비비</th><th>판정</th></tr></thead>
-    <tbody>
+    <h2>3. 역할 토큰 (Semantic) — 라이트 / 다크</h2>
+    <p class="h2note">화면에서 실제로 참조하는 토큰. 각 토큰은 라이트·다크 두 값을 가진다. 기능색(성공·경고·위험)은 상태 구분을 위해 브랜드 블루에서 분리한다.</p>
+    <div class="grid" id="tokGrid"></div>
+
+    <h2>4. 대비 검증 (WCAG AA)</h2>
+    <p class="h2note">주요 텍스트/배경 조합의 실제 대비비. 본문 4.5:1, 큰 텍스트 3:1 이상이면 통과.</p>
+    <table class="ctbl">
+      <thead><tr><th>조합</th><th>모드</th><th>대비비</th><th>판정</th></tr></thead>
+      <tbody>
       <tr><td>기본 텍스트 / 배경</td><td>라이트</td><td>15.42:1</td><td class="ok">본문 AA</td></tr>
       <tr><td>보조 텍스트(muted) / 배경</td><td>라이트</td><td>5.83:1</td><td class="ok">본문 AA</td></tr>
       <tr><td>흰 텍스트 / primary</td><td>공통</td><td>5.79~7.34:1</td><td class="ok">본문 AA</td></tr>
@@ -341,255 +623,614 @@
       <tr><td>기본 텍스트 / 배경</td><td>다크</td><td>15.65:1</td><td class="ok">본문 AA</td></tr>
       <tr><td>보조 텍스트(muted) / 배경</td><td>다크</td><td>6.88:1</td><td class="ok">본문 AA</td></tr>
       <tr><td>accent 텍스트 / 배경</td><td>다크</td><td>6.90:1</td><td class="ok">본문 AA</td></tr>
-    </tbody>
-  </table>
-  <div class="note"><b>accent(#4f6fe6) 사용 제한</b> — 라이트 배경에서 작은 본문 텍스트로 쓰기엔 대비가 부족하다(4.09:1, 큰 텍스트만 AA). 라이트 모드의 링크·강조 본문 텍스트는 <code>--primary #3346c9</code>(6.79:1)를 쓰고, accent는 <b>채움·포커스 링·큰 텍스트·다크 모드</b>에 쓴다.</div>
+      </tbody>
+    </table>
+    <div class="note"><b>accent(#4f6fe6) 사용 제한</b> — 라이트 배경에서 작은 본문 텍스트로 쓰기엔 대비가 부족하다(4.09:1, 큰 텍스트만 AA). 라이트 모드의 링크·강조 본문 텍스트는 <code>--primary #3346c9</code>(6.79:1)를 쓰고, accent는 <b>채움·포커스 링·큰 텍스트·다크 모드</b>에 쓴다.</div>
 
-  <h2>5. shadcn 토큰 정의 (형식 참고용)</h2>
-  <p class="h2note">색 토큰을 shadcn CSS 변수 형식으로 정리한 시안이다. 형식 참고용이며, 확정 값·최종 반영은 디자인/프론트가 정한다.</p>
-  <div class="code" id="codeBlock"></div>
-</div>
+    <h2>5. shadcn 토큰 정의 (형식 참고용)</h2>
+    <p class="h2note">색 토큰을 shadcn CSS 변수 형식으로 정리한 시안이다. 형식 참고용이며, 확정 값·최종 반영은 디자인/프론트가 정한다.</p>
+    <div class="code" id="codeBlock"></div>
+  </div>
 
-<!-- ================= 탭2: 컴포넌트 ================= -->
-<div class="pane" id="paneComp">
-  <p class="h2note" style="margin-bottom:20px">공통정책 조항을 실제 동작으로 확인하는 컴포넌트 모음. 파란 칩이 공통정책 조항 번호와 매핑된다. 색은 탭1 팔레트를 그대로 사용하며, 시각(간격·모션)은 예시로 디자인 라이브러리에서 확정한다.</p>
+  <!-- ================= 탭2: 컴포넌트 ================= -->
+  <div class="pane" id="paneComp">
+    <p class="h2note" style="margin-bottom:20px">공통정책 조항을 실제 동작으로 확인하는 컴포넌트 모음. 파란 칩이 공통정책 조항 번호와 매핑된다. 색은 탭1 팔레트를 그대로 사용하며, 시각(간격·모션)은 예시로 디자인 라이브러리에서 확정한다.</p>
 
-  <!-- 4.1 -->
-  <section class="gs">
-    <div class="gs-head"><span class="chip">공통정책 4.1</span><h3>데이터 상태별 표기</h3></div>
-    <div class="gs-quote">화면·영역 데이터 상태에 따라 공통 표기 기준을 적용한다. 헤더·GNB·툴바는 상태와 무관하게 유지하고 데이터 영역만 대체한다. Empty(0건)와 Error(조회 실패)를 구분하며, 권한 문제는 No Permission으로 처리한다.</div>
-    <div class="demo">
-      <div class="demo-lb">상태 전환 — 버튼을 눌러 각 상태 확인</div>
-      <div class="state-tabs">
-        <button class="on" onclick="setState('default',this)">정상</button>
-        <button onclick="setState('loading',this)">Loading</button>
-        <button onclick="setState('empty',this)">Empty(0건)</button>
-        <button onclick="setState('search',this)">Empty(검색 0건)</button>
-        <button onclick="setState('error',this)">Error</button>
-        <button onclick="setState('perm',this)">No Permission</button>
-      </div>
-      <div class="stage">
-        <div class="stbar"><span class="tb-in"></span><span class="tb-b">필터</span><span class="tb-b">＋ 생성</span><span style="margin-left:auto">툴바 유지</span></div>
-        <div class="zone" id="stateZone"></div>
-      </div>
-      <div class="note"><b>메시지 규칙</b> — Empty "{대상}이(가) 없습니다."(+생성 권한 시 생성 유도) · 검색 0건 "검색 결과가 없습니다." · Error "데이터를 불러오지 못했습니다."(+재시도) · No Permission "접근 권한이 없습니다."(+이전 화면). Loading 장시간 초과 시 Error로 전환(6.3).</div>
-    </div>
-  </section>
-
-  <!-- 5.1 -->
-  <section class="gs">
-    <div class="gs-head"><span class="chip">공통정책 5.1</span><span class="chip">2.3</span><h3>상태 값 · 상태 배지</h3></div>
-    <div class="gs-quote">상태값은 원천(플랫폼·K8s·작업 상태) 기준으로 통일 표기한다. 아래는 콘체르토 주요 상태값 축이며, 색·아이콘 등 시각 표현은 별도 규격을 따른다(예시).</div>
-    <div class="demo">
-      <div class="grp"><div class="gl">CDE(개발환경) <code>PENDING → PROVISIONING → ACTIVE → TERMINATING</code></div>
-        <div class="row"><span class="stbadge mu"><span class="d"></span>PENDING</span><span class="stbadge ac"><span class="d"></span>PROVISIONING</span><span class="stbadge ok"><span class="d"></span>ACTIVE</span><span class="stbadge wa"><span class="d"></span>TERMINATING</span></div></div>
-      <div class="grp"><div class="gl">배치 작업(Batch Job) <code>Pending / Running / Succeeded / Failed</code></div>
-        <div class="row"><span class="stbadge mu"><span class="d"></span>Pending</span><span class="stbadge ac"><span class="d"></span>Running</span><span class="stbadge ok"><span class="d"></span>Succeeded</span><span class="stbadge cr"><span class="d"></span>Failed</span></div></div>
-      <div class="grp"><div class="gl">모델 헬스 <code>STABLE / WARNING / CRITICAL</code></div>
-        <div class="row"><span class="stbadge ok"><span class="d"></span>STABLE</span><span class="stbadge wa"><span class="d"></span>WARNING</span><span class="stbadge cr"><span class="d"></span>CRITICAL</span></div></div>
-      <div class="grp"><div class="gl">승인(결재) <code>대기 / 승인 / 반려 / 취소</code></div>
-        <div class="row"><span class="stbadge mu"><span class="d"></span>대기</span><span class="stbadge ok"><span class="d"></span>승인</span><span class="stbadge cr"><span class="d"></span>반려</span><span class="stbadge mu"><span class="d"></span>취소</span></div></div>
-      <div class="note">라벨 옆 점은 상태 색을 예시로 보여주는 <b>시각 예시</b>일 뿐이며 강제 규격이 아니다. 정책(5.1)은 상태값 텍스트 통일 표기까지만 정하고, 색·아이콘은 시각 규격 소관이다. 심각도 등급(알람·인시던트)은 모니터링 정책에서 정의한다.</div>
-    </div>
-  </section>
-
-  <!-- 1.8 -->
-  <section class="gs">
-    <div class="gs-head"><span class="chip">공통정책 1.8</span><h3>배지(카운트) 표기</h3></div>
-    <div class="gs-quote">배지는 처리 대기·미확인 건수를 숫자로 표시한다(예: 내 작업함=처리할 건수, 알림=읽지 않은 건수). 0건일 때는 배지를 표시하지 않는다.</div>
-    <div class="demo">
-      <div class="row" style="gap:16px">
-        <span class="cbtn">내 작업함 <span class="cbadge">3</span></span>
-        <span class="cbtn">알림 <span class="cbadge">12</span></span>
-        <span class="cbtn">내 작업함 <span style="color:var(--muted-foreground);font-size:12px">(0건 — 배지 없음)</span></span>
-      </div>
-      <div class="note">무엇을 세는지(카운트 기준)는 내 작업/알림 정책에서 정의한다.</div>
-    </div>
-  </section>
-
-  <!-- 7.7 -->
-  <section class="gs">
-    <div class="gs-head"><span class="chip">공통정책 7.7</span><span class="chip">7.6</span><h3>토스트 메시지</h3></div>
-    <div class="gs-quote">동기 작업의 즉시 결과는 토스트로 처리한다. 성공(3초)·실패(5초)·부분 성공(5초, 일괄 작업 한정)을 사용하며, 표시 시간 경과 시 자동 소멸하고 사용자가 수동으로 닫을 수 있다. 본인이 수행한 동기 행위는 별도 알림을 발송하지 않는다.</div>
-    <div class="demo">
-      <div class="demo-lb">버튼을 눌러 토스트 확인 (우측 상단)</div>
-      <div class="row">
-        <button class="btn" onclick="toast('ok','✅ 워크스페이스 생성이(가) 완료되었습니다.',3000)">성공 토스트</button>
-        <button class="btn ghost" onclick="toast('err','❌ 워크스페이스 생성에 실패했습니다.',5000)">실패 토스트</button>
-        <button class="btn ghost" onclick="toast('warn','⚠️ 삭제 8건 완료, 2건 실패',5000)">부분 성공 토스트</button>
-      </div>
-      <div class="note"><b>부분 성공</b>은 일괄 작업에서 일부만 성공한 경우에만 사용한다(형식: {작업명} {N}건 완료, {M}건 실패). 동일 내용 연속 발생 시 최신 1건으로 갱신하며, 비동기 완료·실패는 토스트가 아니라 알림으로 통지한다.</div>
-    </div>
-  </section>
-
-  <!-- 7.3 -->
-  <section class="gs">
-    <div class="gs-head"><span class="chip">공통정책 7.3</span><h3>처리 중(로딩) 상태</h3></div>
-    <div class="gs-quote">동기 작업(등록/저장/삭제)은 버튼 클릭 시 완료 전까지 버튼을 비활성화하여 중복 실행을 막고, 스피너로 진행 중임을 표시한다. 버튼 라벨은 유지한다(문구 교체는 구현 재량). 비동기 작업(CDE 프로비저닝·배치)은 버튼에 대기시키지 않고 요청 접수 토스트 후 완료·실패를 알림으로 통지한다.</div>
-    <div class="demo">
-      <div class="demo-lb">동기 작업 — 클릭 시 라벨 유지 + 스피너 + 비활성화</div>
-      <div class="row">
-        <button class="btn" data-lb="생성" onclick="proc(this)">생성</button>
-        <button class="btn ghost" data-lb="저장" onclick="proc(this)">저장</button>
-        <button class="btn danger" data-lb="삭제" onclick="proc(this)">삭제</button>
-      </div>
-      <div class="note"><b>비동기</b>(CDE 프로비저닝 등)는 여기에 해당하지 않는다 — 버튼을 붙잡지 않고 "요청했습니다" 접수 토스트 후 완료/실패를 알림으로 통지한다. 진행률 바는 진행 정도를 측정할 수 있는 작업(업로드·다운로드 등)에만 사용한다.</div>
-    </div>
-  </section>
-
-  <!-- 4.5 -->
-  <section class="gs">
-    <div class="gs-head"><span class="chip">공통정책 4.5</span><span class="chip">7.5</span><h3>모달 · 팝오버 (닫힘 규칙 대비)</h3></div>
-    <div class="gs-quote">모달은 배경 상호작용을 막고 화면 중앙에 배치하며, 외부 클릭·ESC로 닫지 않고 의도적 버튼 클릭만 허용한다. 반대로 팝오버·드롭다운·플라이아웃은 외부 클릭·ESC·트리거 재클릭으로 닫으며 배경 상호작용을 막지 않는다.</div>
-    <div class="demo">
-      <div class="demo-lb">모달 3유형 — 눌러서 확인 (셋 다 외부 클릭·ESC로 안 닫힘, 버튼만)</div>
-      <div class="row" style="gap:8px"><button class="btn ghost" onclick="openAlert()">알림(Alert)</button><button class="btn ghost" onclick="openConfirm()">확인(Confirm)</button><button class="btn" onclick="openForm()">입력(Form)</button></div>
-      <div class="note">알림=통지·확인 1버튼 / 확인=결정·취소·실행 2버튼 / 입력=폼+저장·취소. 셋 다 외부 클릭·ESC로 닫히지 않고 버튼으로만 닫힌다. 입력 모달은 저장=필수값 유효 시 활성(7.1), 취소 시 입력이 있으면 확인 알럿(7.2). 삭제 확인 문구는 7.5를 따른다.</div>
-    </div>
-    <div class="demo">
-      <div class="demo-lb">팝오버 — 외부 클릭·ESC·재클릭으로 닫힘</div>
-      <div class="row">
-        <div class="pop-anchor" id="popAnchor">
-          <button class="btn ghost" onclick="togglePop(event)">더보기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M6 9l6 6 6-6"/></svg></button>
-          <div class="pop" id="pop"><a onclick="return false">상세 보기</a><a onclick="return false">수정</a><a onclick="return false">삭제</a></div>
+    <!-- 4.1 -->
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 4.1</span><h3>데이터 상태별 표기</h3></div>
+      <div class="gs-quote">화면·영역 데이터 상태에 따라 공통 표기 기준을 적용한다. 헤더·GNB·툴바는 상태와 무관하게 유지하고 데이터 영역만 대체한다. Empty(0건)와 Error(조회 실패)를 구분하며, 권한 문제는 No Permission으로 처리한다.</div>
+      <div class="demo">
+        <div class="demo-lb">상태 전환 — 버튼을 눌러 각 상태 확인</div>
+        <div class="state-tabs">
+          <button class="on" onclick="setState('default',this)">정상</button>
+          <button onclick="setState('loading',this)">Loading</button>
+          <button onclick="setState('empty',this)">Empty(0건)</button>
+          <button onclick="setState('search',this)">Empty(검색 0건)</button>
+          <button onclick="setState('error',this)">Error</button>
+          <button onclick="setState('perm',this)">No Permission</button>
         </div>
-        <span style="font-size:12px;color:var(--muted-foreground)">← 열고 바깥 클릭·ESC로 닫힘 확인</span>
+        <div class="stage">
+          <div class="stbar"><span class="tb-in"></span><span class="tb-b">필터</span><span class="tb-b">＋ 생성</span><span style="margin-left:auto">툴바 유지</span></div>
+          <div class="zone" id="stateZone"></div>
+        </div>
+        <div class="note"><b>메시지 규칙</b> — Empty "{대상}이(가) 없습니다."(+생성 권한 시 생성 유도) · 검색 0건 "검색 결과가 없습니다." · Error "데이터를 불러오지 못했습니다."(+재시도) · No Permission "접근 권한이 없습니다."(+이전 화면). Loading 장시간 초과 시 Error로 전환(6.3).</div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- 4.7 툴팁 -->
-  <section class="gs">
-    <div class="gs-head"><span class="chip">공통정책 4.7</span><span class="chip">2.3</span><h3>툴팁</h3></div>
-    <div class="gs-quote">툴팁은 호버·포커스 시 나타나는 짧은 보조 설명이다. 한두 문장 이내(용어 풀이·아이콘 의미·축약 원문)에만 쓰고, 더보기·스크롤이 필요할 만큼 길면 팝오버·상세로 처리한다. 정의가 필요한 열의 도움말은 팝오버로 제공한다.</div>
-    <div class="demo">
-      <div class="demo-lb">아이콘·라벨에 호버 (짧은 보조 설명)</div>
-      <div class="row" style="gap:26px;align-items:center">
-        <span class="tip-anchor">모델 헬스&nbsp;<span class="tip-ic" tabindex="0">?</span><span class="tip">모델 응답 상태를 STABLE·WARNING·CRITICAL로 표시합니다.</span></span>
-        <span class="tip-anchor" tabindex="0" style="color:var(--muted-foreground);cursor:help;text-decoration:underline dotted">vLLM<span class="tip">고성능 LLM 추론 서버 엔진</span></span>
+    <!-- 5.1 -->
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 5.1</span><span class="chip">2.3</span><h3>상태 값 · 상태 배지</h3></div>
+      <div class="gs-quote">상태값은 원천(플랫폼·K8s·작업 상태) 기준으로 통일 표기한다. 아래는 콘체르토 주요 상태값 축이며, 색·아이콘 등 시각 표현은 별도 규격을 따른다(예시).</div>
+      <div class="demo">
+        <div class="grp"><div class="gl">CDE(개발환경) <code>PENDING → PROVISIONING → ACTIVE → TERMINATING</code></div>
+          <div class="row"><span class="stbadge mu"><span class="d"></span>PENDING</span><span class="stbadge ac"><span class="d"></span>PROVISIONING</span><span class="stbadge ok"><span class="d"></span>ACTIVE</span><span class="stbadge wa"><span class="d"></span>TERMINATING</span></div></div>
+        <div class="grp"><div class="gl">배치 작업(Batch Job) <code>Pending / Running / Succeeded / Failed</code></div>
+          <div class="row"><span class="stbadge mu"><span class="d"></span>Pending</span><span class="stbadge ac"><span class="d"></span>Running</span><span class="stbadge ok"><span class="d"></span>Succeeded</span><span class="stbadge cr"><span class="d"></span>Failed</span></div></div>
+        <div class="grp"><div class="gl">모델 헬스 <code>STABLE / WARNING / CRITICAL</code></div>
+          <div class="row"><span class="stbadge ok"><span class="d"></span>STABLE</span><span class="stbadge wa"><span class="d"></span>WARNING</span><span class="stbadge cr"><span class="d"></span>CRITICAL</span></div></div>
+        <div class="grp"><div class="gl">승인(결재) <code>대기 / 승인 / 반려 / 취소</code></div>
+          <div class="row"><span class="stbadge mu"><span class="d"></span>대기</span><span class="stbadge ok"><span class="d"></span>승인</span><span class="stbadge cr"><span class="d"></span>반려</span><span class="stbadge mu"><span class="d"></span>취소</span></div></div>
+        <div class="note">라벨 옆 점은 상태 색을 예시로 보여주는 <b>시각 예시</b>일 뿐이며 강제 규격이 아니다. 정책(5.1)은 상태값 텍스트 통일 표기까지만 정하고, 색·아이콘은 시각 규격 소관이다. 심각도 등급(알람·인시던트)은 모니터링 정책에서 정의한다.</div>
       </div>
-      <div class="note">호버·키보드 포커스 모두 지원. 내용이 길어져 더보기·스크롤이 필요하면 툴팁이 아니라 팝오버·상세로 바꾼다.</div>
-    </div>
-  </section>
+    </section>
 
-  <!-- 테이블 -->
-  <section class="gs">
-    <div class="gs-head"><span class="chip">공통정책 2.2</span><span class="chip">1.7</span><span class="chip">1.5</span><span class="chip">3.1</span><span class="chip">3.6</span><span class="chip">3.7</span><h3>테이블 · 정렬 · 작업 · 페이지네이션</h3></div>
-    <div class="gs-quote">테이블 필수 항목·순서는 이름 → 상태 → 유형 → 워크스페이스 → 담당자(없으면 생성자) → 생성일시 → 작업. 값이 없는 항목은 '-', 사용자는 {이름}({아이디})로 표기한다. 행 작업은 …(더보기)로 통일하고, 목록은 페이지네이션을 기본으로 한다.</div>
-    <div class="demo">
-      <div class="tbltop"><select id="pageSize" onchange="onPageSize()"><option selected>20</option><option>50</option><option>100</option></select>개씩 보기</div>
-      <table class="tbl">
-        <thead><tr><th>이름</th><th>상태</th><th>유형</th><th>워크스페이스</th><th>담당자</th><th>생성일시 <svg class="sar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></th><th style="cursor:default">작업</th></tr></thead>
-        <tbody>
+    <!-- 1.8 -->
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 1.8</span><h3>배지(카운트) 표기</h3></div>
+      <div class="gs-quote">배지는 처리 대기·미확인 건수를 숫자로 표시한다(예: 내 작업함=처리할 건수, 알림=읽지 않은 건수). 0건일 때는 배지를 표시하지 않는다.</div>
+      <div class="demo">
+        <div class="row" style="gap:16px">
+          <span class="cbtn">내 작업함 <span class="cbadge">3</span></span>
+          <span class="cbtn">알림 <span class="cbadge">12</span></span>
+          <span class="cbtn">내 작업함 <span style="color:var(--muted-foreground);font-size:12px">(0건 — 배지 없음)</span></span>
+        </div>
+        <div class="note">무엇을 세는지(카운트 기준)는 내 작업/알림 정책에서 정의한다.</div>
+      </div>
+    </section>
+
+    <!-- 7.7 -->
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 7.7</span><span class="chip">7.6</span><h3>토스트 메시지</h3></div>
+      <div class="gs-quote">동기 작업의 즉시 결과는 토스트로 처리한다. 성공(3초)·실패(5초)·부분 성공(5초, 일괄 작업 한정)을 사용하며, 표시 시간 경과 시 자동 소멸하고 사용자가 수동으로 닫을 수 있다. 본인이 수행한 동기 행위는 별도 알림을 발송하지 않는다.</div>
+      <div class="demo">
+        <div class="demo-lb">버튼을 눌러 토스트 확인 (우측 상단)</div>
+        <div class="row">
+          <button class="btn" onclick="toast('ok','✅ 워크스페이스 생성이(가) 완료되었습니다.',3000)">성공 토스트</button>
+          <button class="btn ghost" onclick="toast('err','❌ 워크스페이스 생성에 실패했습니다.',5000)">실패 토스트</button>
+          <button class="btn ghost" onclick="toast('warn','⚠️ 삭제 8건 완료, 2건 실패',5000)">부분 성공 토스트</button>
+        </div>
+        <div class="note"><b>부분 성공</b>은 일괄 작업에서 일부만 성공한 경우에만 사용한다(형식: {작업명} {N}건 완료, {M}건 실패). 동일 내용 연속 발생 시 최신 1건으로 갱신하며, 비동기 완료·실패는 토스트가 아니라 알림으로 통지한다.</div>
+      </div>
+    </section>
+
+    <!-- 7.3 -->
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 7.3</span><h3>처리 중(로딩) 상태</h3></div>
+      <div class="gs-quote">동기 작업(등록/저장/삭제)은 버튼 클릭 시 완료 전까지 버튼을 비활성화하여 중복 실행을 막고, 스피너로 진행 중임을 표시한다. 버튼 라벨은 유지한다(문구 교체는 구현 재량). 비동기 작업(CDE 프로비저닝·배치)은 버튼에 대기시키지 않고 요청 접수 토스트 후 완료·실패를 알림으로 통지한다.</div>
+      <div class="demo">
+        <div class="demo-lb">동기 작업 — 클릭 시 라벨 유지 + 스피너 + 비활성화</div>
+        <div class="row">
+          <button class="btn" data-lb="생성" onclick="proc(this)">생성</button>
+          <button class="btn ghost" data-lb="저장" onclick="proc(this)">저장</button>
+          <button class="btn danger" data-lb="삭제" onclick="proc(this)">삭제</button>
+        </div>
+        <div class="note"><b>비동기</b>(CDE 프로비저닝 등)는 여기에 해당하지 않는다 — 버튼을 붙잡지 않고 "요청했습니다" 접수 토스트 후 완료/실패를 알림으로 통지한다. 진행률 바는 진행 정도를 측정할 수 있는 작업(업로드·다운로드 등)에만 사용한다.</div>
+      </div>
+    </section>
+
+    <!-- 4.5 -->
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 4.5</span><span class="chip">7.5</span><h3>모달 · 팝오버 (닫힘 규칙 대비)</h3></div>
+      <div class="gs-quote">모달은 배경 상호작용을 막고 화면 중앙에 배치하며, 외부 클릭·ESC로 닫지 않고 의도적 버튼 클릭만 허용한다. 반대로 팝오버·드롭다운·플라이아웃은 외부 클릭·ESC·트리거 재클릭으로 닫으며 배경 상호작용을 막지 않는다.</div>
+      <div class="demo">
+        <div class="demo-lb">모달 3유형 — 눌러서 확인 (셋 다 외부 클릭·ESC로 안 닫힘, 버튼만)</div>
+        <div class="row" style="gap:8px"><button class="btn ghost" onclick="openAlert()">알림(Alert)</button><button class="btn ghost" onclick="openConfirm()">확인(Confirm)</button><button class="btn" onclick="openForm()">입력(Form)</button></div>
+        <div class="note">알림=통지·확인 1버튼 / 확인=결정·취소·실행 2버튼 / 입력=폼+저장·취소. 셋 다 외부 클릭·ESC로 닫히지 않고 버튼으로만 닫힌다. 입력 모달은 저장=필수값 유효 시 활성(7.1), 취소 시 입력이 있으면 확인 알럿(7.2). 삭제 확인 문구는 7.5를 따른다.</div>
+      </div>
+      <div class="demo">
+        <div class="demo-lb">팝오버 — 외부 클릭·ESC·재클릭으로 닫힘</div>
+        <div class="row">
+          <div class="pop-anchor" id="popAnchor">
+            <button class="btn ghost" onclick="togglePop(event)">더보기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="pop" id="pop"><a onclick="return false">상세 보기</a><a onclick="return false">수정</a><a onclick="return false">삭제</a></div>
+          </div>
+          <span style="font-size:12px;color:var(--muted-foreground)">← 열고 바깥 클릭·ESC로 닫힘 확인</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4.7 툴팁 -->
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 4.7</span><span class="chip">2.3</span><h3>툴팁</h3></div>
+      <div class="gs-quote">툴팁은 호버·포커스 시 나타나는 짧은 보조 설명이다. 한두 문장 이내(용어 풀이·아이콘 의미·축약 원문)에만 쓰고, 더보기·스크롤이 필요할 만큼 길면 팝오버·상세로 처리한다. 정의가 필요한 열의 도움말은 팝오버로 제공한다.</div>
+      <div class="demo">
+        <div class="demo-lb">아이콘·라벨에 호버 (짧은 보조 설명)</div>
+        <div class="row" style="gap:26px;align-items:center">
+          <span class="tip-anchor">모델 헬스&nbsp;<span class="tip-ic" tabindex="0">?</span><span class="tip">모델 응답 상태를 STABLE·WARNING·CRITICAL로 표시합니다.</span></span>
+          <span class="tip-anchor" tabindex="0" style="color:var(--muted-foreground);cursor:help;text-decoration:underline dotted">vLLM<span class="tip">고성능 LLM 추론 서버 엔진</span></span>
+        </div>
+        <div class="note">호버·키보드 포커스 모두 지원. 내용이 길어져 더보기·스크롤이 필요하면 툴팁이 아니라 팝오버·상세로 바꾼다.</div>
+      </div>
+    </section>
+
+    <!-- 테이블 -->
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 2.2</span><span class="chip">1.7</span><span class="chip">1.5</span><span class="chip">3.1</span><span class="chip">3.6</span><span class="chip">3.7</span><h3>테이블 · 정렬 · 작업 · 페이지네이션</h3></div>
+      <div class="gs-quote">테이블 필수 항목·순서는 이름 → 상태 → 유형 → 워크스페이스 → 담당자(없으면 생성자) → 생성일시 → 작업. 값이 없는 항목은 '-', 사용자는 {이름}({아이디})로 표기한다. 행 작업은 …(더보기)로 통일하고, 목록은 페이지네이션을 기본으로 한다.</div>
+      <div class="demo">
+        <div class="tbltop"><select id="pageSize" onchange="onPageSize()"><option selected>20</option><option>50</option><option>100</option></select>개씩 보기</div>
+        <table class="tbl">
+          <thead><tr><th>이름</th><th>상태</th><th>유형</th><th>워크스페이스</th><th>담당자</th><th>생성일시 <svg class="sar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></th><th style="cursor:default">작업</th></tr></thead>
+          <tbody>
           <tr><td>llama-3-8b-serving</td><td><span class="stbadge ok"><span class="d"></span>ACTIVE</span></td><td>vLLM</td><td>공용 워크스페이스</td><td>성유진<span class="uid">(yj.seong)</span></td><td>2026-07-18 14:22:05</td><td><span class="dots" onclick="openRowMenu(event)">⋯</span></td></tr>
           <tr><td>batch-embed-daily</td><td><span class="stbadge ac"><span class="d"></span>Running</span></td><td>Batch Job</td><td>연구팀</td><td class="dash">-</td><td>2026-07-18 09:10:41</td><td><span class="dots" onclick="openRowMenu(event)">⋯</span></td></tr>
           <tr><td>cde-oh-dev</td><td><span class="stbadge mu"><span class="d"></span>PENDING</span></td><td>CDE</td><td>공용 워크스페이스</td><td>오경환<span class="uid">(kh.oh)</span></td><td>2026-07-17 18:03:12</td><td><span class="dots" onclick="openRowMenu(event)">⋯</span></td></tr>
-        </tbody>
-      </table>
-      <div class="pgbottom"><span class="total">총 123건</span><span class="pg"><button>‹</button><button class="on">1</button><button>2</button><button>3</button><button id="lastPg">7</button><button>›</button></span></div>
-      <div class="note"><b>빈 값</b>은 '-'(2행 담당자) · <b>사용자</b>는 {이름}({아이디}) · <b>작업(⋯)</b>은 개수와 무관하게 더보기로 통일(3.6, ⋯를 눌러 예시 메뉴 확인) — 실제 항목은 화면별로 정의(화면정의서) · 페이지당 건수는 표 상단 좌측 · 총 건수와 페이지 이동은 하단(3.7). 정렬·필터·검색 조건은 페이지 이동 시 유지.</div>
-    </div>
-  </section>
-
-  <!-- 폼·입력 요소 -->
-  <section class="gs">
-    <div class="gs-head"><span class="chip">공통정책 7.1</span><span class="chip">7.8</span><span class="chip">1.3</span><span class="chip">3.2</span><h3>폼·입력 요소</h3></div>
-    <div class="gs-quote">입력 폼의 공통 요소와 상태. 필수 항목이 모두 유효해야 등록/저장을 활성화하고(7.1), 검증 실패는 필드 하위 에러로 표시하며 필드를 에러 상태로 둔다(7.8). 날짜는 YYYY-MM-DD(1.3), 다중 값은 OR로 조합한다(3.2). 색·간격 등 시각 규격은 디자인 라이브러리로 확정.</div>
-    <div class="demo">
-      <div class="fgrid">
-        <div class="field" id="f-name">
-          <label>이름 <span class="req">*</span></label>
-          <input class="inp" id="nameInp" maxlength="30" placeholder="이름을 입력하세요" oninput="onName()" onblur="reqBlur('f-name',this)">
-          <div class="field-foot"><span class="errmsg">필수 입력 항목입니다.</span><span class="cnt"><span id="nameCnt">0</span>/30</span></div>
-        </div>
-        <div class="field show-err">
-          <label>이메일 <span class="req">*</span></label>
-          <input class="inp err" value="user@">
-          <div class="field-foot"><span class="errmsg">올바른 이메일 형식이 아닙니다.</span></div>
-        </div>
-        <div class="field">
-          <label>프레임워크</label>
-          <div class="selwrap"><select class="inp"><option>vLLM</option><option>Triton</option><option>TGI</option></select><svg class="cv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
-        </div>
-        <div class="field" style="max-width:none;grid-column:1/-1">
-          <label>설명</label>
-          <textarea class="inp" placeholder="장문 입력(로그·코드 등은 제한 없음)"></textarea>
-        </div>
+          </tbody>
+        </table>
+        <div class="pgbottom"><span class="total">총 123건</span><span class="pg"><button>‹</button><button class="on">1</button><button>2</button><button>3</button><button id="lastPg">7</button><button>›</button></span></div>
+        <div class="note"><b>빈 값</b>은 '-'(2행 담당자) · <b>사용자</b>는 {이름}({아이디}) · <b>작업(⋯)</b>은 개수와 무관하게 더보기로 통일(3.6, ⋯를 눌러 예시 메뉴 확인) — 실제 항목은 화면별로 정의(화면정의서) · 페이지당 건수는 표 상단 좌측 · 총 건수와 페이지 이동은 하단(3.7). 정렬·필터·검색 조건은 페이지 이동 시 유지.</div>
       </div>
+    </section>
 
-      <div class="fgrid" style="margin-top:18px">
-        <div class="field" id="f-msel">
-          <label>워크스페이스 (다중 선택 · 태그 입력형)</label>
-          <div class="msel" id="msel" onclick="document.getElementById('mselInp').focus()">
-            <span class="tag">공용 워크스페이스<button onclick="rmTag(this,event)" aria-label="제거">×</button></span>
-            <span class="tag">연구팀<button onclick="rmTag(this,event)" aria-label="제거">×</button></span>
-            <input id="mselInp" placeholder="추가…" onkeydown="mselAdd(event)">
+    <!-- 폼·입력 요소 -->
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 7.1</span><span class="chip">7.8</span><span class="chip">1.3</span><span class="chip">3.2</span><h3>폼·입력 요소</h3></div>
+      <div class="gs-quote">입력 폼의 공통 요소와 상태. ⭐ 한글 입력 필드는 조합 중(<code>compositionstart</code>~<code>compositionend</code>) 다시 그리지 않는다 — 조합 도중 필드를 새로 만들면 자모가 분리돼 들어간다. 검색·자동완성처럼 입력에 따라 목록을 다시 그리는 필드가 특히 그렇다. ⭐ 필수 항목은 라벨 뒤에 <code>*</code>를 붙인다. 통용되는 표기이므로 <code>* 필수 항목</code> 같은 안내를 따로 두지 않고, 선택 항목에도 라벨을 붙이지 않는다. 필수 항목이 모두 유효해야 등록/저장을 활성화하고(7.1), 검증 실패는 필드 하위 에러로 표시하며 필드를 에러 상태로 둔다(7.8). 날짜는 YYYY-MM-DD(1.3), 다중 값은 OR로 조합한다(3.2). 색·간격 등 시각 규격은 디자인 라이브러리로 확정.</div>
+      <div class="demo">
+        <div class="fgrid">
+          <div class="field" id="f-name">
+            <label>이름 <span class="req">*</span></label>
+            <input class="inp" id="nameInp" maxlength="30" placeholder="이름을 입력하세요" oninput="onName()" onblur="reqBlur('f-name',this)">
+            <div class="field-foot"><span class="errmsg">필수 입력 항목입니다.</span><span class="cnt"><span id="nameCnt">0</span>/30</span></div>
+          </div>
+          <div class="field show-err">
+            <label>이메일 <span class="req">*</span></label>
+            <input class="inp err" value="user@">
+            <div class="field-foot"><span class="errmsg">올바른 이메일 형식이 아닙니다.</span></div>
+          </div>
+          <div class="field">
+            <label>프레임워크</label>
+            <div class="selwrap"><select class="inp"><option>vLLM</option><option>Triton</option><option>TGI</option></select><svg class="cv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+          </div>
+          <div class="field" style="max-width:none;grid-column:1/-1">
+            <label>설명</label>
+            <textarea class="inp" placeholder="장문 입력(로그·코드 등은 제한 없음)"></textarea>
           </div>
         </div>
-        <div class="field">
-          <label>가속기 (다중 선택 · 드롭다운형)</label>
-          <div class="msdd" id="msdd">
-            <button class="inp msdd-trig" onclick="toggleMsdd(event)"><span id="msddLabel">전체</span><svg class="msdd-cv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="msdd-pop" id="msddPop">
-              <label class="check"><input type="checkbox" value="GPU" onchange="msddUpd()">GPU</label>
-              <label class="check"><input type="checkbox" value="TPU" onchange="msddUpd()">TPU</label>
-              <label class="check"><input type="checkbox" value="CPU" onchange="msddUpd()">CPU</label>
+
+        <div class="fgrid" style="margin-top:18px">
+          <div class="field" id="f-msel">
+            <label>워크스페이스 (다중 선택 · 태그 입력형)</label>
+            <div class="msel" id="msel" onclick="document.getElementById('mselInp').focus()">
+              <span class="tag">공용 워크스페이스<button onclick="rmTag(this,event)" aria-label="제거">×</button></span>
+              <span class="tag">연구팀<button onclick="rmTag(this,event)" aria-label="제거">×</button></span>
+              <input id="mselInp" placeholder="추가…" onkeydown="mselAdd(event)">
+            </div>
+          </div>
+          <div class="field">
+            <label>가속기 (다중 선택 · 드롭다운형)</label>
+            <div class="msdd" id="msdd">
+              <button class="inp msdd-trig" onclick="toggleMsdd(event)"><span id="msddLabel">전체</span><svg class="msdd-cv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+              <div class="msdd-pop" id="msddPop">
+                <label class="check"><input type="checkbox" value="GPU" onchange="msddUpd()">GPU</label>
+                <label class="check"><input type="checkbox" value="TPU" onchange="msddUpd()">TPU</label>
+                <label class="check"><input type="checkbox" value="CPU" onchange="msddUpd()">CPU</label>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label>생성일 (YYYY-MM-DD)</label>
+            <div class="datefield"><input type="date" class="inp" value="2026-07-20"><svg class="cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div>
+          </div>
+          <div class="field">
+            <label>기간</label>
+            <div class="daterange">
+              <div class="datefield"><input type="date" class="inp" value="2026-07-01"><svg class="cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div>
+              <span class="til">~</span>
+              <div class="datefield"><input type="date" class="inp" value="2026-07-20"><svg class="cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div>
             </div>
           </div>
         </div>
-        <div class="field">
-          <label>생성일 (YYYY-MM-DD)</label>
-          <div class="datefield"><input type="date" class="inp" value="2026-07-20"><svg class="cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div>
-        </div>
-        <div class="field">
-          <label>기간</label>
-          <div class="daterange">
-            <div class="datefield"><input type="date" class="inp" value="2026-07-01"><svg class="cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div>
-            <span class="til">~</span>
-            <div class="datefield"><input type="date" class="inp" value="2026-07-20"><svg class="cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div>
+
+        <div class="fgrid" style="margin-top:18px">
+          <div class="field">
+            <label>알림 채널 (체크박스)</label>
+            <div class="checks">
+              <label class="check"><input type="checkbox" checked>Portal (기본)</label>
+              <label class="check"><input type="checkbox">Email</label>
+            </div>
           </div>
+          <div class="field">
+            <label>가속기 (라디오)</label>
+            <div class="checks">
+              <label class="check"><input type="radio" name="acc" checked>GPU</label>
+              <label class="check"><input type="radio" name="acc">CPU</label>
+            </div>
+          </div>
+          <div class="field">
+            <label>토글 · 세그먼트 · 검색</label>
+            <div class="tgrow"><span>자동 스케일링 (온·오프 스위치)</span><span class="tg on" onclick="this.classList.toggle('on')"></span></div>
+            <div class="segmented" style="margin-top:12px" onclick="segPick(event)"><button class="on">전체</button><button>실행중</button><button>중지</button></div>
+            <div style="margin-top:12px"><input class="inp" placeholder="🔎 검색어 입력 후 Enter"></div>
+          </div>
+        </div>
+
+        <div class="note" style="margin-top:16px"><b>버튼 활성 규칙(7.1)</b> — 아래 저장 버튼은 위 '이름'이 입력되어야 활성화된다(필수·유효성 통과 시 등록/저장 활성화). 이메일 필드는 유효성 실패(7.8) 예시로 에러 상태를 고정해 두었다.</div>
+        <div class="row" style="margin-top:10px"><button class="btn" id="saveBtn" disabled data-lb="저장" onclick="proc(this)">저장</button><span style="font-size:12px;color:var(--muted-foreground)">← '이름' 입력 시 활성화</span></div>
+      </div>
+    </section>
+
+    <!-- ═══════════ v0.3 신규 ═══════════ -->
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 7.5</span><h3>차단 안내 모달</h3></div>
+      <div class="gs-quote">조건이 맞지 않아 실행할 수 없는 경우, 버튼을 눌렀을 때 <b>왜 안 되는지와 무엇을 하면 되는지</b>를 확인 모달로 알린다. 실행 버튼 없이 <code>확인</code>만 둔다. 버튼을 비활성으로만 두면 이유를 알 수 없고, 토스트는 사라져서 조치를 놓친다.</div>
+      <div class="demo">
+        <div class="demo-lb">제목은 <code>~ 불가</code>, 본문은 원인 + 조치</div>
+        <div style="display:flex;flex-direction:column;gap:10px;max-width:460px">
+          <div class="mdemo"><b>승인 불가</b><p>본인이 신청한 요청은 승인할 수 없습니다. 다른 관리자에게 요청해 주세요.</p></div>
+          <div class="mdemo"><b>역할 변경 불가</b><p>이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 변경할 수 있습니다.</p></div>
+          <div class="mdemo"><b>할당량 수정 불가</b><p>할당량 변경이 진행 중입니다. 완료된 뒤에 다시 시도해 주세요.</p></div>
+        </div>
+        <div class="note">권한이 아예 없는 기능은 이 모달이 아니라 <b>미노출</b>로 처리한다(7.10). 이 모달은 권한은 있으나 지금 상태에서 실행할 수 없는 경우에 쓴다.</div>
+      </div>
+    </section>
+
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 4.1</span><h3>부가정보 블록</h3></div>
+      <div class="gs-quote">입력이 아닌 <b>참조값</b>(클러스터 잔여 등)이나 <b>계산 결과</b>(배분 결과 등)는 카드 면 위에 그대로 두지 않고 표면 배경으로 분리한다. 같은 면에 두면 사용자가 고칠 수 있는 값인지 아닌지 구분되지 않는다. 값이 무엇인지는 블록 제목 옆 툴팁으로 밝힌다.</div>
+      <div class="demo">
+        <div class="demo-lb">계산 결과 — 입력값에 따라 실시간으로 바뀐다</div>
+        <div class="subbox">
+          <div class="sbt">배분 결과 <span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">운영룸 값은 개발룸이 상한을 다 쓸 때의 최소값입니다.</span></span></div>
+          <div class="sbrow"><span class="sbl">CPU</span><span class="sbar"><span style="width:25%"></span></span><span class="sbv">개발룸 최대 8 · 운영룸 최소 24</span></div>
+          <div class="sbrow"><span class="sbl">Memory</span><span class="sbar"><span style="width:25%"></span></span><span class="sbv">개발룸 최대 32 · 운영룸 최소 96</span></div>
+        </div>
+        <div class="note">막대 트랙은 <code>--card</code> 계열로 둔다. 블록 배경(<code>--muted</code>)과 같은 값이면 빈 구간이 보이지 않는다. 블록 안 설명은 별도 문단으로 두지 않고 제목 툴팁에 담는다 — 항상 같은 내용이라 hint가 아니다.</div>
+      </div>
+    </section>
+
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 7.8</span><h3>숫자 스테퍼</h3></div>
+      <div class="gs-quote">하한과 상한을 아는 수치 입력에 쓴다. 버튼은 범위를 벗어나면 비활성되어 유효 범위가 조작에서 드러나고, 잘못된 값을 넣기 전에 막는다. 범위를 모르거나 자릿수가 큰 값(금액·ID 등)은 스테퍼를 두지 않는다.</div>
+      <div class="demo">
+        <div class="demo-lb">기본 — 증감 단위는 값의 성격에 맞춘다</div>
+        <div style="display:flex;flex-direction:column;gap:14px;max-width:420px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:110px;font-size:12.5px;font-weight:600">CPU <span class="req">*</span></span>
+            <span class="stepper"><button class="stbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg></button><span class="stfield"><input class="inp" value="32"><span class="stunit">Cores</span></span><button class="stbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></span>
+            <span style="margin-left:auto;font-size:11.5px;color:var(--muted-foreground)">배분 가능 144.6</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:110px;font-size:12.5px;font-weight:600">AI 가속기 <span class="req">*</span></span>
+            <span class="stepper"><button class="stbtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg></button><span class="stfield"><input class="inp" value="0"><span class="stunit">개</span></span><button class="stbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></span>
+            <span style="margin-left:auto;font-size:11.5px;color:var(--muted-foreground)">배분 가능 2</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:110px;font-size:12.5px;font-weight:600">Memory <span class="req">*</span></span>
+            <span class="stepper err"><button class="stbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg></button><span class="stfield"><input class="inp" value="9999"><span class="stunit">Gi</span></span><button class="stbtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></span>
+            <span style="margin-left:auto;font-size:11.5px;color:var(--destructive)">배분 가능 1423.4</span>
+          </div>
+        </div>
+        <div class="note">⭐ 단위는 입력 안 우측에 붙이고 라벨에서 뺀다(<code>CPU (Cores)</code> ✕ → <code>CPU</code> + 입력 안 <code>Cores</code>). 증감 단위 — 개수 1, CPU 0.5, Memory 8, 스토리지 10. ⭐ 소수 허용 여부는 자원마다 다르다 — CPU는 쿠버네티스가 millicore를 허용해 소수를 받고, 개수·Gi·GB 단위는 정수만 받는다. 정수 항목은 <code>inputmode="numeric"</code>, 소수 항목은 <code>decimal</code>로 둔다. 직접 입력도 가능하며 범위를 벗어나면 인라인 에러로 알린다(7.8). 버튼은 <code>tabindex="-1"</code>로 두어 키보드 탭 이동에서 건너뛴다.</div>
+      </div>
+    </section>
+
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 3.3</span><span class="chip">4.5</span><h3>다중 선택 목록</h3></div>
+      <div class="gs-quote">여러 항목을 골라야 하고 개수가 데이터에 따라 늘어나는 경우에 쓴다. 체크박스를 그대로 나열하면 항목이 늘 때 컨테이너가 세로로 길어지고 원하는 항목을 찾기 어렵다. 검색·전체 선택·선택 수 표시를 함께 두고 목록 영역에만 스크롤을 준다. 선택할 수 없는 항목은 감추지 않고 비활성으로 두어 사유를 알 수 있게 한다.</div>
+      <div class="demo">
+        <div class="demo-lb">접근 허용 배포 선택</div>
+        <div class="mselect" style="max-width:440px">
+          <div class="mshead">
+          <span class="mssearch">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input placeholder="배포명 검색">
+          </span>
+            <button class="msall">전체 선택</button>
+          </div>
+          <div class="mslist">
+            <label class="msitem"><input type="checkbox" checked><span class="mnm">gpt-oss-120b-symphony</span><span class="st ok">정상</span></label>
+            <label class="msitem"><input type="checkbox"><span class="mnm">qwen3-6-35b-a3b-fp8-symphony</span><span class="st ok">정상</span></label>
+            <label class="msitem off" title="정상 상태인 배포만 선택할 수 있습니다."><input type="checkbox" disabled><span class="mnm">gemma-4-12b-it-serving</span><span class="st cr">오류</span></label>
+          </div>
+          <div class="msfoot"><b>1</b>건 선택 · 전체 3건</div>
+        </div>
+        <div class="note">항목이 3~4개로 고정되어 있으면 <code>.pick</code> 카드 선택을 쓴다. 선택 결과를 다른 화면의 목록 셀에 표시할 때는 <code>{첫 항목} 외 N건</code> 형식으로 줄이고 전체는 해당 화면에서 확인한다.</div>
+      </div>
+    </section>
+
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 4.1</span><span class="chip">4.7</span><h3>툴팁 · hint · 알림 박스 구분</h3></div>
+      <div class="gs-quote">화면에 문구를 둘 때 성격을 먼저 가른다. 항상 같은 내용이고 용어를 모르는 사람만 필요한 것은 툴팁으로, 조건에 따라 나타나고 조치가 필요할 수 있는 것은 알림 박스로 둔다. 두 가지를 구분하지 않으면 섹션 안에 안내 문구가 쌓여 정작 봐야 할 내용이 묻힌다.</div>
+      <div class="demo">
+        <div class="demo-lb">항목 설명 — 툴팁. 제목 옆에 둔다</div>
+        <div style="margin-bottom:18px">
+          <h4 style="margin:0 0 8px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px">배포
+            <span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">운영룸에서 서비스 중인 배포입니다. 목록과 상세는 운영룸에서 확인합니다.</span></span>
+          </h4>
+          <p style="margin:0;font-size:12.5px;color:var(--muted-foreground)">2건</p>
+        </div>
+
+        <div class="demo-lb">알림 — 안내. 읽으면 끝나므로 닫을 수 있다</div>
+        <div class="alertbox info">
+          <svg class="aic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v5M12 16.5v.01"/><circle cx="12" cy="12" r="9"/></svg>
+          <div class="atx"><b>개발룸이 만들어지지 않았습니다.</b>개발룸을 만들면 구성원이 개발환경을 신청할 수 있습니다.</div>
+          <button class="aclose" aria-label="닫기">✕</button>
+        </div>
+
+        <div class="demo-lb">알림 — 조치 필요. 닫을 수 없고 실행 경로를 붙인다</div>
+        <div class="alertbox warn">
+          <svg class="aic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 2.4 18a1.8 1.8 0 0 0 1.6 2.7h16a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          <div class="atx"><b>승인 대기 중인 신청이 2건 있습니다.</b>승인·반려 처리는 내 작업함에서 합니다.
+            <div class="aact"><button class="btn ghost sm">내 작업함으로<span class="ar">→</span></button></div>
+          </div>
+        </div>
+
+        <div class="alertbox crit">
+          <svg class="aic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+          <div class="atx"><b>운영룸이 정상 동작하지 않습니다.</b>배포를 기동할 수 없습니다. 자원 할당량이 부족한지 확인해 주세요.
+            <div class="aact"><button class="btn sm">할당량 수정</button></div>
+          </div>
+        </div>
+
+        <div class="demo-lb">입력 규칙 — hint. 입력 필드 아래에 상시 노출</div>
+        <div style="max-width:360px;margin-bottom:18px">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--muted-foreground);margin-bottom:6px">워크스페이스명
+            <span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">쿠버네티스 네임스페이스명으로 사용됩니다.</span></span>
+          </label>
+          <input class="inp" value="ai-service-team" style="width:100%">
+          <div style="font-size:11px;color:var(--muted-foreground);margin-top:5px;line-height:1.5">영문 소문자·숫자·하이픈만 사용할 수 있습니다.</div>
+        </div>
+
+        <div class="note">수준은 <code>info</code>(안내) · <code>warn</code>(주의) · <code>crit</code>(오류)로 둔다. 위치는 관련 섹션 상단이며, 조치가 필요한 알림에는 닫기를 두지 않는다.</div>
+        <div class="note"><b>세 갈래로 가른다.</b> 항목이 무엇인지 설명하는 문구는 <b>툴팁</b>, 입력 규칙과 값에 따라 변하는 안내는 <b>hint</b>(필드 아래 상시 노출), 조건에 따라 나타나고 조치가 필요할 수 있는 것은 <b>알림 박스</b>다. 입력 규칙을 툴팁에 숨기면 규칙을 모르고 입력했다가 오류를 보게 되므로 상시 노출한다. 반대로 항목 설명을 필드 아래에 두면 아는 사람에게는 자리만 차지한다.</div>
+      </div>
+    </section>
+
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 7.2</span><span class="chip">4.5</span><h3>모달 안에서 확인 알럿을 띄우지 않는다</h3></div>
+      <div class="gs-quote">모달 위에 확인 모달을 겹치면 어느 것을 조작하는지 알기 어렵고 닫는 순서도 헷갈린다. 모달은 입력이 적어 다시 작성하는 비용이 낮으므로 취소 시 즉시 닫는다. 경고가 필요하면 모달 안에 인라인으로 표시하고 실행 버튼 라벨로 결과를 알린다. 입력이 많은 페이지 폼에서는 확인 알럿을 유지한다.</div>
+      <div class="demo">
+        <div class="demo-lb">모달 — 경고를 안에 두고 버튼 라벨로 결과를 알린다</div>
+        <div style="max-width:440px;border:1px solid var(--border);background:var(--card);border-radius:12px;overflow:hidden">
+          <div style="padding:16px 18px 12px;border-bottom:1px solid var(--border)">
+            <div style="font-size:14px;font-weight:600">수정</div>
+          </div>
+          <div style="padding:16px 18px">
+            <div style="margin-bottom:12px">
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--muted-foreground);margin-bottom:6px">이름</label>
+              <input class="inp" value="new-name" style="width:100%">
+            </div>
+            <div class="alertbox warn" style="margin-bottom:0">
+              <svg class="aic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 2.4 18a1.8 1.8 0 0 0 1.6 2.7h16a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+              <div class="atx">이름을 변경하면 이 워크스페이스를 참조하는 경로가 함께 바뀔 수 있습니다.</div>
+            </div>
+          </div>
+          <div style="padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
+            <button class="btn ghost">취소</button>
+            <button class="btn">이름 변경 후 저장</button>
+          </div>
+        </div>
+        <div class="note">취소는 확인 없이 즉시 닫는다. 페이지 폼(생성·신청 등)은 입력이 많아 잃는 비용이 크므로 7.2대로 [계속 작성] / [취소] 확인 알럿을 유지한다. 삭제·종료 같은 파괴적 액션의 확인 알럿은 목록·상세에서 호출되므로 이 규칙과 무관하다.</div>
+      </div>
+    </section>
+
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 7.5</span><span class="chip">4.5</span><h3>파괴적 액션 버튼</h3></div>
+      <div class="gs-quote">삭제·종료처럼 되돌릴 수 없는 액션은 두 단계로 나눠 표현한다. 화면에 상시 노출되는 진입 버튼은 외곽선으로 두고, 확인 알럿의 최종 실행 버튼만 채운다. 진입 버튼까지 채우면 화면에서 그 버튼만 도드라져 정작 자주 쓰는 액션이 묻힌다. ⭐ 되돌릴 수 없는 액션 라벨 — <code>삭제 · 제외 · 취소 · 폐기 · 나가기 · 해제 · 반납 · 신청 취소</code>. 확인 알럿의 최종 실행 버튼이 이 라벨이면 채움으로 둔다.</div>
+      <div class="demo">
+        <div class="demo-lb">진입 — 상세 화면 헤더</div>
+        <div style="display:flex;gap:8px;margin-bottom:18px">
+          <button class="btn ghost">수정</button>
+          <button class="btn danger-line">삭제</button>
+        </div>
+
+        <div class="demo-lb">최종 확인 — 알럿</div>
+        <div style="max-width:400px;border:1px solid var(--border);background:var(--card);border-radius:12px;padding:18px 20px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px">알림</div>
+          <p style="margin:0 0 16px;font-size:12.5px;color:var(--muted-foreground);line-height:1.65">
+            이 워크스페이스에는 멤버 3명과 운영 중인 자원이 있습니다. 삭제하면 모델·배포·개발환경이 함께 제거되며 복구할 수 없습니다.
+          </p>
+          <div style="display:flex;justify-content:flex-end;gap:8px">
+            <button class="btn ghost">취소</button>
+            <button class="btn danger">삭제</button>
+          </div>
+        </div>
+        <div class="note">진입 버튼이 여럿일 때는 파괴적 액션을 더보기 메뉴로 내리는 것도 검토한다. 삭제 빈도가 낮은 화면에서는 상시 노출할 이유가 없다.</div>
+      </div>
+    </section>
+
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 1.7</span><span class="chip">4.3</span><h3>링크 · 텍스트 버튼</h3></div>
+      <div class="gs-quote">링크는 색이 아니라 밑줄로 구분한다. 강조색을 링크에 쓰면 화면에서 링크만 도드라져 실제로 강조해야 할 요소가 묻힌다. 목록 행 이름은 행 전체가 클릭 대상이므로 평상시 밑줄을 두지 않고 호버 시에만 표시한다.</div>
+      <div class="demo">
+        <div class="demo-lb">이동 링크 — 다른 화면으로 넘어간다</div>
+        <p style="font-size:13px;line-height:1.7;margin:0 0 16px">
+          이 모델은 <a class="lnk">gpt-oss-120b-symphony</a> 배포에서 사용 중입니다.
+          전체 목록은 <a class="lnk">배포 화면</a>에서 확인할 수 있습니다.
+        </p>
+
+        <div class="demo-lb">목록 행 이름 — 호버 시에만 밑줄</div>
+        <div class="tblwrap" style="margin-bottom:16px"><table class="tbl">
+          <thead><tr><th>이름</th><th>상태</th></tr></thead>
+          <tbody>
+          <tr><td><a class="lnk-row">gpt-oss-120b</a></td><td><span class="st ok">캐싱됨</span></td></tr>
+          <tr><td><a class="lnk-row">gemma-4-12b-it</a></td><td><span class="st mu">미캐싱</span></td></tr>
+          </tbody></table></div>
+
+        <div class="demo-lb">텍스트 버튼 — 이동이 아니라 동작</div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+          <button class="txtbtn">조건 초기화</button>
+          <button class="txtbtn">전체 선택</button>
+          <button class="txtbtn">전체 보기 →</button>
+        </div>
+
+        <div class="demo-lb">경로 — 위치 표시가 주 목적</div>
+        <div class="crumb"><a>콘체르토 플랫폼</a> / <a>워크스페이스</a> / <b>상세</b></div>
+
+        <div class="note">이동 링크는 밑줄을 상시 노출하고 호버 시 진해진다. 텍스트 버튼은 평상시 흐린 색이며 호버 시 밑줄이 생긴다. 경로는 현재 위치를 볼드로 두고 클릭할 수 없다(4.3).</div>
+      </div>
+    </section>
+
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 4.2</span><span class="chip">2.1</span><h3>사이드 패널 · 섹션 접기</h3></div>
+      <div class="gs-quote">목록에서 대상을 바꿔가며 확인하는 상세는 사이드 패널로 제공한다. 패널 안의 섹션은 성격(식별·귀속 / 속성·스펙 / 상태·현황 / 설정 / 연관 리소스)으로 나누고 최대 6개로 한다. 모든 섹션은 기본 펼침이며 사용자가 개별로 접을 수 있다. 접힘 상태는 패널을 닫으면 초기화한다.
+
+        <p style="margin:14px 0 0"><b>⭐ 패널에 담는 것</b> — 목록 컬럼만으로 부족하지만 <b>대상에 진입할지 판단하는 데</b> 필요한 값. 조작은 그 자리에서 끝나는 단일 액션(승인·반려 등)이나 다른 화면으로 가는 버튼만 둔다.</p>
+        <p style="margin:8px 0 0"><b>⭐ 패널에 담지 않는 것</b> — ① 항목 수가 정해지지 않은 하위 목록(스크롤이 생기면 패널의 이점이 사라진다. 건수와 이동 버튼만 둔다) ② 생성·편집 폼(좁은 폭에서 입력이 눌린다) ③ 탭(탭이 필요하면 페이지로 전환한다) ④ 진입 판단과 무관한 감사용 정보. <b>항목 수가 소수로 고정된 목록</b>(멤버 등)은 스크롤이 생기지 않는 범위에서 담을 수 있다.</p>
+        <p style="margin:8px 0 0"><b>⭐ 상세와의 관계</b> — 상세에 항목이 추가되어도 패널에 자동으로 반영하지 않는다. 패널 추가는 위 두 기준으로 별도 판단한다. 이 조항이 없으면 검증 과정에서 <i>상세에 있는데 패널에 왜 없냐</i>는 지적이 반복되어 경계가 무너진다.</p></div>
+      <div class="demo">
+        <div class="demo-lb">섹션 제목을 눌러 접기 · 항목 옆 ? 에 호버</div>
+        <div class="lib-panel">
+          <div class="pn-head">
+            <div class="pn-r1">
+              <h4>gpt-oss-120b</h4>
+              <button class="pn-ic" title="상세 페이지로 이동"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-8 8M10 6H5a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1v-5"/></svg></button>
+              <button class="pn-ic" title="더보기">⋯</button>
+            </div>
+            <div class="pn-tags"><span class="badge">모델 이미지</span><span class="st ok">캐싱됨</span></div>
+          </div>
+          <div class="pn-body">
+            <div class="lsec" id="ls1"><h5 onclick="lsecTg('ls1')">기본 정보<span class="fold">▾</span></h5>
+              <div class="lsec-body"><dl class="ldl">
+                <dt>버전</dt><dd>1.0.0</dd>
+                <dt>표시 범위</dt><dd>글로벌 카탈로그</dd>
+                <dt>등록자</dt><dd>성유진(yj.seong)</dd>
+              </dl></div></div>
+            <div class="lsec" id="ls2"><h5 onclick="lsecTg('ls2')">모델 사양<span class="fold">▾</span></h5>
+              <div class="lsec-body"><dl class="ldl">
+                <dt>양자화<span class="dtic">?<span class="dtpop">모델 가중치를 더 적은 비트로 표현해 메모리 사용량을 줄이는 방식입니다.</span></span></dt><dd>NVFP4</dd>
+                <dt>최소 vRAM</dt><dd>160 GB / 노드</dd>
+                <dt>요구 GPU 유형</dt><dd>NVIDIA-H200</dd>
+              </dl></div></div>
+            <div class="lsec" id="ls3"><h5 onclick="lsecTg('ls3')">사용 중인 배포 <span style="font-weight:400;color:var(--muted-foreground)">2건</span><span class="fold">▾</span></h5>
+              <div class="lsec-body" style="font-size:12.5px;color:var(--muted-foreground)">다른 리소스의 속성은 링크로만 제공한다(2.1).</div></div>
+          </div>
+        </div>
+        <div class="note">상세 페이지가 필요한 경우(실시간 스트리밍·대용량 호출·독립 URL)에는 패널 우측 상단 확장 버튼으로 페이지에 진입한다. ⭐ 단일 액션은 패널 하단에 둘 수 있다 — 승인·반려처럼 값 입력 없이 한 번에 끝나고, 처리 후 목록으로 돌아가는 동작이 그렇다. 값을 입력해야 하면 모달이나 페이지로 넘긴다.</div>
+      </div>
+    </section>
+
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 3.2</span><span class="chip">3.3</span><h3>컬럼 헤더 필터 · 검색 조건 칩</h3></div>
+      <div class="gs-quote">필터는 목록 상단(컬럼 헤더)에서 제공한다. 필터 축은 기획서에서 고정 정의하며 데이터가 노출 여부를 결정하지 않는다. 선택지는 실제 존재하는 값으로 채우고 건수를 함께 표기한다. 검색 조건은 칩으로 누적하며 조건 간 관계는 AND로 표시한다.</div>
+      <div class="demo">
+        <div class="demo-lb">필터 아이콘을 눌러 열기</div>
+        <div style="position:relative;display:inline-block">
+        <span class="thwrap">캐싱 상태
+          <span class="thic">?</span>
+          <button class="thfilter on" onclick="fddTg(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button>
+        </span>
+          <div class="fdd" id="libFdd" onclick="event.stopPropagation()">
+            <label><input type="checkbox">전체<span class="fc">12</span></label><hr>
+            <label><input type="checkbox" checked>캐싱됨<span class="fc">5</span></label>
+            <label><input type="checkbox">미캐싱<span class="fc">6</span></label>
+            <label><input type="checkbox">캐싱 중<span class="fc">1</span></label>
+            <hr><div class="fbtns"><button>초기화</button><button class="pri">확인</button></div>
+          </div>
+        </div>
+        <div style="margin-top:18px">
+          <div class="demo-lb">검색 조건 칩</div>
+          <div class="chips">
+            <span class="schip">llama<button>✕</button></span>
+            <span class="andmark">AND</span>
+            <span class="schip">yj.seong<button>✕</button></span>
+            <button class="clr">조건 초기화</button>
+          </div>
+        </div>
+        <div class="note">필터가 걸린 열은 아이콘에 강조를 준다. 조건은 확인 버튼을 눌러 적용하며, 작업 완료 후에는 초기화한다.</div>
+      </div>
+    </section>
+
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 7.3</span><h3>진행률 — 단계가 있는 작업</h3></div>
+      <div class="gs-quote">진행 정도를 측정할 수 있는 비동기 작업에는 진행률을 표시한다. 단계가 정해진 작업은 현재 단계를 함께 보여준다. 상태 배지만으로는 어디까지 진행됐는지 알 수 없다.</div>
+      <div class="demo">
+        <div class="demo-lb">모델 반입 — 3단계</div>
+        <div class="prog">
+          <div class="plabel"><span><b>llama-3.2-1b</b> 반입 중</span><span>압축·변환 40%</span></div>
+          <div class="pbar"><div class="pfill" style="width:40%"></div></div>
+          <div class="psteps"><span class="pstep done">다운로드</span><span class="pstep on">압축·변환</span><span class="pstep">스토리지 이관</span></div>
         </div>
       </div>
+    </section>
 
-      <div class="fgrid" style="margin-top:18px">
-        <div class="field">
-          <label>알림 채널 (체크박스)</label>
-          <div class="checks">
-            <label class="check"><input type="checkbox" checked>Portal (기본)</label>
-            <label class="check"><input type="checkbox">Email</label>
-          </div>
-        </div>
-        <div class="field">
-          <label>가속기 (라디오)</label>
-          <div class="checks">
-            <label class="check"><input type="radio" name="acc" checked>GPU</label>
-            <label class="check"><input type="radio" name="acc">CPU</label>
-          </div>
-        </div>
-        <div class="field">
-          <label>토글 · 세그먼트 · 검색</label>
-          <div class="tgrow"><span>자동 스케일링 (온·오프 스위치)</span><span class="tg on" onclick="this.classList.toggle('on')"></span></div>
-          <div class="segmented" style="margin-top:12px" onclick="segPick(event)"><button class="on">전체</button><button>실행중</button><button>중지</button></div>
-          <div style="margin-top:12px"><input class="inp" placeholder="🔎 검색어 입력 후 Enter"></div>
-        </div>
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 7.1</span><h3>선택지 카드</h3></div>
+      <div class="gs-quote">선택 결과가 갈리고 무엇을 고르는지 설명이 필요한 경우 드롭다운·라디오 대신 카드로 제공한다. 각 선택지에 결과와 적합한 상황을 함께 적는다.</div>
+      <div class="demo">
+        <div class="demo-lb">서빙 토폴로지</div>
+        <div class="optcard"><input type="radio" name="libtopo">
+          <div><div class="oc-t">단일 노드</div><div class="oc-d">프리필과 디코드를 같은 파드에서 처리합니다. 구성이 단순하고 자원을 적게 씁니다.</div><span class="oc-tag">일반적인 서비스</span></div></div>
+        <div class="optcard on"><input type="radio" name="libtopo" checked>
+          <div><div class="oc-t">프리필·디코드 분리</div><div class="oc-d">연산이 몰리는 프리필과 메모리 대역폭이 중요한 디코드를 물리적으로 나눠 배치합니다.</div><span class="oc-tag">동시 요청이 많은 대형 서비스</span></div></div>
+        <div class="note">항목이 많거나 설명이 필요 없으면 드롭다운을 쓴다. 카드는 판단이 필요한 선택에만 적용한다.</div>
       </div>
+    </section>
 
-      <div class="note" style="margin-top:16px"><b>버튼 활성 규칙(7.1)</b> — 아래 저장 버튼은 위 '이름'이 입력되어야 활성화된다(필수·유효성 통과 시 등록/저장 활성화). 이메일 필드는 유효성 실패(7.8) 예시로 에러 상태를 고정해 두었다.</div>
-      <div class="row" style="margin-top:10px"><button class="btn" id="saveBtn" disabled data-lb="저장" onclick="proc(this)">저장</button><span style="font-size:12px;color:var(--muted-foreground)">← '이름' 입력 시 활성화</span></div>
-    </div>
-  </section>
-</div>
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 7.2</span><span class="chip">7.8</span><h3>마법사 단계 네비게이터</h3></div>
+      <div class="gs-quote">입력 항목이 많고 단계 간 의존·분기가 있으며 되돌리기 어려운 작업은 마법사로 제공한다. 완료한 단계는 클릭으로 이동할 수 있고, 검증은 단계 이동 시점에 인라인으로 처리한다. 마지막 단계에서 전체를 확인한다.</div>
+      <div class="demo">
+        <div class="wnav">
+          <h6>배포 단계</h6>
+          <div class="wstep done"><span class="no">✓</span><span class="tx"><b>모델</b><span>배포할 모델과 엔진 옵션</span></span></div>
+          <div class="wstep err"><span class="no">!</span><span class="tx"><b>게이트웨이</b><span>배포명과 외부 접근 설정</span></span></div>
+          <div class="wstep on"><span class="no">03</span><span class="tx"><b>서빙 방식</b><span>토폴로지와 스케줄링</span></span></div>
+          <div class="wstep lock"><span class="no">04</span><span class="tx"><b>실행 규모</b><span>레플리카와 오토스케일</span></span></div>
+        </div>
+        <div class="note">오류가 있는 단계는 마지막까지 기다리지 않고 네비게이터에 표시한다. 이탈 시 입력값이 있으면 확인 알럿을 표시한다(7.2).</div>
+      </div>
+    </section>
 
-<!-- ================= 탭3: 상태 매트릭스 ================= -->
-<div class="pane" id="paneMtx">
-  <p class="h2note" style="margin-bottom:18px">컴포넌트별로 상태(Default·Focus·Hover·완료/선택·Disabled·Error)와 변형을 한 행에 정리한 매트릭스다. 콘체르토 상태·문구·팔레트 기준이며, 색·정확한 px는 시안(디자인/프론트 확정). 해당 상태가 없으면 '해당 없음'으로 둔다.</p>
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 4.1</span><h3>진단 — 원인과 조치</h3></div>
+      <div class="gs-quote">오류 상태를 배지로만 표시하면 사용자가 원인을 알 수 없다. 원인 설명과 조치 방법을 함께 제시하고, 조치로 이어지는 실행 경로를 붙인다.</div>
+      <div class="demo">
+        <div class="diag">
+          <svg class="dic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v5M12 16.5v.01"/><circle cx="12" cy="12" r="9"/></svg>
+          <div style="flex:1">
+            <div class="dtt">가속기 메모리가 부족해 파드가 기동되지 않았습니다.</div>
+            <div class="dds">모델이 요구하는 최소 vRAM은 노드당 320GB이나 현재 배치된 노드의 가용 vRAM은 80GB입니다.</div>
+            <div class="drc"><b>권장 조치</b>파드당 가속기 개수를 늘리거나, 요구 vRAM이 낮은 모델로 변경해 주세요.</div>
+            <div style="margin-top:10px"><button class="btn">설정 변경</button></div>
+          </div>
+        </div>
+        <div class="note">경고 수준은 <code>.warn</code>을 붙여 색을 낮춘다. 조치 버튼 없이 안내만 하면 사용자가 어디서 처리할지 알 수 없다.</div>
+      </div>
+    </section>
 
-  <h2>입력 계열 상태 매트릭스</h2>
-  <p class="h2note">Input · Search · Dropdown · Checkbox의 상태별 표기. Focus는 포커스 링, Error는 필드 에러 상태 + 하위 문구(7.8).</p>
-  <div class="mtxwrap">
-    <table class="mtx">
-      <thead><tr><th>컴포넌트</th><th>Default</th><th>Focus</th><th>Hover</th><th>완료 / 선택</th><th>Disabled</th><th>Error</th><th>Variation</th></tr></thead>
-      <tbody>
+    <section class="gs">
+      <div class="gs-head"><span class="chip">공통정책 1.2</span><h3>로그 뷰</h3></div>
+      <div class="gs-quote">로그는 장문이므로 테이블에 넣지 않는다. 실시간으로 표출하는 화면과 쌓아두고 분석하는 화면은 성격이 다르며, 전자는 읽고 흘려보내는 용도이므로 정렬·비교 대상이 아니다.</div>
+      <div class="demo">
+        <div class="logbar">
+          <button class="chbtn on">APP</button><button class="chbtn on">INFRA</button><button class="chbtn">SYSTEM</button>
+          <button class="chbtn" style="margin-left:8px">노이즈 숨김</button>
+          <span class="live"><span class="ld"></span>실시간 수신 중</span>
+        </div>
+        <div class="logbox">
+          <div class="logrow"><span class="ch infra">[INFRA]</span><span class="tm">17:40:08</span><span class="msg">Pod scheduled on node gpu-svr-02.</span></div>
+          <div class="logrow"><span class="ch app">[APP]</span><span class="tm">17:41:02</span><span class="msg">vLLM engine initialized. KV cache 48.2 GB allocated.</span></div>
+          <div class="logrow"><span class="ch app">[APP]</span><span class="tm">17:41:04</span><span class="msg">Model weights loaded. Ready to serve.</span></div>
+          <div class="logrow"><span class="ch infra">[INFRA]</span><span class="tm">18:03:44</span><span class="msg">Autoscale triggered. Replica 1 → 2.</span></div>
+        </div>
+        <div class="note">채널 필터와 노이즈 숨김만 제공한다. 검색·시간 범위·레벨 구분은 분석 영역이므로 별도 화면에서 다룬다.</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= 탭3: 상태 매트릭스 ================= -->
+  <div class="pane" id="paneMtx">
+    <p class="h2note" style="margin-bottom:18px">컴포넌트별로 상태(Default·Focus·Hover·완료/선택·Disabled·Error)와 변형을 한 행에 정리한 매트릭스다. 콘체르토 상태·문구·팔레트 기준이며, 색·정확한 px는 시안(디자인/프론트 확정). 해당 상태가 없으면 '해당 없음'으로 둔다.</p>
+
+    <h2>입력 계열 상태 매트릭스</h2>
+    <p class="h2note">Input · Search · Dropdown · Checkbox의 상태별 표기. Focus는 포커스 링, Error는 필드 에러 상태 + 하위 문구(7.8).</p>
+    <div class="mtxwrap">
+      <table class="mtx">
+        <thead><tr><th>컴포넌트</th><th>Default</th><th>Focus</th><th>Hover</th><th>완료 / 선택</th><th>Disabled</th><th>Error</th><th>Variation</th></tr></thead>
+        <tbody>
         <tr>
           <td class="rh">Input</td>
           <td><input class="inp miniinp" placeholder="입력하세요"></td>
@@ -640,16 +1281,16 @@
           <td><label class="check"><input type="checkbox" style="outline:1.5px solid var(--destructive);outline-offset:1px">이전 설정과 동일</label></td>
           <td class="var">단일 체크박스 · 부분 선택(indeterminate, 전체 중 일부 선택 시). Error는 필수(반드시 체크해야 진행) 체크박스에만 해당 — 예: 필수 동의. '이전 설정과 동일' 같은 선택 체크박스는 에러 없음.</td>
         </tr>
-      </tbody>
-    </table>
-  </div>
+        </tbody>
+      </table>
+    </div>
 
-  <h2>Button — 사이즈 · 변형</h2>
-  <p class="h2note">크기는 티어(L/M/S/XS)로만 정한다. 정확한 높이·여백(px)은 시안이며 디자인/프론트(shadcn 기본)가 확정한다. 색은 브랜드 primary 기준(변경 가능).</p>
-  <div class="mtxwrap">
-    <table class="mtx">
-      <thead><tr><th>사이즈</th><th>기본(Solid)</th><th>라인(Outline)</th><th>아이콘 결합</th><th>비고</th></tr></thead>
-      <tbody>
+    <h2>Button — 사이즈 · 변형</h2>
+    <p class="h2note">크기는 티어(L/M/S/XS)로만 정한다. 정확한 높이·여백(px)은 시안이며 디자인/프론트(shadcn 기본)가 확정한다. 색은 브랜드 primary 기준(변경 가능).</p>
+    <div class="mtxwrap">
+      <table class="mtx">
+        <thead><tr><th>사이즈</th><th>기본(Solid)</th><th>라인(Outline)</th><th>아이콘 결합</th><th>비고</th></tr></thead>
+        <tbody>
         <tr><td class="rh">L</td>
           <td><button class="btn" style="padding:11px 20px;font-size:14px">일이삼사</button></td>
           <td><button class="btn ghost" style="padding:11px 20px;font-size:14px;border-color:var(--primary);color:var(--primary)">일이삼사</button></td>
@@ -667,16 +1308,16 @@
           <td><button class="btn" style="padding:5px 11px;font-size:12px">일이삼</button></td>
           <td><button class="btn ghost" style="padding:5px 11px;font-size:12px;border-color:var(--primary);color:var(--primary)">일이삼</button></td>
           <td><button class="btn" style="padding:5px 11px;font-size:12px">＋ 일이삼</button></td></tr>
-      </tbody>
-    </table>
-  </div>
+        </tbody>
+      </table>
+    </div>
 
-  <h2>Badge — 사이즈</h2>
-  <p class="h2note">높이는 티어별 고정, 가로는 텍스트 길이에 따라. 상태 색은 5.1 상태값 기준. 채움 방식(소프트 필/아웃라인)은 한 스타일로 통일하며 디자이너 검토·시안이다.</p>
-  <div class="mtxwrap">
-    <table class="mtx">
-      <thead><tr><th>사이즈</th><th>상태 배지 (색은 상태값별)</th><th>비고</th></tr></thead>
-      <tbody>
+    <h2>Badge — 사이즈</h2>
+    <p class="h2note">높이는 티어별 고정, 가로는 텍스트 길이에 따라. 상태 색은 5.1 상태값 기준. 채움 방식(소프트 필/아웃라인)은 한 스타일로 통일하며 디자이너 검토·시안이다.</p>
+    <div class="mtxwrap">
+      <table class="mtx">
+        <thead><tr><th>사이즈</th><th>상태 배지 (색은 상태값별)</th><th>비고</th></tr></thead>
+        <tbody>
         <tr><td class="rh">S <small>20px</small></td>
           <td style="text-align:left"><span class="stbadge ok" style="font-size:10.5px;padding:1px 7px"><span class="d" style="width:5px;height:5px"></span>정상</span> <span class="stbadge wa" style="font-size:10.5px;padding:1px 7px"><span class="d" style="width:5px;height:5px"></span>경고</span> <span class="stbadge cr" style="font-size:10.5px;padding:1px 7px"><span class="d" style="width:5px;height:5px"></span>위험</span></td>
           <td class="var" rowspan="3">채움 방식(소프트 필/아웃라인)은 하나로 통일한다 — 디자이너 검토·시안. 솔리드 채움은 강조가 꼭 필요한 상태(위험·실패)나 카운트 배지에만 예외로 쓴다. 숫자 배지(카운트)=1.8, 상태 배지=5.1. px는 시안.</td></tr>
@@ -684,12 +1325,12 @@
           <td style="text-align:left"><span class="stbadge ok" style="font-size:12.5px;padding:4px 11px"><span class="d"></span>정상</span> <span class="stbadge wa" style="font-size:12.5px;padding:4px 11px"><span class="d"></span>경고</span> <span class="stbadge cr" style="font-size:12.5px;padding:4px 11px"><span class="d"></span>위험</span></td></tr>
         <tr><td class="rh">L <small>28px</small></td>
           <td style="text-align:left"><span class="stbadge ok" style="font-size:14.5px;padding:6px 15px"><span class="d" style="width:8px;height:8px"></span>정상</span> <span class="stbadge wa" style="font-size:14.5px;padding:6px 15px"><span class="d" style="width:8px;height:8px"></span>경고</span> <span class="stbadge cr" style="font-size:14.5px;padding:6px 15px"><span class="d" style="width:8px;height:8px"></span>위험</span></td></tr>
-      </tbody>
-    </table>
-  </div>
+        </tbody>
+      </table>
+    </div>
 
-  <div class="note" style="margin-top:6px">Table(정렬·선택·페이지네이션)·Step(진행 상태)·FileUploader(첨부 전/후·조회·Error)는 같은 형식으로 확장 예정이다.</div>
-</div>
+    <div class="note" style="margin-top:6px">Table(정렬·선택·페이지네이션)·Step(진행 상태)·FileUploader(첨부 전/후·조회·Error)는 같은 형식으로 확장 예정이다.</div>
+  </div>
 
 </div>
 
@@ -698,119 +1339,124 @@
 <div class="overlay" id="overlay"></div>
 
 <script>
-/* ---- 탭 ---- */
-function showTab(t){
-  ['Color','Comp','Mtx'].forEach(function(k){
-    var key=k.toLowerCase();
-    document.getElementById('pane'+k).classList.toggle('on', t===key);
-    document.getElementById('tab'+k).classList.toggle('on', t===key);
-  });
-  window.scrollTo(0,0);
-}
-
-/* ---- 팔레트 ---- */
-var INDIGO=[['50','#eef1fc'],['100','#d5ddfa'],['200','#aebdf5'],['300','#8397ee'],['400','#5a78e8'],['500','#4159d6'],['600','#3346c9'],['700','#26368f'],['800','#182352'],['900','#0f1838'],['950','#0a1026']];
-var SLATE=[['50','#f5f6f9'],['100','#eceef2'],['200','#dde0e7'],['300','#c5c9d2'],['400','#8f95a1'],['500','#616773'],['600','#464b55'],['700','#31353d'],['800','#22252c'],['900','#16181f'],['950','#0d0f14']];
-function ramp(id,arr,name){document.getElementById(id).innerHTML=arr.map(function(x){return '<div class="sw"><div class="chip" style="background:'+x[1]+'"></div><div class="meta"><b>'+name+'-'+x[0]+'</b>'+x[1]+'</div></div>';}).join('');}
-ramp('rampIndigo',INDIGO,'indigo');ramp('rampSlate',SLATE,'slate');
-var TOKENS=[['background','화면 배경','#f4f6fc','#0d0f14'],['foreground','기본 텍스트','#171d33','#e6e8ee'],['card','카드·표면','#ffffff','#16181f'],['muted','비강조 배경','#eef1f9','#1c1f27'],['muted-foreground','보조 텍스트','#565f7e','#969ba6'],['border','경계·구분선','#dce2f1','#262a33'],['primary','주 액션(브랜드)','#3346c9','#4159d6'],['accent','강조·링크·포커스','#4f6fe6','#7d97f0'],['success','성공 상태','#2f9e6a','#46b17f'],['warning','경고 상태','#c98a2e','#d9a441'],['destructive','위험·삭제','#d64a51','#e0585f']];
-document.getElementById('tokGrid').innerHTML=TOKENS.map(function(t){return '<div class="tok"><div class="band" style="background:var(--'+t[0]+')"><span class="tag">--'+t[0]+'</span></div><div class="body"><div class="nm">--'+t[0]+'</div><div class="use">'+t[1]+'</div><div class="vals"><span>L <b>'+t[2]+'</b></span><span>D <b>'+t[3]+'</b></span></div></div></div>';}).join('');
-(function(){var l=':root {\n'+TOKENS.map(function(t){return '  --'+t[0]+': '+t[2]+';';}).join('\n')+'\n  --ring: #4f6fe6;\n  --radius: 0.75rem;\n}';var d='.dark {\n'+TOKENS.map(function(t){return '  --'+t[0]+': '+t[3]+';';}).join('\n')+'\n  --ring: #7d97f0;\n}';document.getElementById('codeBlock').textContent=l+'\n\n'+d;})();
-
-/* ---- 상태 ---- */
-var STATES={
-'default':'<div style="width:100%;padding:2px 4px"><table class="tbl"><thead><tr><th>이름</th><th>상태</th><th>생성일시</th></tr></thead><tbody><tr><td>llama-3-8b-serving</td><td><span class="stbadge ok"><span class="d"></span>ACTIVE</span></td><td>2026-07-18 14:22:05</td></tr><tr><td>batch-embed-daily</td><td><span class="stbadge ac"><span class="d"></span>Running</span></td><td>2026-07-18 09:10:41</td></tr></tbody></table></div>',
-'loading':'<div class="bigspin"></div><div class="sub">데이터를 불러오는 중… · 영역 크기 유지</div><div style="width:100%;display:flex;flex-direction:column;gap:10px;margin-top:4px"><div class="skrow"><span class="sk" style="width:34%"></span><span class="sk" style="width:20%"></span><span class="sk" style="width:26%"></span></div><div class="skrow"><span class="sk" style="width:30%"></span><span class="sk" style="width:18%"></span><span class="sk" style="width:24%"></span></div></div>',
-'empty':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="width:32px;height:32px;opacity:.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg><div class="msg">배포가 없습니다.</div><div class="sub">첫 배포를 생성해 추론을 시작하세요.</div><button class="btn" onclick="toast(\'ok\',\'✅ (예시) 생성 화면으로 이동\',3000)">＋ 배포 생성</button>',
-'search':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:30px;height:30px;opacity:.6"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><div class="msg">검색 결과가 없습니다.</div><div class="sub">검색어·필터 조건을 변경해보세요.</div>',
-'error':'<svg viewBox="0 0 24 24" fill="none" stroke="var(--destructive)" stroke-width="1.5" style="width:30px;height:30px"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><div class="msg">데이터를 불러오지 못했습니다.</div><div class="sub">잠시 후 다시 시도해주세요.</div><button class="btn ghost" onclick="setState(\'loading\',null);setTimeout(function(){setState(\'default\',null)},1000)">↻ 재시도</button>',
-'perm':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:30px;height:30px;opacity:.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg><div class="msg">접근 권한이 없습니다.</div><div class="sub">권한이 있는 관리자에게 문의하세요.</div><button class="btn ghost" onclick="toast(\'ok\',\'✅ (예시) 이전 화면으로 이동\',3000)">← 이전 화면</button>'
-};
-function setState(key,btn){document.getElementById('stateZone').innerHTML=STATES[key];if(btn){document.querySelectorAll('.state-tabs button').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');}}
-setState('default',null);
-
-/* ---- 토스트 ---- */
-function toast(type,text,ms){
-  var wrap=document.getElementById('toastWrap');var el=document.createElement('div');
-  el.className='toast '+(type==='ok'?'ok':type==='err'?'err':'warn');
-  var icon=type==='ok'?'✅':type==='err'?'❌':'⚠️';var body=text.replace(/^([✅❌⚠️])\s*/,'');
-  el.innerHTML='<span class="ic">'+icon+'</span><span class="tx">'+body+'</span><button class="cl" aria-label="닫기">×</button>';
-  el.querySelector('.cl').onclick=function(){dismiss(el);};
-  wrap.appendChild(el);el._t=setTimeout(function(){dismiss(el);},ms);
-}
-function dismiss(el){if(el._t)clearTimeout(el._t);el.classList.add('out');setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},200);}
-
-/* ---- 처리 중 (라벨 유지 + 스피너) ---- */
-function proc(btn){
-  if(btn.disabled)return;var lb=btn.getAttribute('data-lb');
-  btn.disabled=true;btn.innerHTML='<span class="spin"></span>'+lb;
-  setTimeout(function(){btn.disabled=false;btn.innerHTML=lb;toast('ok','✅ '+lb+' 작업이 완료되었습니다.',3000);},1500);
-}
-
-/* ---- 모달 (3유형: 알림·확인·입력) ---- */
-var _ov=document.getElementById('overlay');
-function _rm(html){_ov.innerHTML='<div class="modal" role="dialog" aria-modal="true">'+html+'</div>';_ov.classList.add('on');}
-function closeModal(){_ov.classList.remove('on');_ov.innerHTML='';}
-function openAlert(){_rm('<h3>안내</h3><p>선택한 배포는 이미 삭제되어 작업을 진행할 수 없습니다.</p><div class="acts"><button class="btn" onclick="closeModal()">확인</button></div>');}
-function openConfirm(){_rm('<h3>배포를 삭제하시겠습니까?</h3><p>llama-3-8b-serving을(를) 삭제하시겠습니까? 삭제된 항목은 복구할 수 없습니다.</p><div class="acts"><button class="btn ghost" onclick="closeModal()">취소</button><button class="btn danger" onclick="closeModal();toast(\'ok\',\'✅ 삭제 작업이 완료되었습니다.\',3000)">삭제</button></div>');}
-function openForm(){_rm('<h3>기본 정보 수정</h3><div class="field" style="max-width:none"><label>이름 <span class="req">*</span></label><input class="inp" id="fmName" placeholder="워크스페이스 이름" value="연구팀" oninput="onFormInput()"></div><div class="field" style="max-width:none;margin-top:12px"><label>설명</label><textarea class="inp" id="fmDesc" placeholder="설명(선택)"></textarea></div><div class="acts" style="margin-top:20px"><button class="btn ghost" onclick="cancelForm()">취소</button><button class="btn" id="fmSave" onclick="closeModal();toast(\'ok\',\'✅ 저장되었습니다.\',3000)">저장</button></div>');onFormInput();}
-function onFormInput(){var n=document.getElementById('fmName');var s=document.getElementById('fmSave');if(s)s.disabled=!n||n.value.trim()==='';}
-function cancelForm(){var n=document.getElementById('fmName');var d=document.getElementById('fmDesc');var has=(n&&n.value.trim()!=='')||(d&&d.value.trim()!=='');if(has){_rm('<h3>작성 중인 내용이 저장되지 않습니다</h3><p>작성 중인 내용은 저장되지 않습니다. 취소하시겠습니까?</p><div class="acts"><button class="btn ghost" onclick="openForm()">계속 작성</button><button class="btn danger" onclick="closeModal()">취소</button></div>');}else{closeModal();}}
-_ov.addEventListener('click',function(e){if(e.target===this){/* 4.5: 외부 클릭 무시 */}});
-
-/* ---- 팝오버 ---- */
-function togglePop(e){e.stopPropagation();document.getElementById('pop').classList.toggle('open');}
-/* ---- 행 작업 메뉴 (⋯) ---- */
-function openRowMenu(e){
-  e.stopPropagation();closeRowMenu();
-  var m=document.createElement('div');m.className='rowmenu';m.id='rowmenu';
-  m.innerHTML='<a onclick="return false">상세 보기</a><a onclick="return false">수정</a><a class="danger" onclick="return false">삭제</a>';
-  document.body.appendChild(m);
-  var r=e.currentTarget.getBoundingClientRect();
-  var top=r.bottom+4, left=r.right-150;
-  m.style.top=top+'px';m.style.left=Math.max(8,left)+'px';
-}
-function closeRowMenu(){var m=document.getElementById('rowmenu');if(m)m.remove();}
-document.addEventListener('click',function(e){
-  document.getElementById('pop').classList.remove('open');
-  var msdd=document.getElementById('msdd');
-  if(msdd && !msdd.contains(e.target)) msdd.classList.remove('open');
-  if(!e.target.closest||!e.target.closest('.rowmenu'))closeRowMenu();
-});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.getElementById('pop').classList.remove('open');var m=document.getElementById('msdd');if(m)m.classList.remove('open');closeRowMenu();/* 모달은 ESC로 안 닫음 */}});
-
-/* ---- 페이지 크기 ---- */
-function onPageSize(){var n=document.getElementById('pageSize').value;var last=Math.ceil(123/parseInt(n,10));document.getElementById('lastPg').textContent=last;}
-onPageSize();
-
-/* ---- 폼 ---- */
-function onName(){
-  var v=document.getElementById('nameInp');
-  document.getElementById('nameCnt').textContent=v.value.length;
-  document.getElementById('saveBtn').disabled = v.value.trim().length===0;
-  if(v.value.trim()) document.getElementById('f-name').classList.remove('show-err');
-}
-function reqBlur(id,el){ document.getElementById(id).classList.toggle('show-err', el.value.trim()===''); }
-function rmTag(btn,e){ e.stopPropagation(); btn.parentElement.remove(); }
-function mselAdd(e){
-  if(e.key==='Enter' && !e.isComposing && e.keyCode!==229){
-    e.preventDefault();
-    var v=e.target.value.trim(); if(!v)return;
-    var t=document.createElement('span'); t.className='tag';
-    t.innerHTML=v+'<button onclick="rmTag(this,event)" aria-label="제거">×</button>';
-    e.target.parentElement.insertBefore(t,e.target); e.target.value='';
+  /* ---- 탭 ---- */
+  function showTab(t){
+    ['Color','Comp','Mtx'].forEach(function(k){
+      var key=k.toLowerCase();
+      document.getElementById('pane'+k).classList.toggle('on', t===key);
+      document.getElementById('tab'+k).classList.toggle('on', t===key);
+    });
+    window.scrollTo(0,0);
   }
-}
-function toggleMsdd(e){ e.stopPropagation(); document.getElementById('msdd').classList.toggle('open'); }
-function msddUpd(){
-  var pop=document.getElementById('msddPop');
-  var sel=[].slice.call(pop.querySelectorAll('input:checked')).map(function(i){return i.value;});
-  document.getElementById('msddLabel').textContent = sel.length ? sel.join(', ') : '전체';
-}
-function segPick(e){ var b=e.target.closest('button'); if(!b)return; b.parentElement.querySelectorAll('button').forEach(function(x){x.classList.remove('on')}); b.classList.add('on'); }
 
-/* ---- 테마 ---- */
-function toggleMode(){var dark=document.body.classList.toggle('dark');document.getElementById('modeLb').textContent=dark?'라이트로 보기':'다크로 보기';}
+  /* ---- 팔레트 ---- */
+  var INDIGO=[['50','#eef1fc'],['100','#d5ddfa'],['200','#aebdf5'],['300','#8397ee'],['400','#5a78e8'],['500','#4159d6'],['600','#3346c9'],['700','#26368f'],['800','#182352'],['900','#0f1838'],['950','#0a1026']];
+  var SLATE=[['50','#f5f6f9'],['100','#eceef2'],['200','#dde0e7'],['300','#c5c9d2'],['400','#8f95a1'],['500','#616773'],['600','#464b55'],['700','#31353d'],['800','#22252c'],['900','#16181f'],['950','#0d0f14']];
+  function ramp(id,arr,name){document.getElementById(id).innerHTML=arr.map(function(x){return '<div class="sw"><div class="chip" style="background:'+x[1]+'"></div><div class="meta"><b>'+name+'-'+x[0]+'</b>'+x[1]+'</div></div>';}).join('');}
+  ramp('rampIndigo',INDIGO,'indigo');ramp('rampSlate',SLATE,'slate');
+  var TOKENS=[['background','화면 배경','#f4f6fc','#0d0f14'],['foreground','기본 텍스트','#171d33','#e6e8ee'],['card','카드·표면','#ffffff','#16181f'],['muted','비강조 표면(배지·코드블록·헤더바)','#eef1f9','#1c1f27'],['hover','행·항목 hover','#fafbfe','#1b1e26'],['selected','선택 상태','#dde6f8','#252b38'],['thead','테이블 헤더','#edf0f7','#212530'],['muted-foreground','보조 텍스트','#565f7e','#969ba6'],['border','면 구분선','#dce2f1','#262a33'],['border-strong','버튼·클릭 대상 테두리','#b9c3dd','#3d4454'],['primary','주 액션(브랜드)','#3346c9','#4159d6'],['primary-hover','주 액션 hover(라이트 프론트확정 / 다크 제안값)','#26368f','#35489f'],['accent','강조·링크·포커스','#4f6fe6','#7d97f0'],['success','성공 상태','#2f9e6a','#46b17f'],['warning','경고 상태','#c98a2e','#d9a441'],['destructive','위험·삭제','#d64a51','#e0585f'],['destructive-hover','위험 액션 hover','#b93b42','#c74a51'],['underline','링크 밑줄','#a8b0c8','#4d5566']];
+  document.getElementById('tokGrid').innerHTML=TOKENS.map(function(t){return '<div class="tok"><div class="band" style="background:var(--'+t[0]+')"><span class="tag">--'+t[0]+'</span></div><div class="body"><div class="nm">--'+t[0]+'</div><div class="use">'+t[1]+'</div><div class="vals"><span>L <b>'+t[2]+'</b></span><span>D <b>'+t[3]+'</b></span></div></div></div>';}).join('');
+  (function(){var l=':root {\n'+TOKENS.map(function(t){return '  --'+t[0]+': '+t[2]+';';}).join('\n')+'\n  --ring: #4f6fe6;\n  --radius: 0.75rem;\n}';var d='.dark {\n'+TOKENS.map(function(t){return '  --'+t[0]+': '+t[3]+';';}).join('\n')+'\n  --ring: #7d97f0;\n}';document.getElementById('codeBlock').textContent=l+'\n\n'+d;})();
+
+  /* ---- 상태 ---- */
+  var STATES={
+    'default':'<div style="width:100%;padding:2px 4px"><table class="tbl"><thead><tr><th>이름</th><th>상태</th><th>생성일시</th></tr></thead><tbody><tr><td>llama-3-8b-serving</td><td><span class="stbadge ok"><span class="d"></span>ACTIVE</span></td><td>2026-07-18 14:22:05</td></tr><tr><td>batch-embed-daily</td><td><span class="stbadge ac"><span class="d"></span>Running</span></td><td>2026-07-18 09:10:41</td></tr></tbody></table></div>',
+    'loading':'<div class="bigspin"></div><div class="sub">데이터를 불러오는 중… · 영역 크기 유지</div><div style="width:100%;display:flex;flex-direction:column;gap:10px;margin-top:4px"><div class="skrow"><span class="sk" style="width:34%"></span><span class="sk" style="width:20%"></span><span class="sk" style="width:26%"></span></div><div class="skrow"><span class="sk" style="width:30%"></span><span class="sk" style="width:18%"></span><span class="sk" style="width:24%"></span></div></div>',
+    'empty':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="width:32px;height:32px;opacity:.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg><div class="msg">배포가 없습니다.</div><div class="sub">첫 배포를 생성해 추론을 시작하세요.</div><button class="btn" onclick="toast(\'ok\',\'✅ (예시) 생성 화면으로 이동\',3000)">＋ 배포 생성</button>',
+    'search':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:30px;height:30px;opacity:.6"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><div class="msg">검색 결과가 없습니다.</div><div class="sub">검색어·필터 조건을 변경해보세요.</div>',
+    'error':'<svg viewBox="0 0 24 24" fill="none" stroke="var(--destructive)" stroke-width="1.5" style="width:30px;height:30px"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><div class="msg">데이터를 불러오지 못했습니다.</div><div class="sub">잠시 후 다시 시도해주세요.</div><button class="btn ghost" onclick="setState(\'loading\',null);setTimeout(function(){setState(\'default\',null)},1000)">↻ 재시도</button>',
+    'perm':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:30px;height:30px;opacity:.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg><div class="msg">접근 권한이 없습니다.</div><div class="sub">권한이 있는 관리자에게 문의하세요.</div><button class="btn ghost" onclick="toast(\'ok\',\'✅ (예시) 이전 화면으로 이동\',3000)">← 이전 화면</button>'
+  };
+  function setState(key,btn){document.getElementById('stateZone').innerHTML=STATES[key];if(btn){document.querySelectorAll('.state-tabs button').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');}}
+  setState('default',null);
+
+  /* ---- 토스트 ---- */
+  function toast(type,text,ms){
+    var wrap=document.getElementById('toastWrap');var el=document.createElement('div');
+    el.className='toast '+(type==='ok'?'ok':type==='err'?'err':'warn');
+    var icon=type==='ok'?'✅':type==='err'?'❌':'⚠️';var body=text.replace(/^([✅❌⚠️])\s*/,'');
+    el.innerHTML='<span class="ic">'+icon+'</span><span class="tx">'+body+'</span><button class="cl" aria-label="닫기">×</button>';
+    el.querySelector('.cl').onclick=function(){dismiss(el);};
+    wrap.appendChild(el);el._t=setTimeout(function(){dismiss(el);},ms);
+  }
+  function dismiss(el){if(el._t)clearTimeout(el._t);el.classList.add('out');setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},200);}
+
+  /* ---- 처리 중 (라벨 유지 + 스피너) ---- */
+  function proc(btn){
+    if(btn.disabled)return;var lb=btn.getAttribute('data-lb');
+    btn.disabled=true;btn.innerHTML='<span class="spin"></span>'+lb;
+    setTimeout(function(){btn.disabled=false;btn.innerHTML=lb;toast('ok','✅ '+lb+' 작업이 완료되었습니다.',3000);},1500);
+  }
+
+  /* ---- 모달 (3유형: 알림·확인·입력) ---- */
+  var _ov=document.getElementById('overlay');
+  function _rm(html){_ov.innerHTML='<div class="modal" role="dialog" aria-modal="true">'+html+'</div>';_ov.classList.add('on');}
+  function closeModal(){_ov.classList.remove('on');_ov.innerHTML='';}
+  function openAlert(){_rm('<h3>안내</h3><p>선택한 배포는 이미 삭제되어 작업을 진행할 수 없습니다.</p><div class="acts"><button class="btn" onclick="closeModal()">확인</button></div>');}
+  function openConfirm(){_rm('<h3>배포를 삭제하시겠습니까?</h3><p>llama-3-8b-serving을(를) 삭제하시겠습니까? 삭제된 항목은 복구할 수 없습니다.</p><div class="acts"><button class="btn ghost" onclick="closeModal()">취소</button><button class="btn danger" onclick="closeModal();toast(\'ok\',\'✅ 삭제 작업이 완료되었습니다.\',3000)">삭제</button></div>');}
+  function openForm(){_rm('<h3>기본 정보 수정</h3><div class="field" style="max-width:none"><label>이름 <span class="req">*</span></label><input class="inp" id="fmName" placeholder="워크스페이스 이름" value="연구팀" oninput="onFormInput()"></div><div class="field" style="max-width:none;margin-top:12px"><label>설명</label><textarea class="inp" id="fmDesc" placeholder="설명(선택)"></textarea></div><div class="acts" style="margin-top:20px"><button class="btn ghost" onclick="cancelForm()">취소</button><button class="btn" id="fmSave" onclick="closeModal();toast(\'ok\',\'✅ 저장되었습니다.\',3000)">저장</button></div>');onFormInput();}
+  function onFormInput(){var n=document.getElementById('fmName');var s=document.getElementById('fmSave');if(s)s.disabled=!n||n.value.trim()==='';}
+  function cancelForm(){var n=document.getElementById('fmName');var d=document.getElementById('fmDesc');var has=(n&&n.value.trim()!=='')||(d&&d.value.trim()!=='');if(has){_rm('<h3>작성 중인 내용이 저장되지 않습니다</h3><p>작성 중인 내용은 저장되지 않습니다. 취소하시겠습니까?</p><div class="acts"><button class="btn ghost" onclick="openForm()">계속 작성</button><button class="btn danger" onclick="closeModal()">취소</button></div>');}else{closeModal();}}
+  _ov.addEventListener('click',function(e){if(e.target===this){/* 4.5: 외부 클릭 무시 */}});
+
+  /* ---- 팝오버 ---- */
+  function togglePop(e){e.stopPropagation();document.getElementById('pop').classList.toggle('open');}
+  /* ---- 행 작업 메뉴 (⋯) ---- */
+  function openRowMenu(e){
+    e.stopPropagation();closeRowMenu();
+    var m=document.createElement('div');m.className='rowmenu';m.id='rowmenu';
+    m.innerHTML='<a onclick="return false">상세 보기</a><a onclick="return false">수정</a><a class="danger" onclick="return false">삭제</a>';
+    document.body.appendChild(m);
+    var r=e.currentTarget.getBoundingClientRect();
+    var top=r.bottom+4, left=r.right-150;
+    m.style.top=top+'px';m.style.left=Math.max(8,left)+'px';
+  }
+  function closeRowMenu(){var m=document.getElementById('rowmenu');if(m)m.remove();}
+  document.addEventListener('click',function(e){
+    document.getElementById('pop').classList.remove('open');
+    var msdd=document.getElementById('msdd');
+    if(msdd && !msdd.contains(e.target)) msdd.classList.remove('open');
+    if(!e.target.closest||!e.target.closest('.rowmenu'))closeRowMenu();
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.getElementById('pop').classList.remove('open');var m=document.getElementById('msdd');if(m)m.classList.remove('open');closeRowMenu();/* 모달은 ESC로 안 닫음 */}});
+
+  /* ---- 페이지 크기 ---- */
+  function onPageSize(){var n=document.getElementById('pageSize').value;var last=Math.ceil(123/parseInt(n,10));document.getElementById('lastPg').textContent=last;}
+  onPageSize();
+
+  /* ---- 폼 ---- */
+  function onName(){
+    var v=document.getElementById('nameInp');
+    document.getElementById('nameCnt').textContent=v.value.length;
+    document.getElementById('saveBtn').disabled = v.value.trim().length===0;
+    if(v.value.trim()) document.getElementById('f-name').classList.remove('show-err');
+  }
+  function reqBlur(id,el){ document.getElementById(id).classList.toggle('show-err', el.value.trim()===''); }
+  function rmTag(btn,e){ e.stopPropagation(); btn.parentElement.remove(); }
+  function mselAdd(e){
+    if(e.key==='Enter' && !e.isComposing && e.keyCode!==229){
+      e.preventDefault();
+      var v=e.target.value.trim(); if(!v)return;
+      var t=document.createElement('span'); t.className='tag';
+      t.innerHTML=v+'<button onclick="rmTag(this,event)" aria-label="제거">×</button>';
+      e.target.parentElement.insertBefore(t,e.target); e.target.value='';
+    }
+  }
+  function toggleMsdd(e){ e.stopPropagation(); document.getElementById('msdd').classList.toggle('open'); }
+  function msddUpd(){
+    var pop=document.getElementById('msddPop');
+    var sel=[].slice.call(pop.querySelectorAll('input:checked')).map(function(i){return i.value;});
+    document.getElementById('msddLabel').textContent = sel.length ? sel.join(', ') : '전체';
+  }
+  function segPick(e){ var b=e.target.closest('button'); if(!b)return; b.parentElement.querySelectorAll('button').forEach(function(x){x.classList.remove('on')}); b.classList.add('on'); }
+
+  /* ---- 테마 ---- */
+  function toggleMode(){var dark=document.body.classList.toggle('dark');document.getElementById('modeLb').textContent=dark?'라이트로 보기':'다크로 보기';}
+
+  /* v0.3 신규 컴포넌트 데모 */
+  function lsecTg(id){var el=document.getElementById(id); if(el) el.classList.toggle('closed');}
+  function fddTg(e){e.stopPropagation();var d=document.getElementById('libFdd'); if(d) d.classList.toggle('open');}
+  document.addEventListener('click',function(){var d=document.getElementById('libFdd'); if(d) d.classList.remove('open');});
 </script>
 </body>
 </html>
