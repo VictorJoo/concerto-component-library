@@ -1,3 +1,71 @@
+<!--
+  콘체르토 매니저 — 워크스페이스 화면 목업 v0.1 (2026-08-05)
+  이 파일이 색·컴포넌트 규격의 정본이다. 컴포넌트 라이브러리·공통 레이아웃을 여기에 맞춘다.
+
+  [검토용 임시 장치 — 확정 후 삭제]
+  하단 비교 바(전역 워크스페이스 B/A/C · 화면 · 데이터 상태 · 권한 · 소속 수 · 테마)와
+  우측 비교안 설명 패널은 안을 고르기 위한 장치다.
+  기획서에 담기는 내용이 아니며 안이 확정되면 삭제한다.
+  전역 워크스페이스는 B안(구획 분리)으로 확정. A·C안은 비교 참고용으로만 남긴다.
+
+  ── 색·토큰 ──────────────────────────────────────
+  · 표면·호버·선택을 한 토큰으로 겸하지 않는다.
+    --hover(주 표면·화면 배경·띄우는 면 위) / --hover-strong(비강조 면·테이블 헤더 위)
+    / --selected(선택·현재) / --thead(테이블 헤더)
+  · 경계선 토큰(--border)을 호버 배경으로 쓰지 않는다.
+  · 버튼·클릭 대상 테두리는 --border-strong.
+  · 링크는 색이 아니라 밑줄로 구분한다(--underline).
+
+  ── 목록 ────────────────────────────────────────
+  · 카드 기본 + 테이블 전환. 표현이 바뀌어도 조회 조건과 선택 상태를 유지한다(공통정책 2.4)
+  · 전역 워크스페이스는 하나뿐이므로 목록 상단 [시스템] 구획에 고정한다(B안).
+    유형 컬럼을 두지 않는다 — 구획과 위치가 곧 구분이다.
+    목록에 섞는 A안에서만 유형 컬럼과 필터를 제공한다(2.2 3순위·3.2)
+  · 이름 셀은 클릭 대상이라(2.3) 배지를 붙이지 않는다
+  · 소속 워크스페이스가 1개이고 최고 관리자가 아니면 목록을 거치지 않고 상세로 이동한다.
+    전역은 소속이 아니므로 세지 않고 상단 전환 드롭다운으로 접근한다
+
+  ── 사이드 패널 ─────────────────────────────────
+  · 배경막을 두지 않는다. 패널이 열려 있어도 목록·GNB·헤더를 한 번의 클릭으로 조작한다
+  · 다른 행·카드를 선택하면 패널을 유지하고 내용만 교체한다.
+    열려 있는 대상은 .rowsel 로 표시한다(.sel 은 select 요소 클래스와 이름이 겹쳐 쓰지 않는다)
+  · 목록 자체가 바뀌는 조작(뷰 전환·정렬·필터·검색)은 패널을 닫는다 — render() 진입 시 해제
+  · 닫기는 닫기 버튼과 ESC. 외부 클릭으로는 닫지 않는다
+
+  ── 이동 ────────────────────────────────────────
+  · 뒤로가기 버튼은 왔던 곳으로 돌아간다. 목록에서 룸으로 들어왔으면 목록으로,
+    상세에서 들어왔으면 상세로 간다
+  · 브레드크럼은 계층을 표시한다(공통정책 4.3). 개발룸은 상세 아래 화면이므로
+    진입 경로와 무관하게 경로에 상세가 들어간다. 뒤로가기와 성격이 다르다
+
+  ── 개발룸 ──────────────────────────────────────
+  · 개발환경 목록은 워크스페이스 전체를 보여준다. 자원을 나눠 쓰므로 누가 무엇을
+    쓰고 있는지 서로 알아야 조정이 된다(팀장 문서 VIEWER 권한 — CDE 목록 읽기 전용)
+  · 접속·연장·반납은 본인 개발환경에만 노출한다. 남의 것은 조회만 한다
+  · 본인 행은 배경과 `나` 태그로 구분한다
+  · 승인·반려 처리는 내 작업함 소관이다. 여기서는 대기 건수만 알리고 이동 경로를 준다
+
+  ── 계정 ────────────────────────────────────────
+  · 멤버 이름은 최고 관리자에게만 링크로 노출하고 플랫폼 설정 > 사용자 및 역할
+    (SET-USER-L01)로 이동한다. 계정은 그 화면에서 관리하며 여기서는 링크로만 제공한다(2.1)
+  · 진입 권한이 없는 역할에게는 링크를 노출하지 않는다(9.4)
+
+  ── 자원 ────────────────────────────────────────
+  · 워크스페이스 할당량은 기본적으로 운영룸이 사용한다.
+    개발룸을 만들면 할당한 만큼 운영룸 한도에서 옮겨진다
+  · 운영룸이 개발룸보다 우선한다. 운영룸 배포가 확장되면 개발룸 자원이 축소된다
+  · 운영룸은 워크스페이스 생성 시 함께 만들어지고, 개발룸은 별도로 생성한다
+  · 개발룸 자원·공유 볼륨·Egress 설정은 개발룸 생성 화면에서 정한다.
+    해당 화면은 개발룸 기획서에서 별도로 작성 예정이며 이 목업에는 진입점만 둔다.
+    워크스페이스 생성·할당량 수정 폼에는 개발룸 항목을 두지 않는다
+  · 개발룸이 없으면 목록 카드와 개발룸 화면에서 생성 진입점을 제공한다
+
+  ── 전역 워크스페이스 ───────────────────────────
+  · 조회는 일반 워크스페이스와 동일하다 — 클릭하면 패널이 열리고 확장하면 상세로 간다
+  · 수정·삭제·멤버 관리·키 발급 진입점은 미노출(공통정책 9.4).
+    지우면 전역 서빙이 중단되므로 최고 관리자에게도 삭제를 노출하지 않는다
+  · 확인 항목 — 전역 배포가 실제로 이 공간에서 운영되는가
+-->
 <style>
 /* ===== 컴포넌트 라이브러리 역할 토큰 (정본) ===== */
 :root{
@@ -5,16 +73,16 @@
   --card:#ffffff; --card-foreground:#171d33;
   --muted:#eef1f9; --muted-foreground:#565f7e;
   /* 용도별 표면 — 표면·호버·선택을 한 토큰으로 쓰면 인접했을 때 구분이 사라진다 */
-  --surface:#eef1f9; --hover:#fafbfe; --selected:#dde6f8; --thead:#edf0f7;
+  --hover:#fafbfe; --hover-strong:#dce2f1; --selected:#dde6f8; --thead:#edf0f7;
   --border:#dce2f1; --border-strong:#b9c3dd; --input:#dce2f1;
   --primary:#3346c9; --primary-foreground:#ffffff; --primary-hover:#26368f;
   --accent:#4f6fe6; --accent-foreground:#0a1026;
   --success:#2f9e6a; --warning:#c98a2e; --destructive:#d64a51; --destructive-hover:#b93b42;
-  --ring:#4f6fe6; --link:var(--foreground); --underline:#a8b0c8;
+  --ring:#4f6fe6; --underline:#a8b0c8;
   --font:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
   --radius:12px;
   /* 레이아웃 전용 (라이브러리 미정의 · 개정 대상) */
-  --flyout:#ffffff; --card-2:#f0f3fb; --active:#e6ebfa; --faint:#8b93ab;
+  --flyout:#ffffff; --card-2:#f0f3fb; --faint:#8b93ad;
   --shadow:rgba(23,29,51,.10);
   --header-h:58px; --panel-w:440px; --gnb-w:236px;
 }
@@ -22,13 +90,13 @@
   --background:#0d0f14; --foreground:#e6e8ee;
   --card:#16181f; --card-foreground:#e6e8ee;
   --muted:#1c1f27; --muted-foreground:#969ba6;
-  --surface:#1c1f27; --hover:#1b1e26; --selected:#252b38; --thead:#212530;
+  --hover:#1b1e26; --hover-strong:#262a33; --selected:#252b38; --thead:#212530;
   --border:#262a33; --border-strong:#3d4454; --input:#262a33;
   --primary:#4159d6; --primary-foreground:#ffffff; --primary-hover:#35489f;
   --accent:#7d97f0; --accent-foreground:#0a1026;
   --success:#46b17f; --warning:#d9a441; --destructive:#e0585f; --destructive-hover:#c74a51;
-  --ring:#7d97f0; --link:var(--foreground); --underline:#4d5566;
-  --flyout:#181b22; --card-2:#1c1f27; --active:#232a3a; --faint:#5f636d;
+  --ring:#7d97f0; --underline:#4d5566;
+  --flyout:#181b22; --card-2:#1c1f27; --faint:#6f7686;
   --shadow:rgba(0,0,0,.55);
 }
 *{box-sizing:border-box}
@@ -61,27 +129,27 @@ a{color:inherit}
 .nav{padding:6px 12px}
 .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:3px;position:relative}
 .nav a svg{width:19px;height:19px;flex:0 0 auto}
-.nav a:hover{background:var(--card);color:var(--foreground)}
+.nav a:hover{background:var(--hover);color:var(--foreground)}
 .nav a.active{background:var(--selected);color:var(--foreground);font-weight:600}
 .nav a.has-fly::after{content:"›";margin-left:auto;color:var(--faint);font-size:16px}
 .flywrap{position:relative}
 .flyout{position:absolute;left:calc(100% + 6px);top:0;width:210px;background:var(--flyout);border:1px solid var(--border);border-radius:11px;padding:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateX(-6px);transition:.13s;z-index:70}
 .flywrap:hover .flyout{opacity:1;visibility:visible;transform:translateX(0)}
 .flyout a{display:flex;align-items:center;padding:9px 11px;border-radius:8px;color:var(--muted-foreground);text-decoration:none;font-size:13.5px;margin-bottom:2px}
-.flyout a:hover{background:var(--card);color:var(--foreground)}
+.flyout a:hover{background:var(--hover);color:var(--foreground)}
 .flyout a .tb{font-size:9.5px;color:var(--faint);border:1px solid var(--border);border-radius:5px;padding:1px 5px;margin-left:6px}
 .gnb-bottom{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
 .worklist{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);font-size:14px;margin-bottom:3px;cursor:pointer}
 .worklist svg{width:19px;height:19px;color:var(--muted-foreground)}
 .cbadge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--primary);color:var(--primary-foreground);font-size:12px;font-weight:700;display:grid;place-items:center}
-.worklist:hover{background:var(--card);color:var(--foreground)}
+.worklist:hover{background:var(--hover);color:var(--foreground)}
 .notice-common{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:10px}
 .notice-common svg{width:19px;height:19px}
 .worklist .cbadge,.notice-common .cbadge{margin-left:auto}
-.notice-common:hover{background:var(--card);color:var(--foreground)}
+.notice-common:hover{background:var(--hover);color:var(--foreground)}
 
 .persona{position:relative}
-.persona .pbtn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:var(--card-2);border:1px solid var(--border);width:100%}
+.persona .pbtn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:var(--card-2);border:1px solid var(--border-strong);width:100%}
 .av{width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--accent) 18%,transparent);display:grid;place-items:center;font-size:12px;color:var(--accent);flex:0 0 auto}
 .persona .who{line-height:1.25;text-align:left}
 .persona .who b{font-size:13px;display:block}
@@ -131,6 +199,7 @@ body.panel-on .page{padding-right:calc(var(--panel-w) + 28px)}
 
 /* 테이블 */
 .tblwrap{background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:visible}
+
 table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 /* 헤더 배경은 --muted, 행 호버는 --hover 로 분리한다.
    같은 토큰을 쓰면 마우스를 올린 행이 헤더처럼 보인다 */
@@ -143,11 +212,15 @@ table.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(-
 table.tbl tr:last-child td{border-bottom:0}
 table.tbl tbody tr{cursor:pointer}
 table.tbl tbody tr:hover{background:var(--hover)}
-table.tbl tbody tr.sel{background:var(--selected)}
+/* 패널이 열려 있는 대상 표시. .sel 은 select 요소 클래스(126행)와 이름이 겹쳐 쓰지 않는다 */
+table.tbl tbody tr.rowsel{background:var(--selected)}
+table.tbl tbody tr.rowsel:hover{background:var(--selected)}
+.wcard.rowsel{border-color:var(--accent);background:var(--selected)}
 /* 행 이름 — 클릭해 다른 화면으로 가는 것만 밑줄을 둔다.
    .mname 은 이동 대상, .rname 은 강조만 하는 식별자(키 이름·작업 ID·사용자명 등) */
-.mname{font-weight:600;color:var(--foreground);cursor:pointer;
+.mname{display:inline-block;font-weight:600;color:var(--foreground);cursor:pointer;
   text-decoration:underline;text-decoration-color:var(--underline);text-underline-offset:3px}
+a.mname:hover{text-decoration-color:var(--foreground)}
 tr:hover .mname{text-decoration-color:var(--foreground)}
 .rname{font-weight:600;color:var(--foreground);text-decoration:none}
 .mver{color:var(--muted-foreground);font-size:11.5px;margin-left:6px}
@@ -198,8 +271,6 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
 /* 사이드 패널 */
 /* ⭐ 목록이 패널 폭만큼 줄어들어 가려지지 않으므로 배경막을 두지 않는다 */
-.pnbg{position:fixed;inset:0;background:transparent;z-index:85;display:none}
-.pnbg.on{display:block}
 .panel{position:fixed;top:var(--header-h);right:0;bottom:0;width:var(--panel-w);max-width:92vw;background:var(--card);border-left:1px solid var(--border);z-index:90;transform:translateX(102%);transition:transform .2s ease;display:flex;flex-direction:column;box-shadow:-14px 0 40px var(--shadow)}
 .panel.on{transform:translateX(0)}
 .pnhead{padding:18px 20px 14px;border-bottom:1px solid var(--border);flex:0 0 auto}
@@ -381,11 +452,54 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 
 /* 하단 미리보기 바 (시안 확인용) */
 .demo-bar{position:fixed;left:0;right:0;bottom:0;z-index:800;background:#0f1320;color:#c9cfe0;
-  display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;font-size:12px;border-top:1px solid #2a2f45;}
+  display:flex;flex-direction:column;gap:0;font-size:12px;border-top:1px solid #2a2f45;}
+.demo-bar .demo-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;}
+.demo-bar .demo-top{background:#151a2c;border-bottom:1px solid #2a2f45;}
+.demo-bar .demo-top button{padding:6px 14px;font-weight:600;}
+.demo-bar .gwfix{margin-left:6px;font-size:10px;font-weight:700;background:rgba(255,255,255,.22);
+  border-radius:9px;padding:1px 6px;letter-spacing:.2px}
+
+/* 비교안 설명 — 화면 영역에 테두리를 그리고 그 영역의 장단점을 붙인다 */
+.gwnote{position:fixed;right:20px;bottom:104px;transition:right .22s ease;z-index:810;width:520px;max-width:calc(100vw - 40px);
+  background:#151a2c;color:#c9cfe0;border:1px solid #2f3654;border-radius:12px;
+  box-shadow:0 18px 44px rgba(0,0,0,.5);font-size:12.5px;line-height:1.55;display:none}
+.gwnote.on{display:block}
+body.panel-on .gwnote{right:calc(var(--panel-w) + 20px)}
+.gwnote .nhd{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid #2a2f45}
+.gwnote .nhd b{font-size:13px;color:#fff}
+.gwnote.ref .nhd b{color:#8f97b0}
+.gwnote .nhd .nx{margin-left:auto;background:transparent;border:0;color:#7f88a8;cursor:pointer;
+  font-size:16px;line-height:1;padding:2px 4px;border-radius:6px;font-family:inherit}
+.gwnote .nhd .nx:hover{color:#fff}
+.gwnote .nbd{padding:0}
+.gwnote table{width:100%;border-collapse:collapse;font-size:12px}
+.gwnote th{text-align:left;font-weight:700;color:#7f88a8;font-size:11px;letter-spacing:.3px;
+  padding:8px 12px;border-bottom:1px solid #2a2f45;background:#11162a}
+.gwnote td{padding:9px 12px;border-bottom:1px solid #232840;vertical-align:top}
+.gwnote td.area{white-space:nowrap;color:#fff;font-weight:600}
+.gwnote ul{margin:0;padding-left:15px}
+.gwnote li{margin-bottom:3px}
+.gwnote li:last-child{margin-bottom:0}
+.gwnote .good li{color:#8fdcb4}
+.gwnote .bad li{color:#f2b0b5}
+.gwnote .nft{padding:10px 14px;border-top:1px solid #2a2f45;color:#7f88a8;font-size:11.5px}
+.gwnote .nft b{color:#e8c073;font-weight:700}
+.gwnote .ntemp{margin-top:8px;padding-top:8px;border-top:1px solid #2a2f45;color:#5f677f;font-size:11px}
 .demo-bar .demo-label{color:#7f88a8;margin-right:4px;}
+/* 목록 구획 제목 — 성격이 다른 항목을 가른다 */
+/* 값 태그 — 읽기만 하는 라벨. 배경 없이 테두리로 구분 (라이브러리 v0.4) */
+/* 본인 개발환경 행 — 목록에서 내 것을 바로 찾을 수 있게 한다 */
+table.tbl tbody tr.rowme{background:var(--hover)}
+table.tbl tbody tr.rowme:hover{background:var(--hover-strong)}
+.vtag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:5px;background:transparent;border:1px solid var(--border);color:var(--muted-foreground)}
+.syshd{font-size:12px;font-weight:700;color:var(--faint);letter-spacing:.3px;margin:2px 0 8px}
+.syshd + .cardgrid + .syshd{margin-top:20px}
+.wcard.sysws{border-color:var(--border-strong)}
+table.tbl tbody tr.sysrow{background:var(--muted)}
+table.tbl tbody tr.sysrow:hover{background:var(--hover-strong)}
 .demo-bar button{background:#1c2136;border:1px solid #2f3654;color:#c9cfe0;border-radius:6px;padding:5px 10px;font-size:12px;font-family:inherit;cursor:pointer;}
 .demo-bar button:hover{border-color:var(--accent);color:#fff;}
-.demo-bar .vw.on,.demo-bar .st.on,.demo-bar .rl.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+.demo-bar .vw.on,.demo-bar .st.on,.demo-bar .rl.on,.demo-bar .gw.on,.demo-bar .mb.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
 .demo-bar button.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600;}
 
 /* GNB 접기 */
@@ -437,7 +551,7 @@ body.gnb-fold-on .gnb-fold{justify-content:center}
 th .thwrap{display:inline-flex;align-items:center;gap:5px}
 .thic{width:15px;height:15px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);font-size:10px;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex:0 0 auto}
 .thfilter{width:18px;height:18px;display:inline-grid;place-items:center;border:0;background:transparent;color:var(--muted-foreground);border-radius:4px;cursor:pointer;flex:0 0 auto}
-.thfilter:hover{background:var(--border);color:var(--foreground)}
+.thfilter:hover{background:var(--hover-strong);color:var(--foreground)}
 .thfilter.on{color:var(--primary)}
 .dark .thfilter.on{color:var(--accent)}
 .thfilter svg{width:12px;height:12px}
@@ -453,7 +567,7 @@ th.thcell.fdd-on .fdd{display:block}
 .fdd label .fc{margin-left:auto;font-size:11px;color:var(--faint)}
 .fdd hr{border:0;border-top:1px solid var(--border);margin:6px 0}
 .fdd .fbtns{display:flex;justify-content:flex-end;gap:6px;padding:2px}
-.fdd .fbtns button{padding:5px 11px;border-radius:7px;font-size:12px;font-family:inherit;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted-foreground)}
+.fdd .fbtns button{padding:5px 11px;border-radius:7px;font-size:12px;font-family:inherit;cursor:pointer;border:1px solid var(--border-strong);background:transparent;color:var(--muted-foreground)}
 .fdd .fbtns button.pri{background:var(--primary);border-color:var(--primary);color:var(--primary-foreground);font-weight:600}
 
 /* 상세 패널 섹션 접기 — 기본 펼침, 개별 접기 가능 */
@@ -581,7 +695,7 @@ th.thcell.fdd-on .fdd{display:block}
 .logrow .tm{color:var(--faint);flex:0 0 74px}
 .logrow .msg{color:var(--foreground);white-space:pre-wrap}
 .logbar{display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap}
-.chbtn{padding:5px 11px;border:1px solid var(--border);background:transparent;border-radius:20px;font-size:12px;color:var(--muted-foreground);font-family:inherit;cursor:pointer}
+.chbtn{padding:5px 11px;border:1px solid var(--border-strong);background:transparent;border-radius:20px;font-size:12px;color:var(--muted-foreground);font-family:inherit;cursor:pointer}
 .chbtn.on{background:color-mix(in srgb,var(--primary) 14%,transparent);border-color:var(--primary);color:var(--primary);font-weight:600}
 .dark .chbtn.on{color:var(--accent);border-color:var(--accent)}
 .live{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--success);margin-left:auto}
@@ -711,6 +825,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .roombtn:hover{border-color:var(--accent);color:var(--foreground)}
 .roombtn .rdot{width:6px;height:6px;border-radius:50%;flex:0 0 auto}
 /* 패널 환경 탭 — 운영룸·개발룸 구분 */
+.roombtn.add{color:var(--primary);border-style:dashed}
 .roombtn .rdot.ok{background:var(--success)}
 .roombtn .rdot.cr{background:var(--destructive)}
 .roombtn .rdot.mu{background:var(--faint)}
@@ -1143,7 +1258,6 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 </div>
 
 <!-- 상세 패널 WKSP-L01.P01 -->
-<div class="pnbg" id="pnbg" onclick="closePanel()"></div>
 <aside class="panel" id="panel">
   <div class="pnhead">
     <div class="r1">
@@ -1359,7 +1473,21 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 
 <div class="toast-wrap" id="toasts"></div>
 
+<div class="gwnote" id="gwNote">
+  <div class="nhd"><b id="gwNoteTitle"></b><button class="nx" onclick="closeGwNote()" title="닫기">×</button></div>
+  <div class="nbd" id="gwNoteBody"></div>
+  <div class="nft" id="gwNoteFoot"></div>
+</div>
 <div class="demo-bar" id="demoBar">
+  <div class="demo-row demo-top">
+    <span class="demo-label" style="color:#5f677f">검토용 · 확정 후 삭제</span>
+    <span class="demo-label" style="margin-left:8px">전역 워크스페이스:</span>
+    <button class="gw on" onclick="setGw('split',this)">B안 · 구획 분리 <span class="gwfix">확정</span></button>
+    <span class="demo-label" style="margin-left:4px;color:#5f677f">참고</span>
+    <button class="gw" onclick="setGw('mix',this)">A안 · 목록에 섞기</button>
+    <button class="gw" onclick="setGw('off',this)">C안 · 없음</button>
+  </div>
+  <div class="demo-row">
   <span class="demo-label">화면:</span>
   <button class="vw on" onclick="goList(this)">목록</button>
   <button class="vw" onclick="goDemo('detail',this)">상세</button>
@@ -1377,19 +1505,39 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <button class="rl" onclick="setRole('admin',this)">WS 관리자</button>
   <button class="rl" onclick="setRole('editor',this)">편집자</button>
   <button class="rl" onclick="setRole('viewer',this)">뷰어</button>
+  <span class="demo-label" style="margin-left:12px;">소속:</span>
+  <button class="mb" id="mbOne" onclick="setMemb(1,this)">1개</button>
+  <button class="mb on" id="mbMany" onclick="setMemb(0,this)">여러 개</button>
   <span class="demo-label" style="margin-left:12px;">테마:</span>
   <button onclick="document.body.classList.remove('dark')">라이트</button>
   <button onclick="document.body.classList.add('dark')">다크</button>
+  </div>
 </div>
 <script>
 /* ===== 데이터 =====
    DEV·PROD는 물리 분리된 환경이며 자원 한도를 각각 책정한다(기술문서 워크스페이스 절).
    개발룸에 할당하고 남은 유휴 쿼터가 운영룸으로 자동 스케줄링된다(현행 운영룸 안내). */
-/* 전역 모델과 외부 반입 배포는 워크스페이스에 담지 않는다.
-   전역 모델은 visibility: GLOBAL 속성으로, 반입 배포는 워크스페이스 미지정으로 처리한다.
-   현행의 Common Workspace는 조회 컨텍스트 확보를 위한 임시 구현으로 판단해 제외했다.
-   판단 근거는 콘체르토매니저_CommonWorkspace_제거판단 문서 참조 */
+/* 전역 워크스페이스(현행 Common Workspace) — A/B 비교 대상.
+   A안: 전역 배포가 이 공간에서 실제로 운영된다는 전제. 자원을 쓰는 실체이므로 목록에 표시한다.
+        전 역할이 조회하고 수정·삭제는 최고 관리자 전용(공통정책 9.4에 따라 그 외에는 미노출).
+   B안: 전역 자산을 속성으로만 표현한다는 전제. 목록에 두지 않는다.
+   확인 항목 — 전역 배포가 실제로 이 공간에서 운영되는가 */
+let gwMode='split';   /* split · mix · off */
+/* 소속 수 — 1이면 소속 워크스페이스를 하나로 좁혀 단일 소속 동작을 재현한다.
+   데이터는 그대로 두고 조회 결과만 좁히므로 다른 화면에 영향이 없다 */
+let membLimit=0;
 const WS=[
+ /* 전역 워크스페이스 — 조회는 일반 워크스페이스와 동일하게 패널·상세를 제공한다.
+    다른 것은 목록에서의 위치(정렬 제외)와 수정·삭제 진입점 미노출뿐이다 */
+ {n:'전역 워크스페이스',ico:'server',st:'정상',desc:'플랫폼 전역 서빙 공간. 전역 모델과 반입 배포가 여기서 운영된다',
+  sys:true, prod:'정상', dev:'미사용', by:'시스템', at:'2026-01-02 09:00:00',
+  quota:{cpu:24,ram:96,gpu:2,vol:200},
+  devq:{cpu:0,ram:0,gpu:0},
+  use:{cpu:18,ram:70,gpu:2},
+  members:[{n:'관리자',id:'admin',role:'관리자'}],
+  models:[{n:'qwen3-32b',st:'캐싱됨',use:'배포 중'},{n:'gemma-4-12b-it',st:'캐싱됨',use:'배포 중'}],
+  deps:[{n:'qwen3-32b-global',st:'정상',rep:'2 / 2'},{n:'gemma-4-12b-global',st:'정상',rep:'2 / 2'}],
+  ext:[], cdes:[], keys:[], jobs:[]},
  {n:'ai-service-team',ico:'server',st:'정상',desc:'AI 서비스 개발 및 모델 서빙',
   prod:'정상',dev:'정상',by:'성유진(yj.seong)',at:'2026-05-14 10:20:31',
   quota:{cpu:32,ram:128,gpu:2,vol:100},
@@ -1438,7 +1586,22 @@ const WS=[
   deps:[], ext:[],
   cdes:[{u:'jh.yu',env:'Jupyter Lab',fw:'PyTorch (CUDA)',acc:'NVIDIA-H200 2개',mode:'비동기 위임',
          start:'2026-07-15 10:11:02',exp:'2026-08-15 10:11:00',st:'정상',ip:'-'}],
-  keys:[], jobs:[]}
+  keys:[], jobs:[]},
+ /* 편집자·뷰어도 여러 워크스페이스에 소속될 수 있다. 역할별 다중 소속을 확인하기 위한 데모 데이터 */
+ {n:'vision-lab',ico:'flask',st:'정상',desc:'비전 모델 실험',
+  prod:'정상',dev:'정상',by:'임승주(sj.lim)',at:'2026-06-20 15:02:44',
+  quota:{cpu:16,ram:64,gpu:1,vol:50},
+  devq:{cpu:8,ram:32,gpu:1},
+  use:{cpu:9,ram:36,gpu:1},
+  members:[{n:'임승주',id:'sj.lim',role:'관리자'},{n:'성유진',id:'yj.seong',role:'편집자'}],
+  models:[], deps:[], ext:[], cdes:[], keys:[], jobs:[]},
+ {n:'legacy-serving',ico:'server',st:'정상',desc:'구버전 모델 서빙 유지',
+  prod:'정상',dev:'미사용',by:'오경환(kh.oh)',at:'2026-03-11 09:31:07',
+  quota:{cpu:12,ram:48,gpu:1,vol:40},
+  devq:{cpu:0,ram:0,gpu:0},
+  use:{cpu:10,ram:40,gpu:1},
+  members:[{n:'오경환',id:'kh.oh',role:'관리자'},{n:'성유진',id:'yj.seong',role:'뷰어'}],
+  models:[], deps:[], ext:[], cdes:[], keys:[], jobs:[]}
 ];
 const RB={'정상':'ok','오류':'cr','생성 중':'ac load','미생성':'mu','승인':'ok','승인 대기':'ac','반려':'cr',
           '캐싱됨':'ok','미캐싱':'mu','배포 중':'ok','미사용':'mu',
@@ -1470,15 +1633,39 @@ let state='default', role='super', view='list', listView='card', cur=null, formK
 /* 권한 (RBAC + 자원 배분은 플랫폼 운영자 소관) */
 const isSuper =()=>role==='super';
 const isWsAdmin=()=>role==='super'||role==='admin';
-const canEditInfo =()=>isWsAdmin();   /* 설명 */
-const canEditQuota=()=>isSuper();     /* 클러스터 자원 배분 */
+/* 전역 워크스페이스는 조회만 제공한다. 수정·삭제·멤버·키 진입점은 미노출(공통정책 9.4).
+   지우면 전역 서빙이 중단되므로 최고 관리자에게도 목록·상세에서 삭제를 노출하지 않는다 */
+const isSysWs =()=>!!(cur && cur.m && cur.m.sys);
+const canEditInfo =()=>isWsAdmin() && !isSysWs();   /* 설명 */
+/* 자원 할당량 조정은 워크스페이스 관리자가 한다(정책 명세서 2장 ADMIN 권한).
+   논리 쿼터라 다른 워크스페이스의 물리 자원을 점유하지 않는다.
+   생성·삭제와 초기 배정만 최고 관리자 소관이다 */
+const canEditQuota=()=>isWsAdmin() && !isSysWs();
 /* 진행 중 상태에서는 같은 작업을 다시 실행할 수 없다(공통정책 7.4) */
 const isBusy=(m)=>m && m.st && m.st!=='정상';
-const canManageMember=()=>isWsAdmin();
-const canIssueKey =()=>isWsAdmin();
+const canManageMember=()=>isWsAdmin() && !isSysWs();
+const canIssueKey =()=>isWsAdmin() && !isSysWs();
 const canCreateWs =()=>isSuper();
 const canRequestWs=()=>!isSuper();    /* 일반 사용자는 신청 */
 const canUseCde   =()=>role!=='viewer';
+/* 본인 개발환경 판정 — 목업은 yj.seong 을 현재 사용자로 둔다 */
+const ME='yj.seong';
+function isMine(c){ return c.u===ME; }
+/* 계정은 플랫폼 설정에서 관리한다(공통정책 2.1 — 다른 리소스는 링크로만).
+   진입 권한이 있는 최고 관리자에게만 링크를 노출한다(9.4 미노출 원칙) */
+const canOpenUser =()=>isSuper();
+function memberName(u){
+  /* 이동이므로 링크로 둔다. 새 탭 열기·주소 확인이 되어야 한다 */
+  return canOpenUser()
+    ? '<a class="mname" href="'+userSettingUrl(u.id)+'" onclick="event.stopPropagation();goUserSetting(event,\''+u.id+'\')" title="사용자 및 역할에서 열기">'+u.n+'</a>'
+    : '<span class="rname">'+u.n+'</span>';
+}
+/* 플랫폼 설정 > 사용자 및 역할 (SET-USER-L01) */
+function userSettingUrl(id){ return '/settings/users?user='+encodeURIComponent(id); }
+function goUserSetting(e,id){
+  e.preventDefault();   /* 목업이라 실제 이동은 하지 않는다 */
+  toast('ok','플랫폼 설정 > 사용자 및 역할(SET-USER-L01)로 이동합니다. 대상 '+id);
+}
 
 /* ===== 검색 ===== */
 let sq='';
@@ -1497,9 +1684,14 @@ function clearQ(){
 function syncCondClr(){}
 
 /* ===== 필터 · 정렬 (테이블 뷰) ===== */
-const FDEF=[{k:'prod',l:'운영룸',opts:['정상','오류','생성 중']},{k:'dev',l:'개발룸',opts:['정상','오류','미생성']}];
+const FDEF=[{k:'kind',l:'유형',opts:['전역','일반']},{k:'prod',l:'운영룸',opts:['정상','오류','생성 중']},{k:'dev',l:'개발룸',opts:['정상','오류','미생성']}];
+/* 유형은 데이터에 없는 파생값이라 필터·표시에서 같은 함수를 쓴다 */
+function wsKind(m){ return m.sys?'전역':'일반'; }
 const COLDEF={
-  prod:'모델을 서비스하는 환경입니다. 개발룸에 할당하고 남은 자원이 배분됩니다.'
+  kind:'워크스페이스의 범위입니다.'
+    +'<dl><dt>전역</dt><dd>플랫폼 전체에서 공유하는 워크스페이스입니다. 전역 모델과 반입 배포가 여기서 운영됩니다.</dd>'
+    +'<dt>일반</dt><dd>특정 조직·프로젝트에 할당된 워크스페이스입니다.</dd></dl>',
+  prod:'모델을 서비스하는 환경입니다. 워크스페이스 할당량에서 개발룸 몫을 뺀 나머지입니다.'
     +'<dl><dt>정상</dt><dd>배포를 기동하고 서비스할 수 있습니다.</dd>'
     +'<dt>오류</dt><dd>자원 부족 등으로 정상 동작하지 않습니다.</dd>'
     +'<dt>생성 중</dt><dd>네임스페이스와 자원을 준비하고 있습니다.</dd></dl>',
@@ -1535,7 +1727,7 @@ let fsel={}, ftmp={};
 function axis(k){ return FDEF.find(f=>f.k===k); }
 function thFilter(k){
   const f=axis(k); if(!f) return '';
-  const list=base(); const opts=f.opts.filter(o=>list.some(m=>m[k]===o));
+  const list=base(); const opts=f.opts.filter(o=>list.some(m=>(k==='kind'?wsKind(m):m[k])===o));
   const on=fsel[k]||[]; const def=COLDEF[k];
   return '<span class="thwrap">'+f.l+(def?'<span class="thic" tabindex="0">?</span>':'')
     + '<button class="thfilter'+(on.length?' on':'')+'" onclick="tgFdd(event,\''+k+'\')" title="필터">'
@@ -1579,15 +1771,26 @@ function sortTh(k,label){ const on=sortKey===k;
    하단바의 역할 전환은 '그 역할로 소속된 워크스페이스만 조회하는 사용자'를 재현한다.
    최고 관리자는 전역 권한이라 소속과 무관하게 전체를 본다 */
 const ROLE_KO={admin:'관리자',editor:'편집자',viewer:'뷰어'};
-function base(){
-  if(isSuper()) return WS;
+/* 전역 워크스페이스는 소속과 무관하게 전 역할이 조회한다 */
+function gwEntry(){ return WS.find(function(w){return w.sys;}); }
+function gw(){ return gwMode==='off' ? null : gwEntry(); }
+/* 소속 워크스페이스 */
+function mine(){
+  if(isSuper()) return WS.filter(function(w){ return !w.sys; });
   const want=ROLE_KO[role];
-  return WS.filter(function(w){ return w.members.some(function(u){ return u.id==='yj.seong' && u.role===want; }); });
+  const list=WS.filter(function(w){ return !w.sys && w.members.some(function(u){ return u.id==='yj.seong' && u.role===want; }); });
+  return membLimit ? list.slice(0,membLimit) : list;
 }
+/* A안(mix) — 전역을 목록에 섞어 정렬·필터 대상에 포함한다
+   B안(split) — 목록에서 빼고 상단 구획에 고정한다
+   C안(off) — 두지 않는다 */
+function base(){ return gwMode==='mix' ? [gwEntry()].concat(mine()) : mine(); }
+/* 상단 전환 드롭다운은 어느 안이든 전역을 함께 제공한다 */
+function wsOptions(){ return gwMode==='split' ? [gwEntry()].concat(mine()) : base(); }
 function rows(){
   return applySort(base().filter(m=>
       (!sq || [m.n,m.desc,m.by].some(x=>String(x).toLowerCase().includes(sq.toLowerCase())))
-   && FDEF.every(f=>{const v=fsel[f.k]; return !v||!v.length||v.includes(m[f.k]);})));
+   && FDEF.every(f=>{const v=fsel[f.k]; return !v||!v.length||v.includes(f.k==='kind'?wsKind(m):m[f.k]);})));
 }
 /* 관리자 표기 — 공통정책 1.5 {이름}({아이디}) + 다건은 '외 N명'.
    순서는 생성 시 지정한 최초 관리자가 앞에 온다 */
@@ -1609,12 +1812,17 @@ function setView(v){ listView=v;
 /* 고를 것이 하나뿐이면 목록을 두지 않고 상세로 보낸다.
    편집자·뷰어는 개발룸에 상시 진입하므로 카드 1장을 매번 거치게 하지 않는다.
    최고 관리자는 생성 권한이 있어 항목이 1건이어도 목록이 필요하다 */
-function shouldSkipList(){ return !isSuper() && base().length===1; }
+/* 단일 소속 판정은 소속 워크스페이스만 센다.
+   전역은 소속이 아니라 전 역할에게 열려 있는 항목이며 상단 전환 드롭다운으로 접근한다 */
+function shouldSkipList(){ return !isSuper() && mine().length===1; }
 function enterWorkspaceMenu(){
-  if(shouldSkipList() && state==='default'){ cur={m:base()[0]}; openDetail(); return true; }
+  if(shouldSkipList() && state==='default'){ cur={m:mine()[0]}; openDetail(); return true; }
   return false;
 }
 function render(){
+  /* 목록 자체가 바뀌는 조작(뷰 전환·정렬·필터·검색)은 패널을 닫는다.
+     대상만 바뀌는 조작(다른 행·카드 선택)은 render 를 거치지 않으므로 패널이 유지된다 */
+  closePanel();
   if(view!=='list') return;
   if(enterWorkspaceMenu()) return;
   const el=document.getElementById('listArea'), pg=document.getElementById('pager');
@@ -1646,14 +1854,34 @@ function render(){
   pg.style.display='flex';
   document.getElementById('pgtxt').textContent='총 '+d.length+'건';
   el.innerHTML = listView==='card' ? cardView(d) : tableView(d);
+  setTimeout(drawGwMarks,60);
 }
 
 /* 카드 — 현행 구성 유지. 룸 배지를 눌러 각 환경으로 진입한다 */
+/* 전역 워크스페이스 카드 — 정렬·필터 대상이 아니므로 목록 위 별도 구획에 둔다 */
+function gwCard(){
+  if(gwMode!=='split') return '';
+  const g=gw(); if(!g) return '';
+  const idx=WS.indexOf(g);
+  return '<div class="syshd">시스템</div>'
+   + '<div class="cardgrid" style="margin-bottom:18px">'
+   + '<div class="wcard sysws" data-i="'+idx+'" onclick="openPanel('+idx+')">'
+   +   '<div class="ch"><span class="wsic">'+wsIcon(g.ico)+'</span>'
+   +     '<span class="nm"><b>'+g.n+'</b></span></div>'
+   +   '<div class="cdesc">'+g.desc+'</div>'
+   +   '<div class="crooms">'
+   +     '<button class="roombtn" onclick="event.stopPropagation();openRoom('+idx+',\'prod\')"><span class="rdot '+DOT[g.prod]+'"></span>운영룸 '+g.prod+'</button>'
+   +   '</div>'
+   +   '<div class="cfoot"><span>운영 중인 배포 '+g.deps.length+'건</span><span>시스템</span></div>'
+   + '</div></div>'
+   /* 항목이 하나뿐이면 구획 제목이 과하다 */
+   + (rows().length>1 ? '<div class="syshd">내 워크스페이스</div>' : '');
+}
 function cardView(d){
-  return '<div class="cardgrid">'+d.map(function(m){
+  return gwCard()+'<div class="cardgrid">'+d.map(function(m){
     const idx=WS.indexOf(m);
-    return '<div class="wcard" onclick="openPanel('+idx+')">'
-     + (canEditInfo()?'<div class="cmore more" id="cm'+idx+'" onclick="event.stopPropagation()"><button class="morebtn" onclick="tgMore(event,\'cm'+idx+'\')">⋯</button><div class="rowmenu">'
+    return '<div class="wcard" data-i="'+idx+'" onclick="openPanel('+idx+')">'
+     + (canEditInfo() && !m.sys?'<div class="cmore more" id="cm'+idx+'" onclick="event.stopPropagation()"><button class="morebtn" onclick="tgMore(event,\'cm'+idx+'\')">⋯</button><div class="rowmenu">'
         +'<button onclick="openEditAt('+idx+')">수정</button>'
         +(canCreateWs()?'<hr><button class="d" onclick="delWs(\''+m.n+'\')">삭제</button>':'')
         +'</div></div>':'')
@@ -1662,10 +1890,13 @@ function cardView(d){
      + '<div class="cdesc'+(m.desc?'':' none')+'">'+(m.desc||'-')+'</div>'
      + '<div class="crooms">'
      +   '<button class="roombtn" onclick="event.stopPropagation();openRoom('+idx+',\'prod\')"><span class="rdot '+DOT[m.prod]+'"></span>운영룸 '+m.prod+'</button>'
-     +   '<button class="roombtn" onclick="event.stopPropagation();openRoom('+idx+',\'dev\')"><span class="rdot '+DOT[m.dev]+'"></span>개발룸 '+m.dev+'</button>'
+     +   (m.dev==='미생성'
+          /* 개발룸은 워크스페이스와 별도로 만든다. 없으면 목록에서 바로 생성으로 간다 */
+          ? '<button class="roombtn add" onclick="event.stopPropagation();openRoom('+idx+',\'dev\')">＋ 개발룸 생성</button>'
+          : '<button class="roombtn" onclick="event.stopPropagation();openRoom('+idx+',\'dev\')"><span class="rdot '+DOT[m.dev]+'"></span>개발룸 '+m.dev+'</button>')
      + '</div>'
-     + '<div class="cfoot"><span>멤버 '+m.members.length+'명</span>'
-     +   '<span>'+adminLabel(m)+'</span></div>'
+     + '<div class="cfoot"><span>'+(m.sys?'운영 중인 배포 '+m.deps.length+'건':'멤버 '+m.members.length+'명')+'</span>'
+     +   '<span>'+(gwMode==='mix'?'<span class="vtag">'+wsKind(m)+'</span>':adminLabel(m))+'</span></div>'
      + '</div>';
   }).join('')+'</div>';
 }
@@ -1673,6 +1904,9 @@ function cardView(d){
 function tableView(d){
   const th = sortTh('n','워크스페이스명')
     + '<th>설명</th>'
+    /* 전역은 하나뿐이라 유형 컬럼을 두지 않는다. 구획과 위치가 곧 구분이다.
+       목록에 섞는 A안에서만 유형 컬럼·필터를 제공한다(공통정책 2.2 3순위·3.2) */
+    + (gwMode==='mix'?'<th class="thcell">'+thFilter('kind')+'</th>':'')
     + '<th class="thcell">'+thHelp('wst','상태')+'</th>'
     + '<th class="thcell">'+thFilter('prod')+'</th>'
     + '<th class="thcell">'+thFilter('dev')+'</th>'
@@ -1680,25 +1914,124 @@ function tableView(d){
     + '<th class="thcell">'+thHelp('mem','멤버')+'</th>'
     + sortTh('at','생성일시')
     + '<th style="width:44px"><span class="sronly">작업</span></th>';
-  return '<div class="tblwrap"><table class="tbl"><thead><tr>'+th+'</tr></thead><tbody>'+
+  /* 전역 워크스페이스는 정렬·필터 대상이 아니므로 첫 행에 고정한다 */
+  const g=(gwMode==='split')?gw():null;
+  const gi=g?WS.indexOf(g):-1;
+  const gwRow = g ? '<tr class="sysrow" data-i="'+gi+'" onclick="openPanel('+gi+')">'
+    + '<td><div class="wsname"><span class="mname">'+g.n+'</span></div></td>'
+    + '<td><span class="celldesc" title="'+g.desc+'">'+g.desc+'</span></td>'
+    + '<td><span class="stbadge '+(WST[g.st]||'mu')+'">'+g.st+'</span></td>'
+    + '<td><span class="stbadge '+RB[g.prod]+'">'+g.prod+'</span></td>'
+    + '<td><span class="stbadge '+RB[g.dev]+'">'+g.dev+'</span></td>'
+    + '<td>'+adminLabel(g)+'</td>'
+    + '<td>'+g.members.length+'명</td><td>'+g.at+'</td><td></td></tr>' : '';
+  return '<div class="tblwrap"><table class="tbl"><thead><tr>'+th+'</tr></thead><tbody>'+ gwRow +
     d.map(function(m){
       const idx=WS.indexOf(m);
-      const act=canEditInfo()
+      const act=(canEditInfo() && !m.sys)
         ? '<td onclick="event.stopPropagation()"><div class="more" id="wm'+idx+'"><button class="morebtn" onclick="tgMore(event,\'wm'+idx+'\')">⋯</button><div class="rowmenu">'
           +'<button onclick="openEditAt('+idx+')">수정</button>'
           +(canCreateWs()?'<hr><button class="d" onclick="delWs(\''+m.n+'\')">삭제</button>':'')
           +'</div></div></td>' : '<td></td>';
-      return '<tr onclick="openPanel('+idx+')">'
+      return '<tr data-i="'+idx+'" onclick="openPanel('+idx+')">'
         /* 이름과 설명을 한 셀에 겹치면 행 높이가 달라져 스캔이 어렵다. 별도 컬럼으로 둔다 */
         + '<td><div class="wsname">'
         +   '<span class="mname">'+m.n+'</span>'+'</div></td>'
         + '<td>'+(m.desc?'<span class="celldesc" title="'+m.desc+'">'+m.desc+'</span>':'<span class="dash">-</span>')+'</td>'
+        + (gwMode==='mix'?'<td><span class="vtag">'+wsKind(m)+'</span></td>':'')
         + '<td><span class="stbadge '+(WST[m.st]||'mu')+'">'+(m.st||'-')+'</span></td>'
         + '<td><span class="stbadge '+RB[m.prod]+'">'+m.prod+'</span></td>'
         + '<td><span class="stbadge '+RB[m.dev]+'">'+m.dev+'</span></td>'
         + '<td>'+adminLabel(m)+'</td>'
         + '<td>'+m.members.length+'명</td><td>'+m.at+'</td>'+act+'</tr>';
     }).join('')+'</tbody></table></div>';
+}
+/* 비교안 설명 — 영향을 받는 화면 영역에 테두리를 그리고 그 영역의 장단점을 붙인다 */
+const GWNOTE={
+ mix:{t:'A안 · 목록에 섞기 (참고)',
+  areas:[
+   {sel:'#listArea', nm:'목록',
+    good:['정렬·필터·페이지네이션이 예외 없이 동작한다',
+          '유형 컬럼에 필터가 붙어 전역만 골라 볼 수 있다',
+          '구획 제목을 정할 필요가 없다',
+          '최고 관리자에게 `내 워크스페이스`라는 틀린 말을 쓰지 않아도 된다'],
+    bad:['필터를 쓰지 않으면 목록 아래에 묻힐 수 있다',
+         '카드 뷰에는 필터가 없어 배지로만 구분된다']},
+   {sel:'#wsWrap', nm:'전환 드롭다운',
+    good:['목록을 거치지 않고 바로 진입할 수 있다','배지로 전역임을 구분한다'],
+    bad:['소속이 아닌 항목이 선택지에 섞인다']}],
+  ask:'최고 관리자가 이 워크스페이스에 얼마나 자주 들어가는가. 자주라면 유형 필터를 기본 제공해야 한다'},
+ split:{t:'B안 · 구획 분리 (확정)',
+  areas:[
+   {sel:'#listArea', nm:'목록',
+    good:['항상 같은 자리에서 찾을 수 있다','정렬 대상에서 빠진다는 사실이 위치로 설명된다'],
+    bad:['구획 제목을 정해야 한다 — `시스템`은 내부 용어, `플랫폼`은 제품명과 겹침',
+         '아래 구획 제목이 역할에 따라 달라진다. 최고 관리자에게 `내 워크스페이스`는 사실과 다르다',
+         '테이블에서 정렬·페이지네이션과 충돌한다. 고정 행을 예외로 빼야 한다',
+         '편집자·뷰어에게는 들어갈 일 없는 항목이 첫 자리를 차지한다']},
+   {sel:'#wsWrap', nm:'전환 드롭다운',
+    good:['목록과 같은 순서로 맨 위에 온다'],
+    bad:['목록은 구획, 드롭다운은 구분선으로 표현이 갈린다']}],
+  ask:'전역 워크스페이스는 하나만 존재하는 것으로 확정. 유형 컬럼을 두지 않고 구획과 위치로 구분한다. 남은 것은 구획 제목이다'},
+ off:{t:'C안 · 두지 않음 (참고)',
+  areas:[
+   {sel:'#listArea', nm:'목록',
+    good:['소속 워크스페이스만 남아 단순해진다','전역 자산을 속성으로만 표현하는 원칙과 일치한다'],
+    bad:['전역 배포가 운영 중이라면 그 자원이 어느 화면에도 잡히지 않는다. 클러스터 잔여만 줄어 있고 추적할 곳이 없다',
+         '전역 모델·배포가 어디서 오는지 알 수 없다']},
+   {sel:'#wsWrap', nm:'전환 드롭다운',
+    good:['소속만 나열되어 선택이 단순하다'],
+    bad:['백엔드가 내려주는 워크스페이스와 화면 목록이 어긋난다']}],
+  ask:'전역 배포가 실제로 이 공간에서 운영되는가. 이 답이 세 안을 가른다'}
+};
+function clearGwMarks(){ document.querySelectorAll('.gwmark').forEach(function(m){m.remove();}); }
+/* 영역 테두리는 두지 않는다. 화면을 가리고 폭 변화에 따라 어긋난다.
+   설명은 우측 패널의 영역별 표로만 제공한다 */
+function drawGwMarks(){ clearGwMarks(); }
+function trackGwMarks(){}
+function drawGwNote(){
+  const d=GWNOTE[gwMode]; if(!d) return;
+  document.getElementById('gwNoteTitle').textContent=d.t;
+  document.getElementById('gwNote').classList.toggle('ref', gwMode!=='split');
+  document.getElementById('gwNoteBody').innerHTML =
+    '<table><thead><tr><th style="width:96px">영역</th><th>장점</th><th>단점</th></tr></thead><tbody>'
+   + d.areas.map(function(a){
+      return '<tr><td class="area">'+a.nm+'</td>'
+        + '<td><ul class="good">'+a.good.map(x=>'<li>'+x+'</li>').join('')+'</ul></td>'
+        + '<td><ul class="bad">'+a.bad.map(x=>'<li>'+x+'</li>').join('')+'</ul></td></tr>';
+     }).join('')
+   + '</tbody></table>';
+  document.getElementById('gwNoteFoot').innerHTML='<b>결정에 필요한 확인</b> — '+d.ask
+    + '<div class="ntemp">이 설명과 하단 비교 바는 안을 고르기 위한 임시 장치입니다. 기획서에 담기는 내용이 아니며 확정 후 삭제합니다.</div>';
+  document.getElementById('gwNote').classList.add('on');
+  setTimeout(drawGwMarks,60);
+}
+function closeGwNote(){ document.getElementById('gwNote').classList.remove('on'); clearGwMarks(); }
+window.addEventListener('resize',drawGwMarks);
+window.addEventListener('scroll',drawGwMarks,true);
+function setMemb(nlimit,btn){
+  membLimit=nlimit;
+  document.querySelectorAll('#demoBar .mb').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  closePanel();
+  /* 조회 범위가 바뀌므로 목록부터 다시 시작한다 */
+  view='list'; cur=null; wsInit(); syncView(); render();
+  vwBtn(document.querySelectorAll('#demoBar .vw')[0]);
+}
+/* 최고 관리자는 전체를 보므로 소속 수 토글이 의미 없다 */
+function syncMembBtn(){
+  const off=isSuper();
+  ['mbOne','mbMany'].forEach(function(id){
+    const b=document.getElementById(id); if(!b) return;
+    b.disabled=off; b.style.opacity=off?'.4':''; b.style.cursor=off?'default':'pointer';
+  });
+}
+function setGw(m,btn){
+  gwMode=m;
+  drawGwNote();
+  document.querySelectorAll('#demoBar .gw').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  closePanel(); render();
 }
 function resetF(){document.getElementById('q').value='';sq='';document.getElementById('qclr').hidden=true;syncCondClr();fsel={};setState('default');}
 function setState(s,btn){state=s;
@@ -1712,6 +2045,7 @@ function setRole(r,btn){
      워크스페이스 안 화면에서는 `관리자`·`편집자`·`뷰어`로 줄여 쓴다(용어사전 *2) */
     {super:'최고 관리자',admin:'워크스페이스 관리자',editor:'워크스페이스 편집자',viewer:'워크스페이스 뷰어'}[r];
   document.getElementById('setWrap').style.display=r==='super'?'':'none';
+  syncMembBtn();
   closePanel();
   /* 역할이 바뀌면 조회 범위가 달라지므로 목록부터 다시 시작한다 */
   view='list'; cur=null; wsInit(); syncView();
@@ -1731,10 +2065,12 @@ function tgMore(e,id){
   if(r.bottom > box.bottom - 8) t.classList.add('up');
 }
 document.addEventListener('click',()=>document.querySelectorAll('.more').forEach(m=>m.classList.remove('open')));
+/* 패널은 닫기 버튼과 ESC 로 닫는다. 배경 클릭을 가로채는 레이어를 두지 않는다 */
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closePanel(); });
 
 /* ===== 패널 WKSP-L01.P01 ===== */
 const ITEMDEF={
-  prod:'모델을 서비스하는 환경입니다. 개발룸에 할당하고 남은 자원이 자동으로 배분됩니다.',
+  prod:'모델을 서비스하는 환경입니다. 워크스페이스 할당량에서 개발룸 몫을 뺀 나머지입니다.',
   dev:'멤버가 개발·실험에 사용하는 환경입니다. 자원은 관리자 승인 후 할당됩니다.',
   vol:'개발룸 멤버가 함께 사용하는 볼륨입니다. 실험 데이터와 가중치를 공유합니다.'
 };
@@ -1793,17 +2129,29 @@ function openPanel(i){
   h+=sec('멤버 <span style="font-weight:400">'+m.members.length+'명</span>',
       '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>이름</th><th>아이디</th><th>역할</th></tr></thead><tbody>'
     + m.members.map(function(u){
-        return '<tr style="cursor:default"><td><div class="memcell"><span class="avatar">'+u.n.charAt(0)+'</span><span class="rname">'+u.n+'</span></div></td>'
+        return '<tr style="cursor:default"><td><div class="memcell"><span class="avatar">'+u.n.charAt(0)+'</span>'+memberName(u)+'</div></td>'
          + '<td>'+u.id+'</td><td>'+u.role+'</td></tr>';
       }).join('')
     + '</tbody></table></div>', 'members');
 
   document.getElementById('pnBody').innerHTML=h;
   document.getElementById('panel').classList.add('on');
-  document.getElementById('pnbg').classList.add('on');
   document.body.classList.add('panel-on');
+  markRowSel(i);
+  /* 패널이 열리면 목록 폭이 줄어든다. 전환 동안 검토용 테두리가 따라오게 한다 */
+  trackGwMarks(320);
 }
-function closePanel(){document.getElementById('panel').classList.remove('on');document.getElementById('pnbg').classList.remove('on');document.body.classList.remove('panel-on');}
+/* 어느 대상의 패널이 열려 있는지 목록에 표시한다 */
+function markRowSel(i){
+  document.querySelectorAll('.rowsel').forEach(function(el){el.classList.remove('rowsel');});
+  document.querySelectorAll('[data-i="'+i+'"]').forEach(function(el){el.classList.add('rowsel');});
+}
+function closePanel(){
+  document.getElementById('panel').classList.remove('on');
+  document.body.classList.remove('panel-on');
+  document.querySelectorAll('.rowsel').forEach(function(el){el.classList.remove('rowsel');});
+  trackGwMarks(320);
+}
 /* ═══════════ 화면 전환 ═══════════ */
 function syncView(){
   ['pgList','pgDetail','pgForm','pgRoom'].forEach(function(id,i){
@@ -1844,17 +2192,21 @@ function goDemo(kind,btn){
 }
 function openDetail(){ if(!cur) return; closePanel(); syncWsCtx(); view='detail'; wTab=0; syncView(); drawDetail(); }
 /* 개발룸·운영룸은 각각 독립 화면이다 */
+/* 룸으로 들어온 경로를 기억한다. 목록에서 들어왔으면 목록으로, 상세에서 들어왔으면 상세로 돌아간다 */
+let roomFrom='detail';
 function openRoom(i,kind){
+  roomFrom = (view==='list') ? 'list' : 'detail';
   if(typeof i==='number') cur={m:WS[i]};
   if(!cur) return;
   closePanel(); syncWsCtx(); view='room'; roomKind=kind; syncView(); drawRoom();
 }
+function backFromRoom(){ if(roomFrom==='list') backToList(); else openDetail(); }
 function drawRoom(){
   if(!cur) return;
   const m=cur.m, isDev=roomKind==='dev';
   let h='';
   h+='<div class="dhead">'
-   + '<button class="back" onclick="openDetail()" title="워크스페이스 상세로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>'
+   + '<button class="back" onclick="backFromRoom()" title="'+(roomFrom==='list'?'워크스페이스 목록으로':'워크스페이스 상세로')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>'
    + '<div class="dinfo"><h1>'+(isDev?'개발룸':'운영룸')
    +   tip(isDev?'멤버가 개발·실험에 사용하는 환경입니다. 자원은 관리자 승인 후 할당되며 사용 기한이 지나면 회수됩니다.'
               :'모델을 서비스하는 환경입니다. 배포 생성·설정 변경·종료는 배포 화면에서 처리합니다.')
@@ -1907,13 +2259,13 @@ function drawDetail(){
   /* 자원은 상한·사용·배분을 한자리에서 본다. 세 곳에 흩어지면 관계가 드러나지 않는다.
      환경은 워크스페이스의 핵심 구조이자 룸 화면 진입 경로라 탭 안에 두지 않는다 */
   const pq=prodQ(m);
-  h+='<div class="dsec"><h4>환경별 배분'+tip('개발룸은 상한까지 쓰고, 쓰지 않는 몫은 운영룸이 사용합니다. 표의 운영룸 값은 개발룸이 상한을 다 쓸 때의 최소값입니다.')+'</h4>'
+  h+='<div class="dsec"><h4>환경별 배분'+tip('운영룸이 개발룸보다 우선합니다. 운영룸 배포가 확장되면 개발룸 자원이 축소됩니다.')+'</h4>'
    /* 알림은 관련 섹션 상단에 둔다. 아래에 두면 표를 다 읽고 나서야 문제를 안다 */
    + (m.prod==='오류'? alertBox('crit','운영룸이 정상 동작하지 않습니다.',
        '이 워크스페이스의 배포를 기동하거나 호출할 수 없습니다.','', false) : '')
-   + (m.dev==='미생성'? alertBox('info','개발룸에 자원이 할당되지 않았습니다.',
-       '자원을 할당하면 멤버가 개발환경을 신청할 수 있습니다.',
-       canEditQuota()?'<button class="btn sm" onclick="openForm(\'quota\')">할당량 수정</button>':'', false) : '')
+   + (m.dev==='미생성'? alertBox('info','개발룸이 없습니다.',
+       '개발룸을 만들면 멤버가 개발환경을 신청할 수 있습니다. 할당한 자원만큼 운영룸 한도가 줄어듭니다.',
+       canEditQuota()?'<button class="btn sm" onclick="act(\'개발룸 생성 화면으로 이동합니다.\')">개발룸 생성</button>':'', false) : '')
    + '<div class="tblwrap" style="border:0"><table class="tbl enter"><thead><tr><th>환경</th><th>상태</th><th>CPU</th><th>Memory</th><th>AI 가속기</th><th>내역</th></tr></thead><tbody>'
    + '<tr onclick="openRoom(null,\'dev\')" title="개발룸으로 이동"><td><span class="mname">개발룸</span></td>'
    +   '<td><span class="stbadge '+RB[m.dev]+'">'+m.dev+'</span><span class="entgo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-8 8M10 6H5a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1v-5"/></svg></span></td>'
@@ -1947,7 +2299,7 @@ function drawDetail(){
      + (canManageMember()?'<button class="btn sm" style="margin-left:auto" onclick="openInvite()">멤버 초대</button>':'')+'</h4>'
      + '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>이름</th><th>아이디</th><th>역할</th><th style="width:44px"><span class="sronly">작업</span></th></tr></thead><tbody>'
      + m.members.map(function(u,i){
-         return '<tr><td><div class="memcell"><span class="avatar">'+u.n.charAt(0)+'</span><span class="rname">'+u.n+'</span></div></td>'
+         return '<tr><td><div class="memcell"><span class="avatar">'+u.n.charAt(0)+'</span>'+memberName(u)+'</div></td>'
           + '<td>'+u.id+'</td>'
           + '<td>'+(canManageMember()
               ? '<select class="rolesel"'+(isLastAdmin(m,i)?' disabled title="이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 변경할 수 있습니다."':'')
@@ -2028,7 +2380,7 @@ function pnRoomBlock(m){
      + '</button>';
   }).join('')
   + (m.prod==='오류'? alertBox('crit','','운영룸이 정상 동작하지 않아 배포를 기동하거나 호출할 수 없습니다.','',false) : '')
-  + (m.dev==='미생성'? '<div class="secnote">개발룸에 자원이 할당되지 않았습니다. 상세에서 할당량을 수정하면 멤버가 개발환경을 신청할 수 있습니다.</div>' : '');
+  + (m.dev==='미생성'? '<div class="secnote">개발룸이 없습니다. 개발룸을 만들면 멤버가 개발환경을 신청할 수 있습니다.</div>' : '');
 }
 
 /* 가속기 등 개수 단위 자원 — 비율 막대를 두지 않는다 */
@@ -2067,10 +2419,10 @@ function roomTab(m,kind){
   if(st==='미생성'){
     return '<div class="dsec"><div class="state" style="padding:34px 0">'
      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg>'
-     + '<h3>개발룸이 자원이 할당되지 않았습니다.</h3>'
-     + '<p>자원을 할당하면 멤버가 개발환경을 신청할 수 있습니다.</p>'
-     + (canEditQuota()?'<button class="btn" onclick="openForm(\'quota\')">할당량 수정</button>'
-        :'<p style="font-size:11.5px;color:var(--faint)">최고 관리자에게 개발룸 자원 할당을 요청해 주세요.</p>')
+     + '<h3>개발룸이 없습니다.</h3>'
+     + '<p>개발룸을 만들면 멤버가 개발환경을 신청할 수 있습니다. 할당한 자원만큼 운영룸 한도가 줄어듭니다.</p>'
+     + (canEditQuota()?'<button class="btn" onclick="act(\'개발룸 생성 화면으로 이동합니다.\')">개발룸 생성</button>'
+        :'<p style="font-size:11.5px;color:var(--faint)">워크스페이스 관리자에게 개발룸 생성을 요청해 주세요.</p>')
      + '</div></div>';
   }
 
@@ -2094,8 +2446,8 @@ function roomTab(m,kind){
     isDev? '개발환경을 신청하거나 접속할 수 없습니다.' : '이 워크스페이스의 배포를 기동하거나 호출할 수 없습니다.','',false);
   h+='<div class="dsec"><h4>'+(isDev?'개발룸':'운영룸')+' 자원'
    +   tip(isDev
-        ? '개발룸이 최대로 쓸 수 있는 양입니다. 구동 중인 개발환경이 이 안에서 자원을 나눠 씁니다.'
-        : '개발룸이 쓰지 않는 몫까지 사용합니다. 아래 값은 개발룸이 상한을 다 쓸 때의 최소값입니다.')
+        ? '개발룸이 최대로 쓸 수 있는 양입니다. 운영룸 배포가 확장되면 이 값보다 적게 쓰일 수 있습니다.'
+        : '워크스페이스 할당량 중 개발룸에 넘긴 몫을 뺀 나머지입니다. 운영룸이 우선하므로 필요하면 개발룸 자원이 축소됩니다.')
    + '</h4>'
    + '<div class="rsgrid">'
    + rows.map(function(r){
@@ -2112,11 +2464,17 @@ function roomTab(m,kind){
             ? '새 개발환경을 신청해도 승인할 수 없습니다. '
             : '새 배포를 기동할 수 없습니다. ')
           + (canEditQuota()
-             ? '워크스페이스 할당량에서 이 환경의 몫을 늘리거나, 사용하지 않는 자원을 반납해 주세요.'
+             ? (isDev
+                ? '개발룸 자원을 늘리거나, 사용하지 않는 개발환경을 반납해 주세요.'
+                : '워크스페이스 할당량을 늘리거나, 사용하지 않는 배포를 종료해 주세요.')
              : (isDev
-                ? '사용하지 않는 개발환경을 반납하거나 관리자에게 할당량 조정을 요청해 주세요.'
-                : '사용하지 않는 배포를 종료하거나 관리자에게 할당량 조정을 요청해 주세요.')),
-          canEditQuota()?'<button class="btn sm" onclick="openForm(\'quota\')">할당량 수정</button>':'',
+                ? '사용하지 않는 개발환경을 반납하거나 관리자에게 자원 조정을 요청해 주세요.'
+                : '사용하지 않는 배포를 종료하거나 관리자에게 자원 조정을 요청해 주세요.')),
+          canEditQuota()
+            ? (isDev
+               ? '<button class="btn sm" onclick="act(\'개발룸 설정 화면으로 이동합니다.\')">개발룸 자원 수정</button>'
+               : '<button class="btn sm" onclick="openForm(\'quota\')">할당량 수정</button>')
+            : '',
           false)
       : '');
 
@@ -2170,7 +2528,8 @@ function roomTab(m,kind){
        ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>사용자</th><th>환경</th><th>실행 방식</th><th>가속기</th><th class="thcell">'+thHelp('cip','접근 허용 IP')+'</th><th>시작</th><th>만료 예정</th><th class="thcell">'+thHelp('cst','상태')+'</th><th style="width:44px"><span class="sronly">작업</span></th></tr></thead><tbody>'
          + m.cdes.map(function(c,i){
              const live = c.st==='정상'||c.st==='절전';
-             return '<tr><td><div class="memcell"><span class="avatar">'+c.u.charAt(0).toUpperCase()+'</span><span class="rname">'+c.u+'</span></div></td>'
+             return '<tr'+(isMine(c)?' class="rowme"':'')+'><td><div class="memcell"><span class="avatar">'+c.u.charAt(0).toUpperCase()+'</span><span class="rname">'+c.u+'</span>'
+           +(isMine(c)?'<span class="vtag" style="margin-left:6px">나</span>':'')+'</div></td>'
            +'<td>'+c.env+'<span class="mver" style="margin-left:5px">'+c.fw+'</span></td>'
            +'<td>'+c.mode+'</td><td>'+c.acc+'</td>'
            +'<td>'+(c.ip&&c.ip!=='-'?'<span class="keyval">'+c.ip+'</span>':'<span class="dash">-</span>')+'</td>'
@@ -2178,8 +2537,9 @@ function roomTab(m,kind){
            +'<td>'+(c.exp!=='-'?c.exp:'<span class="dash">-</span>')+'</td>'
            +'<td><span class="stbadge '+RB[c.st]+'">'+c.st+'</span>'
            +  (c.rej?tip(c.rej):'')+'</td>'
-           /* 접속·연장·반납은 구동 중일 때만. 승인 대기·반려 건은 조작 대상이 아니다 */
-           +'<td>'+(canUseCde()&&live?'<div class="more" id="cdm'+i+'"><button class="morebtn" onclick="tgMore(event,\'cdm'+i+'\')">⋯</button><div class="rowmenu">'
+           /* 접속·연장·반납은 본인 것만. 남의 개발환경은 조회만 한다.
+              구동 중일 때만 — 승인 대기·반려 건은 조작 대상이 아니다 */
+           +'<td>'+(canUseCde()&&live&&isMine(c)?'<div class="more" id="cdm'+i+'"><button class="morebtn" onclick="tgMore(event,\'cdm'+i+'\')">⋯</button><div class="rowmenu">'
              +'<button onclick="act(\'개발환경에 접속합니다.\')">접속</button><button onclick="openCdeForm(\'cdeExt\')">기한 연장 신청</button>'
              +'<hr><button class="d" onclick="rmCde(\''+c.u+'\')">반납</button></div></div>':'')+'</td></tr>'; }).join('')
          + '</tbody></table></div>'
@@ -2265,7 +2625,7 @@ function openForm(kind){
   shownF={}; view='form'; syncView(); drawForm(); }
 /* 할당량 수정 — 변경 여부·초과 검증 */
 let qInit='';
-function qSnap(){ return ['cpu','ram','vol','devCpu','devRam','devGpu'].concat(CLUSTER.gpu.map(accKey)).map(function(k){return NF[k];}).join('|'); }
+function qSnap(){ return ['cpu','ram','vol'].concat(CLUSTER.gpu.map(accKey)).map(function(k){return NF[k];}).join('|'); }
 function qDirty(){ return qSnap()!==qInit; }
 function qErrs(){
   /* 생성·신청은 기존 할당이 없어 점유 하한이 0이다 */
@@ -2295,15 +2655,6 @@ function qErrs(){
     const mine = accBase===g.k? m.quota.gpu : 0;
     if(num(accKey(g))>g.free+mine) e.push(g.n+' 할당량이 배분 가능한 최대를 넘습니다.');
   });
-  /* 개발룸 상한도 필수 항목이라 값 형식을 함께 검증한다 */
-  [['devCpu','개발룸 CPU',true],['devRam','개발룸 Memory',false],['devGpu','개발룸 AI 가속기',false]].forEach(function(p){
-    const v=num(p[0]);
-    if(isNaN(v)||v<0) e.push(p[1]+' 값을 정확히 입력해 주세요.');
-    else if(!p[2] && v%1!==0) e.push(p[1]+'는 정수로 입력해 주세요.');
-  });
-  if(num('devCpu')>num('cpu')) e.push('개발룸 CPU가 전체 할당량을 넘습니다.');
-  if(num('devRam')>num('ram')) e.push('개발룸 Memory가 전체 할당량을 넘습니다.');
-  if(num('devGpu')>gpuAll) e.push('개발룸 AI 가속기가 전체 할당량을 넘습니다.');
   return e;
 }
 
@@ -2420,37 +2771,13 @@ function drawForm(){
 
   {
     /* 신규 생성·신청 모두 기존 할당이 없으므로 curQuota·used 가 0이다 */
-    h+='<div class="fsec"><h4>워크스페이스 할당량'+tip('클러스터 잔여 범위 안에서 이 워크스페이스가 쓸 몫을 정합니다. 개발룸과 운영룸이 이 안에서 자원을 나눠 씁니다.')+'</h4>'
+    h+='<div class="fsec"><h4>워크스페이스 할당량'+tip('클러스터 잔여 범위 안에서 이 워크스페이스가 쓸 몫을 정합니다. 기본적으로 운영룸이 사용하며, 개발룸을 만들면 그만큼 운영룸 한도에서 옮겨집니다.')+'</h4>'
      + clusterCard()
      + qRow('cpu','CPU',CLUSTER.cpu.total,CLUSTER.cpu.free,0,0,CLUSTER.cpu.unit,'0.5 단위로 지정할 수 있습니다.')
      + qRow('ram','Memory',CLUSTER.ram.total,CLUSTER.ram.free,0,0,CLUSTER.ram.unit,'')
      + accBlock(null)
      + qRow('vol','공유 볼륨',CLUSTER.vol.total,CLUSTER.vol.free,0,0,CLUSTER.vol.unit,'개발룸 멤버가 함께 사용하는 볼륨입니다. 실험 데이터와 가중치를 공유합니다.')
      + '</div>';
-
-    h+='<div class="fsec"><h4>개발룸'+tip('개발룸이 쓸 상한과 개발환경 신청 시 적용될 정책을 정합니다. 개발룸이 쓰지 않는 몫은 운영룸이 사용합니다.')+'</h4>'
-     + '<div class="sublb2">자원 상한'+tip('개발환경 신청 합계가 이 값을 넘을 수 없습니다.')+'</div>'
-     + '<div class="stgrid">'
-     +   fnum('CPU','devCpu','워크스페이스 할당량 '+(NF.cpu||0),false,+NF.cpu||0,1,'Cores')
-     +   fnum('Memory','devRam','워크스페이스 할당량 '+(NF.ram||0),false,+NF.ram||0,8,'Gi')
-     +   fnum('AI 가속기','devGpu','워크스페이스 할당량 '+CLUSTER.gpu.reduce(function(a,g){ return a+(+NF[accKey(g)]||0); },0),false,CLUSTER.gpu.reduce(function(a,g){ return a+(+NF[accKey(g)]||0); },0),1,'개')
-     + '</div>'
-     /* 운영룸 몫을 고정값으로 표현하지 않는다. 개발룸이 안 쓰면 운영룸이 더 쓴다(용어사전 *3) */
-     + '<div class="subbox splitbar"><div class="sbt">배분 결과'+tip('운영룸 값은 개발룸이 상한을 다 쓸 때의 최소값입니다. 개발룸이 쓰지 않는 만큼 운영룸이 더 사용합니다.')+'</div>'
-     +   '<div class="sb"><span class="sbl">CPU</span><span class="sbar"><span class="sdev" style="width:'+Math.min(100,(+NF.devCpu||0)/(+NF.cpu||1)*100)+'%"></span></span>'
-     +     '<span class="sbv">개발룸 최대 '+(+NF.devCpu||0)+' · 운영룸 최소 '+Math.max(0,(+NF.cpu||0)-(+NF.devCpu||0))+'</span></div>'
-     +   '<div class="sb"><span class="sbl">Memory</span><span class="sbar"><span class="sdev" style="width:'+Math.min(100,(+NF.devRam||0)/(+NF.ram||1)*100)+'%"></span></span>'
-     +     '<span class="sbv">개발룸 최대 '+(+NF.devRam||0)+' · 운영룸 최소 '+Math.max(0,(+NF.ram||0)-(+NF.devRam||0))+'</span></div>'
-     + '</div>'
-     + '<div class="sublb2">신청 정책</div>'
-     + '<div class="f" style="margin-bottom:0"><label>개인 볼륨 용량 선택지'+tip('개발환경 신청 시 고를 수 있는 크기 목록입니다. 비우면 플랫폼 기본값을 사용합니다.')+'</label>'
-     +   '<div class="chipin">'
-     +     NF.cls.map(function(c,i){ return '<span class="ichip">'+c.n+' '+c.s
-             +'<button onclick="clsDel('+i+')" aria-label="제거">✕</button></span>'; }).join('')
-     +     '<button class="chipadd" onclick="clsAdd()">＋ 추가</button>'
-     +   '</div>'
-     +   (NF.cls.length?'':'<div class="hint">선택지가 없으면 플랫폼 기본값을 사용합니다.</div>')
-     + '</div></div>';
 
     h+='<div class="fsec"><h4>저장소</h4>'
      + '<div class="f" style="margin-bottom:0">'
@@ -2481,27 +2808,12 @@ function drawQuotaForm(){
   h+='<div class="formpage two">';
   /* 가용량과 입력을 한 행으로 합친다. 위에서 남은 양을 보고 아래에서 입력하면
      값이 가용량을 넘는지 즉시 보이지 않는다 */
-  h+='<div class="fsec"><h4>워크스페이스 할당량'+tip('클러스터 잔여 범위 안에서 배분합니다. 현재 점유량보다 작게 줄일 수 없습니다.')+'</h4>'
+  h+='<div class="fsec"><h4>워크스페이스 할당량'+tip('클러스터 잔여 범위 안에서 배분합니다. 현재 점유량보다 작게 줄일 수 없습니다. 개발룸 자원은 개발룸 화면에서 정합니다.')+'</h4>'
    + clusterCard()
    + qRow('cpu','CPU',CLUSTER.cpu.total,CLUSTER.cpu.free,m.quota.cpu,m.use.cpu,CLUSTER.cpu.unit,'0.5 단위로 지정할 수 있습니다.')
    + qRow('ram','Memory',CLUSTER.ram.total,CLUSTER.ram.free,m.quota.ram,m.use.ram,CLUSTER.ram.unit,'')
    + accBlock(m)
    + qRow('vol','공유 볼륨',CLUSTER.vol.total,CLUSTER.vol.free,m.quota.vol,0,CLUSTER.vol.unit,'개발룸 멤버가 함께 사용하는 볼륨입니다. 실험 데이터와 가중치를 공유합니다.')
-   + '</div>';
-  h+='<div class="fsec"><h4>개발룸'+tip('개발룸이 쓸 상한을 정합니다. 개발룸이 쓰지 않는 몫은 운영룸이 사용합니다.')+'</h4>'
-   + '<div class="sublb2">자원 상한'+tip('개발환경 신청 합계가 이 값을 넘을 수 없습니다.')+'</div>'
-   + '<div class="stgrid">'
-   +   fnum('CPU','devCpu','워크스페이스 할당량 '+(NF.cpu||0),false,+NF.cpu||0,1,'Cores')
-   +   fnum('Memory','devRam','워크스페이스 할당량 '+(NF.ram||0),false,+NF.ram||0,8,'Gi')
-   +   fnum('AI 가속기','devGpu','워크스페이스 할당량 '+CLUSTER.gpu.reduce(function(a,g){ return a+(+NF[accKey(g)]||0); },0),false,CLUSTER.gpu.reduce(function(a,g){ return a+(+NF[accKey(g)]||0); },0),1,'개')
-   + '</div>'
-   /* 운영룸 몫을 고정값으로 표현하지 않는다. 개발룸이 안 쓰면 운영룸이 더 쓴다(용어사전 *3) */
-   + '<div class="subbox splitbar"><div class="sbt">배분 결과'+tip('운영룸 값은 개발룸이 상한을 다 쓸 때의 최소값입니다. 개발룸이 쓰지 않는 만큼 운영룸이 더 사용합니다.')+'</div>'
-     +   '<div class="sb"><span class="sbl">CPU</span><span class="sbar"><span class="sdev" style="width:'+Math.min(100,(+NF.devCpu||0)/(+NF.cpu||1)*100)+'%"></span></span>'
-     +     '<span class="sbv">개발룸 최대 '+(+NF.devCpu||0)+' · 운영룸 최소 '+Math.max(0,(+NF.cpu||0)-(+NF.devCpu||0))+'</span></div>'
-     +   '<div class="sb"><span class="sbl">Memory</span><span class="sbar"><span class="sdev" style="width:'+Math.min(100,(+NF.devRam||0)/(+NF.ram||1)*100)+'%"></span></span>'
-     +     '<span class="sbv">개발룸 최대 '+(+NF.devRam||0)+' · 운영룸 최소 '+Math.max(0,(+NF.ram||0)-(+NF.devRam||0))+'</span></div>'
-     + '</div>'
    + '</div>';
   if(errs.length) h+='<div class="warnbox" style="margin-bottom:18px"><b>⚠</b><span>'+errs.map(x=>'<div>'+x+'</div>').join('')+'</span></div>';
   h+='<div class="formfoot"><button class="btn ghost" onclick="cancelForm()">취소</button>'
@@ -3286,7 +3598,7 @@ let wsCur=null, wsQ='';
    배포 목록의 워크스페이스 컬럼에서 `미지정`으로 표시된다. 라벨에 담지 않는다 */
 function wsAllLabel(){ return '전체'; }
 function wsInit(){
-  const list=base();
+  const list=mine();
   /* 소속이 하나면 그것을 보고 있는 상태, 여럿이면 아직 고르지 않은 상태 */
   wsCur = list.length===1? list[0].n : (list.length? wsAllLabel() : null);
   wsQ='';
@@ -3297,7 +3609,8 @@ function drawWsBtn(){
   const btn=document.getElementById('wsBtn');
   if(el) el.textContent = wsCur || '소속 워크스페이스 없음';
   /* 고를 것이 하나뿐이거나 없으면 전환할 대상이 없다 */
-  if(btn) btn.disabled = base().length<=1;
+  /* 전역이 함께 제공되므로 소속이 하나여도 고를 대상이 있다 */
+  if(btn) btn.disabled = wsOptions().length<=1;
 }
 function tgWs(e){
   e.stopPropagation();
@@ -3312,24 +3625,28 @@ function closeWs(){ const w=document.getElementById('wsWrap'); if(w) w.classList
 function wsSearch(v){ wsQ=v; if(composing) return; drawWsDd(true); }
 function drawWsDd(keepFocus){
   const dd=document.getElementById('wsDd'); if(!dd) return;
-  const all=base();
+  const all=wsOptions();
   const hit=all.filter(function(w){ return !wsQ || w.n.toLowerCase().indexOf(wsQ.toLowerCase())>=0 || (w.desc||'').toLowerCase().indexOf(wsQ.toLowerCase())>=0; });
   dd.innerHTML =
      '<div class="wssearch"><input placeholder="워크스페이스 검색" value="'+wsQ+'" oninput="wsSearch(this.value)" oncompositionstart="onComposeStart()" oncompositionend="onComposeEnd(wsSearch,this)" onclick="event.stopPropagation()"></div>'
    + '<div class="wslist" onclick="event.stopPropagation()">'
-   /* ⭐ `전체`는 목록으로 돌아가는 항목이라 가장 위에 둔다.
-      워크스페이스를 고르는 것과 성격이 달라 구분선으로 나눈다 */
-   + (all.length>1 && !wsQ
+   /* `전체`는 목록으로 돌아가는 항목이라 가장 위에 둔다.
+      워크스페이스를 고르는 것과 성격이 달라 구분선으로 나눈다.
+      소속이 하나뿐이면 돌아갈 목록이 없으므로 두지 않는다 */
+   + (mine().length>1 && !wsQ
       ? '<button class="wsitem'+(wsCur===wsAllLabel()?' on':'')+'" onclick="pickWs(\''+wsAllLabel()+'\')">'
         + '<span class="wic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>'
         + '<span class="wnm">'+wsAllLabel()+'</span>'
         + (wsCur===wsAllLabel()?'<span class="wck">✓</span>':'') + '</button><hr>'
       : '')
    + (hit.length
-      ? hit.map(function(w){
-          return '<button class="wsitem'+(wsCur===w.n?' on':'')+'" onclick="pickWs(\''+w.n+'\')">'
+      ? hit.map(function(w,wi){
+          /* 전역은 소속이 아니므로 구분선으로 나눈다. 하나뿐이라 제목은 두지 않는다 */
+          return ((gwMode==='split'&&!wsQ&&wi===1&&hit[0].sys)?'<hr>':'')
+           + '<button class="wsitem'+(wsCur===w.n?' on':'')+'" onclick="pickWs(\''+w.n+'\')">'
            + '<span class="wic">'+wsIcon(w.ico)+'</span>'
            + '<span class="wnm">'+w.n+'</span>'
+           + (w.sys&&gwMode==='mix'?'<span class="vtag" style="margin-left:6px">전역</span>':'')
            + (w.st&&w.st!=='정상'?'<span class="stbadge '+(WST[w.st]||'mu')+'">'+w.st+'</span>':'')
            + (wsCur===w.n?'<span class="wck">✓</span>':'')
            + '</button>';
@@ -3368,6 +3685,8 @@ function toggleGnb(btn){
     ? '<path d="M10 6l6 6-6 6"/><path d="M5 5v14"/>'
     : '<path d="M14 6l-6 6 6 6"/><path d="M19 5v14"/>';
 }
-wsInit(); setRole('super'); syncView(); render();
+wsInit(); setRole('super'); syncView(); render(); syncMembBtn();
+/* 처음 열었을 때 어떤 안을 보고 있는지와 무엇을 봐야 하는지 안내한다 */
+drawGwNote();
 </script>
 </body></html>
