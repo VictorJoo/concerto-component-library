@@ -1,1 +1,640 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>콘체르토 매니저 · 마이페이지</title>
+<!--
+  콘체르토 매니저 — 마이페이지 화면 목업 v0.1
+  · 컴포넌트 라이브러리 v0.2 색상 토큰에 맞춤. (: 라이브러리에 없던 레이아웃 전용 색 sidebar·flyout·border-soft·faint·active를 기존 라이브러리 토큰으로 치환 — 모든 색이 라이브러리 역할 토큰만 참조)
+  · 치환 매핑: sidebar·header(크롬)→card(흰 크롬), flyout→card, border-soft→border, faint→muted-foreground, active(선택)→border, 메뉴 hover·칩→card-2(muted). 본문 캔버스만 background. 라이브러리 밖 색 제거.
+  · 언어·테마 위치: 1안(프로필 팝오버) 확정 반영.
+  · 프로토타입 비교 요소(안 토글·변경요소 표시·TO-BE 마킹) 제거.
+  · GNB 키비주얼: 제공된 키비주얼 이미지 기준 CSS 재현(디자인 확정 시 교체).
+  · 실제 아이콘·간격·모션은 디자인 라이브러리로 확정. 본 파일은 구조·배치 전달용.
+-->
+<style>
+  :root{
+    --background:#f4f6fc; --foreground:#171d33;
+    --card:#ffffff; --card-foreground:#171d33;
+    --muted:#eef1f9; --muted-foreground:#565f7e;
+  /* 용도별 표면 — 표면·호버·선택을 한 토큰으로 쓰면 인접했을 때 구분이 사라진다 */
+    --hover:#fafbfe; --hover-strong:#dce2f1; --selected:#dde6f8; --selected-soft:#f2f6fd; --thead:#edf0f7;
+    --border:#dce2f1; --border-strong:#b9c3dd; --input:#dce2f1;
+    --primary:#3346c9; --primary-foreground:#ffffff; --primary-hover:#26368f;
+    --accent:#4f6fe6; --accent-foreground:#0a1026;
+    --success:#2f9e6a; --warning:#c98a2e; --destructive:#d64a51; --destructive-hover:#b93b42;
+    --ring:#4f6fe6; --underline:#a8b0c8;
+    --card-2:#f0f3fb; --flyout:#ffffff; --faint:#8b93ad;
+    --shadow:rgba(23,29,51,.10);
+    /* 레이아웃 치수 */
+    --header-h:58px; --gnb-w:236px; --panel-w:440px;
+    --font:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+    --radius:12px;
+  }
+  .dark{
+    --background:#0d0f14; --foreground:#e6e8ee;
+    --card:#16181f; --card-foreground:#e6e8ee;
+    --muted:#1c1f27; --muted-foreground:#969ba6;
+  --hover:#1b1e26; --hover-strong:#262a33; --selected:#252b38; --selected-soft:#1e2430; --thead:#212530;
+    --border:#262a33; --border-strong:#3d4454; --input:#262a33;
+    --primary:#4159d6; --primary-foreground:#ffffff; --primary-hover:#35489f;
+    --accent:#7d97f0; --accent-foreground:#0a1026;
+    --success:#46b17f; --warning:#d9a441; --destructive:#e0585f; --destructive-hover:#c74a51;
+    --ring:#7d97f0; --underline:#4d5566;
+    --card-2:#1c1f27; --flyout:#181b22; --faint:#6f7686;
+    --shadow:rgba(0,0,0,.55);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--background);color:var(--foreground);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+  /* 하단 미리보기 바 (시안 확인용) */
+  .demo-bar{position:fixed;left:0;right:0;bottom:0;z-index:800;background:#0f1320;color:#c9cfe0;
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;font-size:12px;border-top:1px solid #2a2f45}
+  .demo-bar .demo-label{color:#7f88a8;margin-right:4px}
+  .demo-bar button{background:#1c2136;border:1px solid #2f3654;color:#c9cfe0;border-radius:6px;padding:5px 10px;font-size:12px;font-family:inherit;cursor:pointer}
+  .demo-bar button:hover{border-color:var(--accent);color:#fff}
+  .demo-bar button.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+  button{font-family:inherit;color:inherit;cursor:pointer}
+  .app{display:grid;grid-template-columns:var(--gnb-w) 1fr;grid-template-rows:var(--header-h) 1fr;height:calc(100vh - 46px);overflow:hidden;grid-template-areas:"brand header" "gnb main"}
+
+  /* 브랜드 */
+  .brand{grid-area:brand;display:flex;align-items:center;gap:10px;padding:0 18px;background:var(--card);border-bottom:1px solid var(--border)}
+  .logo-mark{display:grid;place-items:center;width:24px;height:24px;flex:0 0 auto;color:var(--foreground)}
+  .logo-mark svg{width:24px;height:24px}
+  .brand b{font-size:15.5px;font-weight:700}
+  .brand b .ai{color:var(--accent)}
+
+  /* 헤더 */
+  .header{grid-area:header;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--card);border-bottom:1px solid var(--border)}
+  .breadcrumb{color:var(--muted-foreground);font-size:13px}.breadcrumb b{color:var(--foreground);font-weight:600}
+  .hr{display:flex;align-items:center;gap:9px}
+  .ws{display:flex;align-items:center;gap:8px;padding:6px 11px;background:var(--card-2);border:1px solid var(--border);border-radius:8px;font-size:13px}
+  .ws .chev{color:var(--muted-foreground)}
+
+  /* GNB */
+  .gnb{grid-area:gnb;display:flex;flex-direction:column;background:var(--card);border-right:1px solid var(--border);overflow:visible}
+  /* 브랜드 키비주얼 배너 */
+  .banner{margin:14px 12px 8px;height:120px;border-radius:12px;background:linear-gradient(135deg,#7386b2 0%,#8698c4 100%);position:relative;overflow:hidden;display:flex;align-items:center;padding:0 18px}
+  .banner .bt{font-size:21px;font-weight:800;color:#fff;line-height:1.05;z-index:1;letter-spacing:.5px}
+  .banner .kv{position:absolute;right:-26px;bottom:-34px;width:170px;height:170px;z-index:0}
+  .banner .ph-tag{position:absolute;bottom:8px;right:10px;font-size:9px;color:rgba(255,255,255,.62);z-index:1}
+  .nav{padding:6px 12px;flex:0 0 auto}
+  .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:3px;position:relative}
+  .nav a svg{width:19px;height:19px;flex:0 0 auto}
+  .nav a:hover{background:var(--card-2);color:var(--foreground)}
+  .nav a.active{background:var(--border);color:var(--foreground);font-weight:600}
+  .nav a.has-fly::after{content:"›";margin-left:auto;color:var(--muted-foreground);font-size:16px}
+
+  /* 플라이아웃 (플랫폼 설정 호버) */
+  .flywrap{position:relative}
+  .flyout{position:absolute;left:calc(100% + 6px);top:0;width:210px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateX(-6px);transition:.13s;z-index:70}
+  .flywrap:hover .flyout{opacity:1;visibility:visible;transform:translateX(0)}
+  .flyout a{display:flex;align-items:center;padding:9px 11px;border-radius:8px;color:var(--muted-foreground);text-decoration:none;font-size:13.5px;margin-bottom:2px}
+  .flyout a:hover{background:var(--card-2);color:var(--foreground)}
+  .flyout a.on{background:var(--border);color:var(--foreground);font-weight:600}
+  .flyout a .tb{font-size:9.5px;color:var(--muted-foreground);border:1px solid var(--border);border-radius:5px;padding:1px 5px;margin-left:6px}
+
+  /* 하단: 내 작업함 + 퍼스널 */
+  .gnb-bottom{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
+  .worklist{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--foreground);background:var(--card);border:1px solid var(--border);position:relative;margin-bottom:8px}
+  .worklist svg{width:19px;height:19px;color:var(--muted-foreground)}
+  .badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--accent);color:#0a0b0e;font-size:12px;font-weight:700;display:grid;place-items:center}
+  .notice-common{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:8px;position:relative}
+  .notice-common svg{width:19px;height:19px}
+  .notice-common:hover{background:var(--card-2);color:var(--foreground)}
+  .notice-common .rdot2{position:absolute;left:24px;top:8px;width:6px;height:6px;border-radius:50%;background:var(--destructive)}
+  .persona{position:relative}
+  .persona .pbtn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:var(--card-2);border:1px solid var(--border);cursor:pointer;width:100%}
+  .persona .pbtn:hover{border-color:var(--border-strong)}
+  .av{width:30px;height:30px;border-radius:50%;background:var(--muted);display:grid;place-items:center;font-size:12px;color:var(--accent);flex:0 0 auto}
+  .persona .who{line-height:1.25;min-width:0;text-align:left}
+  .persona .who b{font-size:13px;display:block}
+  .persona .who span{font-size:11px;color:var(--muted-foreground)}
+  .persona .up{margin-left:auto;color:var(--muted-foreground);transition:transform .15s}
+  .persona.open .up{transform:rotate(180deg)}
+  .pmenu{position:absolute;left:0;bottom:calc(100% + 8px);width:100%;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:8px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateY(6px);transition:.13s;z-index:70}
+  .persona.open .pmenu{opacity:1;visibility:visible;transform:translateY(0)}
+  .persona.open .pbtn{border-color:var(--border-strong)}
+  .pmenu a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--muted-foreground);text-decoration:none;font-size:13px}
+  .pmenu a:hover{background:var(--card-2);color:var(--foreground)}
+  .pmenu a svg{width:16px;height:16px}
+  .pmenu hr{border:0;border-top:1px solid var(--border);margin:6px 0}
+  .pm-head{display:flex;align-items:center;gap:10px;padding:6px 10px 8px}
+  .pm-head .av{width:32px;height:32px;flex:0 0 auto}
+  .pm-who{line-height:1.35;min-width:0}
+  .pm-who b{font-size:13px;display:block}
+  .pm-who span{font-size:11px;color:var(--muted-foreground);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pmenu .theme{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;font-size:13px;color:var(--muted-foreground);cursor:pointer}
+  .toggle{width:38px;height:20px;border-radius:11px;background:var(--card-2);border:1px solid var(--border);position:relative;transition:.15s;flex:0 0 auto}
+  .toggle::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--muted-foreground);transition:.15s}
+  .toggle.on{background:color-mix(in srgb,var(--accent) 30%,transparent);border-color:var(--accent)}
+  .toggle.on::after{left:20px;background:var(--accent)}
+  /* 언어: 한 줄 → 클릭 시 인라인 펼침 */
+  .lang-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--muted-foreground);font-size:13px;cursor:pointer}
+  .lang-row:hover{background:var(--card-2);color:var(--foreground)}
+  .lang-row svg.gl{width:16px;height:16px;flex:0 0 auto}
+  .lang-row .cur{margin-left:auto;color:var(--muted-foreground);font-size:12px}
+  .lang-row .cv{margin-left:6px;color:var(--muted-foreground);transition:transform .15s}
+  .lang-row .cv svg{width:13px;height:13px;display:block}
+  .lang-row.open .cv{transform:rotate(180deg)}
+  .lang-list{max-height:0;overflow:hidden;transition:max-height .18s ease}
+  .lang-list.open{max-height:140px}
+  .lang-list button{display:flex;align-items:center;width:100%;gap:10px;padding:8px 10px 8px 36px;border:0;background:transparent;border-radius:8px;color:var(--muted-foreground);font-size:12.5px;text-align:left;cursor:pointer}
+  .lang-list button:hover{background:var(--card-2);color:var(--foreground)}
+  .lang-list button .ck{margin-left:auto;color:var(--accent);opacity:0}
+  .lang-list button.sel .ck{opacity:1}
+  .lang-list button.sel{color:var(--foreground)}
+  .lang-list button .ck svg{width:14px;height:14px;display:block}
+
+  /* 메인 */
+  .main{grid-area:main;background:var(--background);overflow-y:auto;overflow-x:hidden;padding:24px 28px;min-height:0}
+  .body-ph{border:1px dashed #2c313d;border-radius:12px;min-height:340px;display:grid;place-items:center;color:var(--muted-foreground);font-size:13px;text-align:center;line-height:1.9;background:repeating-linear-gradient(135deg,transparent,transparent 12px,rgba(255,255,255,.012) 12px,rgba(255,255,255,.012) 24px)}
+  .body-ph b{color:var(--muted-foreground);font-weight:600;display:block;margin-bottom:2px}
+  #page .ph{margin-bottom:20px}
+  #page .ph h1{font-size:22px;margin:0 0 6px;letter-spacing:-.2px}
+  #page .ph p{font-size:12.5px;color:var(--muted-foreground);margin:0}
+  #page .ph-row{display:flex;align-items:flex-start;justify-content:space-between}
+  #page .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:16px}
+  #page .tab{padding:9px 14px;font-size:13px;color:var(--muted-foreground);border-bottom:2px solid transparent;cursor:pointer}
+  #page .tab.on{color:var(--foreground);border-bottom-color:var(--accent)}
+  .addbtn{padding:8px 15px;background:var(--primary);color:#fff;border:0;border-radius:8px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap}
+  .addbtn:hover{background:var(--primary-hover)}
+  /* 마이페이지 */
+  .mp-form{max-width:none}
+/* 데이터 상태 — 헤더·GNB는 유지하고 폼 자리만 대체한다(공통정책 4.1) */
+.mp-state{padding:60px 0;text-align:center;color:var(--muted-foreground)}
+.mp-state h3{margin:0 0 8px;font-size:15px;color:var(--foreground);font-weight:600}
+.mp-state p{margin:0 0 16px;font-size:13px}
+.mp-spin{width:22px;height:22px;margin:0 auto 14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:mpspin .8s linear infinite}
+@keyframes mpspin{to{transform:rotate(360deg)}}
+  .mp-sec{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:18px 20px;margin-bottom:14px}
+  .mp-sec h3{font-size:14px;margin:0 0 14px}
+  .mp-f{margin-bottom:16px}
+  /* 비밀번호 섹션 — 제목과 액션을 한 줄에 둔다 */
+  .mp-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  /* 소속 워크스페이스 — 확인용 목록이라 조작을 두지 않는다 */
+  .mp-cnt{margin-left:6px;font-size:12px;font-weight:400;color:var(--muted-foreground)}
+  .mp-wslist{margin-top:10px;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+  .mp-wsrow{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid var(--border);
+    text-decoration:none;color:var(--foreground);font-size:13px}
+  .mp-wsrow:last-child{border-bottom:0}
+  .mp-wsrow:hover{background:var(--hover)}
+  .mp-wsic{width:17px;height:17px;color:var(--muted-foreground);flex:0 0 auto}
+  .mp-wsic svg{width:100%;height:100%}
+  .mp-wsn{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--underline)}
+  .mp-wsrow:hover .mp-wsn{text-decoration-color:var(--foreground)}
+  .mp-role{margin-left:auto;font-size:11.5px;color:var(--muted-foreground)}
+  /* 조치가 필요한 안내 — 경고색으로 구분한다. 차단이 아니라 권장이므로 destructive 를 쓰지 않는다 */
+  .mp-warn{font-size:11.5px;color:var(--warning);line-height:1.6}
+  /* 라벨 툴팁 — 워크스페이스·CDE 화면과 같은 방식으로 처리한다(공통정책 4.7) */
+  .tip-anchor{position:relative;display:inline-flex;align-items:center;gap:5px}
+  .tip-ic{width:15px;height:15px;border-radius:50%;border:1px solid var(--border-strong);color:var(--muted-foreground);
+    font-size:10px;display:inline-grid;place-items:center;cursor:help;flex:0 0 auto}
+  .tip{position:absolute;bottom:calc(100% + 8px);left:0;background:var(--flyout);color:var(--foreground);
+    border:1px solid var(--border-strong);font-size:12px;line-height:1.55;padding:9px 11px;border-radius:9px;
+    width:max-content;max-width:280px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;
+    transform:translateY(4px);transition:.14s;z-index:60;white-space:normal;text-align:left}
+  .tip-anchor:hover .tip,.tip-anchor:focus-within .tip{opacity:1;visibility:visible;transform:translateY(0)}
+  .tip::after{content:"";position:absolute;top:100%;left:14px;border:5px solid transparent;border-top-color:var(--flyout)}
+  .tip::before{content:"";position:absolute;left:0;right:0;height:10px;bottom:-10px}
+  .mp-f label{display:block;font-size:12.5px;color:var(--muted-foreground);margin-bottom:6px}
+  .mp-f input{width:100%;padding:9px 12px;background:var(--card-2);border:1px solid var(--border);border-radius:8px;color:var(--foreground);font-size:13px;font-family:inherit}
+  /* 읽기 전용 값 — 고칠 수 없는 값은 입력창 모양으로 두지 않는다(라이브러리) */
+.rov{display:inline-flex;align-items:baseline;gap:9px;font-size:13px;color:var(--foreground);padding:9px 0}
+.rov span{font-size:11.5px;color:var(--faint)}
+  .mp-act{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+  /* 처리 중 스피너 — 라이브러리 규격 */
+  .btn .spin{display:none;width:13px;height:13px;border-radius:50%;
+    border:2px solid color-mix(in srgb,var(--primary-foreground) 45%,transparent);
+    border-top-color:currentColor;animation:mpsp .7s linear infinite}
+  .btn.loading .spin{display:inline-block}
+  @keyframes mpsp{to{transform:rotate(360deg)}}
+  .mp-hint{font-size:11.5px;color:var(--faint);margin:6px 0 0;line-height:1.6}
+  /* 버튼 — 컴포넌트 라이브러리 .btn 규격 */
+  .btn{padding:8px 15px;background:var(--primary);color:var(--primary-foreground);border:0;border-radius:8px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{background:var(--primary-hover)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.sm{padding:6px 11px;font-size:12px}
+  .btn.ghost{background:transparent;border:1px solid var(--border-strong);color:var(--foreground)}
+  .btn.ghost:hover{background:var(--hover);border-color:var(--accent)}
+  /* 섹션 제목 — 우측에 액션을 둔다(워크스페이스 상세 .dsec > h4 와 같은 규격) */
+  .mp-sec h3{margin:0 0 12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+  /* 조회 항목 — 워크스페이스 상세 .dl 규격 */
+  .dl{display:grid;grid-template-columns:132px 1fr;gap:10px 12px;font-size:12.5px;margin:0}
+  .dl dt{color:var(--muted-foreground);display:flex;align-items:center;gap:5px}
+  .dl dd{margin:0;word-break:break-all}
+  /* 수정 화면 헤더 — 뒤로가기 + 제목 */
+  .mp-ehead{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px}
+  .back{width:32px;height:32px;flex:0 0 auto;display:grid;place-items:center;border:1px solid var(--border-strong);
+    background:var(--card);border-radius:8px;color:var(--muted-foreground);cursor:pointer;margin-top:4px}
+  .back:hover{border-color:var(--accent);color:var(--foreground)}
+  /* 마이페이지 폼 검증·상태 */
+  .mp-f .req{color:var(--destructive);margin-left:2px}
+  .mp-f input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
+  .mp-f input.has-error{border-color:var(--destructive)}
+  .mp-err{display:none;font-size:11.5px;color:var(--destructive);margin:6px 0 0;line-height:1.6}
+  .mp-err.show{display:block}
+  .addbtn:disabled{opacity:.5;cursor:not-allowed}
+  .addbtn .spin{display:none;width:13px;height:13px;border:2px solid color-mix(in srgb,var(--primary-foreground) 45%,transparent);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
+  .addbtn.loading .spin{display:inline-block}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  /* 토스트 (공통정책 7.6·7.7 — 성공 3초/실패 5초, 호버 정지, 수동 닫기) */
+  .toast{position:fixed;top:20px;right:20px;transform:translateX(24px);background:var(--card-2);border:1px solid var(--border);color:var(--foreground);font-size:13px;padding:11px 14px;border-radius:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:120;display:flex;align-items:center;gap:9px}
+  .toast.show{opacity:1;transform:translateX(0);pointer-events:auto}
+  .toast .ti{width:16px;height:16px;flex:0 0 auto}
+  .toast.ok .ti{color:var(--success)} .toast.err .ti{color:var(--destructive)}
+  .toast .tx{margin-left:2px} .toast .tc{margin-left:6px;border:0;background:transparent;color:var(--muted-foreground);cursor:pointer;font-size:13px;line-height:1;padding:2px 3px}
+  .toast .tc:hover{color:var(--foreground)}
+  /* 확인 알럿 모달 (공통정책 4.5·7.2 — 외부클릭·ESC 미닫힘) */
+  .ov{display:none;position:fixed;inset:0;z-index:110;background:color-mix(in srgb,var(--foreground) 45%,transparent);align-items:center;justify-content:center;padding:20px}
+  .ov.show{display:flex}
+  .amodal{width:100%;max-width:380px;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+  .amodal h4{font-size:15px;margin:0 0 8px}
+  .amodal p{font-size:13px;color:var(--muted-foreground);line-height:1.6;margin:0 0 18px}
+  .amodal .amact{display:flex;justify-content:flex-end;gap:8px}
+  /* 세부 미확정 — 흐리게 처리(화면정의서에서 정의) */
+  .mp-sec.tbd{position:relative;overflow:hidden}
+  .mp-sec.tbd > *:not(.tbd-tag){filter:blur(3.5px);opacity:.45;user-select:none;pointer-events:none}
+  .tbd-tag{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;background:var(--card);border:1px dashed var(--border);border-radius:9px;padding:10px 16px;font-size:12px;color:var(--muted-foreground);white-space:nowrap;text-align:center;line-height:1.7}
+  .tbd-tag b{display:block;color:var(--foreground);font-size:12.5px;margin-bottom:2px}
+</style>
+</head>
+<body class="dark">
+<div class="app">
+
+  <div class="brand"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9.2" stroke-width="1.4" opacity="0.35"/><circle cx="12" cy="12" r="6" stroke-width="1.5" opacity="0.6"/><circle cx="12" cy="12" r="2.6" fill="currentColor" stroke="none"/></svg></span><b>Concerto <span class="ai">AI</span></b></div>
+
+  <header class="header">
+    <div class="breadcrumb">콘체르토 플랫폼 / <b>플랫폼 설정</b></div>
+    <div class="hr">
+      <div class="ws"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="width:15px;height:15px"><rect x="4" y="3" width="10" height="18" rx="1"/><path d="M14 8h5a1 1 0 011 1v11a1 1 0 01-1 1H4"/><path d="M7 7h3M7 11h3M7 15h3"/></svg> 전체 <span class="chev">▾</span></div>
+    </div>
+  </header>
+
+  <nav class="gnb">
+    <!-- 브랜드 키비주얼 배너 (디자인 확정 시 교체) -->
+    <div class="banner">
+      <div class="bt">CONCERTO<br>A.I.</div>
+      <svg class="kv" viewBox="0 0 170 170" fill="none">
+        <circle cx="118" cy="118" r="70" fill="#5f73a6" opacity="0.55"/>
+        <circle cx="118" cy="118" r="46" fill="#516596" opacity="0.7"/>
+        <circle cx="118" cy="118" r="22" fill="#43567f"/>
+      </svg>
+      <span class="ph-tag">키비주얼 영역 · 디자인 확정 시 교체</span>
+    </div>
+
+    <div class="nav">
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>홈</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg>워크스페이스</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg>모델</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 15c-1.5 1.5-2 4-2 4s2.5-.5 4-2m3-1l7-7M13 5s4 0 6 2 2 6 2 6l-9 5-4-4 5-9z"/></svg>배포</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg>모니터링</a>
+
+      <div class="flywrap">
+        <a href="#" class="has-fly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 00-1.7-1L15 3H9l-.4 2.6a7.6 7.6 0 00-1.7 1l-2.3-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 001.7 1L9 21h6l.4-2.6a7.6 7.6 0 001.7-1l2.3 1 2-3.4z"/></svg>플랫폼 설정</a>
+        <div class="flyout">
+          <a href="#" class="on">사용자 및 역할 <span class="tb">RBAC</span></a>
+          <a href="#">보안 및 감사</a>
+          <a href="#">외부 연동</a>
+          <a href="#">알림 채널</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="gnb-bottom">
+      <div class="worklist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>
+        내 작업함 <span class="badge">3</span>
+      </div>
+      <a href="#" class="notice-common"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 8a6 6 0 1112 0c0 7 3 7 3 9H3c0-2 3-2 3-9z"/><path d="M10 21a2 2 0 004 0"/></svg>알림<span class="badge">12</span></a>
+
+      <div class="persona" id="persona">
+        <div class="pbtn" onclick="togglePersona(event)">
+          <span class="av">유</span>
+          <span class="who"><b>성유진</b><span>일반 사용자</span></span>
+          <span class="up">▴</span>
+        </div>
+        <div class="pmenu">
+          <div class="pm-head">
+            <span class="av">유</span>
+            <div class="pm-who"><b>성유진</b><span>yj.seong@okestro.com</span></div>
+          </div>
+          <hr>
+          <a href="#" onclick="go('mypage');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0114 0"/></svg>마이페이지</a>
+          <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>비밀번호 변경</a>
+          <hr>
+          <div class="lang-row" id="langRow" onclick="toggleLang(event)">
+            <svg class="gl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg>
+            <span>언어</span>
+            <span class="cur" id="langCur">한국어</span>
+            <span class="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span>
+          </div>
+          <div class="lang-list" id="langList">
+            <button onclick="pickLang(this,'English')">English<span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12l5 5L20 6"/></svg></span></button>
+            <button class="sel" onclick="pickLang(this,'한국어')">한국어<span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12l5 5L20 6"/></svg></span></button>
+            <button onclick="pickLang(this,'日本語')">日本語<span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12l5 5L20 6"/></svg></span></button>
+          </div>
+          <hr>
+          <div class="theme" onclick="toggleTheme(event)"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="width:16px;height:16px;vertical-align:-3px;margin-right:8px"><path d="M20 14.5A8 8 0 019.5 4a7 7 0 100 10.5 7 7 0 0010.5 0z" stroke-linejoin="round"/></svg>다크 테마</span><span class="toggle on"></span></div>
+          <hr>
+          <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>로그아웃</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main"><div id="page"></div></main>
+</div>
+
+<!-- 토스트 -->
+<div class="toast" id="toast"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="tx" id="toastMsg"></span><button type="button" class="tc" onclick="hideToast()" aria-label="닫기">✕</button></div>
+
+<!-- 취소 확인 알럿 (공통정책 7.2) -->
+<div class="ov" id="cancelOv">
+  <div class="amodal">
+    <h4>변경 취소</h4>
+    <p>작성 중인 내용은 저장되지 않습니다. 취소하시겠습니까?</p>
+    <div class="amact"><button class="btn ghost" onclick="closeCancel()">계속 작성</button><button class="btn" onclick="doCancel()">취소</button></div>
+  </div>
+</div>
+
+<script>
+var PAGES = {
+  overview: {crumb:'홈', html:`
+    <div class="ph"><h1>환영합니다, 성유진님</h1><p>클러스터 전체의 AI 인프라 및 모델 배포 개요를 확인하세요.</p></div>
+    <div class="body-ph"><div><b>홈 대시보드</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃(헤더·GNB·플라이아웃·사이드바 하단) 전달용입니다.</div></div>`},
+  workspaces: {crumb:'워크스페이스', html:`
+    <div class="ph-row"><div class="ph"><h1>워크스페이스</h1><p>논리적 환경, 팀 액세스 및 리소스 할당량을 관리합니다.</p></div><button class="addbtn">＋ 워크스페이스 생성</button></div>
+    <div class="body-ph"><div><b>워크스페이스 목록</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
+  models: {crumb:'모델', html:`
+    <div class="ph-row"><div class="ph"><h1>모델 레지스트리</h1><p>등록된 모델과 사양을 관리합니다.</p></div><button class="addbtn">＋ 모델 등록</button></div>
+    <div class="body-ph"><div><b>모델 레지스트리</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
+  deployments: {crumb:'배포', html:`
+    <div class="ph-row"><div class="ph"><h1>배포</h1><p>운영 중인 추론 배포를 관리합니다.</p></div><button class="addbtn">＋ 새 배포</button></div>
+    <div class="body-ph"><div><b>배포 목록</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
+  monitoring: {crumb:'모니터링', html:`
+    <div class="ph"><h1>글로벌 모니터링</h1><p>가속기 자원과 추론 성능을 실시간으로 확인합니다.</p></div>
+    <div class="tabs"><span class="tab on">가속기 모니터링</span><span class="tab">오버뷰 대시보드</span><span class="tab">알림 규칙 탐색기</span></div>
+    <div class="body-ph"><div><b>글로벌 모니터링</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
+  settings: {crumb:'플랫폼 설정', sub:'사용자 및 역할', html:`
+    <div class="ph"><h1>플랫폼 설정</h1><p>글로벌 인프라 연결 및 시스템 전체 역할을 관리합니다.</p></div>
+    <div class="body-ph"><div><b>사용자 및 역할(RBAC)</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
+  mypage: {crumb:'마이페이지', html:`
+    <div class="ph"><h1>마이페이지</h1><p>본인 계정 정보와 소속을 확인합니다.</p></div>
+    <div class="mp-form">
+      <!-- 조회 화면. 수정은 별도 화면에서 처리해 저장 시점을 섞지 않는다 -->
+      <section class="mp-sec">
+        <h3>내 정보<button class="btn sm" style="margin-left:auto" onclick="go('mypageEdit')">수정</button></h3>
+        <dl class="dl">
+          <dt>계정 아이디${mpTip('로그인에 사용하는 아이디입니다. 변경할 수 없습니다.')}</dt><dd>yj.seong</dd>
+          <dt>이름</dt><dd>성유진</dd>
+          <dt>이메일 주소${mpTip('알림 수신에 사용됩니다.')}</dt><dd>yj.seong@okestro.com</dd>
+        </dl>
+      </section>
+
+      <!-- 소속과 역할은 워크스페이스마다 들어가야 확인할 수 있어 여기서 한 번에 보여준다.
+           조작은 두지 않는다 — 멤버 관리는 워크스페이스 관리자 소관이다 -->
+      <section class="mp-sec">
+        <h3>소속 워크스페이스 <span class="mp-cnt">3</span></h3>
+        <div class="mp-wslist">
+          <a class="mp-wsrow" href="#" onclick="return false">
+            <span class="mp-wsic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="10" height="18" rx="1"/><path d="M14 8h5a1 1 0 011 1v11a1 1 0 01-1 1H4"/><path d="M7 7h3M7 11h3M7 15h3"/></svg></span>
+            <span class="mp-wsn">ai-service-team</span><span class="mp-role">편집자</span></a>
+          <a class="mp-wsrow" href="#" onclick="return false">
+            <span class="mp-wsic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="10" height="18" rx="1"/><path d="M14 8h5a1 1 0 011 1v11a1 1 0 01-1 1H4"/><path d="M7 7h3M7 11h3M7 15h3"/></svg></span>
+            <span class="mp-wsn">data-platform</span><span class="mp-role">뷰어</span></a>
+          <a class="mp-wsrow" href="#" onclick="return false">
+            <span class="mp-wsic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></span>
+            <span class="mp-wsn">공용 워크스페이스</span><span class="mp-role">뷰어</span></a>
+        </div>
+        <p class="mp-hint">역할 변경은 워크스페이스 관리자에게 요청해 주세요.</p>
+      </section>
+
+      <!-- 마지막 변경일은 권고 주기(90일) 초과 여부를 판단하는 근거다(계정정책 2.2) -->
+      <section class="mp-sec">
+        <h3>비밀번호<button class="btn sm ghost" style="margin-left:auto" onclick="openPw()">비밀번호 변경</button></h3>
+        <p class="mp-hint" id="pwHint" style="margin:0">마지막 변경 2026-06-01</p>
+      </section>
+    </div>`},
+
+  mypageEdit: {crumb:'마이페이지', sub:'기본 정보 수정', html:`
+    <div class="mp-ehead">
+      <button class="back" onclick="go('mypage')" title="마이페이지로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <div class="ph" style="margin-bottom:0"><h1>기본 정보 수정</h1><p>이름과 이메일 주소를 수정합니다.</p></div>
+    </div>
+    <div class="mp-form">
+      <section class="mp-sec">
+        <div class="mp-f">
+          <label>계정 아이디${mpTip('로그인에 사용하는 아이디입니다. 변경할 수 없습니다.')}</label>
+          <div class="rov">yj.seong</div>
+        </div>
+        <div class="mp-f">
+          <label>이름 <span class="req">*</span></label>
+          <input id="mpName" value="성유진" maxlength="50" oninput="onMp()" onblur="vName(true)">
+          <p class="mp-err" id="mpNameErr"></p>
+        </div>
+        <div class="mp-f">
+          <label>이메일 주소 <span class="req">*</span>${mpTip('알림 수신에 사용됩니다.')}</label>
+          <input id="mpEmail" value="yj.seong@okestro.com" oninput="onMp()" onblur="vEmail(true)">
+          <p class="mp-err" id="mpEmailErr"></p>
+        </div>
+        <div class="mp-act">
+          <button class="btn ghost" onclick="cancelMp()">취소</button>
+          <button class="btn" id="mpSave" onclick="saveMp()" disabled><span class="spin"></span><span>저장</span></button>
+        </div>
+      </section>
+    </div>`}};
+
+/* 라벨 옆 도움말 — 워크스페이스 목업의 tip() 과 같은 규격 */
+function mpTip(t){ return '<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">'+t+'</span></span>'; }
+function setCrumb(main, sub){
+  var el=document.querySelector('.breadcrumb');
+  el.innerHTML = '콘체르토 플랫폼 / <b>'+ (sub? main+' ▸ '+sub : main) +'</b>';
+}
+function render(key, subLabel){
+  var p=PAGES[key]; if(!p) return;
+  document.getElementById('page').innerHTML = p.html;
+  setCrumb(p.crumb, subLabel || p.sub);
+  /* 조회 화면을 다시 그리면 비밀번호 상태 표시가 초기화되므로 복원한다 */
+  if(key==='mypage' && typeof drawPwHint==='function') drawPwHint();
+  if(key==='mypageEdit' && typeof refreshSave==='function') refreshSave();
+}
+function nav(key){
+  document.querySelectorAll('.nav a').forEach(function(a){a.classList.remove('active')});
+  var link=document.querySelector('.nav a[data-page="'+key+'"]');
+  if(link) link.classList.add('active');
+  render(key);
+  return false;
+}
+function go(key){
+  document.querySelectorAll('.nav a').forEach(function(a){a.classList.remove('active')});
+  render(key);
+  document.querySelector('.main').scrollTop=0;
+  return false;
+}
+function navSub(key, label){
+  nav(key);
+  document.querySelectorAll('.flyout a').forEach(function(a){a.classList.toggle('on', a.textContent.indexOf(label)===0)});
+  render(key, label);
+  return false;
+}
+/* 초기 렌더는 스크립트 하단에서 실행(마이페이지 폼 함수 정의 이후) */
+
+document.addEventListener('click', function(e){
+  var a = e.target.closest && e.target.closest('a[href="#"]');
+  if(a){ e.preventDefault(); }
+}, true);
+
+function toggleTheme(e){
+  if(e) e.stopPropagation();
+  var dark = !document.body.classList.toggle('light');
+  document.querySelectorAll('.toggle').forEach(function(t){t.classList.toggle('on', dark)});
+}
+function togglePersona(e){
+  if(e) e.stopPropagation();
+  document.getElementById('persona').classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  var p=document.getElementById('persona');
+  if(p && !p.contains(e.target)) p.classList.remove('open');
+});
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ document.getElementById('persona').classList.remove('open'); }});
+function toggleLang(e){
+  e.stopPropagation();
+  document.getElementById('langRow').classList.toggle('open');
+  document.getElementById('langList').classList.toggle('open');
+}
+/* ===== 마이페이지 폼 (기본 정보 수정) ===== */
+var MP_ORIG={name:'성유진',email:'yj.seong@okestro.com'};
+var mpEmailRe=/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+function $mp(id){return document.getElementById(id);}
+function showMpErr(inp,errEl,msg){ if(msg){inp.classList.add('has-error');errEl.textContent=msg;errEl.classList.add('show');return false;} inp.classList.remove('has-error');errEl.classList.remove('show');return true; }
+function nameMsg(){ var el=$mp('mpName'); if(!el) return ''; var v=el.value.trim();
+  if(v.length<2) return '2자 이상 입력해 주세요.';   /* 계정정책 2.4 길이 2~50자. 안내 문구는 확인 필요 */
+  if(el.value.length>50) return '50자까지 입력할 수 있습니다.';
+  if(/\s/.test(el.value)) return '공백은 사용할 수 없습니다.';
+  if(!/^[가-힣a-zA-Z0-9ぁ-んァ-ンー一-龥,.\-_]+$/.test(v)) return '한글·영문·숫자와 특수문자(, . - _)만 사용할 수 있습니다.';
+  return ''; }
+/* 이메일은 중복 불가다(계정정책 2.3). 저장 시 서버가 판정하며 여기서는 데모용으로 확인한다 */
+var MP_TAKEN=['admin@okestro.com','sj.lim@okestro.com'];
+function emailMsg(){ var el=$mp('mpEmail'); if(!el) return ''; var v=el.value.trim();
+  if(!mpEmailRe.test(v)) return '올바른 이메일 형식이 아닙니다.';
+  if(MP_TAKEN.indexOf(v.toLowerCase())>=0) return '이미 사용 중인 이메일입니다.';
+  return ''; }
+function vName(show){ return showMpErr($mp('mpName'),$mp('mpNameErr'), show?nameMsg():''); }
+function vEmail(show){ return showMpErr($mp('mpEmail'),$mp('mpEmailErr'), show?emailMsg():''); }
+function isChanged(){ return $mp('mpName').value.trim()!==MP_ORIG.name || $mp('mpEmail').value.trim()!==MP_ORIG.email; }
+function refreshSave(){ var b=$mp('mpSave'); if(!b) return; b.disabled=!(nameMsg()===''&&emailMsg()===''&&isChanged()); }
+function onMp(){ if($mp('mpName').classList.contains('has-error')&&nameMsg()==='') vName(true); if($mp('mpEmail').classList.contains('has-error')&&emailMsg()==='') vEmail(true); refreshSave(); }
+function saveMp(){ var okN=vName(true),okE=vEmail(true); if(!okN||!okE){ (!okN?$mp('mpName'):$mp('mpEmail')).focus(); return; }
+  var b=$mp('mpSave'); b.classList.add('loading'); b.disabled=true;
+  setTimeout(function(){ b.classList.remove('loading');
+    MP_ORIG.name=$mp('mpName').value.trim(); MP_ORIG.email=$mp('mpEmail').value.trim();
+    /* 저장하면 조회 화면으로 돌아간다 */
+    go('mypage'); showToast('저장되었습니다.',true); },800); }
+/* 취소하면 조회 화면으로 돌아간다. 변경분이 있으면 확인을 받는다(공통정책 7.2) */
+function cancelMp(){ if(isChanged()){ $mp('cancelOv').classList.add('show'); } else { go('mypage'); } }
+function closeCancel(){ $mp('cancelOv').classList.remove('show'); }
+function doCancel(){ resetMp(); $mp('cancelOv').classList.remove('show'); go('mypage'); }
+function resetMp(){ $mp('mpName').value=MP_ORIG.name; $mp('mpEmail').value=MP_ORIG.email; vName(false); vEmail(false); refreshSave(); }
+/* 비밀번호 변경은 별도 모달로 제공한다. 화면 규격은 비밀번호 변경 기획서를 따른다 */
+function openPw(){ showToast('비밀번호 변경 모달이 열립니다. 화면 구성은 비밀번호 변경 기획서에서 확인할 수 있습니다.',true); }
+var mpToastTimer,mpToastDur=3000;
+function showToast(msg,ok){ var t=$mp('toast'); if(!t) return; var isErr=(ok===false); t.classList.toggle('ok',!isErr); t.classList.toggle('err',isErr);
+  t.querySelector('.ti').innerHTML = isErr ? '<path d="M18 6 6 18M6 6l12 12"/>' : '<path d="M20 6 9 17l-5-5"/>';
+  $mp('toastMsg').textContent=msg; mpToastDur=isErr?5000:3000; t.classList.add('show'); clearTimeout(mpToastTimer);
+  mpToastTimer=setTimeout(function(){t.classList.remove('show');},mpToastDur); }
+function hideToast(){ clearTimeout(mpToastTimer); var t=$mp('toast'); if(t) t.classList.remove('show'); }
+(function(){ var t=document.getElementById('toast'); if(!t) return;
+  t.addEventListener('mouseenter',function(){clearTimeout(mpToastTimer);});
+  t.addEventListener('mouseleave',function(){ if(t.classList.contains('show')){clearTimeout(mpToastTimer); mpToastTimer=setTimeout(function(){t.classList.remove('show');},mpToastDur);} }); })();
+function pickLang(btn,name){
+  event.stopPropagation();
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  document.getElementById('langCur').textContent=name;
+  document.getElementById('langRow').classList.remove('open');
+  document.getElementById('langList').classList.remove('open');
+}
+
+/* ===== 초기 렌더 (모든 함수·변수 정의 이후 실행) ===== */
+document.querySelectorAll('.nav a').forEach(function(a){a.classList.remove('active')});
+render('mypage');
+refreshSave();
+</script>
+<div class="demo-bar" id="demoBar">
+  <span class="demo-label">화면:</span>
+  <button class="vw on" onclick="goDemo('mypage',this)">마이페이지</button>
+  <button class="vw" onclick="goDemo('mypageEdit',this)">기본 정보 수정</button>
+  <span class="demo-label" style="margin-left:12px;">비밀번호:</span>
+  <button class="pw on" onclick="setPw('ok',this)">정상</button>
+  <button class="pw" onclick="setPw('old',this)">주기 초과</button>
+  <button class="pw" onclick="setPw('temp',this)">임시</button>
+  <span class="demo-label" style="margin-left:12px;">데이터:</span>
+  <button class="st on" onclick="setState('default',this)">기본</button>
+  <button class="st" onclick="setState('loading',this)">로딩</button>
+  <button class="st" onclick="setState('error',this)">오류</button>
+  <span class="demo-label" style="margin-left:12px;">테마:</span>
+  <button class="th" onclick="setTheme(false,this)">라이트</button>
+  <button class="th on" onclick="setTheme(true,this)">다크</button>
+</div>
+<script>
+function setTheme(dark,btn){
+  document.body.classList.toggle('dark',dark);
+  document.querySelectorAll('#demoBar .th').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+}
+/* 데이터 상태 — 조회 중·조회 실패를 폼 자리에 표시한다(공통정책 4.1) */
+let mpState='default';
+function setState(v,btn){
+  mpState=v;
+  document.querySelectorAll('#demoBar .st').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  drawMpState();
+}
+function drawMpState(){
+  go('mypage');
+  if(mpState==='default') return;
+  const box=document.querySelector('.mp-form'); if(!box) return;
+  box.innerHTML = mpState==='loading'
+    ? '<div class="mp-state"><div class="mp-spin"></div><p>계정 정보를 불러오고 있습니다.</p></div>'
+    : '<div class="mp-state"><h3>계정 정보를 불러오지 못했습니다.</h3>'
+      + '<p>잠시 후 다시 시도해 주세요.</p>'
+      + '<button class="btn2 pri" onclick="setState(\'default\',document.querySelectorAll(\'#demoBar .st\')[0])">다시 시도</button></div>';
+}
+/* 화면 전환 — 조회 / 수정 */
+function goDemo(key,btn){
+  document.querySelectorAll('#demoBar .vw').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  go(key);
+}
+/* 비밀번호 상태 — 권고 주기 90일 초과와 임시 비밀번호를 구분해 안내한다(계정정책 2.2) */
+let pwState='ok';
+function setPw(v,btn){
+  pwState=v;
+  document.querySelectorAll('#demoBar .pw').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  drawPwHint();
+}
+/* 화면을 다시 그릴 때도 비밀번호 상태를 유지한다 */
+function drawPwHint(){
+  const v=pwState;
+  const el=document.getElementById('pwHint'); if(!el) return;
+  if(v==='temp'){
+    el.className='mp-warn'; el.style.margin='0';
+    el.textContent='관리자가 발급한 임시 비밀번호입니다. 새 비밀번호로 변경해 주세요.';
+  } else if(v==='old'){
+    el.className='mp-warn'; el.style.margin='0';
+    el.textContent='마지막 변경 2026-03-01 · 90일이 지났습니다. 변경을 권장합니다.';
+  } else {
+    el.className='mp-hint'; el.style.margin='0';
+    el.textContent='마지막 변경 2026-06-01';
+  }
+}
+setTheme(true);
+</script>
+</body>
+</html>
 
