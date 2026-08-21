@@ -1,5 +1,5 @@
 <!--
-  콘체르토 매니저 — 워크스페이스 화면 목업 v0.32 (2026-08-05)
+  콘체르토 매니저 — 워크스페이스 화면 목업 v0.4 (2026-08-20)
   이 파일이 색·컴포넌트 규격의 정본이다. 컴포넌트 라이브러리·공통 레이아웃을 여기에 맞춘다.
 
   [검토용 임시 장치 — 확정 후 삭제]
@@ -15,6 +15,20 @@
   · 버튼·클릭 대상 테두리는 --border-strong.
   · 링크는 색이 아니라 밑줄로 구분한다(--underline).
 
+  ── v0.4 변경 ───────────────────────────────────
+  · 상단 워크스페이스 스위처를 조회 필터로 바꿨다(8/19 배포 회의 3.1).
+    눌러도 상세로 이동하지 않고 현재 화면의 목록을 거른다.
+    상세 진입 바로가기로 두면 상단 표기가 무엇을 뜻하는지 흐려진다.
+    스위처는 조회 범위를 좁히는 장치이지 자산이 어디에 만들어질지를 정하지 않는다 —
+    배포·모델 생성 화면에서는 귀속 워크스페이스를 따로 받는다.
+  · 작성 중 스위처를 누르면 확인 알럿을 띄운다. 필터를 바꾸면 목록으로 돌아가
+    폼을 벗어나게 된다(공통정책 7.2).
+  · 생성 화면 진입 시 패널을 닫는다. 열린 채로 넘어가면 폼을 덮어 조작이 막힌다.
+  · 라이브러리 v0.3 규격에서 벗어나 있던 것을 맞췄다 —
+    포커스 링(box-shadow) · 필수 표시 여백 · 페이지네이션 · 버튼 font-family ·
+    모달 그림자 토큰화 · 등장 애니메이션(min·tin).
+    모달 폭(440px)·좌측 단계 sticky·테이블 헤더 white-space 는 이 화면 사정이라 남긴다.
+
   ── 목록 ────────────────────────────────────────
   · 카드 기본 + 테이블 전환. 표현이 바뀌어도 조회 조건과 선택 상태를 유지한다(공통정책 2.4)
   · 공용 워크스페이스가 항상 소속에 포함되므로 목록은 최소 2건이다.
@@ -29,8 +43,8 @@
   · 검색·필터 대상에는 포함하되 정렬에서는 뺀다.
     조작할 수 있는 범위가 달라 목록 안에서 위치가 흔들리면 찾기 어렵다
   · 이름 셀은 클릭 대상이라(2.3) 배지를 붙이지 않는다
-  · 소속 워크스페이스가 1개이고 최고 관리자가 아니면 목록을 거치지 않고 상세로 이동한다.
-    공용은 소속이 아니므로 세지 않고 상단 전환 드롭다운으로 접근한다
+  · 공용 워크스페이스가 항상 소속에 포함되므로 목록은 최소 2건이다.
+    1행짜리 목록이 생기지 않아 소속 1개일 때 목록을 건너뛰지 않는다(정책 2.7)
 
   ── 사이드 패널 ─────────────────────────────────
   · 배경막을 두지 않는다. 패널이 열려 있어도 목록·GNB·헤더를 한 번의 클릭으로 조작한다
@@ -220,7 +234,7 @@ body.panel-on .page{padding-right:calc(var(--panel-w) + 28px)}
 .phead h1{font-size:21px;margin:0 0 5px;letter-spacing:-.3px}
 .phead p{margin:0;font-size:13px;color:var(--muted-foreground)}
 .pact{display:flex;gap:8px;flex:0 0 auto}
-.btn{padding:8px 15px;background:var(--primary);color:var(--primary-foreground);border:0;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+.btn{padding:8px 15px;background:var(--primary);color:var(--primary-foreground);border:0;border-radius:8px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
 .btn:hover:not(:disabled){background:var(--primary-hover)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.ghost{background:transparent;border:1px solid var(--border-strong);color:var(--foreground)}
@@ -313,7 +327,7 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .rowmenu hr{border:0;border-top:1px solid var(--border);margin:5px 0}
 
 /* 페이지네이션 */
-.pager{display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:12.5px;color:var(--muted-foreground)}
+.pager{display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:12px;color:var(--muted-foreground);flex-wrap:wrap;gap:10px}
 .pgnum{display:flex;align-items:center;gap:6px}
 .pgnum button{width:29px;height:29px;display:grid;place-items:center;border:1px solid var(--border);background:var(--card);border-radius:7px;font-size:13px;color:var(--muted-foreground);cursor:pointer}
 .pgnum button:hover:not(:disabled){border-color:var(--accent);color:var(--foreground)}
@@ -355,9 +369,15 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .emptyline{font-size:12.5px;color:var(--muted-foreground);font-style:italic}
 
 /* 모달 */
-.mdbg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+/* 모달·토스트 등장 — 라이브러리 v0.3 규격 */
+  @keyframes min{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+  @keyframes tin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+  .mdbg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
 .mdbg.on{display:flex}
-.modal{width:440px;max-width:100%;max-height:88vh;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+/* ⚠ 라이브러리 규격은 width:400px · padding:22px 다.
+   여기는 자원 배정 등 입력이 많은 모달이 있어 440px 로 넓히고, 내부 헤더·본문·푸터에서
+   각각 여백을 준다. 긴 내용은 스크롤로 처리한다 — 라이브러리 개정 제안 대상 */
+.modal{width:440px;max-width:100%;max-height:88vh;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 24px 60px var(--shadow);animation:min .18s ease}
 .modal.w520{width:520px}
 .mdhead{padding:20px 22px 0}
 .mdhead h3{margin:0 0 5px;font-size:15.5px}
@@ -371,9 +391,9 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .f{margin-bottom:16px}
 /* 폼 라벨 — 라이브러리 .field > label 규격. 굵기를 주지 않아 입력값이 앞선다 */
 .f label{display:block;font-size:12.5px;color:var(--muted-foreground);margin-bottom:6px}
-.f label .req{color:var(--destructive);margin-left:3px}
+.f label .req{color:var(--destructive);margin-left:2px}
 .inp{width:100%;padding:9px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--foreground);font-size:13px;font-family:inherit;color-scheme:light dark}
-.inp:focus{outline:2px solid var(--ring);outline-offset:-1px;border-color:var(--ring)}
+.inp:focus{outline:none;border-color:var(--ring);box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
 .inp.err{border-color:var(--destructive)}
 .hint{font-size:11.5px;color:var(--muted-foreground);margin-top:5px;line-height:1.55}
 .errmsg{font-size:11.5px;color:var(--destructive);margin-top:5px}
@@ -394,7 +414,9 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 
 /* 토스트 */
 .toast-wrap{position:fixed;top:74px;right:22px;z-index:300;display:flex;flex-direction:column;gap:10px;width:340px;max-width:calc(100vw - 44px)}
-.toast{display:flex;align-items:center;gap:10px;padding:12px 15px;background:var(--card);border:1px solid var(--border);border-radius:10px;font-size:12.5px;box-shadow:0 10px 30px var(--shadow);min-width:280px}
+/* 라이브러리 규격은 진행 바(.prog)가 붙는 구조라 flex-start·overflow:hidden 이다.
+   여기는 진행 바가 없어 center 로 둔다. 등장 동작(tin)은 공통 규격을 따른다 */
+.toast{display:flex;align-items:center;gap:10px;padding:12px 15px;background:var(--card);border:1px solid var(--border);border-radius:10px;font-size:12.5px;box-shadow:0 10px 30px var(--shadow);min-width:280px;animation:tin .22s ease}
 .toast .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
 .toast.ok .dot{background:var(--success)}
 .toast.cr .dot{background:var(--destructive)}
@@ -665,6 +687,8 @@ th.thcell.fdd-on .fdd{display:block}
 
 /* ── 배포 마법사 ─────────────────────────────────────── */
 .wiz{display:grid;grid-template-columns:230px 1fr;gap:22px;align-items:start}
+/* 폭 230px 은 그리드에서 잡는다(라이브러리와 같은 값).
+   페이지 스크롤이 있어 sticky 를 더했다 — 라이브러리 개정 제안 대상 */
 .wnav{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 12px;position:sticky;top:0}
 .wnav h5{margin:0 0 10px;font-size:11px;font-weight:700;color:var(--muted-foreground);letter-spacing:.4px}
 .wstep{display:flex;align-items:flex-start;gap:10px;padding:9px 8px;border-radius:8px;cursor:pointer;margin-bottom:2px}
@@ -1960,7 +1984,10 @@ function base(){ return [gwEntry()].concat(mine()); }
 function wsOptions(){ return base().filter(function(m){ return m.st==='활성'; }); }
 function rows(){
   const hit = base().filter(m=>
-      (!sq || [m.n,m.desc,m.by].some(x=>String(x).toLowerCase().includes(sq.toLowerCase())))
+      /* 상단 스위처는 목록 워크스페이스 필터와 같은 조건으로 동작한다(8/19 회의 3.1).
+         `전체` 는 소속 전부를 합쳐 보는 선택지라 걸러내지 않는다 */
+      (!wsCur || wsCur===wsAllLabel() || m.n===wsCur)
+   && (!sq || [m.n,m.desc,m.by].some(x=>String(x).toLowerCase().includes(sq.toLowerCase())))
    && FDEF.every(f=>{
         const v=fsel[f.k]; if(!v||!v.length) return true;
         /* 환경은 운영룸·개발룸 두 값을 갖는다. 하나라도 해당하면 통과 */
@@ -2948,6 +2975,8 @@ function openForm(kind){
     CLUSTER.gpu.forEach(function(g){ NF[accKey(g)]='0'; });
     accRows=[]; accBase=null;
   }
+  /* 어느 경로로 들어오든 패널을 닫는다. 열린 채로 넘어가면 폼을 덮어 조작이 막힌다 */
+  closePanel();
   shownF={}; view='form'; syncView(); drawForm(); }
 /* 할당량 수정 — 변경 여부·초과 검증 */
 let qInit='';
@@ -4162,15 +4191,19 @@ function toast(t,msg){
    공용 전용 항목을 두지 않는다. '전체'는 소속 워크스페이스 전부를 합쳐 보는 선택지이며,
    최고 관리자에게는 워크스페이스 미지정 자산까지 포함한다.
 
-   컨텍스트는 하나만 유지한다. 워크스페이스 상세에 진입하면 이 값도 함께 이동한다 */
+   컨텍스트는 하나만 유지한다.
+
+   스위처는 조회 필터다. 눌러도 상세로 이동하지 않고 현재 화면에 필터를 적용한다.
+   상세 진입 바로가기로 두면 상단 표기가 무엇을 뜻하는지 흐려진다(8/19 회의 3.1).
+   다만 목록에서 상세로 들어가면 보고 있는 대상과 조회 범위를 맞춘다 */
 let wsCur=null, wsQ='';
 /* 드롭다운은 워크스페이스를 고르는 자리다. 미지정 자산은 워크스페이스가 아니라
    배포 목록의 워크스페이스 컬럼에서 `미지정`으로 표시된다. 라벨에 담지 않는다 */
 function wsAllLabel(){ return '전체'; }
+/* 공용 워크스페이스가 항상 소속에 포함되므로 고를 대상이 최소 2개다.
+   소속이 하나뿐인 상태가 생기지 않아 기본값은 언제나 전체다(정책 2.7) */
 function wsInit(){
-  const list=mine();
-  /* 소속이 하나면 그것을 보고 있는 상태, 여럿이면 아직 고르지 않은 상태 */
-  wsCur = list.length===1? list[0].n : (list.length? wsAllLabel() : null);
+  wsCur = wsAllLabel();
   wsQ='';
   drawWsBtn();
 }
@@ -4178,8 +4211,7 @@ function drawWsBtn(){
   const el=document.getElementById('wsName');
   const btn=document.getElementById('wsBtn');
   if(el) el.textContent = wsCur || '소속 워크스페이스 없음';
-  /* 고를 것이 하나뿐이거나 없으면 전환할 대상이 없다 */
-  /* 공용이 함께 제공되므로 소속이 하나여도 고를 대상이 있다 */
+  /* 공용이 항상 소속에 포함되어 고를 대상이 최소 2개다. 비활성이 되는 경우는 없다 */
   if(btn) btn.disabled = wsOptions().length<=1;
 }
 function tgWs(e){
@@ -4200,10 +4232,10 @@ function drawWsDd(keepFocus){
   dd.innerHTML =
      '<div class="wssearch"><input placeholder="워크스페이스 검색" value="'+wsQ+'" oninput="wsSearch(this.value)" oncompositionstart="onComposeStart()" oncompositionend="onComposeEnd(wsSearch,this)" onclick="event.stopPropagation()"></div>'
    + '<div class="wslist" onclick="event.stopPropagation()">'
-   /* `전체`는 목록으로 돌아가는 항목이라 가장 위에 둔다.
-      워크스페이스를 고르는 것과 성격이 달라 구분선으로 나눈다.
-      소속이 하나뿐이면 돌아갈 목록이 없으므로 두지 않는다 */
-   + (mine().length>1 && !wsQ
+   /* `전체`는 소속을 합쳐 보는 항목이라 가장 위에 둔다.
+      워크스페이스 하나를 고르는 것과 성격이 달라 구분선으로 나눈다.
+      공용이 항상 포함되어 고를 대상이 최소 2개이므로 늘 표시한다(정책 2.7) */
+   + (!wsQ
       ? '<button class="wsitem'+(wsCur===wsAllLabel()?' on':'')+'" onclick="pickWs(\''+wsAllLabel()+'\')">'
         + '<span class="wic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>'
         + '<span class="wnm">'+wsAllLabel()+'</span>'
@@ -4228,17 +4260,27 @@ function drawWsDd(keepFocus){
 /* 드롭다운은 볼 대상을 고르는 것이다.
    워크스페이스를 고르면 그 상세를 열고, `전체`를 고르면 목록으로 돌아간다.
    목록은 아직 대상을 고르지 않은 상태의 화면이다 */
+/* 작성 중인 입력이 있으면 확인받는다(공통정책 7.2). 필터를 바꾸면 목록으로 돌아가
+   폼을 벗어나게 된다 */
+function formDirty(){
+  if(view!=='form') return false;
+  if(formKind==='quota') return qDirty();
+  return !!(NF.name.trim()||NF.desc.trim()||NF.rsn.trim());
+}
+/* 스위처는 조회 필터다. 눌러도 상세로 이동하지 않고 현재 화면에 필터를 적용한다.
+   상세 진입 바로가기로 두면 상단 표기가 무엇을 뜻하는지 흐려진다(8/19 회의 3.1) */
 function pickWs(name){
-  wsCur=name; closeWs(); drawWsBtn(); closePanel();
-  if(name===wsAllLabel()){
+  const go=function(){
+    wsCur=name; closeWs(); drawWsBtn(); closePanel();
     cur=null; view='list'; syncView(); render();
     vwBtn(document.querySelectorAll('#demoBar .vw')[0]);
+  };
+  if(formDirty()){
+    closeWs();
+    openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.', go, '취소', '계속 작성');
     return;
   }
-  const i=WS.findIndex(function(w){ return w.n===name; });
-  if(i<0) return;
-  cur={m:WS[i]}; view='detail'; wTab=0; syncView(); drawDetail();
-  vwBtn(document.querySelectorAll('#demoBar .vw')[1]);
+  go();
 }
 /* 상세·룸 진입 시 컨텍스트를 함께 이동한다 — 보고 있는 대상과 조회 범위를 일치시킨다 */
 /* 목록에서 상세로 들어가도 드롭다운 표시를 맞춘다 */
