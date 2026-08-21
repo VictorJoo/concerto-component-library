@@ -1,0 +1,1573 @@
+
+<style>
+/* ===== 컴포넌트 라이브러리 역할 토큰 (정본) ===== */
+:root{
+  --background:#f4f6fc; --foreground:#171d33;
+  --card:#ffffff; --card-foreground:#171d33;
+  --muted:#eef1f9; --muted-foreground:#565f7e;
+  /* 용도별 표면 — 표면·호버·선택을 한 토큰으로 쓰면 인접했을 때 구분이 사라진다 */
+  --surface:#eef1f9; --hover:#fafbfe; --selected:#dde6f8; --thead:#edf0f7;
+  --border:#dce2f1; --border-strong:#b9c3dd; --input:#dce2f1;
+  --primary:#3346c9; --primary-foreground:#ffffff; --primary-hover:#26368f;
+  --accent:#4f6fe6; --accent-foreground:#0a1026;
+  --success:#2f9e6a; --warning:#c98a2e; --destructive:#d64a51; --destructive-hover:#b93b42;
+  --ring:#4f6fe6; --link:var(--foreground); --underline:#a8b0c8;
+  --font:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+  --radius:12px;
+  /* 레이아웃 전용 (라이브러리 미정의 · 개정 대상) */
+  --sidebar:#f7f9fe; --flyout:#ffffff; --card-2:#f0f3fb; --active:#e6ebfa; --faint:#8b93ab;
+  --shadow:rgba(23,29,51,.10);
+  --header-h:58px; --gnb-w:236px;
+}
+.dark{
+  --background:#0d0f14; --foreground:#e6e8ee;
+  --card:#16181f; --card-foreground:#e6e8ee;
+  --muted:#1c1f27; --muted-foreground:#969ba6;
+  --surface:#1c1f27; --hover:#1b1e26; --selected:#252b38; --thead:#212530;
+  --border:#262a33; --border-strong:#3d4454; --input:#262a33;
+  --primary:#4159d6; --primary-foreground:#ffffff; --primary-hover:#35489f;
+  --accent:#7d97f0; --accent-foreground:#0a1026;
+  --success:#46b17f; --warning:#d9a441; --destructive:#e0585f; --destructive-hover:#c74a51;
+  --ring:#7d97f0; --link:var(--foreground); --underline:#4d5566;
+  --sidebar:#111318; --flyout:#181b22; --card-2:#1c1f27; --active:#232a3a; --faint:#5f636d;
+  --shadow:rgba(0,0,0,.55);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--background);color:var(--foreground);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;color-scheme:light}
+body.dark{color-scheme:dark}
+button{font-family:inherit;color:inherit;cursor:pointer}
+a{color:inherit}
+.app{display:grid;grid-template-columns:var(--gnb-w) 1fr;grid-template-rows:var(--header-h) 1fr;height:calc(100vh - 46px);overflow:hidden;grid-template-areas:"brand header" "gnb main"}
+
+/* ===== 공통 레이아웃 ===== */
+.brand{grid-area:brand;display:flex;align-items:center;gap:10px;padding:0 18px;background:var(--sidebar);border-bottom:1px solid var(--border)}
+.logo-mark svg{width:24px;height:24px}
+.brand b{font-size:15.5px;font-weight:700}
+.brand b .ai{color:var(--accent)}
+.header{grid-area:header;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--sidebar);border-bottom:1px solid var(--border)}
+/* ⭐ 상세 페이지 헤더 */
+.pnexp{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--border-strong);
+  background:transparent;border-radius:7px;color:var(--muted-foreground);cursor:pointer;flex:0 0 auto}
+.pnexp:hover{border-color:var(--accent);color:var(--foreground)}
+.pnexp svg{width:14px;height:14px}
+.dhead{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px}
+.dback{width:36px;height:36px;flex:0 0 auto;display:grid;place-items:center;border:1px solid var(--border-strong);
+  background:transparent;border-radius:9px;color:var(--muted-foreground);cursor:pointer}
+.dback:hover{border-color:var(--accent);color:var(--foreground)}
+.dback svg{width:17px;height:17px}
+.dinfo{flex:1;min-width:0}
+.dinfo h1{margin:0;font-size:20px;letter-spacing:-.3px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.dinfo h1 .ver{font-size:13px;font-weight:400;color:var(--muted-foreground)}
+.dmeta{margin-top:5px;font-size:12.5px;color:var(--muted-foreground)}
+.dact{margin-left:auto;display:flex;gap:8px;flex:0 0 auto}
+/* 속성 섹션 — 탭에 숨기지 않는다. 상세로 들어온 주된 이유다 */
+.dsec{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.dsec > h4{margin:0 0 12px;font-size:13px;font-weight:600}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 22px}
+.dgrid .k{font-size:11.5px;color:var(--muted-foreground);margin-bottom:3px}
+.dgrid .v{font-size:13px;color:var(--foreground);word-break:break-all}
+.breadcrumb{color:var(--muted-foreground);font-size:13px}
+.breadcrumb b{color:var(--foreground);font-weight:600}
+.breadcrumb a{color:var(--muted-foreground);text-decoration:none}
+.breadcrumb a:hover{color:var(--foreground)}
+.hr{display:flex;align-items:center;gap:9px}
+.ws{display:flex;align-items:center;gap:8px;padding:6px 11px;background:var(--card-2);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer}
+.ws .chev{color:var(--muted-foreground)}
+.gnb{grid-area:gnb;display:flex;flex-direction:column;background:var(--sidebar);border-right:1px solid var(--border);overflow:visible}
+.banner{margin:14px 12px 8px;height:120px;border-radius:12px;background:linear-gradient(135deg,#7386b2 0%,#8698c4 100%);position:relative;overflow:hidden;display:flex;align-items:center;padding:0 18px}
+.banner .bt{font-size:21px;font-weight:800;color:#fff;line-height:1.05;z-index:1;letter-spacing:.5px}
+.banner .kv{position:absolute;right:-26px;bottom:-34px;width:170px;height:170px;z-index:0}
+.banner .ph-tag{position:absolute;bottom:8px;right:10px;font-size:9px;color:rgba(255,255,255,.62);z-index:1}
+.nav{padding:6px 12px}
+.nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:3px;position:relative}
+.nav a svg{width:19px;height:19px;flex:0 0 auto}
+.nav a:hover{background:var(--card);color:var(--foreground)}
+.nav a.active{background:var(--selected);color:var(--foreground);font-weight:600}
+.nav a.has-fly::after{content:"›";margin-left:auto;color:var(--faint);font-size:16px}
+.flywrap{position:relative}
+.flyout{position:absolute;left:calc(100% + 6px);top:0;width:210px;background:var(--flyout);border:1px solid var(--border);border-radius:11px;padding:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateX(-6px);transition:.13s;z-index:70}
+.flywrap:hover .flyout{opacity:1;visibility:visible;transform:translateX(0)}
+.flyout a{display:flex;align-items:center;padding:9px 11px;border-radius:8px;color:var(--muted-foreground);text-decoration:none;font-size:13.5px;margin-bottom:2px}
+.flyout a:hover{background:var(--card);color:var(--foreground)}
+.flyout a .tb{font-size:9.5px;color:var(--faint);border:1px solid var(--border);border-radius:5px;padding:1px 5px;margin-left:6px}
+.gnb-bottom{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
+.worklist{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);font-size:14px;margin-bottom:3px;cursor:pointer}
+.worklist svg{width:19px;height:19px;color:var(--muted-foreground)}
+.cbadge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--primary);color:var(--primary-foreground);font-size:12px;font-weight:700;display:grid;place-items:center}
+.worklist:hover{background:var(--card);color:var(--foreground)}
+.notice-common{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:10px}
+.notice-common svg{width:19px;height:19px}
+.worklist .cbadge,.notice-common .cbadge{margin-left:auto}
+.notice-common:hover{background:var(--card);color:var(--foreground)}
+
+.persona{position:relative}
+.persona .pbtn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:var(--card-2);border:1px solid var(--border);width:100%}
+.av{width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--accent) 18%,transparent);display:grid;place-items:center;font-size:12px;color:var(--accent);flex:0 0 auto}
+.persona .who{line-height:1.25;text-align:left}
+.persona .who b{font-size:13px;display:block}
+.persona .who span{font-size:11px;color:var(--faint)}
+.persona .up{margin-left:auto;color:var(--faint)}
+.main{grid-area:main;overflow:auto;position:relative}
+/* ===== 페이지 ===== */
+.page{padding:26px 28px 40px;max-width:1400px}
+.phead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+.phead h1{font-size:21px;margin:0 0 5px;letter-spacing:-.3px}
+.phead p{margin:0;font-size:13px;color:var(--muted-foreground)}
+.pact{display:flex;gap:8px;flex:0 0 auto}
+.btn{padding:8px 15px;background:var(--primary);color:var(--primary-foreground);border:0;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+.btn:hover:not(:disabled){background:var(--primary-hover)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;border:1px solid var(--border-strong);color:var(--foreground)}
+.btn.ghost:hover:not(:disabled){background:var(--hover);border-color:var(--foreground)}
+.btn.danger{background:var(--destructive);color:#fff}
+.btn.danger:hover:not(:disabled){background:var(--destructive-hover)}
+.btn svg{width:14px;height:14px}
+.btn.sm{padding:6px 11px;font-size:12px}
+
+/* 탭 */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tabs button{padding:10px 16px;background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted-foreground);font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+.tabs button.on{color:var(--foreground);border-bottom-color:var(--primary)}
+.tabs .cnt{font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:20px;background:var(--muted);color:var(--muted-foreground)}
+.tabs button.on .cnt{background:var(--primary);color:var(--primary-foreground)}
+
+/* 툴바 */
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:7px;padding:0 11px;background:var(--card);border:1px solid var(--border);border-radius:8px;min-width:260px}
+.search svg{width:14px;height:14px;color:var(--muted-foreground);flex:0 0 auto}
+.search input{border:0;background:transparent;color:var(--foreground);font-family:inherit;font-size:13px;padding:9px 0;width:100%;outline:none}
+.sel{padding:9px 11px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--muted-foreground);font-size:12.5px;font-family:inherit;color-scheme:light dark}
+.tspacer{margin-left:auto}
+.cbtn{width:34px;height:34px;display:grid;place-items:center;background:var(--card);border:1px solid var(--border-strong);border-radius:8px;color:var(--muted-foreground)}
+.cbtn:hover{color:var(--foreground);border-color:var(--accent)}
+.cbtn svg{width:15px;height:15px}
+
+/* 테이블 */
+.tblwrap{background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:visible}
+table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+/* 헤더 배경은 --muted, 행 호버는 --hover 로 분리한다.
+   같은 토큰을 쓰면 마우스를 올린 행이 헤더처럼 보인다 */
+table.tbl th{text-align:left;color:var(--muted-foreground);font-weight:600;padding:10px 12px;
+  border-bottom:1px solid var(--border);background:var(--thead);white-space:nowrap;user-select:none}
+table.tbl th.sortable{cursor:pointer}
+table.tbl th.sortable:hover{color:var(--foreground)}
+table.tbl th .sar{color:var(--accent);margin-left:3px;font-size:10px}
+table.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--foreground);vertical-align:middle}
+table.tbl tr:last-child td{border-bottom:0}
+table.tbl tbody tr{cursor:pointer}
+table.tbl tbody tr:hover{background:var(--hover)}
+table.tbl tbody tr.sel{background:var(--selected)}
+/* 목록 행 이름 — 이동 대상임이 호버 전에도 보이도록 밑줄을 상시 노출한다 */
+.mname{font-weight:600;color:var(--foreground);text-decoration:underline;text-decoration-color:var(--underline);text-underline-offset:3px}
+tr:hover .mname{text-decoration-color:var(--foreground)}
+.mver{color:var(--muted-foreground);font-size:11.5px;margin-left:6px}
+.dash{color:var(--muted-foreground)}
+.path{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted-foreground);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle}
+
+/* 상태 배지 */
+.stbadge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 11px;border-radius:20px;border:1px solid var(--border);white-space:nowrap}
+.stbadge .d{width:7px;height:7px;border-radius:50%;background:currentColor}
+.stbadge.ok{color:var(--success);border-color:var(--success)}
+.stbadge.wa{color:var(--warning);border-color:var(--warning)}
+.stbadge.cr{color:var(--destructive);border-color:var(--destructive)}
+.stbadge.mu{color:var(--muted-foreground)}
+.stbadge.ac{color:var(--accent);border-color:var(--accent)}
+.stbadge.load .d{animation:pulse 1.1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;background:color-mix(in srgb,var(--primary) 12%,transparent);color:var(--primary);border:1px solid color-mix(in srgb,var(--primary) 25%,transparent);white-space:nowrap}
+/* 값 태그 — 읽기만 하는 라벨. 배경 없이 테두리로 구분한다 */
+.vtag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:5px;background:transparent;
+  border:1px solid var(--border);color:var(--muted-foreground);margin-right:4px}
+
+/* 더보기 */
+.more{position:relative;display:inline-block}
+.morebtn{width:28px;height:28px;display:grid;place-items:center;background:transparent;border:0;border-radius:7px;color:var(--muted-foreground);font-size:16px;line-height:1}
+.morebtn:hover{background:var(--hover);color:var(--foreground)}
+.rowmenu{position:absolute;right:0;top:calc(100% + 4px);min-width:160px;background:var(--flyout);border:1px solid var(--border);border-radius:10px;padding:6px;box-shadow:0 12px 30px var(--shadow);z-index:85;display:none}
+.more.open{z-index:85}
+.more.open .rowmenu{display:block}
+/* 아래 공간이 부족하면 위로 펼친다 — 스크롤 영역 경계에서 잘리는 것을 막는다 */
+.more.up .rowmenu{top:auto;bottom:calc(100% + 4px)}
+.rowmenu button{display:block;width:100%;text-align:left;padding:8px 10px;border:0;background:transparent;border-radius:7px;font-size:12.5px;color:var(--foreground)}
+.rowmenu button:hover{background:var(--hover)}
+.rowmenu button.d{color:var(--destructive)}
+.rowmenu hr{border:0;border-top:1px solid var(--border);margin:5px 0}
+
+/* 페이지네이션 */
+.pager{display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:12.5px;color:var(--muted-foreground)}
+.pgnum{display:flex;align-items:center;gap:6px}
+.pgnum button{width:29px;height:29px;display:grid;place-items:center;border:1px solid var(--border);background:var(--card);border-radius:7px;font-size:13px;color:var(--muted-foreground);cursor:pointer}
+.pgnum button:hover:not(:disabled){border-color:var(--accent);color:var(--foreground)}
+.pgnum button:disabled{opacity:.4;cursor:not-allowed}
+.pgnum .pgin{width:46px;height:29px;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:7px;color:var(--foreground);font-size:12.5px;font-family:inherit;color-scheme:light dark}
+.pgnum .pgtot{font-size:12.5px;color:var(--muted-foreground)}
+
+/* 상태 화면 */
+.state{padding:64px 20px;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:11px}
+.state svg{width:38px;height:38px;color:var(--muted-foreground);opacity:.5;margin-bottom:12px}
+.state h3{margin:0 0 6px;font-size:14px;font-weight:600}
+.state p{margin:0 0 16px;font-size:12.5px;color:var(--muted-foreground)}
+.skrow{height:14px;border-radius:5px;background:linear-gradient(90deg,var(--muted) 25%,var(--border) 50%,var(--muted) 75%);background-size:200% 100%;animation:sk 1.3s infinite}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* 사이드 패널 */
+.pnbg{position:fixed;inset:0;background:transparent;z-index:80;display:none}
+.pnbg.on{display:block}
+.panel{position:fixed;top:var(--header-h);right:0;bottom:0;width:440px;max-width:92vw;background:var(--card);border-left:1px solid var(--border);z-index:90;transform:translateX(102%);transition:transform .2s ease;display:flex;flex-direction:column;box-shadow:-14px 0 40px var(--shadow)}
+.panel.on{transform:translateX(0)}
+.pnhead{padding:18px 20px 14px;border-bottom:1px solid var(--border);flex:0 0 auto}
+.pnhead .r1{display:flex;align-items:flex-start;gap:10px}
+.pnhead h2{margin:0;font-size:16px;letter-spacing:-.2px;flex:1;word-break:break-all}
+.pnhead .ver{font-size:12px;color:var(--muted-foreground);font-weight:400;margin-left:7px}
+.pnclose{width:28px;height:28px;display:grid;place-items:center;border:0;background:transparent;border-radius:7px;color:var(--muted-foreground);font-size:17px;flex:0 0 auto}
+.pnclose:hover{background:var(--hover)}
+.pntags{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+.pnbody{padding:6px 20px 20px;overflow:auto;flex:1}
+.sec{padding:16px 0;border-bottom:1px solid var(--border)}
+.sec:last-child{border-bottom:0}
+.sec h4{margin:0 0 11px;font-size:12.5px;font-weight:700;color:var(--muted-foreground);letter-spacing:.2px;display:flex;align-items:center;justify-content:space-between}
+.dl{display:grid;grid-template-columns:112px 1fr;gap:8px 12px;font-size:12.5px}
+.dl dt{color:var(--muted-foreground)}
+.dl dd{margin:0;word-break:break-all}
+.desc{font-size:12.5px;color:var(--muted-foreground);line-height:1.65;background:var(--muted);border:1px solid var(--border);border-radius:9px;padding:11px 12px;margin-bottom:12px}
+.linklist{display:flex;flex-direction:column;gap:7px}
+.linklist a{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;background:var(--muted);border:1px solid var(--border);border-radius:9px;text-decoration:none;font-size:12.5px}
+.linklist a:hover{border-color:var(--accent)}
+/* 이동 링크 — 색이 아니라 밑줄로 구분한다 */
+.linklist a .nm{color:var(--foreground);font-weight:600;text-decoration:underline;text-decoration-color:var(--underline);text-underline-offset:3px}
+.linklist a:hover .nm{text-decoration-color:var(--foreground)}
+.secact{display:flex;gap:7px;margin-top:12px}
+.emptyline{font-size:12.5px;color:var(--muted-foreground);font-style:italic}
+
+/* 모달 */
+.mdbg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.mdbg.on{display:flex}
+.modal{width:440px;max-width:100%;max-height:88vh;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.modal.w520{width:520px}
+.mdhead{padding:20px 22px 0}
+.mdhead h3{margin:0 0 5px;font-size:15.5px}
+.mdhead p{margin:0;font-size:12.5px;color:var(--muted-foreground);line-height:1.6}
+.mdbody{padding:18px 22px}
+.mdfoot{padding:14px 22px 20px;display:flex;justify-content:flex-end;gap:8px}
+.f{margin-bottom:15px}
+.f label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
+.f label .req{color:var(--destructive);margin-left:3px}
+.inp{width:100%;padding:9px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--foreground);font-size:13px;font-family:inherit;color-scheme:light dark}
+.inp:focus{outline:2px solid var(--ring);outline-offset:-1px;border-color:var(--ring)}
+.inp.err{border-color:var(--destructive)}
+.hint{font-size:11.5px;color:var(--muted-foreground);margin-top:5px;line-height:1.55}
+.errmsg{font-size:11.5px;color:var(--destructive);margin-top:5px}
+.row2{display:grid;grid-template-columns:150px 1fr;gap:8px}
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pick label{display:block;padding:12px;border:1px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;font-size:12.5px;font-weight:600;margin:0}
+.pick label small{display:block;font-weight:400;color:var(--muted-foreground);font-size:11px;margin-top:3px}
+.pick input{display:none}
+.pick input:checked + span{color:var(--primary)}
+.pick label:has(input:checked){border-color:var(--primary);background:var(--selected)}
+.noderow{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer}
+.noderow:has(input:checked){border-color:var(--primary);background:var(--selected)}
+.noderow .nn{font-weight:600;font-size:13px}
+.noderow .nm2{font-size:11.5px;color:var(--muted-foreground);font-family:ui-monospace,Menlo,monospace;margin-top:2px}
+.noderow .rt{margin-left:auto}
+.selall{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--muted);border:1px solid var(--border);border-radius:9px;margin-bottom:10px;font-size:12.5px;font-weight:600}
+.selall button{border:0;background:transparent;color:var(--muted-foreground);font-size:12px;font-weight:600}
+
+/* 토스트 */
+.toast-wrap{position:fixed;top:74px;right:22px;z-index:300;display:flex;flex-direction:column;gap:10px;width:340px;max-width:calc(100vw - 44px)}
+.toast{display:flex;align-items:center;gap:10px;padding:12px 15px;background:var(--card);border:1px solid var(--border);border-radius:10px;font-size:12.5px;box-shadow:0 10px 30px var(--shadow);min-width:280px}
+.toast .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.toast.ok .dot{background:var(--success)}
+.toast.cr .dot{background:var(--destructive)}
+.toast .x{margin-left:auto;border:0;background:transparent;color:var(--muted-foreground);font-size:14px}
+
+/* 검증 컨트롤 (목업 전용) */
+
+
+
+
+
+
+
+
+/* 스크린 ID 표기 (목업 전용 · 핸드오프용) */
+
+
+
+
+
+.notebox{display:flex;gap:9px;padding:10px 12px;background:color-mix(in srgb,var(--warning) 10%,transparent);border:1px solid color-mix(in srgb,var(--warning) 30%,transparent);border-radius:9px;font-size:12px;color:var(--foreground);margin-bottom:14px;line-height:1.6}
+.notebox b{color:var(--warning)}
+.secnote{font-size:11.5px;color:var(--muted-foreground);line-height:1.6;margin-top:9px;padding:9px 11px;background:var(--muted);border:1px solid var(--border);border-radius:8px}
+
+/* 검색 (공통정책 3.3) */
+.searchzone{display:flex;flex-direction:column;gap:8px;flex:1;min-width:320px}
+.searchbar{position:relative;display:flex;align-items:center;gap:0;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.searchbar:focus-within{outline:2px solid var(--ring);outline-offset:-1px;border-color:var(--ring)}
+
+
+
+.searchbar .sicon{width:14px;height:14px;color:var(--muted-foreground);margin-left:11px;flex:0 0 auto}
+.searchbar input{border:0;background:transparent;color:var(--foreground);font-family:inherit;font-size:13px;padding:9px 11px;width:100%;outline:none}
+
+
+
+
+
+
+.chips{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.schip{display:inline-flex;align-items:center;gap:7px;padding:4px 8px 4px 10px;background:var(--muted);border:1px solid var(--border);border-radius:7px;font-size:12px;color:var(--foreground)}
+
+.schip button{border:0;background:transparent;color:var(--muted-foreground);font-size:13px;line-height:1;padding:0;cursor:pointer}
+.schip button:hover{color:var(--destructive)}
+.chips .clr{border:0;background:transparent;color:var(--muted-foreground);font-size:12px;font-weight:600;padding:4px 6px}
+.andmark{font-size:11px;color:var(--faint);font-weight:700;letter-spacing:.5px}
+
+/* 다중 선택 필터 (공통정책 3.2) */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 툴팁 (공통정책 4.7 · 컴포넌트 라이브러리 원본) */
+.tbltop{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted-foreground)}
+.tip-anchor{position:relative;display:inline-flex;align-items:center}
+.tip-anchor .tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--flyout);color:var(--foreground);border:1px solid var(--border-strong);font-size:12px;line-height:1.5;padding:8px 11px;border-radius:7px;opacity:0;visibility:hidden;transition:.12s;z-index:70;pointer-events:auto;box-shadow:0 6px 18px var(--shadow);width:max-content;max-width:340px;white-space:normal;text-align:left}
+.tip-anchor .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--flyout)}
+.tip-anchor:hover .tip,.tip-anchor:focus-within .tip{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.tip-ic{width:16px;height:16px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);font-size:11px;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex:0 0 auto}
+.tip-anchor:hover .tip-ic,.tip-anchor:focus-within .tip-ic{border-color:var(--foreground);color:var(--foreground)}
+.phead h1{display:inline-flex;align-items:center;gap:8px}
+
+/* 페이지 타이틀 툴팁 — 화면 상단이라 아래로 펼침(잘림 방지) */
+.tip-anchor.below .tip{top:calc(100% + 8px);bottom:auto;left:0;transform:translateX(0) translateY(-4px)}
+.tip-anchor.below:hover .tip,.tip-anchor.below:focus-within .tip{transform:translateX(0) translateY(0)}
+.tip-anchor.below .tip::after{top:auto;bottom:100%;left:14px;transform:none;border-top-color:transparent;border-bottom-color:var(--flyout)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 다중 선택 필터 (공통정책 3.2) */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 툴팁 유지 — 말풍선 위에서도 호버가 끊기지 않도록 간격을 브리지로 연결 */
+.tip-anchor .tip::before{content:"";position:absolute;left:0;right:0;height:10px;bottom:-10px}
+.tip-anchor.below .tip::before{bottom:auto;top:-10px}
+
+/* 하단 미리보기 바 (시안 확인용) */
+.demo-bar{position:fixed;left:0;right:0;bottom:0;z-index:800;background:#0f1320;color:#c9cfe0;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;font-size:12px;border-top:1px solid #2a2f45;}
+.demo-bar .demo-label{color:#7f88a8;margin-right:4px;}
+/* ⭐ 패널 안 버전 목록 — 좁은 폭에 맞춰 여백을 줄인다 */
+.panel table.tbl.sm th,.panel table.tbl.sm td{padding:7px 8px;font-size:11.5px}
+.panel table.tbl.sm .stbadge{font-size:10.5px;padding:2px 7px}
+.panel .tblwrap{margin:0}
+.demo-bar button{background:#1c2136;border:1px solid #2f3654;color:#c9cfe0;border-radius:6px;padding:5px 10px;font-size:12px;font-family:inherit;cursor:pointer;}
+.demo-bar button:hover{border-color:var(--accent);color:#fff;}
+.demo-bar button.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600;}
+
+/* GNB 접기 */
+.gnb-fold{display:flex;align-items:center;justify-content:flex-end;margin-top:10px}
+.foldbtn{width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--border-strong);background:transparent;border-radius:8px;color:var(--muted-foreground);cursor:pointer}
+.foldbtn:hover{border-color:var(--accent);color:var(--foreground)}
+.foldbtn svg{width:14px;height:14px}
+
+body.gnb-fold-on{--gnb-w:68px}
+body.gnb-fold-on .brand b,
+body.gnb-fold-on .nav > a .lb,
+body.gnb-fold-on .nav .flywrap > a .lb,
+body.gnb-fold-on .worklist .lb,
+body.gnb-fold-on .notice-common .lb,
+body.gnb-fold-on .persona .who,
+body.gnb-fold-on .persona .up,
+body.gnb-fold-on .banner .bt,
+body.gnb-fold-on .banner .ph-tag{display:none}
+body.gnb-fold-on .banner{display:none}
+body.gnb-fold-on .brand{justify-content:center;padding:0}
+body.gnb-fold-on .nav{padding:14px 8px 6px}
+body.gnb-fold-on .nav a{justify-content:center;padding:11px 0}
+body.gnb-fold-on .nav a.has-fly::after{content:none}
+body.gnb-fold-on .gnb-bottom{padding:10px 8px}
+body.gnb-fold-on .worklist,
+body.gnb-fold-on .notice-common{justify-content:center;padding:10px 0}
+body.gnb-fold-on .worklist .cbadge,
+body.gnb-fold-on .notice-common .cbadge{position:absolute;top:4px;right:6px;left:auto;margin:0;min-width:16px;height:16px;font-size:10px;padding:0 4px}
+body.gnb-fold-on .persona .pbtn{justify-content:center;padding:8px 0}
+body.gnb-fold-on .gnb-fold{justify-content:center}
+
+/* 필터 (공통정책 3.2) — 선택지가 적어 펼쳐 제공. 단일 필드 다중 값 OR / 필드 간 AND */
+
+
+
+
+
+
+
+
+
+
+
+
+
+.fclear{border:0;background:transparent;color:var(--muted-foreground);font-size:12px;font-weight:600;padding:2px 4px;cursor:pointer}
+.fclear:hover,.chips .clr:hover,.selall button:hover{color:var(--foreground);text-decoration:underline;text-underline-offset:3px}
+
+/* 컬럼 헤더 — 도움말 팝오버(2.3) + 필터(3.2) */
+th .thwrap{display:inline-flex;align-items:center;gap:5px}
+.thic{width:15px;height:15px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);font-size:10px;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex:0 0 auto}
+.thfilter{width:18px;height:18px;display:inline-grid;place-items:center;border:0;background:transparent;color:var(--muted-foreground);border-radius:4px;cursor:pointer;flex:0 0 auto}
+.thfilter:hover{background:var(--border);color:var(--foreground)}
+.thfilter.on{color:var(--primary)}
+.dark .thfilter.on{color:var(--accent)}
+.thfilter svg{width:12px;height:12px}
+.thpop{position:absolute;left:0;top:calc(100% + 6px);width:230px;background:var(--flyout);border:1px solid var(--border);border-radius:9px;padding:9px 10px;font-size:12px;font-weight:400;color:var(--foreground);line-height:1.55;box-shadow:0 12px 30px var(--shadow);z-index:75;display:none;white-space:normal;text-align:left}
+th.thcell{position:relative}
+th.thcell.pop-on .thpop{display:block}
+.fdd{position:absolute;left:0;top:calc(100% + 6px);min-width:210px;background:var(--flyout);border:1px solid var(--border);border-radius:10px;padding:7px;box-shadow:0 12px 30px var(--shadow);z-index:80;display:none;font-weight:400}
+th.thcell.fdd-on .fdd{display:block}
+.fdd label{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:7px;font-size:12.5px;color:var(--foreground);cursor:pointer;white-space:nowrap}
+.fdd label:hover{background:var(--hover)}
+.fdd label input{accent-color:var(--primary)}
+.fdd label .fc{margin-left:auto;font-size:11px;color:var(--faint)}
+.fdd hr{border:0;border-top:1px solid var(--border);margin:6px 0}
+.fdd .fbtns{display:flex;justify-content:flex-end;gap:6px;padding:2px}
+.fdd .fbtns button{padding:5px 11px;border-radius:7px;font-size:12px;font-family:inherit;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted-foreground)}
+.fdd .fbtns button.pri{background:var(--primary);border-color:var(--primary);color:var(--primary-foreground);font-weight:600}
+
+/* 상세 패널 섹션 접기 — 기본 펼침, 개별 접기 가능 */
+.sec > h4{cursor:pointer;user-select:none}
+.sec > h4 .fold{margin-left:auto;color:var(--muted-foreground);font-size:11px;transition:transform .15s}
+.sec.closed > h4 .fold{transform:rotate(-90deg)}
+.sec.closed .secbody{display:none}
+.secbody{padding-top:2px}
+/* 패널 항목 도움말 */
+.dl dt{display:flex;align-items:center;gap:5px}
+.dtic{width:14px;height:14px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);font-size:9px;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex:0 0 auto;position:relative}
+.dtic:hover{border-color:var(--foreground);color:var(--foreground)}
+.dtic .dtpop{position:absolute;left:-8px;top:calc(100% + 6px);width:210px;background:var(--flyout);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11.5px;font-weight:400;color:var(--foreground);line-height:1.55;box-shadow:0 10px 24px var(--shadow);z-index:95;display:none;white-space:normal;text-align:left}
+.dtic:hover .dtpop{display:block}
+
+/* 반입 진행률 (기술문서 §7.3 — 3단계 디커플링) */
+.prog{margin-top:8px}
+.prog .plabel{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted-foreground);margin-bottom:5px}
+.prog .pbar{height:5px;border-radius:3px;background:var(--muted);overflow:hidden}
+.prog .pfill{height:100%;background:var(--primary);border-radius:3px;transition:width .4s}
+.prog .psteps{display:flex;gap:4px;margin-top:6px}
+.prog .pstep{flex:1;font-size:10.5px;text-align:center;color:var(--faint);padding:3px 0;border-radius:5px;background:var(--muted)}
+.prog .pstep.on{color:var(--primary);font-weight:600;background:color-mix(in srgb,var(--primary) 12%,transparent)}
+.prog .pstep.done{color:var(--success)}
+
+/* 컬럼 도움말 — 상태값 목록 */
+.thpop dl{margin:8px 0 0;display:grid;grid-template-columns:auto 1fr;gap:5px 9px;font-size:11.5px}
+.thpop dt{font-weight:600;color:var(--foreground);white-space:nowrap}
+.thpop dd{margin:0;color:var(--muted-foreground);line-height:1.5}
+.thpop{width:290px}
+</style><body class="dark">
+<div class="app">
+
+  <div class="brand"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9.2" stroke-width="1.4" opacity=".35"/><circle cx="12" cy="12" r="6" stroke-width="1.5" opacity=".6"/><circle cx="12" cy="12" r="2.6" fill="currentColor" stroke="none"/></svg></span><b>Concerto <span class="ai">AI</span></b></div>
+
+  <header class="header">
+    <div class="breadcrumb"><a href="#">콘체르토 플랫폼</a> / <b>모델</b></div>
+    <div class="hr">
+      <div class="ws" onclick="cycleWs()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="width:15px;height:15px"><rect x="4" y="3" width="10" height="18" rx="1"/><path d="M14 8h5a1 1 0 011 1v11a1 1 0 01-1 1H4"/><path d="M7 7h3M7 11h3M7 15h3"/></svg> <span id="wsName">Common Workspace</span> <span class="chev">▾</span></div>
+    </div>
+  </header>
+
+  <nav class="gnb">
+    <div class="banner">
+      <div class="bt">CONCERTO<br>A.I.</div>
+      <svg class="kv" viewBox="0 0 170 170" fill="none"><circle cx="118" cy="118" r="70" fill="#5f73a6" opacity=".55"/><circle cx="118" cy="118" r="46" fill="#516596" opacity=".7"/><circle cx="118" cy="118" r="22" fill="#43567f"/></svg>
+      <span class="ph-tag">키비주얼 영역 · 디자인 확정 시 교체</span>
+    </div>
+    <div class="nav">
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="lb">홈</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg><span class="lb">워크스페이스</span></a>
+      <a href="#" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg><span class="lb">모델</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 15c-1.5 1.5-2 4-2 4s2.5-.5 4-2m3-1l7-7M13 5s4 0 6 2 2 6 2 6l-9 5-4-4 5-9z"/></svg><span class="lb">배포</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg><span class="lb">모니터링</span></a>
+      <div class="flywrap" id="setWrap">
+        <a href="#" class="has-fly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 00-1.7-1L15 3H9l-.4 2.6a7.6 7.6 0 00-1.7 1l-2.3-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 001.7 1L9 21h6l.4-2.6a7.6 7.6 0 001.7-1l2.3 1 2-3.4z"/></svg><span class="lb">플랫폼 설정</span></a>
+        <div class="flyout">
+          <a href="#">사용자 및 역할 <span class="tb">RBAC</span></a>
+          <a href="#">보안 및 감사</a><a href="#">외부 연동</a><a href="#">알림 채널</a>
+        </div>
+      </div>
+    </div>
+    <div class="gnb-bottom">
+      <div class="worklist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg><span class="lb">내 작업함 </span><span class="cbadge">3</span></div>
+      <a href="#" class="notice-common"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 8a6 6 0 1112 0c0 7 3 7 3 9H3c0-2 3-2 3-9z"/><path d="M10 21a2 2 0 004 0"/></svg><span class="lb">알림</span><span class="cbadge" id="notiCnt">12</span></a>
+      <div class="persona"><div class="pbtn"><span class="av">유</span><span class="who"><b>성유진</b><span id="roleName">최고 관리자</span></span><span class="up">▴</span></div></div>
+      <div class="gnb-fold">
+        <button class="foldbtn" onclick="toggleGnb(this)" title="사이드바 접기">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 6l-6 6 6 6"/><path d="M19 5v14"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <!-- 목록 MODEL-L01 -->
+    <div class="page" id="pgList">
+      <div class="phead">
+        <div>
+          <h1>모델
+            <span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span><span class="tip">배포에 사용할 모델 이미지와 원천 가중치를 관리합니다. 모델 사양은 반입 시 수집된 값 기준이며 일부 항목은 제공되지 않을 수 있습니다.</span></span>
+          </h1>
+        </div>
+        <div class="pact" id="pact">
+          <button class="btn ghost" onclick="reconcileAsk()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7M21 3v6h-6"/></svg>저장소 동기화</button>
+          <button class="btn" onclick="openReg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>모델 등록</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button id="tabA" class="on" onclick="setTab('A')">모델 이미지 <span class="cnt" id="cntA">12</span></button>
+        <button id="tabB" onclick="setTab('B')">원천 가중치 <span class="cnt" id="cntB">6</span></button>
+      </div>
+
+      <div class="toolbar">
+        <div class="searchzone">
+          <div class="searchbar">
+            <svg class="sicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input id="q" placeholder="항목 이름 또는 값을 입력해 주세요." onkeydown="onSearchKey(event)">
+          </div>
+          <div class="chips" id="chips"></div>
+        </div>
+        
+        <div class="tspacer"></div>
+        <button class="cbtn" title="열 편집"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg></button>
+        <button class="cbtn" title="다운로드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg></button>
+      </div>
+
+            <div id="listArea"></div>
+
+      <div class="pager" id="pager">
+        <span id="pgtxt">총 12건</span>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="pgnum">
+            <button disabled aria-label="이전">‹</button>
+            <input class="pgin" value="1"><span class="pgtot">/ <span id="pgLast">1</span></span>
+            <button disabled aria-label="다음">›</button>
+          </div>
+          <select class="sel" style="padding:7px 10px" onchange="render()">
+            <option>20개씩 보기</option><option>50개씩 보기</option><option>100개씩 보기</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⭐ 상세 MODEL-L01.D01 — 버전에 캐싱·배포·삭제 액션이 붙어 패널 폭으로는 수용할 수 없다 -->
+    <div class="page" id="pgDetail" style="display:none">
+      <div class="dhead">
+        <button class="dback" onclick="closeDetail()" title="목록으로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <div class="dinfo">
+          <h1 id="dName">—</h1>
+          <div class="dmeta" id="dMeta"></div>
+        </div>
+        <div class="dact" id="dAct"></div>
+      </div>
+      <div id="detailBody"></div>
+    </div>
+  </main>
+</div>
+<!-- 사이드 패널 MODEL-L01.P01 -->
+<div class="pnbg" id="pnbg" onclick="closePanel()"></div>
+<aside class="panel" id="panel">
+  <div class="pnhead">
+    <div class="r1">
+      <h2 id="pnName">—<span class="ver" id="pnVer"></span></h2>
+      <div class="more" id="pnMore">
+        <button class="morebtn" onclick="tgMore(event,'pnMore')">⋯</button>
+        <div class="rowmenu">
+          <button onclick="openEdit()">기본 정보 수정</button>
+          <button id="pnActBtn" onclick="panelAct()">노드 캐싱</button>
+          <hr><button class="d" onclick="panelDel()">삭제</button>
+        </div>
+      </div>
+      <button class="pnexp" onclick="expandDetail()" title="상세 보기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3H3v6M15 21h6v-6M3 3l7 7M21 21l-7-7"/></svg>
+      </button>
+      <button class="pnclose" onclick="closePanel()">✕</button>
+    </div>
+    <div class="pntags" id="pnTags"></div>
+    <div style="margin-top:8px"></div>
+  </div>
+  <div class="pnbody" id="pnBody"></div>
+</aside>
+
+<!-- 모델 등록 MODEL-L01.M01 -->
+<div class="mdbg" id="mdReg">
+  <div class="modal">
+    <div class="mdhead">
+      <h3>모델 등록</h3>
+      <p>원천 모델 가중치 경로를 입력하면 컨테이너 이미지로 빌드할 수 있습니다.</p>
+    </div>
+    <div class="mdbody">
+      <div class="f">
+        <label>소스<span class="req">*</span></label>
+        <select class="inp" id="rSrc" onchange="regValid()"><option>S3</option><option>HuggingFace</option></select>
+      </div>
+      <div class="f">
+        <label>소스 경로<span class="req">*</span></label>
+        <input class="inp" id="rPath" placeholder="s3://concerto-models/llama-3.2-1b" oninput="regValid()" onblur="regBlur('rPath')">
+        <div class="errmsg" id="rPathErr" style="display:none">가중치 경로를 입력해 주세요.</div>
+        <div class="hint">S3 폴더명이 모델명으로 사용됩니다. 소문자·하이픈 구분 형태를 권장합니다.</div>
+      </div>
+      <div class="row2 f">
+        <div>
+          <label>버전<span class="req">*</span></label>
+          <input class="inp" id="rVer" value="1.0.0" oninput="regValid()" onblur="regBlur('rVer')">
+          <div class="errmsg" id="rVerErr" style="display:none">버전을 입력해 주세요.</div>
+        </div>
+        <div>
+          <label>모델명<span class="req">*</span></label>
+          <input class="inp" id="rName" placeholder="llama-3.2-1b" oninput="regValid()" onblur="regBlur('rName')">
+          <div class="errmsg" id="rNameErr" style="display:none">이미 등록된 모델명과 버전입니다.</div>
+          <div class="hint">버전과 조합해 중복을 확인합니다.</div>
+        </div>
+      </div>
+      <div class="f">
+        <label>토크나이저 경로</label>
+        <input class="inp" id="rTok" placeholder="llama-3.2-1b/tokenizer.json">
+        <div class="hint">입력하지 않으면 벤치마크 실행이 제한됩니다.</div>
+      </div>
+      <div class="f">
+        <label>설명</label>
+        <textarea class="inp" id="rDesc" rows="2" placeholder="모델의 용도나 특징을 적습니다."></textarea>
+      </div>
+      <div class="f">
+        <label>태그</label>
+        <input class="inp" id="rTag" placeholder="예) 추천, 한국어, 경량">
+        <div class="hint">쉼표로 구분해 입력합니다. 검색할 때 함께 찾습니다.</div>
+      </div>
+      <div class="f" style="margin-bottom:0">
+        <label>표시 범위<span class="req">*</span></label>
+        <div class="pick" id="scopePick"></div>
+        <div class="hint" id="scopeHint"></div>
+      </div>
+    </div>
+    <div class="mdfoot">
+      <button class="btn ghost" onclick="closeReg()">취소</button>
+      <button class="btn" id="rSubmit" disabled onclick="submitReg()">등록</button>
+    </div>
+  </div>
+</div>
+
+<!-- 노드 캐싱 MODEL-L01.M02 -->
+<div class="mdbg" id="mdCache">
+  <div class="modal">
+    <div class="mdhead">
+      <h3>노드 캐싱</h3>
+      <p><b id="cName"></b> 이미지를 미리 내려받을 노드를 선택합니다. 캐싱된 노드에서는 배포 시 기동이 빨라집니다.</p>
+    </div>
+    <div class="mdbody" id="cacheBody"></div>
+    <div class="mdfoot">
+      <button class="btn ghost" onclick="closeCache()">취소</button>
+      <button class="btn" id="cSubmit" disabled onclick="submitCache()">캐싱 실행</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- 확인 알럿 (공통정책 7.5 / 4.5 Confirm) -->
+
+<!-- 기본 정보 수정 -->
+<div class="mdbg" id="mdEdit">
+  <div class="modal">
+    <div class="mdhead">
+      <h3>수정</h3>
+    </div>
+    <div class="mdbody">
+      <div class="row2 f">
+        <div>
+          <label>모델명</label>
+          <input class="inp" id="eName" disabled>
+        </div>
+        <div>
+          <label>버전</label>
+          <input class="inp" id="eVer" disabled>
+        </div>
+      </div>
+      <div class="f">
+        <label>설명</label>
+        <textarea class="inp" id="eDesc" rows="3" style="resize:vertical" oninput="editValid()"></textarea>
+      </div>
+      <div class="f">
+        <label>표시 범위</label>
+        <div class="pick" id="eScope"></div>
+        <div class="hint" id="eScopeHint"></div>
+      </div>
+      <div class="f" id="eEngWrap">
+        <label>서빙 엔진</label>
+        <select class="inp" id="eEng" onchange="editValid()"><option>vLLM</option></select>
+      </div>
+      <div class="f" style="margin-bottom:0">
+        <label>태그</label>
+        <input class="inp" id="eTag" placeholder="쉼표로 구분" oninput="editValid()">
+      </div>
+    </div>
+    <div class="mdfoot">
+      <button class="btn ghost" onclick="closeEdit()">취소</button>
+      <button class="btn" id="eSubmit" disabled onclick="submitEdit()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="mdbg" id="mdConfirm">
+  <div class="modal" style="width:400px">
+    <div class="mdhead"><h3 id="cfTitle"></h3><p id="cfBody"></p></div>
+    <div class="mdfoot">
+      <button class="btn ghost" onclick="closeConfirm()">취소</button>
+      <button class="btn danger" id="cfOk">삭제</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<div class="demo-bar" id="demoBar">
+  <span class="demo-label">목록 행 단위:</span>
+  <button class="un on" onclick="setUnit('model',this)">모델 단위</button>
+  <button class="un" onclick="setUnit('version',this)">버전 단위</button>
+  <span class="demo-label" style="margin-left:12px;">데이터 상태:</span>
+  <button class="st on" onclick="setState('default',this)">기본</button>
+  <button class="st" onclick="setState('empty',this)">빈 상태</button>
+  <button class="st" onclick="setState('noresult',this)">검색 결과 없음</button>
+  <button class="st" onclick="setState('loading',this)">로딩</button>
+  <button class="st" onclick="setState('error',this)">오류</button>
+  <span class="demo-label" style="margin-left:12px;">권한:</span>
+  <button class="rl on" onclick="setRole('super',this)">최고 관리자</button>
+  <button class="rl" onclick="setRole('editor',this)">편집자</button>
+  <button class="rl" onclick="setRole('viewer',this)">뷰어</button>
+  <span class="demo-label" style="margin-left:12px;">테마:</span>
+  <button onclick="document.body.classList.remove('dark')">라이트</button>
+  <button onclick="document.body.classList.add('dark')">다크</button>
+</div>
+<script>
+/* ===== 데이터 (현행 관측값 기준 · 시스템 컴포넌트 제외 — 7.2 안 A) ===== */
+const IMG=[
+ {n:'gpt-oss-120b-furiosa',v:'1.0.0',ready:'미캐싱',use:'배포 중',scope:'전역',ws:'-',tags:['추천','대형'],by:'관리자(admin)',at:'2026-07-08 17:47:25',eng:'vLLM',base:'Official Base',
+  arch:{p:'-',c:'-',q:'NONE',d:'-'},infra:{v:'-',r:'아니요',g:'Universal / Any'},store:'model-registry/gpt-oss-120b-furiosa:v1.0.0',mode:'MONOLITHIC',deps:[{n:'furiosa-gpt-oss-120b-biz-prod',ws:'AI서비스팀',st:'정상'}]},
+ {n:'gpt-oss-20b',v:'latest',ready:'캐싱됨',use:'배포 중',scope:'전역',ws:'-',tags:['경량'],by:'관리자(admin)',at:'2026-04-15 11:02:10',eng:'vLLM',base:'Custom Build',
+  arch:{p:'20B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'48',r:'아니요',g:'Universal / Any'},store:'model-registry/gpt-oss-20b:latest',mode:'MONOLITHIC',deps:[{n:'gpt-oss-20b-biz-prod',ws:'AI서비스팀',st:'정상'}]},
+ {n:'k-exaone-236b-a23b-nvfp4a16',v:'1.0.0',ready:'미캐싱',use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 14:20:00',eng:'vLLM',base:'Official Base',
+  arch:{p:'236B',c:'-',q:'NVFP4',d:'-'},infra:{v:'320',r:'예',g:'NVIDIA-H200'},store:'model-registry/k-exaone-236b-a23b-nvfp4a16:v1.0.0',mode:'PD 분산',deps:[]},
+ {n:'solar-open-100b-nvfp4a16',v:'1.0.0',ready:'미캐싱',use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 13:55:41',eng:'vLLM',base:'Official Base',
+  arch:{p:'100B',c:'-',q:'NVFP4',d:'-'},infra:{v:'160',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/solar-open-100b-nvfp4a16:v1.0.0',mode:'MONOLITHIC',deps:[]},
+ {n:'qwen3-5-122b-a10b-gptq-int4',v:'1.0.0',ready:'미캐싱',use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-28 09:11:07',eng:'vLLM',base:'Official Base',
+  arch:{p:'122B',c:'-',q:'GPTQ-INT4',d:'-'},infra:{v:'96',r:'아니요',g:'Universal / Any'},store:'model-registry/qwen3-5-122b-a10b-gptq-int4:v1.0.0',mode:'MONOLITHIC',deps:[]},
+ {n:'furiosa-qwen3-32b-fp8',v:'latest',ready:'캐싱됨',use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-25 16:40:33',eng:'vLLM',base:'Official Base',
+  arch:{p:'32B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'Furiosa RNGD'},store:'model-registry/furiosa-qwen3-32b-fp8:latest',mode:'MONOLITHIC',deps:[]},
+ {n:'qwen-next-80b-a3b-thinking',v:'latest',ready:'미캐싱',use:'미사용',scope:'워크스페이스',ws:'AI서비스팀',by:'성유진(yj.seong)',at:'2026-06-20 10:05:12',eng:'vLLM',base:'Custom Build',
+  arch:{p:'80B',c:'-',q:'NONE',d:'-'},infra:{v:'128',r:'아니요',g:'Universal / Any'},store:'model-registry/qwen-next-80b-a3b-thinking:latest',mode:'MONOLITHIC',deps:[]},
+ {n:'llama-3.2-1b-instruct',v:'latest',ready:'캐싱 중',use:'미사용',scope:'워크스페이스',ws:'AI서비스팀',by:'성유진(yj.seong)',at:'2026-06-18 15:32:44',eng:'vLLM',base:'Custom Build',
+  arch:{p:'1B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'8',r:'아니요',g:'Universal / Any'},store:'model-registry/llama-3.2-1b-instruct:latest',mode:'MONOLITHIC',deps:[]},
+ {n:'gemma-4-12b-it',v:'1.0.0',ready:'미캐싱',use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-15 11:18:29',eng:'vLLM',base:'Official Base',
+  arch:{p:'12B',c:'-',q:'NONE',d:'-'},infra:{v:'32',r:'아니요',g:'Universal / Any'},store:'model-registry/gemma-4-12b-it:v1.0.0',mode:'MONOLITHIC',deps:[]},
+ {n:'gpt-oss-120b',v:'latest',ready:'캐싱됨',use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-10 09:44:51',eng:'vLLM',base:'Custom Build',
+  arch:{p:'120B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'160',r:'아니요',g:'Universal / Any'},store:'model-registry/gpt-oss-120b:latest',mode:'MONOLITHIC',deps:[{n:'gpt-oss-120b-symphony',ws:'AI서비스팀',st:'정상'}]},
+ {n:'gemma-4-31b-it-fp8-block',v:'1.0.0',ready:'캐싱됨',use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-05 17:22:03',eng:'vLLM',base:'Official Base',
+  arch:{p:'31B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'Universal / Any'},store:'model-registry/gemma-4-31b-it-fp8-block:v1.0.0',mode:'MONOLITHIC',deps:[{n:'gemma-4-31b-it-fp8-block-symphony',ws:'AI서비스팀',st:'정상'}]},
+ {n:'qwen3-6-35b-a3b-fp8',v:'1.0.0',ready:'캐싱됨',use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-01 13:07:38',eng:'vLLM',base:'Official Base',
+  arch:{p:'35B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'Universal / Any'},store:'model-registry/qwen3-6-35b-a3b-fp8:v1.0.0',mode:'MONOLITHIC',deps:[{n:'qwen3-6-35b-a3b-fp8-symphony',ws:'AI서비스팀',st:'정상'}]},
+ /* 같은 모델의 여러 버전 — 목록 행 단위를 비교하기 위한 데모 데이터 */
+ {n:'qwen3-32b',v:'v3.6',ready:'캐싱됨',use:'미사용',scope:'전역',ws:'-',tags:['추천'],by:'임승주(sj.lim)',at:'2026-08-01 09:12:00',eng:'vLLM',base:'Official Base',
+  arch:{p:'32B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.6',mode:'MONOLITHIC',deps:[]},
+ {n:'qwen3-32b',v:'v3.2',ready:'캐싱됨',use:'배포 중',scope:'전역',ws:'-',tags:['추천'],by:'성유진(yj.seong)',at:'2026-06-11 15:40:22',eng:'vLLM',base:'Official Base',
+  arch:{p:'32B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.2',mode:'MONOLITHIC',deps:[{n:'qwen3-32b-chat-prod',ws:'AI서비스팀',st:'정상'},{n:'qwen3-32b-batch',ws:'ml-research',st:'정상'}]},
+ {n:'qwen3-32b',v:'v3.1',ready:'미캐싱',use:'미사용',scope:'전역',ws:'-',by:'성유진(yj.seong)',at:'2026-04-02 11:05:10',eng:'vLLM',base:'Official Base',
+  arch:{p:'32B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.1',mode:'MONOLITHIC',deps:[]},
+ {n:'qwen3-32b',v:'v3.0',ready:'미캐싱',use:'미사용',scope:'전역',ws:'-',by:'성유진(yj.seong)',at:'2026-02-15 10:00:00',eng:'vLLM',base:'Official Base',
+  arch:{p:'32B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.0',mode:'MONOLITHIC',deps:[]},
+ {n:'llama-3.2-1b-instruct',v:'v2.0',ready:'캐싱됨',use:'미사용',scope:'워크스페이스',ws:'AI서비스팀',by:'유지현(jh.yu)',at:'2026-07-20 16:33:41',eng:'vLLM',base:'Custom Build',
+  arch:{p:'1B',c:'8,192',q:'NONE',d:'BF16'},infra:{v:'8',r:'아니요',g:'Universal / Any'},store:'model-registry/llama-3.2-1b-instruct:v2.0',mode:'MONOLITHIC',deps:[]}
+];
+const WGT=[
+ {n:'gpt-oss-20b',v:'1.0.0',ready:'빌드 중',path:'s3://concerto-models/gpt-oss-20b',size:'2.02 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-04-15 10:58:00',tok:'gpt-oss-20b/tokenizer.json',built:'gpt-oss-20b:latest',
+  arch:{p:'20B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'48',r:'아니요',g:'Universal / Any'}},
+ {n:'qwen3.5-122b-a10b-fp8',v:'1.0.0',ready:'미빌드',path:'s3://concerto-models/qwen3.5-122b-a10b-fp8',size:'12.23 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-28 09:02:11',tok:'-',built:'',
+  arch:{p:'122B',c:'-',q:'FP8',d:'-'},infra:{v:'96',r:'아니요',g:'Universal / Any'}},
+ {n:'solar-open-100b',v:'1.0.0',ready:'미빌드',path:'s3://concerto-models/solar-open-100b',size:'1.71 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 13:40:22',tok:'-',built:'',
+  arch:{p:'100B',c:'-',q:'NONE',d:'-'},infra:{v:'160',r:'아니요',g:'Universal / Any'}},
+ {n:'qwen3-next-80b-a3b-thinking',v:'latest',ready:'미빌드',path:'s3://concerto-models/qwen3-next-80b-a3b-thinking',size:'12.23 MB',scope:'워크스페이스',ws:'AI서비스팀',by:'성유진(yj.seong)',at:'2026-06-20 09:50:03',tok:'-',built:'',
+  arch:{p:'80B',c:'-',q:'NONE',d:'-'},infra:{v:'128',r:'아니요',g:'Universal / Any'}},
+ {n:'llama-3.2-1b',v:'latest',ready:'미빌드',path:'s3://concerto-models/llama-3.2-1b',size:'6.71 MB',scope:'워크스페이스',ws:'AI서비스팀',by:'성유진(yj.seong)',at:'2026-06-18 15:20:17',tok:'llama-3.2-1b/tokenizer.json',built:'',
+  arch:{p:'1B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'8',r:'아니요',g:'Universal / Any'}},
+ {n:'gpt-oss-120b',v:'1.0.0',ready:'미빌드',path:'s3://concerto-models/gpt-oss-120b',size:'2.02 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-10 09:30:44',tok:'-',built:'',
+  arch:{p:'120B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'160',r:'아니요',g:'Universal / Any'}}
+];
+const NODES=[
+ {n:'furiosa',acc:'rngd',cpu:'128',mem:'1,007 GB',cached:true},
+ {n:'gpu-svr',acc:'NVIDIA-H200',cpu:'128',mem:'1,007 GB',cached:false},
+ {n:'gpu-svr-02',acc:'NVIDIA-H200',cpu:'96',mem:'755 GB',cached:false}
+];
+/* 필터·정렬용 평면 필드 — infra 중첩값을 목록에서 바로 쓰기 위함 */
+/* 시스템 컴포넌트는 목록에서 제외 (판정 기준 확인 필요 — B-12) */
+IMG.forEach(m=>{ m.gpu=m.infra.g; m.vram=m.infra.v; m.sys=false; });
+IMG.push({n:'oci-storage-initializer',v:'v0.15.2',ready:'캐싱됨',use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-03-02 09:12:00',eng:'-',base:'Official Base',
+  arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'},store:'model-registry/oci-storage-initializer:v0.15.2',mode:'-',deps:[],gpu:'-',vram:'-',sys:true});
+WGT.forEach(m=>{ m.gpu=m.infra.g; m.vram=m.infra.v; });
+const RB={'캐싱됨':'ok','미캐싱':'mu','캐싱 중':'ac load','미빌드':'mu','빌드 중':'ac load','빌드됨':'ok','빌드 실패':'cr'};
+const RB2={'정상':'ok','경고':'wa','위험':'cr'};
+const UB={'배포 중':'ac','미사용':'mu'};
+const WSLIST=['Common Workspace','AI서비스팀','공용 워크스페이스(전체)'];
+
+let tab='A', state='default', role='super', wsIdx=0, cur=null;
+const isAll=()=>wsIdx===2;
+const canWrite=()=>role!=='viewer';
+
+/* ===== 워크스페이스 전환 ===== */
+function cycleWs(){
+  if(role!=='super'){ wsIdx = wsIdx===0?1:0; }        // 일반 사용자는 전체 선택 불가
+  else { wsIdx=(wsIdx+1)%WSLIST.length; }
+  document.getElementById('wsName').textContent=WSLIST[wsIdx];
+  fsel={}; closePanel(); render();
+}
+/* 조회 스코프 — 7.1 확정정책 + 7.2 안 A */
+function scoped(list){
+  if(isAll()) return list;                                   // 전체: 전역 + 모든 WS 전용
+  const ws=WSLIST[wsIdx];
+  if(ws==='Common Workspace') return list.filter(m=>m.scope==='전역');
+  return list.filter(m=>m.scope==='전역'||m.ws===ws);         // 전역 + 해당 WS 전용
+}
+/* ===== 목록 렌더 ===== */
+function setTab(t){
+  tab=t;
+  document.getElementById('tabA').classList.toggle('on',t==='A');
+  document.getElementById('tabB').classList.toggle('on',t==='B');
+  fsel={}; sortKey='at'; sortDir='desc';
+  sconds=[]; drawChips();
+  closePanel(); render();
+}
+/* 목록 행 단위 — model: 모델 하나가 한 행, 버전은 상세에서 / version: 버전마다 한 행
+   동종 레지스트리(Docker Hub·npm·MLflow·Vertex AI)는 모두 model 방식이다.
+   버전은 같은 자산의 시간축이라 목록에서 비교 대상이 아니고, 개수도 예측할 수 없다 */
+let unit='model';
+function groupByModel(list){
+  const map={}, order=[];
+  list.forEach(function(m){ if(!map[m.n]){ map[m.n]=[]; order.push(m.n); } map[m.n].push(m); });
+  return order.map(function(k){
+    /* 최신 등록분을 대표로 둔다. 원본 객체를 그대로 반환해 기존 인덱스 참조를 깨지 않는다 */
+    const vs=map[k].slice().sort(function(a,b){ return String(b.at).localeCompare(String(a.at)); });
+    const head=vs[0];
+    head._vers=vs;
+    head._vcnt=vs.length;
+    /* 사용 상태는 참조 배포 레코드의 존재로 판정한다(모델 정책 2.6).
+       버전 중 하나라도 배포에 쓰이면 이 모델은 배포 중이다 */
+    head._use = vs.some(function(x){return x.use==='배포 중';}) ? '배포 중' : '미사용';
+    head._deps = vs.reduce(function(a,x){ return a.concat(x.deps||[]); },[]);
+    return head;
+  });
+}
+function base(){
+  const list = tab==='A'?scoped(IMG):scoped(WGT);
+  const f = list.filter(m=>!m.sys);   /* 시스템 컴포넌트 제외 */
+  return unit==='model' ? groupByModel(f) : f;
+}
+/* 그룹 모드에서는 합산값을, 버전 모드에서는 레코드 값을 쓴다 */
+function useOf(m){ return (unit==='model' && m._use) ? m._use : m.use; }
+function depsOf(m){ return (unit==='model' && m._deps) ? m._deps : (m.deps||[]); }
+
+/* ===== 필터 (공통정책 3.2) — 단일 필드 다중 값 OR / 필드 간 AND ===== */
+const FDEF={
+  A:[{k:'ready',l:'캐싱 상태',opts:['캐싱됨','미캐싱','캐싱 중']},
+     {k:'use',  l:'사용 상태',opts:['배포 중','미사용']},
+     {k:'scope',l:'표시 범위',opts:['전역','워크스페이스']},
+     {k:'eng',  l:'엔진',    opts:['vLLM']},
+     {k:'gpu',  l:'요구 가속기',opts:['Universal / Any','NVIDIA-H200','Furiosa RNGD']}],
+  B:[{k:'ready',l:'빌드 상태',opts:['미빌드','빌드 중','빌드됨','빌드 실패']},
+     {k:'scope',l:'표시 범위',opts:['전역','워크스페이스']}]
+};
+let fsel={};
+/* 컬럼 정의 (2.3 도움말 팝오버) */
+const COLDEF={
+  ready_A:'이미지가 서빙 워커 노드에 사전 다운로드되었는지를 표시합니다.'
+    +'<dl><dt>캐싱됨</dt><dd>노드에 이미지가 있어 바로 기동할 수 있습니다.</dd>'
+    +'<dt>캐싱 중</dt><dd>이미지를 내려받고 있습니다.</dd>'
+    +'<dt>미캐싱</dt><dd>배포 시 이미지를 내려받아야 해 초기 기동에 시간이 걸립니다.</dd></dl>',
+  ready_B:'원천 가중치가 컨테이너 이미지로 빌드되었는지를 표시합니다.'
+    +'<dl><dt>빌드됨</dt><dd>모델 이미지로 만들어져 배포할 수 있습니다.</dd>'
+    +'<dt>빌드 중</dt><dd>이미지를 만들고 있습니다.</dd>'
+    +'<dt>미빌드</dt><dd>아직 이미지로 만들지 않았습니다.</dd>'
+    +'<dt>빌드 실패</dt><dd>이미지 생성에 실패했습니다. 다시 시도할 수 있습니다.</dd></dl>',
+  use:'이 모델을 참조하는 배포의 존재 여부를 표시합니다.'
+    +'<dl><dt>배포 중</dt><dd>이 모델을 사용하는 배포가 있습니다.</dd>'
+    +'<dt>미사용</dt><dd>이 모델을 사용하는 배포가 없습니다.</dd></dl>',
+  eng:'모델 이미지에 결합된 서빙 엔진을 표시합니다.',
+  gpu:'이 모델을 배포하는 데 필요한 가속기를 벤더·유형으로 표시합니다.',
+  vram:'노드당 필요한 최소 가속기 메모리를 표시합니다.'
+};
+/* 패널 항목 도움말 (공통정책 4.7) */
+const ITEMDEF={
+  quant:'모델 가중치를 더 적은 비트로 표현해 메모리 사용량을 줄이는 방식입니다.',
+  rdma:'노드 간 고속 통신이 필요한지를 표시합니다. 여러 노드에 분산 배포할 때 사용됩니다.',
+  mode:'이 모델에 적합한 서빙 방식입니다. 배포 생성 시 기본값으로 사용됩니다.',
+  sync:'저장소의 실제 이미지와 플랫폼에 등록된 정보가 일치하는지를 표시합니다.',
+  cnode:'이 이미지를 사전 다운로드한 노드 수입니다.'
+};
+let ftmp={};
+function axis(k){ return FDEF[tab].find(f=>f.k===k); }
+function thFilter(k){
+  const f=axis(k); if(!f) return '';
+  const list=base();
+  /* 필터 축은 고정 정의. 노출 여부를 데이터가 결정하지 않는다.
+     선택지는 실제 존재하는 값으로만 채운다 */
+  const opts=f.opts.filter(o=>list.some(m=>m[k]===o));
+  const on=fsel[k]||[];
+  const def=COLDEF[k==='ready'?('ready_'+tab):k];
+  return '<span class="thwrap">'+f.l
+    + (def?'<span class="thic" onclick="tgPop(event,this)">?</span>':'')
+    + '<button class="thfilter'+(on.length?' on':'')+'" onclick="tgFdd(event,\''+k+'\')" title="필터">'
+    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button>'
+    + '</span>'
+    + (def?'<div class="thpop">'+def+'</div>':'')
+    + '<div class="fdd" onclick="event.stopPropagation()">'
+    + '<label><input type="checkbox" '+(on.length===0?'checked':'')+' onchange="fPickAll(\''+k+'\')">전체<span class="fc">'+list.length+'</span></label><hr>'
+    + opts.map(o=>'<label><input type="checkbox" '+((ftmp[k]||on).includes(o)?'checked':'')+' onchange="fTmp(\''+k+'\',\''+o+'\')">'+o
+        +'<span class="fc">'+list.filter(m=>m[k]===o).length+'</span></label>').join('')
+    + '<hr><div class="fbtns"><button onclick="fReset(\''+k+'\')">초기화</button>'
+    + '<button class="pri" onclick="fApply(\''+k+'\')">확인</button></div></div>';
+}
+function thHelp(k,label){
+  const def=COLDEF[k];
+  return '<span class="thwrap">'+label+(def?'<span class="thic" onclick="tgPop(event,this)">?</span>':'')+'</span>'
+    + (def?'<div class="thpop">'+def+'</div>':'');
+}
+function tgPop(e,el){e.stopPropagation();const th=el.closest('th');const o=th.classList.contains('pop-on');
+  document.querySelectorAll('th').forEach(x=>x.classList.remove('pop-on','fdd-on'));if(!o)th.classList.add('pop-on');}
+function tgFdd(e,k){e.stopPropagation();const th=e.target.closest('th');const o=th.classList.contains('fdd-on');
+  document.querySelectorAll('th').forEach(x=>x.classList.remove('pop-on','fdd-on'));
+  if(!o){ ftmp[k]=(fsel[k]||[]).slice(); th.classList.add('fdd-on'); }}
+function fTmp(k,v){ ftmp[k]=ftmp[k]||[];
+  const i=ftmp[k].indexOf(v); i<0?ftmp[k].push(v):ftmp[k].splice(i,1);
+  const th=document.querySelector('th.fdd-on'); if(th){const cb=th.querySelector('.fdd label input'); if(cb) cb.checked=ftmp[k].length===0;} }
+function fPickAll(k){ ftmp[k]=[]; const th=document.querySelector('th.fdd-on');
+  if(th) th.querySelectorAll('.fdd label input').forEach((cb,i)=>cb.checked=(i===0)); }
+function fReset(k){ ftmp[k]=[]; fsel[k]=[]; document.querySelectorAll('th').forEach(x=>x.classList.remove('fdd-on')); render(); }
+function fApply(k){ const f=axis(k);
+  const opts=f.opts.filter(o=>base().some(m=>m[k]===o));
+  let v=(ftmp[k]||[]).slice();
+  if(v.length===opts.length) v=[];
+  fsel[k]=v; document.querySelectorAll('th').forEach(x=>x.classList.remove('fdd-on')); render(); }
+document.addEventListener('click',()=>document.querySelectorAll('th').forEach(x=>x.classList.remove('pop-on','fdd-on')));
+/* ===== 검색 (공통정책 3.3) — 통합 검색
+   · 검색 대상 열: 모델명 · 경로·출처 · 등록자 · 태그
+   · 엔터로 실행, 조건은 누적되며 AND 결합
+   · 등록·수정·삭제 완료 후 검색·필터 초기화 → 전체 재조회 */
+let sconds=[];
+function onSearchKey(e){
+  if(e.key!=='Enter')return;
+  const v=e.target.value.trim(); if(!v)return;
+  if(sconds.some(c=>c.val===v)){e.target.value='';return;}
+  sconds.push({val:v}); e.target.value=''; drawChips(); render();
+}
+function rmCond(i){sconds.splice(i,1);drawChips();render();}
+function clearConds(){sconds=[];drawChips();render();}
+function drawChips(){
+  const w=document.getElementById('chips');
+  if(!sconds.length){w.innerHTML='';return;}
+  w.innerHTML=sconds.map((c,i)=>
+    (i?'<span class="andmark">AND</span>':'')+
+    '<span class="schip">'+c.val+'<button onclick="rmCond('+i+')">✕</button></span>'
+  ).join('')+'<button class="clr" onclick="clearConds()">조건 초기화</button>';
+}
+function matchCond(m,c){
+  const v=c.val.toLowerCase();
+  /* 태그는 자유 입력이라 필터 축으로 두지 않고 검색 대상에만 포함한다(모델 정책 5) */
+  return [m.n,m.path||'',m.by,(m.tags||[]).join(' ')].some(x=>String(x).toLowerCase().includes(v));
+}
+/* 정렬 (공통정책 3.1) — 기본: 날짜 컬럼 내림차순(최신순) */
+let sortKey='at', sortDir='desc';
+function tgSort(k){
+  if(sortKey===k){ sortDir = sortDir==='asc'?'desc':'asc'; }
+  else { sortKey=k; sortDir = (k==='at')?'desc':'asc'; }
+  render();
+}
+function applySort(list){
+  const dir = sortDir==='asc'?1:-1;
+  return list.slice().sort((a,b)=>{
+    const x=String(a[sortKey]||''), y=String(b[sortKey]||'');
+    return x.localeCompare(y,'ko',{numeric:true})*dir;
+  });
+}
+function sortTh(k,label){
+  const on = sortKey===k;
+  return '<th class="sortable" onclick="tgSort(\''+k+'\')">'+label
+    + (on?' <span class="sar">'+(sortDir==='asc'?'▲':'▼')+'</span>':'')
+    + '</th>';
+}
+function rows(){
+  return applySort(base().filter(m=>
+      sconds.every(c=>matchCond(m,c))
+   && FDEF[tab].every(f=>{
+        const v=fsel[f.k]; if(!v||!v.length) return true;
+        /* 사용 상태는 모델 단위에서 버전 합산값으로 판정한다 */
+        if(f.k==='use') return v.includes(useOf(m));
+        return v.includes(m[f.k]);
+      })));
+}
+function render(){
+  const el=document.getElementById('listArea'),pg=document.getElementById('pager');
+  document.getElementById('cntA').textContent=scoped(IMG).length;
+  document.getElementById('cntB').textContent=scoped(WGT).length;
+  document.getElementById('pact').style.display=canWrite()?'flex':'none';
+
+  if(state==='loading'){pg.style.display='none';
+    el.innerHTML='<div class="tblwrap" style="padding:14px">'+Array(6).fill('<div class="skrow" style="margin:13px 0"></div>').join('')+'</div>';return;}
+  if(state==='error'){pg.style.display='none';
+    el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해주세요.</p><button class="btn ghost" onclick="setState(\'default\')">재시도</button></div>';return;}
+  if(state==='empty'){pg.style.display='none';const nm=tab==='A'?'모델 이미지':'원천 가중치';
+    el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg><h3>등록된 '+nm+'이(가) 없습니다.</h3><p>모델을 등록하면 목록에 표시됩니다.</p>'+(canWrite()?'<button class="btn" onclick="openReg()">모델 등록</button>':'')+'</div>';return;}
+
+  const d=state==='noresult'?[]:rows();
+  if(!d.length){pg.style.display='none';
+    el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><h3>검색 결과가 없습니다.</h3><p>검색어나 필터 조건을 변경해보세요.</p><button class="btn ghost" onclick="resetF()">조건 초기화</button></div>';return;}
+
+  pg.style.display='flex';
+  document.getElementById('pgtxt').textContent='총 '+d.length+'건';
+  const isA=tab==='A', showWs=isAll();   // 워크스페이스 컬럼: 전체 선택 시에만 (7.2 안 A)
+  /* 컬럼 순서 — 공통정책 2.2: 이름 → 상태 → 유형 → 워크스페이스 → 생성자 → 생성일시 → 작업 */
+  /* 컬럼 순서 — 공통정책 2.2 / 상태 컬럼에 도움말 팝오버(2.3) + 필터(3.2) */
+  /* 컬럼 순서 — 공통정책 2.2 / 정렬 3.1 / 상태 컬럼 도움말 2.3 + 필터 3.2 */
+  const th = isA
+   ? sortTh('n','모델명')+'<th class="thcell">'+thFilter('ready')+'</th><th class="thcell">'+thFilter('use')+'</th>'
+     +'<th class="thcell">'+thFilter('eng')+'</th>'
+     +'<th class="thcell">'+thFilter('gpu')+'</th>'
+     +'<th class="thcell">'+thHelp('vram','최소 vRAM')+'</th>'
+     +(showWs?'<th>워크스페이스</th>':'')+'<th>등록자</th>'+sortTh('at','등록일시')+'<th style="width:44px"></th>'
+   : sortTh('n','모델명')+'<th class="thcell">'+thFilter('ready')+'</th><th>경로·출처</th><th>용량</th>'
+     +(showWs?'<th>워크스페이스</th>':'')+'<th>등록자</th>'+sortTh('at','등록일시')+'<th style="width:44px"></th>';
+
+  el.innerHTML='<div class="tblwrap"><table class="tbl"><thead><tr>'+th+'</tr></thead><tbody>'+importRow()+
+    d.map(m=>{const idx=(isA?IMG:WGT).indexOf(m);
+      const busy = m.ready==='캐싱 중'||m.ready==='빌드 중';
+      /* 모델 단위에서는 최신 버전과 버전 수를 함께 둔다(npm·MLflow와 같은 형태) */
+      const vlabel = (unit==='model' && m._vcnt>1)
+        ? '<span class="mver">'+m.v+' · '+m._vcnt+'개 버전</span>'
+        : '<span class="mver">v'+m.v+'</span>';
+      const name='<td><span class="mname">'+m.n+'</span>'+vlabel+(m.scope==='전역'?'':' <span class="chip">전용</span>')+'</td>';
+      const rd='<td><span class="stbadge '+RB[m.ready]+(m.ready.indexOf('중')>-1?' load':'')+'"><span class="d"></span>'+m.ready+'</span></td>';
+      const uv=useOf(m);
+      const mid=isA?'<td><span class="stbadge '+UB[uv]+'"><span class="d"></span>'+uv+'</span></td><td>'+m.eng+'</td>'
+                   +'<td>'+m.gpu+'</td><td>'+(m.vram==='-'?'<span class="dash">-</span>':m.vram+' GB')+'</td>'
+                   :'<td><span class="path" title="'+m.path+'">'+m.path+'</span></td><td>'+m.size+'</td>';
+      const ws=showWs?('<td>'+(m.ws==='-'?'<span class="dash">-</span>':m.ws)+'</td>'):'';
+      const menu = isA
+        ? '<button onclick="openCache(\''+m.n+'\')"'+(busy?' disabled':'')+'>노드 캐싱</button><button onclick="goDeploy(\''+m.n+'\',\''+m.ready+'\')">배포</button>'
+        : '<button onclick="build(\''+m.n+'\')"'+(busy?' disabled':'')+'>이미지 빌드</button>';
+      const act=canWrite()
+        ? '<td onclick="event.stopPropagation()"><div class="more" id="m'+(isA?'i':'w')+idx+'"><button class="morebtn" onclick="tgMore(event,\'m'+(isA?'i':'w')+idx+'\')">⋯</button><div class="rowmenu">'+menu+'<hr><button class="d" onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+')">삭제</button></div></div></td>'
+        : '<td></td>';
+      return '<tr onclick="openPanel('+idx+')">'+name+rd+mid+ws+'<td>'+m.by+'</td><td>'+m.at+'</td>'+act+'</tr>';
+    }).join('')+'</tbody></table></div>';
+}
+function resetF(){document.getElementById('q').value='';sconds=[];drawChips();fsel={};setState('default');}
+/* 목록 행 단위 전환 — 회의 비교용. 확정 후 삭제 */
+function setUnit(u,btn){
+  unit=u;
+  document.querySelectorAll('#demoBar .un').forEach(function(b){b.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  closePanel(); render();
+}
+function setState(s,btn){state=s;
+  if(btn){document.querySelectorAll('#demoBar .st').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+  render();}
+function setRole(r,btn){
+  role=r;
+  document.querySelectorAll('#demoBar .rl').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  document.getElementById('roleName').textContent={super:'최고 관리자',editor:'워크스페이스 편집자',viewer:'워크스페이스 뷰어'}[r];
+  document.getElementById('setWrap').style.display=r==='super'?'':'none';   // 플랫폼 설정 = Super Admin 전용
+  if(r!=='super'&&wsIdx===2){wsIdx=1;document.getElementById('wsName').textContent=WSLIST[1];}
+  closePanel(); render();
+}
+function toggleGnb(btn){
+  const on=document.body.classList.toggle('gnb-fold-on');
+  btn.title = on?'사이드바 펼치기':'사이드바 접기';
+  btn.querySelector('svg').innerHTML = on
+    ? '<path d="M10 6l6 6-6 6"/><path d="M5 5v14"/>'
+    : '<path d="M14 6l-6 6 6 6"/><path d="M19 5v14"/>';
+}
+function toggleTheme(b){document.body.classList.toggle('dark');b.textContent=document.body.classList.contains('dark')?'라이트':'다크';}
+function tgMore(e,id){
+  e.stopPropagation();
+  const t=document.getElementById(id), o=t.classList.contains('open');
+  document.querySelectorAll('.more').forEach(m=>m.classList.remove('open','up'));
+  if(o) return;
+  t.classList.add('open');
+  /* 스크롤 영역 하단에 걸리면 위로 펼친다 */
+  const menu=t.querySelector('.rowmenu'); if(!menu) return;
+  const box=(document.querySelector('.main')||document.body).getBoundingClientRect();
+  const r=menu.getBoundingClientRect();
+  if(r.bottom > box.bottom - 8) t.classList.add('up');
+}
+document.addEventListener('click',()=>document.querySelectorAll('.more').forEach(m=>m.classList.remove('open')));
+/* ===== 사이드 패널 (섹션 5 · 자산 유형별 분기) ===== */
+function sec(title,body,key){
+  return '<div class="sec" id="sec_'+key+'"><h4 onclick="tgSec(\''+key+'\')">'+title
+    +'<span class="fold">▾</span></h4><div class="secbody">'+body+'</div></div>';
+}
+function tgSec(k){const el=document.getElementById('sec_'+k); if(el) el.classList.toggle('closed');}
+function help(k){const d=ITEMDEF[k]; return d?'<span class="dtic">?<span class="dtpop">'+d+'</span></span>':'';}
+function dv(v){return (v===''||v==='-'||v==null)?'<span class="dash">-</span>':v}
+function openPanel(i){
+  const isA=tab==='A'; const m=(isA?IMG:WGT)[i]; cur={m,isA};
+  const busy = m.ready==='캐싱 중'||m.ready==='빌드 중';
+  /* 모델 단위에서는 헤더에 최신 버전과 버전 수를 함께 둔다 */
+  document.getElementById('pnName').innerHTML = m.n
+    + '<span class="ver">' + ((unit==='model' && m._vcnt>1) ? m.v+' · '+m._vcnt+'개 버전' : 'v'+m.v) + '</span>';
+  document.getElementById('pnTags').innerHTML=
+    '<span class="chip">'+(isA?'모델 이미지':'원천 가중치')+'</span>'
+    +(isA?'<span class="chip">'+m.base+'</span>':'')
+    +'<span class="chip">'+(m.scope==='전역'?'전역 카탈로그':'워크스페이스 전용')+'</span>'
+    +(isA?'<span class="chip">'+m.eng+'</span>':'');
+  document.getElementById('pnMore').style.display=canWrite()?'':'none';
+  document.getElementById('pnActBtn').textContent=isA?'노드 캐싱':'이미지 빌드';
+
+  let h='';
+  /* ① 기본 정보 — 식별·귀속 */
+  h+=sec('기본 정보',
+      '<div class="desc">'+(isA?'서빙 엔진 드라이버가 결합된 배포용 컨테이너 이미지입니다.':'S3에서 반입한 원천 가중치입니다. 배포하려면 이미지 빌드가 필요합니다.')+'</div>'
+    + '<dl class="dl">'
+    + '<dt>버전</dt><dd>'+m.v+'</dd>'
+    + '<dt>표시 범위</dt><dd>'+(m.scope==='전역'?'글로벌 카탈로그':'워크스페이스 전용')+'</dd>'
+    + '<dt>워크스페이스</dt><dd>'+dv(m.ws)+'</dd>'
+    + (isA?'<dt>서빙 엔진</dt><dd>'+m.eng+'</dd>':'<dt>토크나이저 경로</dt><dd>'+dv(m.tok)+'</dd>')
+    + '<dt>태그</dt><dd>'+((m.tags&&m.tags.length)?m.tags.map(function(t){return '<span class="vtag">'+t+'</span>';}).join(' '):dv(''))+'</dd>'
+    + '<dt>동기화 상태'+help('sync')+'</dt><dd><span class="stbadge ok">일치</span></dd>'
+    + '<dt>등록자</dt><dd>'+m.by+'</dd>'
+    + '<dt>등록일시</dt><dd>'+m.at+'</dd>'
+    + '</dl>', 'basic');
+
+  /* ② 모델 사양 — 속성·스펙 (배포 프리셋 통합) */
+  h+=sec('모델 사양',
+      '<dl class="dl">'
+    + '<dt>파라미터 수</dt><dd>'+dv(m.arch.p)+'</dd>'
+    + '<dt>컨텍스트 윈도우</dt><dd>'+dv(m.arch.c)+'</dd>'
+    + '<dt>양자화'+help('quant')+'</dt><dd>'+dv(m.arch.q)+'</dd>'
+    + '<dt>데이터 타입</dt><dd>'+dv(m.arch.d)+'</dd>'
+    + '<dt>최소 vRAM</dt><dd>'+(m.infra.v==='-'?'<span class="dash">-</span>':m.infra.v+' GB / 노드')+'</dd>'
+    + '<dt>RDMA 필요'+help('rdma')+'</dt><dd>'+m.infra.r+'</dd>'
+    + '<dt>요구 가속기</dt><dd>'+m.infra.g+'</dd>'
+    + (isA?'<dt>권장 엔진 모드'+help('mode')+'</dt><dd>'+m.mode+'</dd>':'')
+    + (isA?'<dt>리소스 프로파일</dt><dd><span class="dash">-</span></dd>':'')
+    + '</dl>', 'spec');
+
+  if(isA){
+    /* ③ 배포 준비 — 상태·현황 */
+    h+=sec('배포 준비',
+        '<dl class="dl">'
+      + '<dt>저장 위치</dt><dd><span class="path" style="max-width:100%">'+m.store+'</span></dd>'
+      + '<dt>캐싱 상태</dt><dd><span class="stbadge '+RB[m.ready]+(m.ready.indexOf('중')>-1?' load':'')+'"><span class="d"></span>'+m.ready+'</span></dd>'
+      + '<dt>캐싱된 노드'+help('cnode')+'</dt><dd>'+(m.ready==='캐싱됨'?'3개 중 2개':'<span class="dash">-</span>')+'</dd>'
+      + '</dl>'
+      + (canWrite()?'<div class="secact"><button class="btn ghost sm" '+(busy?'disabled':'')+' onclick="openCache(\''+m.n+'\')">'+(busy?'캐싱 중…':'노드 캐싱')+'</button>'
+        +'<button class="btn sm" onclick="goDeploy(\''+m.n+'\',\''+m.ready+'\')">배포</button></div>':'')
+      + (m.ready==='미캐싱'?'<div class="secnote">노드에 캐싱되지 않은 이미지는 배포할 수 있으나 초기 기동이 지연됩니다.</div>':''), 'ready');
+
+    /* 버전 목록은 상세 페이지의 버전 탭에서 제공한다.
+       버전에 캐싱·배포·삭제 액션이 붙어 패널 폭으로는 수용할 수 없다 */
+
+    /* ④ 사용 중인 배포 — 연관 리소스 */
+    const dps=depsOf(m);
+    h+=sec('사용 중인 배포 <span style="font-weight:400">'+dps.length+'건</span>',
+        (dps.length
+          ? '<div class="linklist">'+dps.map(d=>'<a href="#" onclick="return false"><span class="nm">'+d.n+'<span class="chip" style="margin-left:6px">'+d.ws+'</span></span><span class="stbadge '+RB2[d.st]+'"><span class="d"></span>'+d.st+'</span></a>').join('')+'</div>'
+          : '<div class="emptyline">이 모델을 사용하는 배포가 없습니다.</div>'), 'deps');
+  }else{
+    /* ③ 빌드 준비 — 상태·현황 */
+    h+=sec('빌드 준비',
+        '<dl class="dl">'
+      + '<dt>경로·출처</dt><dd><span class="path" style="max-width:100%">'+m.path+'</span></dd>'
+      + '<dt>용량</dt><dd>'+m.size+'</dd>'
+      + '<dt>빌드 상태</dt><dd><span class="stbadge '+RB[m.ready]+(m.ready.indexOf('중')>-1?' load':'')+'"><span class="d"></span>'+m.ready+'</span></dd>'
+      + '<dt>빌드 산출 이미지</dt><dd>'+(m.built?'<a href="#" class="mname" onclick="goImg(\''+m.built+'\');return false">'+m.built+'</a>':'<span class="dash">-</span>')+'</dd>'
+      + '</dl>'
+      + (canWrite()?'<div class="secact"><button class="btn ghost sm" '+(busy?'disabled':'')+' onclick="build(\''+m.n+'\')">'+(busy?'빌드 중…':'이미지 빌드')+'</button></div>':'')
+      + '<div class="secnote">원천 가중치는 배포 대상이 아닙니다. 이미지로 빌드한 뒤 배포할 수 있습니다.</div>', 'ready');
+  }
+  document.getElementById('pnBody').innerHTML=h;
+  document.getElementById('panel').classList.add('on');
+  document.getElementById('pnbg').classList.add('on');
+  const list=rows(), pos=list.indexOf(m);
+  document.querySelectorAll('table.tbl tbody tr').forEach(r=>r.classList.remove('sel'));
+  if(pos>=0){const tr=document.querySelectorAll('table.tbl tbody tr')[pos]; if(tr)tr.classList.add('sel');}
+}
+/* ===== ⭐ 상세 페이지 MODEL-L01.D01 =====
+   버전에 캐싱·배포·삭제 액션이 붙어 패널 폭으로 수용할 수 없다.
+   속성(아키텍처·인프라 요건)은 탭에 숨기지 않고 상단 섹션으로 둔다 —
+   상세로 들어온 주된 이유가 그 값들이다 */
+let dTab=0, dCur=null;
+function openDetail(i){
+  const isA=tab==='A'; const m=(isA?IMG:WGT)[i];
+  dCur={m,isA}; dTab=0;
+  closePanel();
+  document.getElementById('pgList').style.display='none';
+  document.getElementById('pgDetail').style.display='';
+  document.querySelector('.breadcrumb').innerHTML='<a href="#" onclick="closeDetail();return false;">콘체르토 플랫폼</a> / <a href="#" onclick="closeDetail();return false;">모델</a> / <b>상세</b>';
+  drawDetail();
+  window.scrollTo(0,0);
+}
+function closeDetail(){
+  dCur=null;
+  document.getElementById('pgDetail').style.display='none';
+  document.getElementById('pgList').style.display='';
+  document.querySelector('.breadcrumb').innerHTML='<a href="#">콘체르토 플랫폼</a> / <b>모델</b>';
+}
+function setDTab(i){ dTab=i; drawDetail(); }
+function drawDetail(){
+  if(!dCur) return;
+  const m=dCur.m, isA=dCur.isA;
+  const vers = (m._vers && m._vers.length) ? m._vers : [m];
+  const dps  = depsOf(m);
+
+  document.getElementById('dName').innerHTML = m.n
+    + '<span class="ver">'+(vers.length>1 ? m.v+' · '+vers.length+'개 버전' : 'v'+m.v)+'</span>'
+    + (m.scope==='전역'?'':' <span class="chip">전용</span>');
+  document.getElementById('dMeta').textContent =
+    (isA?'모델 이미지':'원천 가중치') + ' · 등록자 ' + m.by + ' · ' + m.at;
+  document.getElementById('dAct').innerHTML = canWrite()
+    ? '<button class="btn ghost" onclick="openEditFrom()">기본 정보 수정</button>'
+      + '<button class="btn danger-line" onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+')">삭제</button>'
+    : '';
+
+  let h='';
+  /* ① 기본 정보 — 모델 속성. 버전과 무관하다 */
+  h+='<div class="dsec"><h4>기본 정보</h4><div class="dgrid">'
+   + kv('모델명', m.n)
+   + kv('표시 범위', m.scope + (m.scope==='전역'?'':' · '+m.ws))
+   + kv('서빙 엔진', isA? m.eng : '<span class="dash">-</span>')
+   + kv('태그', (m.tags&&m.tags.length)? m.tags.map(function(t){return '<span class="chip">'+t+'</span>';}).join(' ') : '<span class="dash">-</span>')
+   + '</div></div>';
+
+  /* ② 아키텍처 · ③ 인프라 요건 — 모델의 고유 스펙 */
+  if(m.arch){
+    h+='<div class="dsec"><h4>아키텍처</h4><div class="dgrid">'
+     + kv('파라미터 수', m.arch.p) + kv('컨텍스트 길이', m.arch.c)
+     + kv('양자화', m.arch.q) + kv('데이터 타입', m.arch.d)
+     + '</div></div>';
+  }
+  if(m.infra){
+    h+='<div class="dsec"><h4>인프라 요건</h4><div class="dgrid">'
+     + kv('최소 vRAM', m.infra.v==='-'?'<span class="dash">-</span>':m.infra.v+' GB')
+     + kv('요구 가속기', m.infra.g)
+     + kv('멀티노드 필요', m.infra.r)
+     + '</div></div>';
+  }
+
+  /* ④ 탭 — 하위 목록 */
+  h+='<div class="tabs">'
+   + '<button class="'+(dTab===0?'on':'')+'" onclick="setDTab(0)">버전 <span class="cnt">'+vers.length+'</span></button>'
+   + '<button class="'+(dTab===1?'on':'')+'" onclick="setDTab(1)">연관 배포 <span class="cnt">'+dps.length+'</span></button>'
+   + '</div>';
+
+  if(dTab===0){
+    h+= canWrite()
+      ? '<div style="display:flex;justify-content:flex-end;margin-bottom:10px">'
+        + '<button class="btn ghost sm" onclick="openVerAdd()">＋ 버전 추가</button></div>' : '';
+    h+='<div class="tblwrap"><table class="tbl"><thead><tr>'
+     + '<th>버전</th><th>'+(isA?'캐싱 상태':'빌드 상태')+'</th>'+(isA?'<th>사용 상태</th>':'')
+     + '<th>저장 경로</th><th>등록자</th><th>등록일시</th><th style="width:44px"></th></tr></thead><tbody>'
+     + vers.map(function(v,vi){
+        const busy = v.ready==='캐싱 중'||v.ready==='빌드 중';
+        return '<tr>'
+         + '<td><span class="mname">'+v.v+'</span></td>'
+         + '<td><span class="stbadge '+RB[v.ready]+(busy?' load':'')+'"><span class="d"></span>'+v.ready+'</span></td>'
+         + (isA?'<td><span class="stbadge '+UB[v.use]+'"><span class="d"></span>'+v.use
+              + ((v.deps&&v.deps.length)?' '+v.deps.length+'건':'')+'</span></td>':'')
+         + '<td><span class="path" title="'+(v.store||v.path||'')+'">'+(v.store||v.path||'-')+'</span></td>'
+         + '<td>'+v.by+'</td><td>'+v.at+'</td>'
+         + '<td>'+(canWrite()
+             ? '<div class="more" id="vm'+vi+'"><button class="morebtn" onclick="tgMore(event,\'vm'+vi+'\')">⋯</button><div class="rowmenu">'
+               + '<button '+(busy?'disabled':'')+' onclick="act(\''+(isA?'노드 캐싱':'이미지 빌드')+'을 요청했습니다.\')">'+(isA?'노드 캐싱':'이미지 빌드')+'</button>'
+               + (isA?'<button onclick="act(\'배포 화면으로 이동합니다.\')">배포</button>':'')
+               /* 배포에 쓰이는 버전은 삭제할 수 없다(정책 2.5) */
+               + '<hr><button class="d"'+(v.use==='배포 중'?' disabled title="배포에 사용 중인 버전은 삭제할 수 없습니다."':'')
+               + ' onclick="act(\'버전을 삭제했습니다.\')">삭제</button>'
+               + '</div></div>' : '')+'</td></tr>';
+       }).join('')
+     + '</tbody></table></div>';
+  } else {
+    h+= dps.length
+      ? '<div class="tblwrap"><table class="tbl"><thead><tr><th>배포명</th><th>워크스페이스</th><th>상태</th></tr></thead><tbody>'
+        + dps.map(function(d){
+            return '<tr><td><span class="mname">'+d.n+'</span></td><td>'+d.ws+'</td>'
+             + '<td><span class="stbadge '+(RB[d.st]||'mu')+'"><span class="d"></span>'+d.st+'</span></td></tr>';
+          }).join('')
+        + '</tbody></table></div>'
+      : '<div class="state"><h3>사용 중인 배포가 없습니다.</h3><p>이 모델을 참조하는 배포가 없습니다.</p></div>';
+  }
+  document.getElementById('detailBody').innerHTML=h;
+}
+function kv(k,v){ return '<div><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'; }
+function expandDetail(){ if(cur) openDetail((cur.isA?IMG:WGT).indexOf(cur.m)); }
+function openEditFrom(){ if(dCur){ cur=dCur; openEdit(); } }
+function openVerAdd(){ act('버전 추가 화면으로 이동합니다. 모델명은 고정되고 버전·소스만 입력합니다.'); }
+
+function closePanel(){document.getElementById('panel').classList.remove('on');document.getElementById('pnbg').classList.remove('on');
+  document.querySelectorAll('table.tbl tbody tr').forEach(r=>r.classList.remove('sel'));}
+/* 기본 정보 수정 (공통정책 4.5 모달 · 7.11 수정 불가 항목은 읽기 전용) */
+let eInit={};
+function openEdit(){
+  if(!cur) return;
+  const m=cur.m, isA=cur.isA;
+  document.getElementById('eName').value = m.n;
+  document.getElementById('eVer').value = 'v'+m.v;
+  document.getElementById('eDesc').value = isA?'서빙 엔진 드라이버가 결합된 배포용 컨테이너 이미지입니다.':'S3에서 반입한 원천 가중치입니다.';
+  document.getElementById('eEngWrap').style.display = isA?'':'none';
+  document.getElementById('eTag').value='';
+  const p=document.getElementById('eScope'), hint=document.getElementById('eScopeHint');
+  const wsLabel=(m.ws==='-')?'AI서비스팀':m.ws;
+  if(role==='super'){
+    p.innerHTML='<label><input type="radio" name="escope" '+(m.scope!=='전역'?'checked':'')+' onchange="editValid()"><span>워크스페이스 전용</span><small>'+wsLabel+'</small></label>'
+              + '<label><input type="radio" name="escope" '+(m.scope==='전역'?'checked':'')+' onchange="editValid()"><span>글로벌 카탈로그</span><small>모든 워크스페이스</small></label>';
+    hint.textContent = useOf(m)==='배포 중' ? '배포에 사용 중인 모델입니다. 범위를 변경하면 해당 배포의 접근 범위가 함께 바뀝니다.' : '';
+  }else{
+    p.innerHTML='<label style="grid-column:1/-1"><input type="radio" name="escope" checked><span>'+(m.scope==='전역'?'글로벌 카탈로그':'워크스페이스 전용')+'</span></label>';
+    hint.textContent='표시 범위 변경은 최고 관리자만 가능합니다.';
+  }
+  eInit={desc:document.getElementById('eDesc').value, tag:'', scope:m.scope};
+  document.getElementById('mdEdit').classList.add('on');
+  editValid();
+}
+function closeEdit(){
+  const changed=isEditChanged();
+  if(changed){ openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.', function(){ document.getElementById('mdEdit').classList.remove('on'); },'취소'); return; }
+  document.getElementById('mdEdit').classList.remove('on');
+}
+function isEditChanged(){
+  return document.getElementById('eDesc').value!==eInit.desc || document.getElementById('eTag').value!==eInit.tag;
+}
+/* 수정은 변경 1개 이상 + 검증 통과 시 활성 (7.1) */
+function editValid(){ document.getElementById('eSubmit').disabled = !isEditChanged(); }
+function submitEdit(){ document.getElementById('mdEdit').classList.remove('on'); toast('ok','수정이 완료되었습니다.'); }
+
+function panelDel(){if(cur)del(cur.m.n, useOf(cur.m)==='배포 중');}
+function panelAct(){if(!cur)return;cur.isA?openCache(cur.m.n):build(cur.m.n);}
+function goImg(name){setTab('A');sconds=[{val:name.split(':')[0]}];drawChips();render();
+  toast('ok','모델 이미지 탭으로 이동했습니다.');}
+/* ===== 모델 등록 모달 (표시 범위 — 7.2 안 A: 글로벌은 Super Admin 전용) ===== */
+function openReg(){
+  const p=document.getElementById('scopePick'), hint=document.getElementById('scopeHint');
+  const wsLabel = (isAll()||WSLIST[wsIdx]==='Common Workspace') ? 'AI서비스팀' : WSLIST[wsIdx];
+  if(role==='super'){
+    p.innerHTML='<label><input type="radio" name="scope" checked><span>워크스페이스 전용</span><small>'+wsLabel+'</small></label>'
+              + '<label><input type="radio" name="scope"><span>글로벌 카탈로그</span><small>모든 워크스페이스</small></label>';
+    hint.textContent='';
+  }else{
+    p.innerHTML='<label style="grid-column:1/-1"><input type="radio" name="scope" checked><span>워크스페이스 전용</span><small>'+wsLabel+'</small></label>';
+    hint.textContent='글로벌 카탈로그 등록은 최고 관리자만 가능합니다.';
+  }
+  document.getElementById('mdReg').classList.add('on'); regValid();
+}
+function closeReg(){document.getElementById('mdReg').classList.remove('on');}
+/* 필수 항목 유효성 — 입력 중에는 오류를 걸지 않고 필드를 벗어날 때 표시한다(공통정책 7.8).
+   저장 버튼 비활성이 1차 방어이고, 인라인 오류는 왜 못 누르는지 알려주는 역할이다 */
+const REG_REQ={rPath:'가중치 경로',rVer:'버전',rName:'모델명'};
+function regBlur(id){
+  const el=document.getElementById(id);
+  const err=document.getElementById(id+'Err');
+  if(!err) return;
+  const empty=!el.value.trim();
+  if(id==='rName'){
+    /* 모델명은 중복 오류가 우선한다 */
+    if(empty){ err.textContent=REG_REQ[id]+'을(를) 입력해 주세요.'; err.style.display='block'; el.classList.add('err'); }
+    return;
+  }
+  err.style.display=empty?'block':'none';
+  el.classList.toggle('err',empty);
+}
+function regValid(){
+  const n=document.getElementById('rName').value.trim(),
+        v=document.getElementById('rVer').value.trim(),
+        p=document.getElementById('rPath').value.trim();
+  const dup=IMG.concat(WGT).some(m=>m.n===n&&m.v===v);
+  const ne=document.getElementById('rNameErr');
+  if(dup){ ne.textContent='이미 등록된 모델명과 버전입니다.'; ne.style.display='block'; }
+  else if(n){ ne.style.display='none'; }
+  document.getElementById('rName').classList.toggle('err',dup);
+  /* 입력이 채워지면 해당 필드 오류를 즉시 해제한다 */
+  [['rPath',p],['rVer',v]].forEach(function(x){
+    const el=document.getElementById(x[0]), er=document.getElementById(x[0]+'Err');
+    if(er && x[1]){ er.style.display='none'; el.classList.remove('err'); }
+  });
+  document.getElementById('rSubmit').disabled=!(n&&v&&p&&!dup);
+}
+/* 모델 반입 — 3단계 진행률 (기술문서 §7.3)
+   다운로드 → 압축·변환 → 스토리지 이관 */
+const IMPORT_STEPS=['다운로드','압축·변환','스토리지 이관'];
+let importing=null;
+function submitReg(){
+  /* 비활성이라 도달하지 않지만, 방어적으로 첫 오류 필드에 포커스한다 */
+  const miss=['rPath','rVer','rName'].filter(function(id){ return !document.getElementById(id).value.trim(); });
+  if(miss.length){ miss.forEach(regBlur); document.getElementById(miss[0]).focus(); return; }
+  const name=document.getElementById('rName').value.trim();
+  const ver=document.getElementById('rVer').value.trim();
+  const path=document.getElementById('rPath').value.trim();
+  closeReg(); resetSearch();
+  toast('ok','모델 반입을 요청했습니다.');
+  importing={n:name,v:ver,path:path,step:0,pct:0};
+  setTab('B');
+  const tick=setInterval(function(){
+    importing.pct+=10;
+    if(importing.pct>=100){ importing.pct=0; importing.step++; }
+    if(importing.step>=3){
+      clearInterval(tick);
+      WGT.unshift({n:importing.n,v:importing.v,ready:'미빌드',path:importing.path,size:'2.02 MB',
+        scope:'전역',ws:'-',by:'성유진(yj.seong)',
+        at:new Date().toISOString().slice(0,19).replace('T',' '),tok:'-',built:'',
+        arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'},gpu:'-',vram:'-'});
+      importing=null; render();
+      notify('모델 반입이 완료되었습니다.');
+      return;
+    }
+    render();
+  }, 400);
+}
+function importRow(){
+  if(!importing || tab!=='B') return '';
+  const pct=importing.pct;
+  return '<tr><td colspan="9"><div class="prog">'
+    + '<div class="plabel"><span><b>'+importing.n+'</b> 반입 중</span><span>'+IMPORT_STEPS[importing.step]+' '+pct+'%</span></div>'
+    + '<div class="pbar"><div class="pfill" style="width:'+pct+'%"></div></div>'
+    + '<div class="psteps">'+IMPORT_STEPS.map(function(t,i){
+        return '<span class="pstep'+(i<importing.step?' done':(i===importing.step?' on':''))+'">'+t+'</span>';
+      }).join('')+'</div></div></td></tr>';
+}
+
+/* ===== 노드 캐싱 모달 (다중 선택 — 7.2 안 A) ===== */
+let cTarget='';
+function openCache(n){
+  cTarget=n; document.getElementById('cName').textContent=n;
+  const b=document.getElementById('cacheBody');
+  if(!NODES.length){
+    b.innerHTML='<div class="state" style="padding:36px 12px;border:0;background:transparent"><h3>캐싱 가능한 노드가 없습니다.</h3><p>클러스터에 가속기 노드가 없습니다.</p></div>';
+  }else{
+    b.innerHTML='<div class="selall"><span>클러스터 노드</span><button onclick="selAllNodes()">가속기 노드 전체 선택</button></div>'
+     + NODES.map((nd,i)=>'<label class="noderow"><input type="checkbox" onchange="cacheValid()" '+(nd.cached?'disabled':'')+'>'
+       + '<div><div class="nn">'+nd.n+' <span class="chip">'+nd.acc+'</span></div><div class="nm2">CPU '+nd.cpu+' · Mem '+nd.mem+'</div></div>'
+       + '<span class="rt stbadge '+(nd.cached?'ok':'mu')+'">'+(nd.cached?'캐싱됨':'미캐싱')+'</span></label>').join('');
+  }
+  document.getElementById('mdCache').classList.add('on'); cacheValid();
+}
+function closeCache(){document.getElementById('mdCache').classList.remove('on');}
+function cacheValid(){document.getElementById('cSubmit').disabled=!document.querySelectorAll('#mdCache input:checked').length;}
+function selAllNodes(){document.querySelectorAll('#mdCache input:not(:disabled)').forEach(c=>c.checked=true);cacheValid();}
+function submitCache(){
+  closeCache();
+  const m=IMG.find(x=>x.n===cTarget); if(!m){ toast('ok','노드 캐싱을 요청했습니다.'); return; }
+  m.ready='캐싱 중'; render(); if(cur&&cur.m===m) openPanel(IMG.indexOf(m));
+  toast('ok','노드 캐싱을 요청했습니다.');
+  setTimeout(function(){
+    m.ready='캐싱됨'; render(); if(cur&&cur.m===m) openPanel(IMG.indexOf(m));
+    notify('노드 캐싱이 완료되었습니다. — '+m.n);
+  }, 3000);
+}
+
+/* ===== 액션 ===== */
+/* 빌드 — 요청 시 토스트, 완료·실패 시 알림 (공통정책 7.6)
+   진행 중에는 동일 작업 재실행 차단 */
+function build(name){
+  const m=WGT.find(x=>x.n===name); if(!m) return;
+  if(m.ready==='빌드 중'){ toast('cr','이미 빌드가 진행 중입니다.'); return; }
+  m.ready='빌드 중'; render(); if(cur&&cur.m===m) openPanel(WGT.indexOf(m));
+  toast('ok','이미지 빌드를 요청했습니다.');
+  setTimeout(function(){
+    m.ready='빌드됨';
+    m.built=m.n+':'+m.v;
+    /* 빌드 완료 시 모델 이미지 탭에 신규 등록 */
+    if(!IMG.some(x=>x.n===m.n&&x.v===m.v)){
+      IMG.unshift({n:m.n,v:m.v,ready:'미캐싱',use:'미사용',scope:m.scope,ws:m.ws,by:m.by,
+        at:new Date().toISOString().slice(0,19).replace('T',' '),eng:'vLLM',base:'Custom Build',
+        arch:m.arch,infra:m.infra,store:'model-registry/'+m.n+':'+m.v,mode:'MONOLITHIC',deps:[],
+        gpu:m.infra.g,vram:m.infra.v,sys:false});
+    }
+    render(); if(cur&&cur.m===m) openPanel(WGT.indexOf(m));
+    notify('이미지 빌드가 완료되었습니다. — '+m.n);
+  }, 4000);
+}
+/* 완료·실패 알림 (7.6) — 토스트와 별도 채널 */
+function notify(msg){
+  const el=document.getElementById('notiCnt');
+  if(el){ el.textContent=String(parseInt(el.textContent||'0',10)+1); }
+  toast('ok',msg);
+}
+/* 등록·수정·삭제 등 작업 완료 후 검색·필터 초기화 → 전체 재조회 (공통정책 3.3) */
+function resetSearch(){sconds=[];drawChips();document.getElementById('q').value='';fsel={};render();}
+function reconcile(){resetSearch();toast('ok','저장소 동기화를 요청했습니다.');}
+function act(msg){toast('ok',msg);}
+/* 삭제 — 공통정책 7.5. 연결 데이터로 삭제 불가 시 클릭 전 사전 감지해 선제 안내 */
+function del(name,inUse){
+  if(inUse){ openConfirm('삭제할 수 없습니다',
+      '<b>'+name+'</b> 모델은 배포에 사용 중이므로 삭제할 수 없습니다. 연결된 배포를 먼저 삭제해주세요.',
+      null,'확인'); return; }
+  openConfirm('모델 삭제','<b>'+name+'</b>을(를) 삭제하면 복구할 수 없습니다.',
+    function(){ resetSearch(); toast('ok','모델 삭제가 완료되었습니다.'); },'삭제');
+}
+function openConfirm(title,body,onOk,okLabel){
+  document.getElementById('cfTitle').textContent=title;
+  document.getElementById('cfBody').innerHTML=body;
+  const ok=document.getElementById('cfOk');
+  ok.textContent=okLabel||'확인';
+  ok.className='btn'+(okLabel==='삭제'?' danger':'');
+  ok.style.display=onOk?'':'none';
+  ok.onclick=function(){closeConfirm(); if(onOk)onOk();};
+  document.querySelector('#mdConfirm .btn.ghost').textContent=onOk?'취소':'닫기';
+  document.getElementById('mdConfirm').classList.add('on');
+}
+function closeConfirm(){document.getElementById('mdConfirm').classList.remove('on');}
+
+/* 저장소 동기화 — 확인 후 실행 */
+function reconcileAsk(){
+  openConfirm('저장소 동기화','저장소의 실제 상태와 메타데이터를 맞춥니다.',
+    function(){ reconcile(); },'동기화');
+}
+/* 캐싱되지 않은 이미지 배포 — 사전 안내 (기획서 R030) */
+function goDeploy(name,ready){
+  if(ready==='미캐싱'||ready==='캐싱 중'){
+    openConfirm('캐싱되지 않은 모델 배포','<b>'+name+'</b>은(는) 아직 노드에 캐싱되어 있지 않아('+ready+') 배포 시 초기 기동이 지연될 수 있습니다.',
+      function(){ toast('ok','배포 생성으로 이동합니다.'); },'계속');
+  } else { toast('ok','배포 생성으로 이동합니다.'); }
+}
+
+/* ===== 토스트 (공통정책 7.7 — 성공 3초 / 실패 5초) ===== */
+function toast(t,msg){
+  const w=document.getElementById('toasts');
+  const d=document.createElement('div'); d.className='toast '+t;
+  d.innerHTML='<span class="dot"></span><span>'+msg+'</span><button class="x" onclick="this.parentNode.remove()">✕</button>';
+  w.appendChild(d); setTimeout(()=>d.remove(), t==='ok'?3000:5000);
+}
+
+setRole('super'); setTab('A'); drawChips();
+</script>
+</body></html>
