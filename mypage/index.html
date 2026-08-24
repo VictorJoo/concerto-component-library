@@ -1,305 +1,310 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>콘체르토 매니저 · 마이페이지</title>
-  <!--
-    콘체르토 매니저 — 마이페이지 화면 목업 v0.2 (2026-08-19)
-    · 컴포넌트 라이브러리 v0.2 색상 토큰에 맞춤. (: 라이브러리에 없던 레이아웃 전용 색 sidebar·flyout·border-soft·faint·active를 기존 라이브러리 토큰으로 치환 — 모든 색이 라이브러리 역할 토큰만 참조)
-    · 치환 매핑: sidebar·header(크롬)→card(흰 크롬), flyout→card, border-soft→border, faint→muted-foreground, active(선택)→border, 메뉴 hover·칩→card-2(muted). 본문 캔버스만 background. 라이브러리 밖 색 제거.
-    · 언어·테마 위치: 1안(프로필 팝오버) 확정 반영.
-    · 프로토타입 비교 요소(안 토글·변경요소 표시·TO-BE 마킹) 제거.
-    · GNB 키비주얼: 제공된 키비주얼 이미지 기준 CSS 재현(디자인 확정 시 교체).
-    · 실제 아이콘·간격·모션은 디자인 라이브러리로 확정. 본 파일은 구조·배치 전달용.
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>콘체르토 매니저 · 마이페이지</title>
+<!--
+  콘체르토 매니저 — 마이페이지 화면 목업 v0.2 (2026-08-19)
+  · 컴포넌트 라이브러리 v0.2 색상 토큰에 맞춤. (: 라이브러리에 없던 레이아웃 전용 색 sidebar·flyout·border-soft·faint·active를 기존 라이브러리 토큰으로 치환 — 모든 색이 라이브러리 역할 토큰만 참조)
+  · 치환 매핑: sidebar·header(크롬)→card(흰 크롬), flyout→card, border-soft→border, faint→muted-foreground, active(선택)→border, 메뉴 hover·칩→card-2(muted). 본문 캔버스만 background. 라이브러리 밖 색 제거.
+  · 언어·테마 위치: 1안(프로필 팝오버) 확정 반영.
+  · 프로토타입 비교 요소(안 토글·변경요소 표시·TO-BE 마킹) 제거.
+  · GNB 키비주얼: 제공된 키비주얼 이미지 기준 CSS 재현(디자인 확정 시 교체).
+  · 실제 아이콘·간격·모션은 디자인 라이브러리로 확정. 본 파일은 구조·배치 전달용.
 
-    ── 변경 ────────────────────────────────────────
-    v0.2  기본 정보 수정에 본인 확인(현재 비밀번호) 섹션을 추가했다.
-          백엔드가 사용자 정보 변경 시 current_password 를 받고 있어 화면에 맞췄다.
-          이름·이메일을 가리지 않고 받는다 — 두 값 모두 계정을 식별하는 정보이고,
-          세션이 탈취된 상태에서 이메일이 바뀌면 알림 수신처가 다른 곳으로 간다.
-          섹션은 바꾼 항목이 생겼을 때만 나타난다. 저장은 변경분이 있어야 활성되므로,
-          처음부터 두면 확인만 마치고 저장이 왜 안 되는지 알 수 없다(7.1).
-          확인 버튼은 배포명 중복 확인과 같은 수동 검증이다(7.1).
-          주기 초과 안내를 알림 박스로 분리했다. 마지막 변경일은 값이라 늘 남긴다.
-          임시 비밀번호 안내를 제거했다 — 최초 로그인 시 변경을 강제하므로
-          마이페이지에 도달할 수 없다(계정정책 2.2).
-          변경 알림은 공통 레이아웃 좌측 하단 알림 영역에서 정의한다.
-    v0.1  최초 작성
-  -->
-  <style>
-    :root{
-      --background:#f4f6fc; --foreground:#171d33;
-      --card:#ffffff; --card-foreground:#171d33;
-      --muted:#eef1f9; --muted-foreground:#565f7e;
-      /* 용도별 표면 — 표면·호버·선택을 한 토큰으로 쓰면 인접했을 때 구분이 사라진다 */
-      --hover:#fafbfe; --hover-strong:#dce2f1; --selected:#dde6f8; --selected-soft:#f2f6fd; --thead:#edf0f7;
-      --border:#dce2f1; --border-strong:#b9c3dd; --input:#dce2f1;
-      --primary:#3346c9; --primary-foreground:#ffffff; --primary-hover:#26368f;
-      --accent:#4f6fe6; --accent-foreground:#0a1026;
-      --success:#2f9e6a; --warning:#c98a2e; --destructive:#d64a51; --destructive-hover:#b93b42;
-      --ring:#4f6fe6; --underline:#a8b0c8;
-      --card-2:#f0f3fb; --flyout:#ffffff; --faint:#8b93ad;
-      --shadow:rgba(23,29,51,.10);
-      /* 레이아웃 치수 */
-      --header-h:58px; --gnb-w:236px; --panel-w:440px;
-      --font:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
-      --radius:12px;
-    }
-    .dark{
-      --background:#0d0f14; --foreground:#e6e8ee;
-      --card:#16181f; --card-foreground:#e6e8ee;
-      --muted:#1c1f27; --muted-foreground:#969ba6;
-      --hover:#1b1e26; --hover-strong:#262a33; --selected:#252b38; --selected-soft:#1e2430; --thead:#212530;
-      --border:#262a33; --border-strong:#3d4454; --input:#262a33;
-      --primary:#4159d6; --primary-foreground:#ffffff; --primary-hover:#35489f;
-      --accent:#7d97f0; --accent-foreground:#0a1026;
-      --success:#46b17f; --warning:#d9a441; --destructive:#e0585f; --destructive-hover:#c74a51;
-      --ring:#7d97f0; --underline:#4d5566;
-      --card-2:#1c1f27; --flyout:#181b22; --faint:#6f7686;
-      --shadow:rgba(0,0,0,.55);
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;height:100%}
-    body{background:var(--background);color:var(--foreground);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  ── 변경 ────────────────────────────────────────
+  v0.2  기본 정보 수정에 본인 확인(현재 비밀번호) 섹션을 추가했다.
+        백엔드가 사용자 정보 변경 시 current_password 를 받고 있어 화면에 맞췄다.
+        이름·이메일을 가리지 않고 받는다 — 두 값 모두 계정을 식별하는 정보이고,
+        세션이 탈취된 상태에서 이메일이 바뀌면 알림 수신처가 다른 곳으로 간다.
+        섹션은 바꾼 항목이 생겼을 때만 나타난다. 저장은 변경분이 있어야 활성되므로,
+        처음부터 두면 확인만 마치고 저장이 왜 안 되는지 알 수 없다(7.1).
+        확인 버튼은 배포명 중복 확인과 같은 수동 검증이다(7.1).
+        주기 초과 안내를 알림 박스로 분리했다. 마지막 변경일은 값이라 늘 남긴다.
+        임시 비밀번호 안내를 제거했다 — 최초 로그인 시 변경을 강제하므로
+        마이페이지에 도달할 수 없다(계정정책 2.2).
+        변경 알림은 공통 레이아웃 좌측 하단 알림 영역에서 정의한다.
+  v0.1  최초 작성
+-->
+<style>
+  :root{
+    --background:#f4f6fc; --foreground:#171d33;
+    --card:#ffffff; --card-foreground:#171d33;
+    --muted:#eef1f9; --muted-foreground:#565f7e;
+  /* 용도별 표면 — 표면·호버·선택을 한 토큰으로 쓰면 인접했을 때 구분이 사라진다 */
+    --hover:#fafbfe; --hover-strong:#dce2f1; --selected:#dde6f8; --selected-soft:#f2f6fd; --thead:#edf0f7;
+    --border:#dce2f1; --border-strong:#b9c3dd; --input:#dce2f1;
+    --primary:#3346c9; --primary-foreground:#ffffff; --primary-hover:#26368f;
+    --accent:#4f6fe6; --accent-foreground:#0a1026;
+    --success:#2f9e6a; --warning:#c98a2e; --destructive:#d64a51; --destructive-hover:#b93b42;
+    --ring:#4f6fe6; --underline:#a8b0c8;
+    --card-2:#f0f3fb; --flyout:#ffffff; --faint:#8b93ad;
+    --shadow:rgba(23,29,51,.10);
+    /* 레이아웃 치수 */
+    --header-h:58px; --gnb-w:236px; --panel-w:440px;
+    --font:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+    --radius:12px;
+  }
+  .dark{
+    --background:#0d0f14; --foreground:#e6e8ee;
+    --card:#16181f; --card-foreground:#e6e8ee;
+    --muted:#1c1f27; --muted-foreground:#969ba6;
+  --hover:#1b1e26; --hover-strong:#262a33; --selected:#252b38; --selected-soft:#1e2430; --thead:#212530;
+    --border:#262a33; --border-strong:#3d4454; --input:#262a33;
+    --primary:#4159d6; --primary-foreground:#ffffff; --primary-hover:#35489f;
+    --accent:#7d97f0; --accent-foreground:#0a1026;
+    --success:#46b17f; --warning:#d9a441; --destructive:#e0585f; --destructive-hover:#c74a51;
+    --ring:#7d97f0; --underline:#4d5566;
+    --card-2:#1c1f27; --flyout:#181b22; --faint:#6f7686;
+    --shadow:rgba(0,0,0,.55);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--background);color:var(--foreground);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 
-    /* 하단 미리보기 바 (시안 확인용) */
-    .demo-bar{position:fixed;left:0;right:0;bottom:0;z-index:800;background:#0f1320;color:#c9cfe0;
-      display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;font-size:12px;border-top:1px solid #2a2f45}
-    .demo-bar .demo-label{color:#7f88a8;margin-right:4px}
-    .demo-bar button{background:#1c2136;border:1px solid #2f3654;color:#c9cfe0;border-radius:6px;padding:5px 10px;font-size:12px;font-family:inherit;cursor:pointer}
-    .demo-bar button:hover{border-color:var(--accent);color:#fff}
-    .demo-bar button.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
-    button{font-family:inherit;color:inherit;cursor:pointer}
-    .app{display:grid;grid-template-columns:var(--gnb-w) 1fr;grid-template-rows:var(--header-h) 1fr;height:calc(100vh - 46px);overflow:hidden;grid-template-areas:"brand header" "gnb main"}
+  /* 하단 미리보기 바 (시안 확인용) */
+  .demo-bar{position:fixed;left:0;right:0;bottom:0;z-index:800;background:#0f1320;color:#c9cfe0;
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;font-size:12px;border-top:1px solid #2a2f45}
+  .demo-bar .demo-label{color:#7f88a8;margin-right:4px}
+  .demo-bar button{background:#1c2136;border:1px solid #2f3654;color:#c9cfe0;border-radius:6px;padding:5px 10px;font-size:12px;font-family:inherit;cursor:pointer}
+  .demo-bar button:hover{border-color:var(--accent);color:#fff}
+  .demo-bar button.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+  button{font-family:inherit;color:inherit;cursor:pointer}
+  .app{display:grid;grid-template-columns:var(--gnb-w) 1fr;grid-template-rows:var(--header-h) 1fr;height:calc(100vh - 46px);overflow:hidden;grid-template-areas:"brand header" "gnb main"}
 
-    /* 브랜드 */
-    .brand{grid-area:brand;display:flex;align-items:center;gap:10px;padding:0 18px;background:var(--card);border-bottom:1px solid var(--border)}
-    .logo-mark{display:grid;place-items:center;width:24px;height:24px;flex:0 0 auto;color:var(--foreground)}
-    .logo-mark svg{width:24px;height:24px}
-    .brand b{font-size:15.5px;font-weight:700}
-    .brand b .ai{color:var(--accent)}
+  /* 브랜드 */
+  .brand{grid-area:brand;display:flex;align-items:center;gap:10px;padding:0 18px;background:var(--card);border-bottom:1px solid var(--border)}
+  .logo-mark{display:grid;place-items:center;width:24px;height:24px;flex:0 0 auto;color:var(--foreground)}
+  .logo-mark svg{width:24px;height:24px}
+  .brand b{font-size:15.5px;font-weight:700}
+  .brand b .ai{color:var(--accent)}
 
-    /* 헤더 */
-    .header{grid-area:header;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--card);border-bottom:1px solid var(--border)}
-    .breadcrumb{color:var(--muted-foreground);font-size:13px}.breadcrumb b{color:var(--foreground);font-weight:600}
-    .hr{display:flex;align-items:center;gap:9px}
-    .ws{display:flex;align-items:center;gap:8px;padding:6px 11px;background:var(--card-2);border:1px solid var(--border);border-radius:8px;font-size:13px}
-    .ws .chev{color:var(--muted-foreground)}
+  /* 헤더 */
+  .header{grid-area:header;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--card);border-bottom:1px solid var(--border)}
+  .breadcrumb{color:var(--muted-foreground);font-size:13px}.breadcrumb b{color:var(--foreground);font-weight:600}
+  .hr{display:flex;align-items:center;gap:9px}
+  .ws{display:flex;align-items:center;gap:8px;padding:6px 11px;background:var(--card-2);border:1px solid var(--border);border-radius:8px;font-size:13px}
+  .ws .chev{color:var(--muted-foreground)}
 
-    /* GNB */
-    .gnb{grid-area:gnb;display:flex;flex-direction:column;background:var(--card);border-right:1px solid var(--border);overflow:visible}
-    /* 브랜드 키비주얼 배너 */
-    .banner{margin:14px 12px 8px;height:120px;border-radius:12px;background:linear-gradient(135deg,#7386b2 0%,#8698c4 100%);position:relative;overflow:hidden;display:flex;align-items:center;padding:0 18px}
-    .banner .bt{font-size:21px;font-weight:800;color:#fff;line-height:1.05;z-index:1;letter-spacing:.5px}
-    .banner .kv{position:absolute;right:-26px;bottom:-34px;width:170px;height:170px;z-index:0}
-    .banner .ph-tag{position:absolute;bottom:8px;right:10px;font-size:9px;color:rgba(255,255,255,.62);z-index:1}
-    .nav{padding:6px 12px;flex:0 0 auto}
-    .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:3px;position:relative}
-    .nav a svg{width:19px;height:19px;flex:0 0 auto}
-    .nav a:hover{background:var(--card-2);color:var(--foreground)}
-    .nav a.active{background:var(--selected);color:var(--foreground);font-weight:600}
-    .nav a.has-fly::after{content:"›";margin-left:auto;color:var(--muted-foreground);font-size:16px}
+  /* GNB */
+  .gnb{grid-area:gnb;display:flex;flex-direction:column;background:var(--card);border-right:1px solid var(--border);overflow:visible}
+  /* 브랜드 키비주얼 배너 */
+  .banner{margin:14px 12px 8px;height:120px;border-radius:12px;background:linear-gradient(135deg,#7386b2 0%,#8698c4 100%);position:relative;overflow:hidden;display:flex;align-items:center;padding:0 18px}
+  .banner .bt{font-size:21px;font-weight:800;color:#fff;line-height:1.05;z-index:1;letter-spacing:.5px}
+  .banner .kv{position:absolute;right:-26px;bottom:-34px;width:170px;height:170px;z-index:0}
+  .banner .ph-tag{position:absolute;bottom:8px;right:10px;font-size:9px;color:rgba(255,255,255,.62);z-index:1}
+  .nav{padding:6px 12px;flex:0 0 auto}
+  .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:3px;position:relative}
+  .nav a svg{width:19px;height:19px;flex:0 0 auto}
+  .nav a:hover{background:var(--card-2);color:var(--foreground)}
+  .nav a.active{background:var(--selected);color:var(--foreground);font-weight:600}
+  .nav a.has-fly::after{content:"›";margin-left:auto;color:var(--muted-foreground);font-size:16px}
 
-    /* 플라이아웃 (플랫폼 설정 호버) */
-    .flywrap{position:relative}
-    .flyout{position:absolute;left:calc(100% + 6px);top:0;width:210px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateX(-6px);transition:.13s;z-index:70}
-    .flywrap:hover .flyout{opacity:1;visibility:visible;transform:translateX(0)}
-    .flyout a{display:flex;align-items:center;padding:9px 11px;border-radius:8px;color:var(--muted-foreground);text-decoration:none;font-size:13.5px;margin-bottom:2px}
-    .flyout a:hover{background:var(--card-2);color:var(--foreground)}
-    .flyout a.on{background:var(--border);color:var(--foreground);font-weight:600}
-    .flyout a .tb{font-size:9.5px;color:var(--muted-foreground);border:1px solid var(--border);border-radius:5px;padding:1px 5px;margin-left:6px}
+  /* 플라이아웃 (플랫폼 설정 호버) */
+  .flywrap{position:relative}
+  .flyout{position:absolute;left:calc(100% + 6px);top:0;width:210px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateX(-6px);transition:.13s;z-index:70}
+  .flywrap:hover .flyout{opacity:1;visibility:visible;transform:translateX(0)}
+  .flyout a{display:flex;align-items:center;padding:9px 11px;border-radius:8px;color:var(--muted-foreground);text-decoration:none;font-size:13.5px;margin-bottom:2px}
+  .flyout a:hover{background:var(--card-2);color:var(--foreground)}
+  .flyout a.on{background:var(--border);color:var(--foreground);font-weight:600}
+  .flyout a .tb{font-size:9.5px;color:var(--muted-foreground);border:1px solid var(--border);border-radius:5px;padding:1px 5px;margin-left:6px}
 
-    /* 하단: 내 작업함 + 퍼스널
-     알림 카운트 배지는 두지 않는다. GNB 는 공통 레이아웃 소관이고
-     배지 규격도 거기서 관리한다 — 목업마다 복사해 두면 값이 갈린다 */
-    .gnb-bottom{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
-    .worklist{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--foreground);background:var(--card);border:1px solid var(--border);position:relative;margin-bottom:8px}
-    .worklist svg{width:19px;height:19px;color:var(--muted-foreground)}
-    .notice-common{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:8px;position:relative}
-    .notice-common svg{width:19px;height:19px}
-    .notice-common:hover{background:var(--card-2);color:var(--foreground)}
-    .notice-common .rdot2{position:absolute;left:24px;top:8px;width:6px;height:6px;border-radius:50%;background:var(--destructive)}
-    .persona{position:relative}
-    .persona .pbtn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:var(--card-2);border:1px solid var(--border);cursor:pointer;width:100%}
-    .persona .pbtn:hover{border-color:var(--border-strong)}
-    .av{width:30px;height:30px;border-radius:50%;background:var(--muted);display:grid;place-items:center;font-size:12px;color:var(--accent);flex:0 0 auto}
-    .persona .who{line-height:1.25;min-width:0;text-align:left}
-    .persona .who b{font-size:13px;display:block}
-    .persona .who span{font-size:11px;color:var(--muted-foreground)}
-    .persona .up{margin-left:auto;color:var(--muted-foreground);transition:transform .15s}
-    .persona.open .up{transform:rotate(180deg)}
-    .pmenu{position:absolute;left:0;bottom:calc(100% + 8px);width:100%;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:8px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateY(6px);transition:.13s;z-index:70}
-    .persona.open .pmenu{opacity:1;visibility:visible;transform:translateY(0)}
-    .persona.open .pbtn{border-color:var(--border-strong)}
-    .pmenu a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--muted-foreground);text-decoration:none;font-size:13px}
-    .pmenu a:hover{background:var(--card-2);color:var(--foreground)}
-    .pmenu a svg{width:16px;height:16px}
-    .pmenu hr{border:0;border-top:1px solid var(--border);margin:6px 0}
-    .pm-head{display:flex;align-items:center;gap:10px;padding:6px 10px 8px}
-    .pm-head .av{width:32px;height:32px;flex:0 0 auto}
-    .pm-who{line-height:1.35;min-width:0}
-    .pm-who b{font-size:13px;display:block}
-    .pm-who span{font-size:11px;color:var(--muted-foreground);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .pmenu .theme{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;font-size:13px;color:var(--muted-foreground);cursor:pointer}
-    .toggle{width:38px;height:20px;border-radius:11px;background:var(--card-2);border:1px solid var(--border);position:relative;transition:.15s;flex:0 0 auto}
-    .toggle::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--muted-foreground);transition:.15s}
-    .toggle.on{background:color-mix(in srgb,var(--accent) 30%,transparent);border-color:var(--accent)}
-    .toggle.on::after{left:20px;background:var(--accent)}
-    /* 언어: 한 줄 → 클릭 시 인라인 펼침 */
-    .lang-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--muted-foreground);font-size:13px;cursor:pointer}
-    .lang-row:hover{background:var(--card-2);color:var(--foreground)}
-    .lang-row svg.gl{width:16px;height:16px;flex:0 0 auto}
-    .lang-row .cur{margin-left:auto;color:var(--muted-foreground);font-size:12px}
-    .lang-row .cv{margin-left:6px;color:var(--muted-foreground);transition:transform .15s}
-    .lang-row .cv svg{width:13px;height:13px;display:block}
-    .lang-row.open .cv{transform:rotate(180deg)}
-    .lang-list{max-height:0;overflow:hidden;transition:max-height .18s ease}
-    .lang-list.open{max-height:140px}
-    .lang-list button{display:flex;align-items:center;width:100%;gap:10px;padding:8px 10px 8px 36px;border:0;background:transparent;border-radius:8px;color:var(--muted-foreground);font-size:12.5px;text-align:left;cursor:pointer}
-    .lang-list button:hover{background:var(--card-2);color:var(--foreground)}
-    .lang-list button .ck{margin-left:auto;color:var(--accent);opacity:0}
-    .lang-list button.sel .ck{opacity:1}
-    .lang-list button.sel{color:var(--foreground)}
-    .lang-list button .ck svg{width:14px;height:14px;display:block}
+  /* 하단: 내 작업함 + 퍼스널
+   알림 카운트 배지는 두지 않는다. GNB 는 공통 레이아웃 소관이고
+   배지 규격도 거기서 관리한다 — 목업마다 복사해 두면 값이 갈린다 */
+  .gnb-bottom{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
+  .worklist{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--foreground);background:var(--card);border:1px solid var(--border);position:relative;margin-bottom:8px}
+  .worklist svg{width:19px;height:19px;color:var(--muted-foreground)}
+  .notice-common{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:8px;position:relative}
+  .notice-common svg{width:19px;height:19px}
+  .notice-common:hover{background:var(--card-2);color:var(--foreground)}
+  .notice-common .rdot2{position:absolute;left:24px;top:8px;width:6px;height:6px;border-radius:50%;background:var(--destructive)}
+  .persona{position:relative}
+  .persona .pbtn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:var(--card-2);border:1px solid var(--border);cursor:pointer;width:100%}
+  .persona .pbtn:hover{border-color:var(--border-strong)}
+  .av{width:30px;height:30px;border-radius:50%;background:var(--muted);display:grid;place-items:center;font-size:12px;color:var(--accent);flex:0 0 auto}
+  .persona .who{line-height:1.25;min-width:0;text-align:left}
+  .persona .who b{font-size:13px;display:block}
+  .persona .who span{font-size:11px;color:var(--muted-foreground)}
+  .persona .up{margin-left:auto;color:var(--muted-foreground);transition:transform .15s}
+  .persona.open .up{transform:rotate(180deg)}
+  .pmenu{position:absolute;left:0;bottom:calc(100% + 8px);width:100%;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:8px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateY(6px);transition:.13s;z-index:70}
+  .persona.open .pmenu{opacity:1;visibility:visible;transform:translateY(0)}
+  .persona.open .pbtn{border-color:var(--border-strong)}
+  .pmenu a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--muted-foreground);text-decoration:none;font-size:13px}
+  .pmenu a:hover{background:var(--card-2);color:var(--foreground)}
+  .pmenu a svg{width:16px;height:16px}
+  .pmenu hr{border:0;border-top:1px solid var(--border);margin:6px 0}
+  .pm-head{display:flex;align-items:center;gap:10px;padding:6px 10px 8px}
+  .pm-head .av{width:32px;height:32px;flex:0 0 auto}
+  .pm-who{line-height:1.35;min-width:0}
+  .pm-who b{font-size:13px;display:block}
+  .pm-who span{font-size:11px;color:var(--muted-foreground);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pmenu .theme{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;font-size:13px;color:var(--muted-foreground);cursor:pointer}
+  .toggle{width:38px;height:20px;border-radius:11px;background:var(--card-2);border:1px solid var(--border);position:relative;transition:.15s;flex:0 0 auto}
+  .toggle::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--muted-foreground);transition:.15s}
+  .toggle.on{background:color-mix(in srgb,var(--accent) 30%,transparent);border-color:var(--accent)}
+  .toggle.on::after{left:20px;background:var(--accent)}
+  /* 언어: 한 줄 → 클릭 시 인라인 펼침 */
+  .lang-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--muted-foreground);font-size:13px;cursor:pointer}
+  .lang-row:hover{background:var(--card-2);color:var(--foreground)}
+  .lang-row svg.gl{width:16px;height:16px;flex:0 0 auto}
+  .lang-row .cur{margin-left:auto;color:var(--muted-foreground);font-size:12px}
+  .lang-row .cv{margin-left:6px;color:var(--muted-foreground);transition:transform .15s}
+  .lang-row .cv svg{width:13px;height:13px;display:block}
+  .lang-row.open .cv{transform:rotate(180deg)}
+  .lang-list{max-height:0;overflow:hidden;transition:max-height .18s ease}
+  .lang-list.open{max-height:140px}
+  .lang-list button{display:flex;align-items:center;width:100%;gap:10px;padding:8px 10px 8px 36px;border:0;background:transparent;border-radius:8px;color:var(--muted-foreground);font-size:12.5px;text-align:left;cursor:pointer}
+  .lang-list button:hover{background:var(--card-2);color:var(--foreground)}
+  .lang-list button .ck{margin-left:auto;color:var(--accent);opacity:0}
+  .lang-list button.sel .ck{opacity:1}
+  .lang-list button.sel{color:var(--foreground)}
+  .lang-list button .ck svg{width:14px;height:14px;display:block}
 
-    /* 메인 */
-    .main{grid-area:main;background:var(--background);overflow-y:auto;overflow-x:hidden;padding:24px 28px;min-height:0}
-    .body-ph{border:1px dashed #2c313d;border-radius:12px;min-height:340px;display:grid;place-items:center;color:var(--muted-foreground);font-size:13px;text-align:center;line-height:1.9;background:repeating-linear-gradient(135deg,transparent,transparent 12px,rgba(255,255,255,.012) 12px,rgba(255,255,255,.012) 24px)}
-    .body-ph b{color:var(--muted-foreground);font-weight:600;display:block;margin-bottom:2px}
-    #page .ph{margin-bottom:20px}
-    #page .ph h1{font-size:22px;margin:0 0 6px;letter-spacing:-.2px}
-    #page .ph p{font-size:12.5px;color:var(--muted-foreground);margin:0}
-    #page .ph-row{display:flex;align-items:flex-start;justify-content:space-between}
-    #page .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:16px}
-    #page .tab{padding:9px 14px;font-size:13px;color:var(--muted-foreground);border-bottom:2px solid transparent;cursor:pointer}
-    #page .tab.on{color:var(--foreground);border-bottom-color:var(--accent)}
-    .addbtn{padding:8px 15px;background:var(--primary);color:#fff;border:0;border-radius:8px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap}
-    .addbtn:hover{background:var(--primary-hover)}
-    /* 마이페이지 */
-    .mp-form{max-width:none}
-    /* 데이터 상태 — 헤더·GNB는 유지하고 폼 자리만 대체한다(공통정책 4.1) */
-    .mp-state{padding:60px 0;text-align:center;color:var(--muted-foreground)}
-    .mp-state h3{margin:0 0 8px;font-size:15px;color:var(--foreground);font-weight:600}
-    .mp-state p{margin:0 0 16px;font-size:13px}
-    .mp-spin{width:22px;height:22px;margin:0 auto 14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:mpspin .8s linear infinite}
-    @keyframes mpspin{to{transform:rotate(360deg)}}
-    .mp-sec{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:18px 20px;margin-bottom:14px}
-    .mp-sec h3{font-size:14px;margin:0 0 14px}
-    .mp-f{margin-bottom:16px}
-    /* 비밀번호 섹션 — 제목과 액션을 한 줄에 둔다 */
-    .mp-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
-    /* 소속 워크스페이스 — 확인용 목록이라 조작을 두지 않는다 */
-    .mp-cnt{margin-left:6px;font-size:12px;font-weight:400;color:var(--muted-foreground)}
-    .mp-wslist{margin-top:10px;border:1px solid var(--border);border-radius:9px;overflow:hidden}
-    .mp-wsrow{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid var(--border);
-      text-decoration:none;color:var(--foreground);font-size:13px}
-    .mp-wsrow:last-child{border-bottom:0}
-    .mp-wsrow:hover{background:var(--hover)}
-    .mp-wsic{width:17px;height:17px;color:var(--muted-foreground);flex:0 0 auto}
-    .mp-wsic svg{width:100%;height:100%}
-    .mp-wsn{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--underline)}
-    .mp-wsrow:hover .mp-wsn{text-decoration-color:var(--foreground)}
-    .mp-role{margin-left:auto;font-size:11.5px;color:var(--muted-foreground)}
-    /* 라벨 툴팁 — 워크스페이스·CDE 화면과 같은 방식으로 처리한다(공통정책 4.7) */
-    .tip-anchor{position:relative;display:inline-flex;align-items:center;gap:5px}
-    .tip-ic{width:15px;height:15px;border-radius:50%;border:1px solid var(--border-strong);color:var(--muted-foreground);
-      font-size:10px;display:inline-grid;place-items:center;cursor:help;flex:0 0 auto}
-    .tip{position:absolute;bottom:calc(100% + 8px);left:0;background:var(--flyout);color:var(--foreground);
-      border:1px solid var(--border-strong);font-size:12px;line-height:1.55;padding:9px 11px;border-radius:9px;
-      width:max-content;max-width:280px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;
-      transform:translateY(4px);transition:.14s;z-index:60;white-space:normal;text-align:left}
-    .tip-anchor:hover .tip,.tip-anchor:focus-within .tip{opacity:1;visibility:visible;transform:translateY(0)}
-    .tip::after{content:"";position:absolute;top:100%;left:14px;border:5px solid transparent;border-top-color:var(--flyout)}
-    .tip::before{content:"";position:absolute;left:0;right:0;height:10px;bottom:-10px}
-    .mp-f label{display:block;font-size:12.5px;color:var(--muted-foreground);margin-bottom:6px}
-    .mp-f input{width:100%;padding:9px 12px;background:var(--card-2);border:1px solid var(--border);border-radius:8px;color:var(--foreground);font-size:13px;font-family:inherit}
-    /* 읽기 전용 값 — 고칠 수 없는 값은 입력창 모양으로 두지 않는다(라이브러리) */
-    .rov{display:inline-flex;align-items:baseline;gap:9px;font-size:13px;color:var(--foreground);padding:9px 0}
-    .rov span{font-size:11.5px;color:var(--faint)}
-    .mp-act{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
-    /* 처리 중 스피너 — 라이브러리 규격 */
-    .btn .spin{display:none;width:13px;height:13px;border-radius:50%;
-      border:2px solid color-mix(in srgb,var(--primary-foreground) 45%,transparent);
-      border-top-color:currentColor;animation:mpsp .7s linear infinite}
-    .btn.loading .spin{display:inline-block}
-    @keyframes mpsp{to{transform:rotate(360deg)}}
-    .mp-hint{font-size:11.5px;color:var(--faint);margin:6px 0 0;line-height:1.6}
-    /* 버튼 — 컴포넌트 라이브러리 .btn 규격 */
-    .btn{padding:8px 15px;background:var(--primary);color:var(--primary-foreground);border:0;border-radius:8px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
-    .btn:hover{background:var(--primary-hover)}
-    .btn:disabled{opacity:.45;cursor:not-allowed}
-    .btn.sm{padding:6px 11px;font-size:12px}
-    .btn.ghost{background:transparent;border:1px solid var(--border-strong);color:var(--foreground)}
-    .btn.ghost:hover{background:var(--hover);border-color:var(--accent)}
-    /* 섹션 제목 — 우측에 액션을 둔다(워크스페이스 상세 .dsec > h4 와 같은 규격) */
-    .mp-sec h3{margin:0 0 12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
-    /* 조회 항목 — 워크스페이스 상세 .dl 규격 */
-    .dl{display:grid;grid-template-columns:132px 1fr;gap:10px 12px;font-size:12.5px;margin:0}
-    .dl dt{color:var(--muted-foreground);display:flex;align-items:center;gap:5px}
-    .dl dd{margin:0;word-break:break-all}
-    /* 수정 화면 헤더 — 뒤로가기 + 제목 */
-    .mp-ehead{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px}
-    .back{width:32px;height:32px;flex:0 0 auto;display:grid;place-items:center;border:1px solid var(--border-strong);
-      background:var(--card);border-radius:8px;color:var(--muted-foreground);cursor:pointer;margin-top:4px}
-    .back:hover{border-color:var(--accent);color:var(--foreground)}
-    /* 마이페이지 폼 검증·상태 */
-    .mp-f .req{color:var(--destructive);margin-left:2px}
-    .mp-f input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
-    .mp-f input.has-error{border-color:var(--destructive)}
-    .mp-err{display:none;font-size:11.5px;color:var(--destructive);margin:6px 0 0;line-height:1.6}
-    /* 확인 완료 — 검증을 통과했음을 알린다. 오류와 같은 자리에 두어 둘이 함께 보이지 않는다 */
-    .mp-ok{display:none;font-size:11.5px;color:var(--success);margin:6px 0 0;line-height:1.6}
-    .mp-ok.show{display:block}
-    .inline{display:flex;gap:8px;align-items:flex-start}
-    .inline .btn{flex:0 0 auto}
-    /* 비밀번호 입력 — 표시·숨김 토글을 필드 안에 둔다(계정정책 7 마스킹) */
-    .pwwrap{position:relative}
-    .pwwrap input{padding-right:40px;width:100%}
-    .pweye{position:absolute;right:8px;top:50%;transform:translateY(-50%);
-      width:28px;height:28px;display:grid;place-items:center;
-      background:transparent;border:0;border-radius:6px;cursor:pointer;color:var(--muted-foreground)}
-    .pweye:hover{background:var(--card-2);color:var(--foreground)}
-    .pweye svg{width:16px;height:16px}
-    /* 알림 박스 — 조건에 따라 나타나고 조치가 필요할 수 있는 것(라이브러리 v0.3).
-       항상 같은 내용인 항목 설명은 툴팁, 입력 규칙은 hint 로 둔다 */
-    .alertbox{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;
-      margin-bottom:14px;border:1px solid var(--border);background:var(--muted)}
-    .alertbox .aic{width:17px;height:17px;flex:0 0 auto;margin-top:1px}
-    .alertbox .atx{flex:1;min-width:0;font-size:12.5px;line-height:1.65;color:var(--foreground)}
-    .alertbox .atx b{display:block;margin-bottom:3px}
-    .alertbox .aclose{width:22px;height:22px;flex:0 0 auto;display:grid;place-items:center;border:0;
-      background:transparent;color:var(--muted-foreground);cursor:pointer;border-radius:5px;
-      font-size:13px;line-height:1}
-    .alertbox .aclose:hover{background:var(--card);color:var(--foreground)}
-    .alertbox.warn{border-color:color-mix(in srgb,var(--warning) 32%,transparent);
-      background:color-mix(in srgb,var(--warning) 8%,transparent)}
-    .alertbox.warn .aic{color:var(--warning)}
-    .mp-err.show{display:block}
-    .addbtn:disabled{opacity:.5;cursor:not-allowed}
-    .addbtn .spin{display:none;width:13px;height:13px;border:2px solid color-mix(in srgb,var(--primary-foreground) 45%,transparent);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
-    .addbtn.loading .spin{display:inline-block}
-    @keyframes sp{to{transform:rotate(360deg)}}
-    /* 토스트 (공통정책 7.6·7.7 — 성공 3초/실패 5초, 호버 정지, 수동 닫기) */
-    .toast{position:fixed;top:20px;right:20px;transform:translateX(24px);background:var(--card-2);border:1px solid var(--border);color:var(--foreground);font-size:13px;padding:11px 14px;border-radius:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:120;display:flex;align-items:center;gap:9px}
-    .toast.show{opacity:1;transform:translateX(0);pointer-events:auto}
-    .toast .ti{width:16px;height:16px;flex:0 0 auto}
-    .toast.ok .ti{color:var(--success)} .toast.err .ti{color:var(--destructive)}
-    .toast .tx{margin-left:2px} .toast .tc{margin-left:6px;border:0;background:transparent;color:var(--muted-foreground);cursor:pointer;font-size:13px;line-height:1;padding:2px 3px}
-    .toast .tc:hover{color:var(--foreground)}
-    /* 확인 알럿 모달 (공통정책 4.5·7.2 — 외부클릭·ESC 미닫힘) */
-    .ov{display:none;position:fixed;inset:0;z-index:110;background:color-mix(in srgb,var(--foreground) 45%,transparent);align-items:center;justify-content:center;padding:20px}
-    .ov.show{display:flex}
-    .amodal{width:100%;max-width:380px;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.45)}
-    .amodal h4{font-size:15px;margin:0 0 8px}
-    .amodal p{font-size:13px;color:var(--muted-foreground);line-height:1.6;margin:0 0 18px}
-    .amodal .amact{display:flex;justify-content:flex-end;gap:8px}
-    /* 세부 미확정 — 흐리게 처리(화면정의서에서 정의) */
-    .mp-sec.tbd{position:relative;overflow:hidden}
-    .mp-sec.tbd > *:not(.tbd-tag){filter:blur(3.5px);opacity:.45;user-select:none;pointer-events:none}
-    .tbd-tag{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;background:var(--card);border:1px dashed var(--border);border-radius:9px;padding:10px 16px;font-size:12px;color:var(--muted-foreground);white-space:nowrap;text-align:center;line-height:1.7}
-    .tbd-tag b{display:block;color:var(--foreground);font-size:12.5px;margin-bottom:2px}
-  </style>
+  /* 메인 */
+  .main{grid-area:main;background:var(--background);overflow-y:auto;overflow-x:hidden;padding:24px 28px;min-height:0}
+  .body-ph{border:1px dashed #2c313d;border-radius:12px;min-height:340px;display:grid;place-items:center;color:var(--muted-foreground);font-size:13px;text-align:center;line-height:1.9;background:repeating-linear-gradient(135deg,transparent,transparent 12px,rgba(255,255,255,.012) 12px,rgba(255,255,255,.012) 24px)}
+  .body-ph b{color:var(--muted-foreground);font-weight:600;display:block;margin-bottom:2px}
+  #page .ph{margin-bottom:20px}
+  #page .ph h1{font-size:22px;margin:0 0 6px;letter-spacing:-.2px}
+  #page .ph p{font-size:12.5px;color:var(--muted-foreground);margin:0}
+  #page .ph-row{display:flex;align-items:flex-start;justify-content:space-between}
+  #page .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:16px}
+  #page .tab{padding:9px 14px;font-size:13px;color:var(--muted-foreground);border-bottom:2px solid transparent;cursor:pointer}
+  #page .tab.on{color:var(--foreground);border-bottom-color:var(--accent)}
+  .addbtn{padding:8px 15px;background:var(--primary);color:#fff;border:0;border-radius:8px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap}
+  .addbtn:hover{background:var(--primary-hover)}
+  /* 마이페이지 */
+  .mp-form{max-width:none}
+/* 데이터 상태 — 헤더·GNB는 유지하고 폼 자리만 대체한다(공통정책 4.1) */
+.mp-state{padding:60px 0;text-align:center;color:var(--muted-foreground)}
+.mp-state h3{margin:0 0 8px;font-size:15px;color:var(--foreground);font-weight:600}
+.mp-state p{margin:0 0 16px;font-size:13px}
+.mp-spin{width:22px;height:22px;margin:0 auto 14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:mpspin .8s linear infinite}
+@keyframes mpspin{to{transform:rotate(360deg)}}
+  .mp-sec{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:18px 20px;margin-bottom:14px}
+  .mp-sec h3{font-size:14px;margin:0 0 14px}
+  .mp-f{margin-bottom:16px}
+  /* 비밀번호 섹션 — 제목과 액션을 한 줄에 둔다 */
+  .mp-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  /* 소속 워크스페이스 — 확인용 목록이라 조작을 두지 않는다 */
+  .mp-cnt{margin-left:6px;font-size:12px;font-weight:400;color:var(--muted-foreground)}
+  .mp-wslist{margin-top:10px;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+  .mp-wsrow{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid var(--border);
+    text-decoration:none;color:var(--foreground);font-size:13px}
+  .mp-wsrow:last-child{border-bottom:0}
+  .mp-wsrow:hover{background:var(--hover)}
+  .mp-wsic{width:17px;height:17px;color:var(--muted-foreground);flex:0 0 auto}
+  .mp-wsic svg{width:100%;height:100%}
+  .mp-wsn{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--underline)}
+  .mp-wsrow:hover .mp-wsn{text-decoration-color:var(--foreground)}
+  .mp-role{margin-left:auto;font-size:11.5px;color:var(--muted-foreground)}
+  /* 라벨 툴팁 — 워크스페이스·CDE 화면과 같은 방식으로 처리한다(공통정책 4.7) */
+  .tip-anchor{position:relative;display:inline-flex;align-items:center;margin-left:5px;vertical-align:middle}
+  .tip-ic{width:16px;height:16px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);
+    font-size:11px;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex:0 0 auto}
+  .tip{position:absolute;bottom:calc(100% + 8px);left:0;background:var(--flyout);color:var(--foreground);
+    border:1px solid var(--border-strong);font-size:12px;line-height:1.55;padding:9px 11px;border-radius:9px;
+    width:max-content;max-width:280px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;
+    transform:translateY(4px);transition:.14s;z-index:60;white-space:normal;text-align:left}
+  .tip-anchor:hover .tip,.tip-anchor:focus-within .tip{opacity:1;visibility:visible;transform:translateY(0)}
+  .tip::after{content:"";position:absolute;top:100%;left:14px;border:5px solid transparent;border-top-color:var(--flyout)}
+  .tip::before{content:"";position:absolute;left:0;right:0;height:10px;bottom:-10px}
+    /* 화면 최상단 타이틀은 위로 열면 잘린다. 아래로 연다 */
+    .tip-anchor.below .tip{top:calc(100% + 8px);bottom:auto;transform:translateY(-4px)}
+    .tip-anchor.below:hover .tip,.tip-anchor.below:focus-within .tip{transform:translateY(0)}
+    .tip-anchor.below .tip::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:var(--flyout)}
+    .tip-anchor.below .tip::before{bottom:auto;top:-10px}
+  .mp-f label{display:block;font-size:12.5px;color:var(--muted-foreground);margin-bottom:6px}
+  .mp-f input{width:100%;padding:9px 12px;background:var(--card-2);border:1px solid var(--border);border-radius:8px;color:var(--foreground);font-size:13px;font-family:inherit}
+  /* 읽기 전용 값 — 고칠 수 없는 값은 입력창 모양으로 두지 않는다(라이브러리) */
+.rov{display:inline-flex;align-items:baseline;gap:9px;font-size:13px;color:var(--foreground);padding:9px 0}
+.rov span{font-size:11.5px;color:var(--faint)}
+  .mp-act{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+  /* 처리 중 스피너 — 라이브러리 규격 */
+  .btn .spin{display:none;width:13px;height:13px;border-radius:50%;
+    border:2px solid color-mix(in srgb,var(--primary-foreground) 45%,transparent);
+    border-top-color:currentColor;animation:mpsp .7s linear infinite}
+  .btn.loading .spin{display:inline-block}
+  @keyframes mpsp{to{transform:rotate(360deg)}}
+  .mp-hint{font-size:11.5px;color:var(--faint);margin:6px 0 0;line-height:1.6}
+  /* 버튼 — 컴포넌트 라이브러리 .btn 규격 */
+  .btn{padding:8px 15px;background:var(--primary);color:var(--primary-foreground);border:0;border-radius:8px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{background:var(--primary-hover)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.sm{padding:6px 11px;font-size:12px}
+  .btn.ghost{background:transparent;border:1px solid var(--border-strong);color:var(--foreground)}
+  .btn.ghost:hover{background:var(--hover);border-color:var(--accent)}
+  /* 섹션 제목 — 우측에 액션을 둔다(워크스페이스 상세 .dsec > h4 와 같은 규격) */
+  .mp-sec h3{margin:0 0 12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+  /* 조회 항목 — 워크스페이스 상세 .dl 규격 */
+  .dl{display:grid;grid-template-columns:132px 1fr;gap:10px 12px;font-size:12.5px;margin:0}
+  .dl dt{color:var(--muted-foreground);display:flex;align-items:center;gap:5px}
+  .dl dd{margin:0;word-break:break-all}
+  /* 수정 화면 헤더 — 뒤로가기 + 제목 */
+  .mp-ehead{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px}
+  .back{width:32px;height:32px;flex:0 0 auto;display:grid;place-items:center;border:1px solid var(--border-strong);
+    background:var(--card);border-radius:8px;color:var(--muted-foreground);cursor:pointer;margin-top:4px}
+  .back:hover{border-color:var(--accent);color:var(--foreground)}
+  /* 마이페이지 폼 검증·상태 */
+  .mp-f .req{color:var(--destructive);margin-left:2px}
+  .mp-f input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
+  .mp-f input.has-error{border-color:var(--destructive)}
+  .mp-err{display:none;font-size:11.5px;color:var(--destructive);margin:6px 0 0;line-height:1.6}
+  /* 확인 완료 — 검증을 통과했음을 알린다. 오류와 같은 자리에 두어 둘이 함께 보이지 않는다 */
+  .mp-ok{display:none;font-size:11.5px;color:var(--success);margin:6px 0 0;line-height:1.6}
+  .mp-ok.show{display:block}
+  .inline{display:flex;gap:8px;align-items:flex-start}
+  .inline .btn{flex:0 0 auto}
+  /* 비밀번호 입력 — 표시·숨김 토글을 필드 안에 둔다(계정정책 7 마스킹) */
+  .pwwrap{position:relative}
+  .pwwrap input{padding-right:40px;width:100%}
+  .pweye{position:absolute;right:8px;top:50%;transform:translateY(-50%);
+    width:28px;height:28px;display:grid;place-items:center;
+    background:transparent;border:0;border-radius:6px;cursor:pointer;color:var(--muted-foreground)}
+  .pweye:hover{background:var(--card-2);color:var(--foreground)}
+  .pweye svg{width:16px;height:16px}
+  /* 알림 박스 — 조건에 따라 나타나고 조치가 필요할 수 있는 것(라이브러리 v0.3).
+     항상 같은 내용인 항목 설명은 툴팁, 입력 규칙은 hint 로 둔다 */
+  .alertbox{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;
+    margin-bottom:14px;border:1px solid var(--border);background:var(--muted)}
+  .alertbox .aic{width:17px;height:17px;flex:0 0 auto;margin-top:1px}
+  .alertbox .atx{flex:1;min-width:0;font-size:12.5px;line-height:1.65;color:var(--foreground)}
+  .alertbox .atx b{display:block;margin-bottom:3px}
+  .alertbox .aclose{width:22px;height:22px;flex:0 0 auto;display:grid;place-items:center;border:0;
+    background:transparent;color:var(--muted-foreground);cursor:pointer;border-radius:5px;
+    font-size:13px;line-height:1}
+  .alertbox .aclose:hover{background:var(--card);color:var(--foreground)}
+  .alertbox.warn{border-color:color-mix(in srgb,var(--warning) 32%,transparent);
+    background:color-mix(in srgb,var(--warning) 8%,transparent)}
+  .alertbox.warn .aic{color:var(--warning)}
+  .mp-err.show{display:block}
+  .addbtn:disabled{opacity:.5;cursor:not-allowed}
+  .addbtn .spin{display:none;width:13px;height:13px;border:2px solid color-mix(in srgb,var(--primary-foreground) 45%,transparent);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
+  .addbtn.loading .spin{display:inline-block}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  /* 토스트 (공통정책 7.6·7.7 — 성공 3초/실패 5초, 호버 정지, 수동 닫기) */
+  .toast{position:fixed;top:20px;right:20px;transform:translateX(24px);background:var(--card-2);border:1px solid var(--border);color:var(--foreground);font-size:13px;padding:11px 14px;border-radius:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:120;display:flex;align-items:center;gap:9px}
+  .toast.show{opacity:1;transform:translateX(0);pointer-events:auto}
+  .toast .ti{width:16px;height:16px;flex:0 0 auto}
+  .toast.ok .ti{color:var(--success)} .toast.err .ti{color:var(--destructive)}
+  .toast .tx{margin-left:2px} .toast .tc{margin-left:6px;border:0;background:transparent;color:var(--muted-foreground);cursor:pointer;font-size:13px;line-height:1;padding:2px 3px}
+  .toast .tc:hover{color:var(--foreground)}
+  /* 확인 알럿 모달 (공통정책 4.5·7.2 — 외부클릭·ESC 미닫힘) */
+  .ov{display:none;position:fixed;inset:0;z-index:110;background:color-mix(in srgb,var(--foreground) 45%,transparent);align-items:center;justify-content:center;padding:20px}
+  .ov.show{display:flex}
+  .amodal{width:100%;max-width:380px;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+  .amodal h4{font-size:15px;margin:0 0 8px}
+  .amodal p{font-size:13px;color:var(--muted-foreground);line-height:1.6;margin:0 0 18px}
+  .amodal .amact{display:flex;justify-content:flex-end;gap:8px}
+  /* 세부 미확정 — 흐리게 처리(화면정의서에서 정의) */
+  .mp-sec.tbd{position:relative;overflow:hidden}
+  .mp-sec.tbd > *:not(.tbd-tag){filter:blur(3.5px);opacity:.45;user-select:none;pointer-events:none}
+  .tbd-tag{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;background:var(--card);border:1px dashed var(--border);border-radius:9px;padding:10px 16px;font-size:12px;color:var(--muted-foreground);white-space:nowrap;text-align:center;line-height:1.7}
+  .tbd-tag b{display:block;color:var(--foreground);font-size:12.5px;margin-bottom:2px}
+</style>
 </head>
 <body class="dark">
 <div class="app">
@@ -401,28 +406,28 @@
 </div>
 
 <script>
-  var PAGES = {
-    overview: {crumb:'홈', html:`
+var PAGES = {
+  overview: {crumb:'홈', html:`
     <div class="ph"><h1>환영합니다, 성유진님</h1><p>클러스터 전체의 AI 인프라와 모델 배포 개요를 확인합니다.</p></div>
     <div class="body-ph"><div><b>홈 대시보드</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃(헤더·GNB·플라이아웃·사이드바 하단) 전달용입니다.</div></div>`},
-    workspaces: {crumb:'워크스페이스', html:`
-    <div class="ph-row"><div class="ph"><h1>워크스페이스</h1><p>논리적 환경, 팀 액세스 및 리소스 할당량을 관리합니다.</p></div><button class="addbtn">＋ 워크스페이스 생성</button></div>
+  workspaces: {crumb:'워크스페이스', html:`
+    <div class="ph-row"><div class="ph"><h1>워크스페이스${mpTip('조직 또는 프로젝트 단위로 자원과 접근 권한을 격리하는 공간입니다.', true)}</h1></div><button class="addbtn">＋ 워크스페이스 생성</button></div>
     <div class="body-ph"><div><b>워크스페이스 목록</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
-    models: {crumb:'모델', html:`
-    <div class="ph-row"><div class="ph"><h1>모델 레지스트리</h1><p>등록된 모델과 사양을 관리합니다.</p></div><button class="addbtn">＋ 모델 등록</button></div>
+  models: {crumb:'모델', html:`
+    <div class="ph-row"><div class="ph"><h1>모델 레지스트리${mpTip('배포에 사용할 모델을 등록해 두는 곳입니다. 등록한 모델을 배포하면 추론 엔드포인트로 기동됩니다.', true)}</h1></div><button class="addbtn">＋ 모델 등록</button></div>
     <div class="body-ph"><div><b>모델 레지스트리</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
-    deployments: {crumb:'배포', html:`
-    <div class="ph-row"><div class="ph"><h1>배포</h1><p>운영 중인 추론 배포를 관리합니다.</p></div><button class="addbtn">＋ 새 배포</button></div>
+  deployments: {crumb:'배포', html:`
+    <div class="ph-row"><div class="ph"><h1>배포${mpTip('등록한 모델을 추론 엔드포인트로 기동한 것입니다. 워크스페이스의 운영룸 자원을 사용하며, 외부 애플리케이션은 이 엔드포인트로 모델을 호출합니다.', true)}</h1></div><button class="addbtn">＋ 새 배포</button></div>
     <div class="body-ph"><div><b>배포 목록</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
-    monitoring: {crumb:'모니터링', html:`
-    <div class="ph"><h1>글로벌 모니터링</h1><p>가속기 자원과 추론 성능을 실시간으로 확인합니다.</p></div>
+  monitoring: {crumb:'모니터링', html:`
+    <div class="ph"><h1>글로벌 모니터링${mpTip('클러스터 전체의 가속기 자원과 추론 성능을 확인합니다. 워크스페이스별 사용 현황도 여기에서 봅니다.', true)}</h1></div>
     <div class="tabs"><span class="tab on">가속기 모니터링</span><span class="tab">오버뷰 대시보드</span><span class="tab">알림 규칙 탐색기</span></div>
     <div class="body-ph"><div><b>글로벌 모니터링</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
-    settings: {crumb:'플랫폼 설정', sub:'사용자 및 역할', html:`
-    <div class="ph"><h1>플랫폼 설정</h1><p>글로벌 인프라 연결 및 시스템 전체 역할을 관리합니다.</p></div>
+  settings: {crumb:'플랫폼 설정', sub:'사용자 및 역할', html:`
+    <div class="ph"><h1>플랫폼 설정${mpTip('플랫폼 전체에 적용되는 설정입니다. 저장소 연결, 계정과 역할, 알림 채널을 관리합니다.', true)}</h1></div>
     <div class="body-ph"><div><b>사용자 및 역할(RBAC)</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
-    mypage: {crumb:'마이페이지', html:`
-    <div class="ph"><h1>마이페이지</h1><p>본인 계정 정보와 소속을 확인합니다.</p></div>
+  mypage: {crumb:'마이페이지', html:`
+    <div class="ph"><h1>마이페이지${mpTip('본인 계정 정보와 소속 워크스페이스를 확인합니다.', true)}</h1></div>
     <div class="mp-form">
       <!-- 조회 화면. 수정은 별도 화면에서 처리해 저장 시점을 섞지 않는다 -->
       <section class="mp-sec">
@@ -461,10 +466,10 @@
       </section>
     </div>`},
 
-    mypageEdit: {crumb:'마이페이지', sub:'기본 정보 수정', html:`
+  mypageEdit: {crumb:'마이페이지', sub:'기본 정보 수정', html:`
     <div class="mp-ehead">
       <button class="back" onclick="go('mypage')" title="마이페이지로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>
-      <div class="ph" style="margin-bottom:0"><h1>기본 정보 수정</h1><p>이름과 이메일 주소를 수정합니다.</p></div>
+      <div class="ph" style="margin-bottom:0"><h1>기본 정보 수정${mpTip('이름과 이메일 주소를 수정합니다. 계정 아이디와 소속은 바꿀 수 없습니다.', true)}</h1></div>
     </div>
     <div class="mp-form">
       <section class="mp-sec">
@@ -514,192 +519,192 @@
       </div>
     </div>`}};
 
-  /* 라벨 옆 도움말 — 워크스페이스 목업의 tip() 과 같은 규격 */
-  function mpTip(t){ return '<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">'+t+'</span></span>'; }
-  function setCrumb(main, sub){
-    var el=document.querySelector('.breadcrumb');
-    el.innerHTML = '콘체르토 플랫폼 / <b>'+ (sub? main+' ▸ '+sub : main) +'</b>';
-  }
-  function render(key, subLabel){
-    var p=PAGES[key]; if(!p) return;
-    document.getElementById('page').innerHTML = p.html;
-    setCrumb(p.crumb, subLabel || p.sub);
-    /* 조회 화면을 다시 그리면 비밀번호 상태 표시가 초기화되므로 복원한다 */
-    if(key==='mypage' && typeof drawPwHint==='function') drawPwHint();
-    /* 수정 화면을 다시 그리면 본인 확인을 처음부터 받는다 */
-    if(key==='mypageEdit' && typeof refreshSave==='function'){ pwChecked=false; refreshSave(); }
-  }
-  function nav(key){
-    document.querySelectorAll('.nav a').forEach(function(a){a.classList.remove('active')});
-    var link=document.querySelector('.nav a[data-page="'+key+'"]');
-    if(link) link.classList.add('active');
-    render(key);
-    return false;
-  }
-  function go(key){
-    document.querySelectorAll('.nav a').forEach(function(a){a.classList.remove('active')});
-    render(key);
-    document.querySelector('.main').scrollTop=0;
-    return false;
-  }
-  function navSub(key, label){
-    nav(key);
-    document.querySelectorAll('.flyout a').forEach(function(a){a.classList.toggle('on', a.textContent.indexOf(label)===0)});
-    render(key, label);
-    return false;
-  }
-  /* 초기 렌더는 스크립트 하단에서 실행(마이페이지 폼 함수 정의 이후) */
-
-  document.addEventListener('click', function(e){
-    var a = e.target.closest && e.target.closest('a[href="#"]');
-    if(a){ e.preventDefault(); }
-  }, true);
-
-  function toggleTheme(e){
-    if(e) e.stopPropagation();
-    var dark = !document.body.classList.toggle('light');
-    document.querySelectorAll('.toggle').forEach(function(t){t.classList.toggle('on', dark)});
-  }
-  function togglePersona(e){
-    if(e) e.stopPropagation();
-    document.getElementById('persona').classList.toggle('open');
-  }
-  document.addEventListener('click',function(e){
-    var p=document.getElementById('persona');
-    if(p && !p.contains(e.target)) p.classList.remove('open');
-  });
-  document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ document.getElementById('persona').classList.remove('open'); }});
-  function toggleLang(e){
-    e.stopPropagation();
-    document.getElementById('langRow').classList.toggle('open');
-    document.getElementById('langList').classList.toggle('open');
-  }
-  /* ===== 마이페이지 폼 (기본 정보 수정) ===== */
-  var MP_ORIG={name:'성유진',email:'yj.seong@okestro.com'};
-  /* 데모용 — 이 값을 넣으면 불일치로 처리한다. 실제로는 서버가 판정한다 */
-  var MP_WRONG_PW='wrong';
-  var mpEmailRe=/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-  function $mp(id){return document.getElementById(id);}
-  function showMpErr(inp,errEl,msg){ if(msg){inp.classList.add('has-error');errEl.textContent=msg;errEl.classList.add('show');return false;} inp.classList.remove('has-error');errEl.classList.remove('show');return true; }
-  function nameMsg(){ var el=$mp('mpName'); if(!el) return ''; var v=el.value.trim();
-    if(v.length<2) return '2자 이상 입력해 주세요.';   /* 계정정책 2.4 길이 2~50자. 안내 문구는 확인 필요 */
-    if(el.value.length>50) return '50자까지 입력할 수 있습니다.';
-    if(/\s/.test(el.value)) return '공백은 사용할 수 없습니다.';
-    if(!/^[가-힣a-zA-Z0-9ぁ-んァ-ンー一-龥,.\-_]+$/.test(v)) return '한글·영문·숫자와 특수문자(, . - _)만 사용할 수 있습니다.';
-    return ''; }
-  /* 이메일은 중복 불가다(계정정책 2.3). 저장 시 서버가 판정하며 여기서는 데모용으로 확인한다 */
-  var MP_TAKEN=['admin@okestro.com','sj.lim@okestro.com'];
-  function emailMsg(){ var el=$mp('mpEmail'); if(!el) return ''; var v=el.value.trim();
-    if(!mpEmailRe.test(v)) return '올바른 이메일 형식이 아닙니다.';
-    if(MP_TAKEN.indexOf(v.toLowerCase())>=0) return '이미 사용 중인 이메일입니다.';
-    return ''; }
-  function vName(show){ return showMpErr($mp('mpName'),$mp('mpNameErr'), show?nameMsg():''); }
-  function vEmail(show){ return showMpErr($mp('mpEmail'),$mp('mpEmailErr'), show?emailMsg():''); }
-  function isChanged(){ return $mp('mpName').value.trim()!==MP_ORIG.name || $mp('mpEmail').value.trim()!==MP_ORIG.email; }
-  /* 현재 비밀번호 — 계정정책 2.2 의 허용 문자 규칙을 그대로 적용한다.
-     복잡도(길이·조합)는 새 비밀번호를 만들 때 쓰는 규칙이라 여기서 보지 않는다.
-     이미 발급된 값을 확인하는 자리다 */
-  function pwMsg(){ var el=$mp('mpPw'); if(!el) return '';
-    if(!el.value) return '현재 비밀번호를 입력해 주세요.';
-    if(!/^[\x21-\x7E]+$/.test(el.value)) return '영문·숫자·특수문자만 사용할 수 있습니다.';
-    if(!pwChecked) return '확인이 필요합니다.';
-    return ''; }
-  /* 금지문자는 입력 즉시 차단한다(공통정책 7.1). 한글·공백 등 비ASCII 는 계정정책 2.2 에서 불허 */
-  function onPwInput(el){
-    var v=el.value.replace(/[^\x21-\x7E]/g,'');
-    if(v!==el.value){
-      var p=el.selectionStart; el.value=v;
-      if(el.setSelectionRange && p!=null) try{ el.setSelectionRange(p-1,p-1); }catch(e){}
-    }
-    /* 값이 바뀌면 확인을 다시 받는다(공통정책 7.1) */
-    if(pwChecked){ pwChecked=false; showPwOk(false); }
-    var b=$mp('mpPwChk'); if(b) b.disabled = !el.value;
-    onMp();
-  }
-  /* 확인 버튼 — 서버가 일치 여부를 판정한다. 목업은 데모용으로 특정 값만 틀린 것으로 둔다 */
-  var pwChecked=false;
-  function checkPw(){
-    var el=$mp('mpPw'); if(!el || !el.value) return;
-    if(!/^[\x21-\x7E]+$/.test(el.value)){ vPw(true); el.focus(); return; }
-    if(el.value===MP_WRONG_PW){
-      pwChecked=false; showPwOk(false);
-      showMpErr(el,$mp('mpPwErr'),'현재 비밀번호가 일치하지 않습니다.');
-      el.focus(); refreshSave(); return;
-    }
-    pwChecked=true; showMpErr(el,$mp('mpPwErr'),''); showPwOk(true); refreshSave();
-  }
-  function showPwOk(on){
-    var el=$mp('mpPwOk'); if(el) el.classList.toggle('show',!!on);
-    var b=$mp('mpPwChk'); if(b) b.disabled = on || !$mp('mpPw').value;
-  }
-  function vPw(show){ return showMpErr($mp('mpPw'),$mp('mpPwErr'), show?pwMsg():''); }
-  function tgPw(){
-    var el=$mp('mpPw'), ic=$mp('mpPwIc'); if(!el) return;
-    var on = el.type==='password';
-    el.type = on? 'text':'password';
-    ic.innerHTML = on
-            ? '<path d="M3 3l18 18"/><path d="M10.6 6.2A9.6 9.6 0 0112 6c6.5 0 10 6 10 6a17 17 0 01-3.2 3.8M6.5 7.8A17 17 0 002 12s3.5 6 10 6a9.7 9.7 0 003.5-.6"/><path d="M9.9 9.9a2.6 2.6 0 003.7 3.7"/>'
-            : '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/>';
-    el.focus();
-  }
-  function refreshSave(){
-    var b=$mp('mpSave'); if(!b) return;
-    var changed=isChanged();
-    /* 바꾼 항목이 생겨야 본인 확인을 받는다. 없으면 확인할 이유가 없다 */
-    var sec=$mp('mpAuthSec');
-    if(sec){
-      sec.style.display = changed ? '' : 'none';
-      if(!changed && pwChecked){ pwChecked=false; showPwOk(false); }
-      if(!changed){ var pw=$mp('mpPw'); if(pw && pw.value){ pw.value=''; showMpErr(pw,$mp('mpPwErr'),''); } }
-    }
-    b.disabled=!(nameMsg()===''&&emailMsg()===''&&changed&&pwMsg()===''); }
-  function onMp(){
-    if($mp('mpName').classList.contains('has-error')&&nameMsg()==='') vName(true);
-    if($mp('mpEmail').classList.contains('has-error')&&emailMsg()==='') vEmail(true);
-    if($mp('mpPw').classList.contains('has-error')&&pwMsg()==='') vPw(true);
-    refreshSave(); }
-  function saveMp(){
-    var okN=vName(true), okE=vEmail(true), okP=vPw(true);
-    /* 첫 오류 필드에 포커스한다(공통정책 7.8) */
-    if(!okN||!okE||!okP){ (!okN?$mp('mpName'):!okE?$mp('mpEmail'):$mp('mpPw')).focus(); return; }
-    var b=$mp('mpSave'); b.classList.add('loading'); b.disabled=true;
-    setTimeout(function(){ b.classList.remove('loading');
-      MP_ORIG.name=$mp('mpName').value.trim(); MP_ORIG.email=$mp('mpEmail').value.trim();
-      /* 저장하면 조회 화면으로 돌아간다 */
-      /* 변경 알림은 공통 레이아웃 좌측 하단 알림 영역에서 정의한다.
-         이메일 발송은 기능 개발 후 붙인다 */
-      go('mypage'); showToast('저장되었습니다.',true); },800); }
-  /* 취소하면 조회 화면으로 돌아간다. 변경분이 있으면 확인을 받는다(공통정책 7.2) */
-  function cancelMp(){ if(isChanged()){ $mp('cancelOv').classList.add('show'); } else { go('mypage'); } }
-  function closeCancel(){ $mp('cancelOv').classList.remove('show'); }
-  function doCancel(){ resetMp(); $mp('cancelOv').classList.remove('show'); go('mypage'); }
-  function resetMp(){ $mp('mpName').value=MP_ORIG.name; $mp('mpEmail').value=MP_ORIG.email;
-    $mp('mpPw').value=''; pwChecked=false; showPwOk(false);
-    vName(false); vEmail(false); vPw(false); refreshSave(); }
-  /* 비밀번호 변경은 별도 모달로 제공한다. 화면 규격은 비밀번호 변경 기획서를 따른다 */
-  function openPw(){ showToast('비밀번호 변경 모달이 열립니다. 화면 구성은 비밀번호 변경 기획서에서 확인할 수 있습니다.',true); }
-  var mpToastTimer,mpToastDur=3000;
-  function showToast(msg,ok){ var t=$mp('toast'); if(!t) return; var isErr=(ok===false); t.classList.toggle('ok',!isErr); t.classList.toggle('err',isErr);
-    t.querySelector('.ti').innerHTML = isErr ? '<path d="M18 6 6 18M6 6l12 12"/>' : '<path d="M20 6 9 17l-5-5"/>';
-    $mp('toastMsg').textContent=msg; mpToastDur=isErr?5000:3000; t.classList.add('show'); clearTimeout(mpToastTimer);
-    mpToastTimer=setTimeout(function(){t.classList.remove('show');},mpToastDur); }
-  function hideToast(){ clearTimeout(mpToastTimer); var t=$mp('toast'); if(t) t.classList.remove('show'); }
-  (function(){ var t=document.getElementById('toast'); if(!t) return;
-    t.addEventListener('mouseenter',function(){clearTimeout(mpToastTimer);});
-    t.addEventListener('mouseleave',function(){ if(t.classList.contains('show')){clearTimeout(mpToastTimer); mpToastTimer=setTimeout(function(){t.classList.remove('show');},mpToastDur);} }); })();
-  function pickLang(btn,name){
-    event.stopPropagation();
-    btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
-    btn.classList.add('sel');
-    document.getElementById('langCur').textContent=name;
-    document.getElementById('langRow').classList.remove('open');
-    document.getElementById('langList').classList.remove('open');
-  }
-
-  /* ===== 초기 렌더 (모든 함수·변수 정의 이후 실행) ===== */
+/* 라벨 옆 도움말 — 워크스페이스 목업의 tip() 과 같은 규격 */
+function mpTip(t, below){ return '<span class="tip-anchor'+(below?' below':'')+'"><span class="tip-ic" tabindex="0">?</span><span class="tip">'+t+'</span></span>'; }
+function setCrumb(main, sub){
+  var el=document.querySelector('.breadcrumb');
+  el.innerHTML = '콘체르토 플랫폼 / <b>'+ (sub? main+' ▸ '+sub : main) +'</b>';
+}
+function render(key, subLabel){
+  var p=PAGES[key]; if(!p) return;
+  document.getElementById('page').innerHTML = p.html;
+  setCrumb(p.crumb, subLabel || p.sub);
+  /* 조회 화면을 다시 그리면 비밀번호 상태 표시가 초기화되므로 복원한다 */
+  if(key==='mypage' && typeof drawPwHint==='function') drawPwHint();
+  /* 수정 화면을 다시 그리면 본인 확인을 처음부터 받는다 */
+  if(key==='mypageEdit' && typeof refreshSave==='function'){ pwChecked=false; refreshSave(); }
+}
+function nav(key){
   document.querySelectorAll('.nav a').forEach(function(a){a.classList.remove('active')});
-  render('mypage');
-  refreshSave();
+  var link=document.querySelector('.nav a[data-page="'+key+'"]');
+  if(link) link.classList.add('active');
+  render(key);
+  return false;
+}
+function go(key){
+  document.querySelectorAll('.nav a').forEach(function(a){a.classList.remove('active')});
+  render(key);
+  document.querySelector('.main').scrollTop=0;
+  return false;
+}
+function navSub(key, label){
+  nav(key);
+  document.querySelectorAll('.flyout a').forEach(function(a){a.classList.toggle('on', a.textContent.indexOf(label)===0)});
+  render(key, label);
+  return false;
+}
+/* 초기 렌더는 스크립트 하단에서 실행(마이페이지 폼 함수 정의 이후) */
+
+document.addEventListener('click', function(e){
+  var a = e.target.closest && e.target.closest('a[href="#"]');
+  if(a){ e.preventDefault(); }
+}, true);
+
+function toggleTheme(e){
+  if(e) e.stopPropagation();
+  var dark = !document.body.classList.toggle('light');
+  document.querySelectorAll('.toggle').forEach(function(t){t.classList.toggle('on', dark)});
+}
+function togglePersona(e){
+  if(e) e.stopPropagation();
+  document.getElementById('persona').classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  var p=document.getElementById('persona');
+  if(p && !p.contains(e.target)) p.classList.remove('open');
+});
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ document.getElementById('persona').classList.remove('open'); }});
+function toggleLang(e){
+  e.stopPropagation();
+  document.getElementById('langRow').classList.toggle('open');
+  document.getElementById('langList').classList.toggle('open');
+}
+/* ===== 마이페이지 폼 (기본 정보 수정) ===== */
+var MP_ORIG={name:'성유진',email:'yj.seong@okestro.com'};
+/* 데모용 — 이 값을 넣으면 불일치로 처리한다. 실제로는 서버가 판정한다 */
+var MP_WRONG_PW='wrong';
+var mpEmailRe=/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+function $mp(id){return document.getElementById(id);}
+function showMpErr(inp,errEl,msg){ if(msg){inp.classList.add('has-error');errEl.textContent=msg;errEl.classList.add('show');return false;} inp.classList.remove('has-error');errEl.classList.remove('show');return true; }
+function nameMsg(){ var el=$mp('mpName'); if(!el) return ''; var v=el.value.trim();
+  if(v.length<2) return '2자 이상 입력해 주세요.';   /* 계정정책 2.4 길이 2~50자. 안내 문구는 확인 필요 */
+  if(el.value.length>50) return '50자까지 입력할 수 있습니다.';
+  if(/\s/.test(el.value)) return '공백은 사용할 수 없습니다.';
+  if(!/^[가-힣a-zA-Z0-9ぁ-んァ-ンー一-龥,.\-_]+$/.test(v)) return '한글·영문·숫자와 특수문자(, . - _)만 사용할 수 있습니다.';
+  return ''; }
+/* 이메일은 중복 불가다(계정정책 2.3). 저장 시 서버가 판정하며 여기서는 데모용으로 확인한다 */
+var MP_TAKEN=['admin@okestro.com','sj.lim@okestro.com'];
+function emailMsg(){ var el=$mp('mpEmail'); if(!el) return ''; var v=el.value.trim();
+  if(!mpEmailRe.test(v)) return '올바른 이메일 형식이 아닙니다.';
+  if(MP_TAKEN.indexOf(v.toLowerCase())>=0) return '이미 사용 중인 이메일입니다.';
+  return ''; }
+function vName(show){ return showMpErr($mp('mpName'),$mp('mpNameErr'), show?nameMsg():''); }
+function vEmail(show){ return showMpErr($mp('mpEmail'),$mp('mpEmailErr'), show?emailMsg():''); }
+function isChanged(){ return $mp('mpName').value.trim()!==MP_ORIG.name || $mp('mpEmail').value.trim()!==MP_ORIG.email; }
+/* 현재 비밀번호 — 계정정책 2.2 의 허용 문자 규칙을 그대로 적용한다.
+   복잡도(길이·조합)는 새 비밀번호를 만들 때 쓰는 규칙이라 여기서 보지 않는다.
+   이미 발급된 값을 확인하는 자리다 */
+function pwMsg(){ var el=$mp('mpPw'); if(!el) return '';
+  if(!el.value) return '현재 비밀번호를 입력해 주세요.';
+  if(!/^[\x21-\x7E]+$/.test(el.value)) return '영문·숫자·특수문자만 사용할 수 있습니다.';
+  if(!pwChecked) return '확인이 필요합니다.';
+  return ''; }
+/* 금지문자는 입력 즉시 차단한다(공통정책 7.1). 한글·공백 등 비ASCII 는 계정정책 2.2 에서 불허 */
+function onPwInput(el){
+  var v=el.value.replace(/[^\x21-\x7E]/g,'');
+  if(v!==el.value){
+    var p=el.selectionStart; el.value=v;
+    if(el.setSelectionRange && p!=null) try{ el.setSelectionRange(p-1,p-1); }catch(e){}
+  }
+  /* 값이 바뀌면 확인을 다시 받는다(공통정책 7.1) */
+  if(pwChecked){ pwChecked=false; showPwOk(false); }
+  var b=$mp('mpPwChk'); if(b) b.disabled = !el.value;
+  onMp();
+}
+/* 확인 버튼 — 서버가 일치 여부를 판정한다. 목업은 데모용으로 특정 값만 틀린 것으로 둔다 */
+var pwChecked=false;
+function checkPw(){
+  var el=$mp('mpPw'); if(!el || !el.value) return;
+  if(!/^[\x21-\x7E]+$/.test(el.value)){ vPw(true); el.focus(); return; }
+  if(el.value===MP_WRONG_PW){
+    pwChecked=false; showPwOk(false);
+    showMpErr(el,$mp('mpPwErr'),'현재 비밀번호가 일치하지 않습니다.');
+    el.focus(); refreshSave(); return;
+  }
+  pwChecked=true; showMpErr(el,$mp('mpPwErr'),''); showPwOk(true); refreshSave();
+}
+function showPwOk(on){
+  var el=$mp('mpPwOk'); if(el) el.classList.toggle('show',!!on);
+  var b=$mp('mpPwChk'); if(b) b.disabled = on || !$mp('mpPw').value;
+}
+function vPw(show){ return showMpErr($mp('mpPw'),$mp('mpPwErr'), show?pwMsg():''); }
+function tgPw(){
+  var el=$mp('mpPw'), ic=$mp('mpPwIc'); if(!el) return;
+  var on = el.type==='password';
+  el.type = on? 'text':'password';
+  ic.innerHTML = on
+    ? '<path d="M3 3l18 18"/><path d="M10.6 6.2A9.6 9.6 0 0112 6c6.5 0 10 6 10 6a17 17 0 01-3.2 3.8M6.5 7.8A17 17 0 002 12s3.5 6 10 6a9.7 9.7 0 003.5-.6"/><path d="M9.9 9.9a2.6 2.6 0 003.7 3.7"/>'
+    : '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/>';
+  el.focus();
+}
+function refreshSave(){
+  var b=$mp('mpSave'); if(!b) return;
+  var changed=isChanged();
+  /* 바꾼 항목이 생겨야 본인 확인을 받는다. 없으면 확인할 이유가 없다 */
+  var sec=$mp('mpAuthSec');
+  if(sec){
+    sec.style.display = changed ? '' : 'none';
+    if(!changed && pwChecked){ pwChecked=false; showPwOk(false); }
+    if(!changed){ var pw=$mp('mpPw'); if(pw && pw.value){ pw.value=''; showMpErr(pw,$mp('mpPwErr'),''); } }
+  }
+  b.disabled=!(nameMsg()===''&&emailMsg()===''&&changed&&pwMsg()===''); }
+function onMp(){
+  if($mp('mpName').classList.contains('has-error')&&nameMsg()==='') vName(true);
+  if($mp('mpEmail').classList.contains('has-error')&&emailMsg()==='') vEmail(true);
+  if($mp('mpPw').classList.contains('has-error')&&pwMsg()==='') vPw(true);
+  refreshSave(); }
+function saveMp(){
+  var okN=vName(true), okE=vEmail(true), okP=vPw(true);
+  /* 첫 오류 필드에 포커스한다(공통정책 7.8) */
+  if(!okN||!okE||!okP){ (!okN?$mp('mpName'):!okE?$mp('mpEmail'):$mp('mpPw')).focus(); return; }
+  var b=$mp('mpSave'); b.classList.add('loading'); b.disabled=true;
+  setTimeout(function(){ b.classList.remove('loading');
+    MP_ORIG.name=$mp('mpName').value.trim(); MP_ORIG.email=$mp('mpEmail').value.trim();
+    /* 저장하면 조회 화면으로 돌아간다 */
+    /* 변경 알림은 공통 레이아웃 좌측 하단 알림 영역에서 정의한다.
+       이메일 발송은 기능 개발 후 붙인다 */
+    go('mypage'); showToast('저장되었습니다.',true); },800); }
+/* 취소하면 조회 화면으로 돌아간다. 변경분이 있으면 확인을 받는다(공통정책 7.2) */
+function cancelMp(){ if(isChanged()){ $mp('cancelOv').classList.add('show'); } else { go('mypage'); } }
+function closeCancel(){ $mp('cancelOv').classList.remove('show'); }
+function doCancel(){ resetMp(); $mp('cancelOv').classList.remove('show'); go('mypage'); }
+function resetMp(){ $mp('mpName').value=MP_ORIG.name; $mp('mpEmail').value=MP_ORIG.email;
+  $mp('mpPw').value=''; pwChecked=false; showPwOk(false);
+  vName(false); vEmail(false); vPw(false); refreshSave(); }
+/* 비밀번호 변경은 별도 모달로 제공한다. 화면 규격은 비밀번호 변경 기획서를 따른다 */
+function openPw(){ showToast('비밀번호 변경 모달이 열립니다. 화면 구성은 비밀번호 변경 기획서에서 확인할 수 있습니다.',true); }
+var mpToastTimer,mpToastDur=3000;
+function showToast(msg,ok){ var t=$mp('toast'); if(!t) return; var isErr=(ok===false); t.classList.toggle('ok',!isErr); t.classList.toggle('err',isErr);
+  t.querySelector('.ti').innerHTML = isErr ? '<path d="M18 6 6 18M6 6l12 12"/>' : '<path d="M20 6 9 17l-5-5"/>';
+  $mp('toastMsg').textContent=msg; mpToastDur=isErr?5000:3000; t.classList.add('show'); clearTimeout(mpToastTimer);
+  mpToastTimer=setTimeout(function(){t.classList.remove('show');},mpToastDur); }
+function hideToast(){ clearTimeout(mpToastTimer); var t=$mp('toast'); if(t) t.classList.remove('show'); }
+(function(){ var t=document.getElementById('toast'); if(!t) return;
+  t.addEventListener('mouseenter',function(){clearTimeout(mpToastTimer);});
+  t.addEventListener('mouseleave',function(){ if(t.classList.contains('show')){clearTimeout(mpToastTimer); mpToastTimer=setTimeout(function(){t.classList.remove('show');},mpToastDur);} }); })();
+function pickLang(btn,name){
+  event.stopPropagation();
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  document.getElementById('langCur').textContent=name;
+  document.getElementById('langRow').classList.remove('open');
+  document.getElementById('langList').classList.remove('open');
+}
+
+/* ===== 초기 렌더 (모든 함수·변수 정의 이후 실행) ===== */
+document.querySelectorAll('.nav a').forEach(function(a){a.classList.remove('active')});
+render('mypage');
+refreshSave();
 </script>
 <div class="demo-bar" id="demoBar">
   <span class="demo-label">화면:</span>
@@ -717,65 +722,65 @@
   <button class="th on" onclick="setTheme(true,this)">다크</button>
 </div>
 <script>
-  function setTheme(dark,btn){
-    document.body.classList.toggle('dark',dark);
-    document.querySelectorAll('#demoBar .th').forEach(function(b){ b.classList.remove('on'); });
-    if(btn) btn.classList.add('on');
-  }
-  /* 데이터 상태 — 조회 중·조회 실패를 폼 자리에 표시한다(공통정책 4.1) */
-  let mpState='default';
-  function setState(v,btn){
-    mpState=v;
-    document.querySelectorAll('#demoBar .st').forEach(function(b){ b.classList.remove('on'); });
-    if(btn) btn.classList.add('on');
-    drawMpState();
-  }
-  function drawMpState(){
-    go('mypage');
-    if(mpState==='default') return;
-    const box=document.querySelector('.mp-form'); if(!box) return;
-    box.innerHTML = mpState==='loading'
-            ? '<div class="mp-state"><div class="mp-spin"></div><p>계정 정보를 불러오고 있습니다.</p></div>'
-            : '<div class="mp-state"><h3>계정 정보를 불러오지 못했습니다.</h3>'
-            + '<p>잠시 후 다시 시도해 주세요.</p>'
-            + '<button class="btn2 pri" onclick="setState(\'default\',document.querySelectorAll(\'#demoBar .st\')[0])">다시 시도</button></div>';
-  }
-  /* 화면 전환 — 조회 / 수정 */
-  function goDemo(key,btn){
-    document.querySelectorAll('#demoBar .vw').forEach(function(b){ b.classList.remove('on'); });
-    if(btn) btn.classList.add('on');
-    go(key);
-  }
-  /* 비밀번호 상태 — 권고 주기 90일 초과 시 안내한다(계정정책 2.2).
-     임시 비밀번호는 최초 로그인 시 변경을 강제하므로 마이페이지에 도달할 수 없다.
-     강제 변경 화면은 별도 기획 대상이다.
-     초기 렌더가 이 선언보다 먼저 실행되므로 var 로 둔다 */
-  var pwState='ok';
-  function setPw(v,btn){
-    pwState=v;
-    document.querySelectorAll('#demoBar .pw').forEach(function(b){ b.classList.remove('on'); });
-    if(btn) btn.classList.add('on');
-    drawPwHint();
-  }
-  /* 화면을 다시 그릴 때도 비밀번호 상태를 유지한다 */
-  function drawPwHint(){
-    const v=pwState;
-    const el=document.getElementById('pwHint'); if(!el) return;
-    const box=document.getElementById('pwAlert');
-    /* 마지막 변경일은 값이라 늘 남긴다. 주기 초과는 조건부라 알림 박스로 분리한다 */
-    el.className='mp-hint'; el.style.margin='0';
-    el.textContent = v==='old' ? '마지막 변경 2026-03-01' : '마지막 변경 2026-06-01';
-    if(!box) return;
-    box.innerHTML = v==='old'
-            ? '<div class="alertbox warn">'
-            + '<svg class="aic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'
-            +   '<path d="M12 8v5M12 16.5v.01"/><circle cx="12" cy="12" r="9"/></svg>'
-            + '<div class="atx"><b>비밀번호를 변경한 지 90일이 넘었습니다.</b>새 비밀번호로 변경하는 것을 권장합니다.</div>'
-            + '<button class="aclose" aria-label="닫기" onclick="this.closest(\'.alertbox\').remove()">✕</button>'
-            + '</div>'
-            : '';
-  }
-  setTheme(true);
+function setTheme(dark,btn){
+  document.body.classList.toggle('dark',dark);
+  document.querySelectorAll('#demoBar .th').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+}
+/* 데이터 상태 — 조회 중·조회 실패를 폼 자리에 표시한다(공통정책 4.1) */
+let mpState='default';
+function setState(v,btn){
+  mpState=v;
+  document.querySelectorAll('#demoBar .st').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  drawMpState();
+}
+function drawMpState(){
+  go('mypage');
+  if(mpState==='default') return;
+  const box=document.querySelector('.mp-form'); if(!box) return;
+  box.innerHTML = mpState==='loading'
+    ? '<div class="mp-state"><div class="mp-spin"></div><p>계정 정보를 불러오고 있습니다.</p></div>'
+    : '<div class="mp-state"><h3>계정 정보를 불러오지 못했습니다.</h3>'
+      + '<p>잠시 후 다시 시도해 주세요.</p>'
+      + '<button class="btn2 pri" onclick="setState(\'default\',document.querySelectorAll(\'#demoBar .st\')[0])">다시 시도</button></div>';
+}
+/* 화면 전환 — 조회 / 수정 */
+function goDemo(key,btn){
+  document.querySelectorAll('#demoBar .vw').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  go(key);
+}
+/* 비밀번호 상태 — 권고 주기 90일 초과 시 안내한다(계정정책 2.2).
+   임시 비밀번호는 최초 로그인 시 변경을 강제하므로 마이페이지에 도달할 수 없다.
+   강제 변경 화면은 별도 기획 대상이다.
+   초기 렌더가 이 선언보다 먼저 실행되므로 var 로 둔다 */
+var pwState='ok';
+function setPw(v,btn){
+  pwState=v;
+  document.querySelectorAll('#demoBar .pw').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  drawPwHint();
+}
+/* 화면을 다시 그릴 때도 비밀번호 상태를 유지한다 */
+function drawPwHint(){
+  const v=pwState;
+  const el=document.getElementById('pwHint'); if(!el) return;
+  const box=document.getElementById('pwAlert');
+  /* 마지막 변경일은 값이라 늘 남긴다. 주기 초과는 조건부라 알림 박스로 분리한다 */
+  el.className='mp-hint'; el.style.margin='0';
+  el.textContent = v==='old' ? '마지막 변경 2026-03-01' : '마지막 변경 2026-06-01';
+  if(!box) return;
+  box.innerHTML = v==='old'
+    ? '<div class="alertbox warn">'
+      + '<svg class="aic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'
+      +   '<path d="M12 8v5M12 16.5v.01"/><circle cx="12" cy="12" r="9"/></svg>'
+      + '<div class="atx"><b>비밀번호를 변경한 지 90일이 넘었습니다.</b>새 비밀번호로 변경하는 것을 권장합니다.</div>'
+      + '<button class="aclose" aria-label="닫기" onclick="this.closest(\'.alertbox\').remove()">✕</button>'
+      + '</div>'
+    : '';
+}
+setTheme(true);
 </script>
 </body>
 </html>
