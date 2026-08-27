@@ -1,7 +1,3 @@
-<!--
-  콘체르토 매니저 — 모델 화면 목업 v0.31 (2026-08-26)
-  색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다.
--->
 <style>
 /* ===== 컴포넌트 라이브러리 역할 토큰 (정본) ===== */
 :root{
@@ -244,7 +240,8 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .skrow{height:14px;border-radius:5px;background:linear-gradient(90deg,var(--muted) 25%,var(--border) 50%,var(--muted) 75%);background-size:200% 100%;animation:sk 1.3s infinite}
 @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
 /* 사이드 패널 */
-
+.pnbg{position:fixed;inset:0;background:transparent;z-index:80;display:none}
+.pnbg.on{display:block}
 .panel{position:fixed;top:var(--header-h);right:0;bottom:0;width:440px;max-width:92vw;background:var(--card);border-left:1px solid var(--border);z-index:90;transform:translateX(102%);transition:transform .2s ease;display:flex;flex-direction:column;box-shadow:-14px 0 40px var(--shadow)}
 .panel.on{transform:translateX(0)}
 .pnhead{padding:18px 20px 14px;border-bottom:1px solid var(--border);flex:0 0 auto}
@@ -563,11 +560,8 @@ th.thcell.fdd-on .fdd{display:block}
       <div class="flywrap" id="setWrap">
         <a href="#" class="has-fly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 00-1.7-1L15 3H9l-.4 2.6a7.6 7.6 0 00-1.7 1l-2.3-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 001.7 1L9 21h6l.4-2.6a7.6 7.6 0 001.7-1l2.3 1 2-3.4z"/></svg><span class="lb">플랫폼 설정</span></a>
         <div class="flyout">
-          <a href="#">사용자 및 역할</a>
-          <a href="#">보안 및 감사</a>
-          <a href="#">인프라 자원</a>
-          <a href="#">카탈로그</a>
-          <a href="#">연동 및 알림</a>
+          <a href="#">사용자 및 역할 <span class="tb">RBAC</span></a>
+          <a href="#">보안 및 감사</a><a href="#">외부 연동</a><a href="#">알림 채널</a>
         </div>
       </div>
     </div>
@@ -598,11 +592,9 @@ th.thcell.fdd-on .fdd{display:block}
         </div>
       </div>
 
-      <!-- 탭 배지는 그 건수가 탭을 열기 전 판단에 쓰일 때만 둔다.
-           이미지와 가중치는 성격이 다른 자산이라 건수를 견줄 이유가 없다 -->
       <div class="tabs">
-        <button id="tabA" class="on" onclick="setTab('A')">모델 이미지</button>
-        <button id="tabB" onclick="setTab('B')">원천 가중치</button>
+        <button id="tabA" class="on" onclick="setTab('A')">모델 이미지 <span class="cnt" id="cntA">12</span></button>
+        <button id="tabB" onclick="setTab('B')">원천 가중치 <span class="cnt" id="cntB">6</span></button>
       </div>
 
       <div class="toolbar">
@@ -615,7 +607,7 @@ th.thcell.fdd-on .fdd{display:block}
         </div>
         
         <div class="tspacer"></div>
-        <!-- 기본 노출에서 뺀 항목(태그·최근 변경일시·토크나이저 경로)을 볼 수단이다.
+        <!-- 기본 노출에서 뺀 항목(태그·최종 수정일시·토크나이저 경로)을 볼 수단이다.
              기본 노출만 아홉이라 가로 스크롤이 생긴다(공통정책 3.4) -->
         <button class="cbtn" title="열 편집"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg></button>
         <button class="cbtn" title="다운로드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg></button>
@@ -655,8 +647,7 @@ th.thcell.fdd-on .fdd{display:block}
   </main>
 </div>
 <!-- 사이드 패널 MODEL-L01.P01 -->
-<!-- 배경막을 두지 않는다. 패널이 열려 있어도 목록·GNB·헤더를 한 번의 클릭으로 조작한다.
-     닫기는 닫기 버튼과 ESC 다 — 외부 클릭으로는 닫지 않는다(공통정책 4.2.4·4.2.5) -->
+<div class="pnbg" id="pnbg" onclick="closePanel()"></div>
 <aside class="panel" id="panel">
   <div class="pnhead">
     <div class="r1">
@@ -845,24 +836,6 @@ th.thcell.fdd-on .fdd{display:block}
 </div>
 <script>
 /* ── v0.31 변경 ──────────────────────────────────
-   · 목록 탭(모델 이미지·원천 가중치)에서 건수 배지를 뺐다. 탭 배지는 그 건수가 탭을
-     열기 전 판단에 쓰일 때 둔다 — 둘은 성격이 다른 자산이라 건수를 견줄 이유가 없다.
-     상세 탭(버전·배포)은 그대로 둔다. 배포 건수는 삭제 차단 판단 재료다.
-   · 캐싱 중·빌드 중일 때 막히는 작업에 사유를 붙였다. 비활성만 되어 있어
-     왜 못 누르는지 알 수 없었다(상태로 막힌 것은 비활성 + 사유).
-   · 캐싱 중·빌드 중 자산의 기본 정보 수정을 막았다. 표시 범위가 바뀌면 캐싱·빌드 대상이
-     달라진다. 버전 메뉴(노드 캐싱·이미지 빌드)와 같은 기준이다.
-   · 등록한 모델이 전역으로만 들어가던 것을 고쳤다. 폼에서 고른 표시 범위를 읽지 않고
-     `scope:'전역', ws:'-'` 로 박아 두었다. 반입 진행 행에도 어디로 들어가는지 함께 보인다.
-   · 기본 정보 수정이 열리지 않던 것을 고쳤다. `openEdit` 안에 `const cur` 이 있어
-     함수 전체에서 전역 `cur`(패널에 열린 대상)이 가려졌다. 지역 변수를 `curWs` 로 바꿨다.
-   · 원시값을 화면 문구로 바꿨다(공통정책 7.9).
-     `MONOLITHIC` → `단일`, `PD 분산` → `프리필·디코드 분리`(배포정책 4.5 와 같은 말),
-     양자화 `NONE` → `적용 안 함`, 요구 가속기 `Universal / Any` → `제한 없음`.
-   · 패널 배경막(.pnbg)과 외부 클릭 닫기를 뺐다. 배경 클릭을 가로채는 레이어를 두면
-     패널이 열린 동안 목록·GNB 를 조작할 수 없다. 닫기는 닫기 버튼과 ESC 다
-     (공통정책 4.2.4·4.2.5 · 워크스페이스 목업과 같은 규격).
-   · 모델 삭제 알럿에 함께 사라지는 버전 수를 넣었다(모델정책 2.5).
    · 선택된 행 클래스를 `.sel` 에서 `.rowsel` 로 바꿨다. `.sel` 은 select 요소 클래스와
      이름이 겹쳐 같은 이름이 두 가지를 가리키고 있었다. 다른 목업과 같은 규격이다.
    · 토큰 `--hover-strong` · `--selected-soft` 를 추가했다. 라이브러리 v0.6 에 있는데
@@ -891,55 +864,55 @@ function userRef(txt){
 
 /* ===== 데이터 (현행 관측값 기준 · 시스템 컴포넌트 제외 — 7.2 안 A) ===== */
 const IMG=[
- {n:'gpt-oss-120b-furiosa',v:'1.0.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',tags:['추천','대형'],by:'관리자(admin)',at:'2026-07-08 17:47:25',eng:'vLLM',base:'Official Base',
-  arch:{p:'-',c:'-',q:'적용 안 함',d:'-'},infra:{v:'-',r:'아니요',g:'제한 없음'},store:'model-registry/gpt-oss-120b-furiosa:v1.0.0',mode:'단일',deps:[]},
- {n:'gpt-oss-20b',v:'latest',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',tags:['경량'],by:'관리자(admin)',at:'2026-04-15 11:02:10',eng:'vLLM',base:'Custom Build',
-  arch:{p:'20B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'48',r:'아니요',g:'제한 없음'},store:'model-registry/gpt-oss-20b:latest',mode:'단일',deps:[]},
+ {n:'gpt-oss-120b-furiosa',v:'1.0.0',ready:'미캐싱',cn:0,use:'배포 중',scope:'전역',ws:'-',tags:['추천','대형'],by:'관리자(admin)',at:'2026-07-08 17:47:25',eng:'vLLM',base:'Official Base',
+  arch:{p:'-',c:'-',q:'NONE',d:'-'},infra:{v:'-',r:'아니요',g:'Universal / Any'},store:'model-registry/gpt-oss-120b-furiosa:v1.0.0',mode:'MONOLITHIC',deps:[{n:'furiosa-gpt-oss-120b-biz-prod',ws:'공용 워크스페이스',st:'정상'}]},
+ {n:'gpt-oss-20b',v:'latest',ready:'캐싱됨',cn:3,use:'배포 중',scope:'전역',ws:'-',tags:['경량'],by:'관리자(admin)',at:'2026-04-15 11:02:10',eng:'vLLM',base:'Custom Build',
+  arch:{p:'20B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'48',r:'아니요',g:'Universal / Any'},store:'model-registry/gpt-oss-20b:latest',mode:'MONOLITHIC',deps:[{n:'gpt-oss-20b-biz-prod',ws:'ai-service-team',st:'정상'}]},
  {n:'k-exaone-236b-a23b-nvfp4a16',v:'1.0.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 14:20:00',eng:'vLLM',base:'Official Base',
-  arch:{p:'236B',c:'-',q:'NVFP4',d:'-'},infra:{v:'320',r:'예',g:'NVIDIA-H200'},store:'model-registry/k-exaone-236b-a23b-nvfp4a16:v1.0.0',mode:'프리필·디코드 분리',deps:[]},
- {n:'solar-open-100b-nvfp4a16',v:'1.0.0',ready:'미캐싱',cn:0,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 13:55:41',eng:'vLLM',base:'Official Base',
-  arch:{p:'100B',c:'-',q:'NVFP4',d:'-'},infra:{v:'160',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/solar-open-100b-nvfp4a16:v1.0.0',mode:'단일',deps:[{n:'solar-open-100b-paused',ws:'ai-service-team',st:'중지됨'}]},
+  arch:{p:'236B',c:'-',q:'NVFP4',d:'-'},infra:{v:'320',r:'예',g:'NVIDIA-H200'},store:'model-registry/k-exaone-236b-a23b-nvfp4a16:v1.0.0',mode:'PD 분산',deps:[]},
+ {n:'solar-open-100b-nvfp4a16',v:'1.0.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 13:55:41',eng:'vLLM',base:'Official Base',
+  arch:{p:'100B',c:'-',q:'NVFP4',d:'-'},infra:{v:'160',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/solar-open-100b-nvfp4a16:v1.0.0',mode:'MONOLITHIC',deps:[]},
  {n:'qwen3-5-122b-a10b-gptq-int4',v:'1.0.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-28 09:11:07',eng:'vLLM',base:'Official Base',
-  arch:{p:'122B',c:'-',q:'GPTQ-INT4',d:'-'},infra:{v:'96',r:'아니요',g:'제한 없음'},store:'model-registry/qwen3-5-122b-a10b-gptq-int4:v1.0.0',mode:'단일',deps:[]},
- {n:'furiosa-qwen3-32b-fp8',v:'latest',ready:'캐싱됨',cn:2,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-25 16:40:33',eng:'vLLM',base:'Official Base',
-  arch:{p:'32B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'Furiosa RNGD'},store:'model-registry/furiosa-qwen3-32b-fp8:latest',mode:'단일',deps:[{n:'furiosa-qwen3-32b-npu',ws:'test-npu',st:'오류'}]},
+  arch:{p:'122B',c:'-',q:'GPTQ-INT4',d:'-'},infra:{v:'96',r:'아니요',g:'Universal / Any'},store:'model-registry/qwen3-5-122b-a10b-gptq-int4:v1.0.0',mode:'MONOLITHIC',deps:[]},
+ {n:'furiosa-qwen3-32b-fp8',v:'latest',ready:'캐싱됨',cn:2,use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-25 16:40:33',eng:'vLLM',base:'Official Base',
+  arch:{p:'32B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'Furiosa RNGD'},store:'model-registry/furiosa-qwen3-32b-fp8:latest',mode:'MONOLITHIC',deps:[]},
  {n:'qwen-next-80b-a3b-thinking',v:'latest',ready:'미캐싱',cn:0,use:'미사용',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-20 10:05:12',eng:'vLLM',base:'Custom Build',
-  arch:{p:'80B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'128',r:'아니요',g:'제한 없음'},store:'model-registry/qwen-next-80b-a3b-thinking:latest',mode:'단일',deps:[]},
- {n:'llama-3.2-1b-instruct',v:'latest',ready:'캐싱 중',cn:1,use:'배포 중',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-18 15:32:44',eng:'vLLM',base:'Custom Build',
-  arch:{p:'1B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'8',r:'아니요',g:'제한 없음'},store:'model-registry/llama-3.2-1b-instruct:latest',mode:'단일',deps:[{n:'llama-3-2-1b-prod',ws:'ai-service-team',st:'정상'}]},
- {n:'gemma-4-12b-it',v:'1.0.0',ready:'미캐싱',cn:0,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-15 11:18:29',eng:'vLLM',base:'Official Base',
-  arch:{p:'12B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'32',r:'아니요',g:'제한 없음'},store:'model-registry/gemma-4-12b-it:v1.0.0',mode:'단일',deps:[{n:'gemma-4-12b-it-idle',ws:'ai-service-team',st:'유휴'}]},
+  arch:{p:'80B',c:'-',q:'NONE',d:'-'},infra:{v:'128',r:'아니요',g:'Universal / Any'},store:'model-registry/qwen-next-80b-a3b-thinking:latest',mode:'MONOLITHIC',deps:[]},
+ {n:'llama-3.2-1b-instruct',v:'latest',ready:'캐싱 중',cn:1,use:'미사용',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-18 15:32:44',eng:'vLLM',base:'Custom Build',
+  arch:{p:'1B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'8',r:'아니요',g:'Universal / Any'},store:'model-registry/llama-3.2-1b-instruct:latest',mode:'MONOLITHIC',deps:[]},
+ {n:'gemma-4-12b-it',v:'1.0.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-15 11:18:29',eng:'vLLM',base:'Official Base',
+  arch:{p:'12B',c:'-',q:'NONE',d:'-'},infra:{v:'32',r:'아니요',g:'Universal / Any'},store:'model-registry/gemma-4-12b-it:v1.0.0',mode:'MONOLITHIC',deps:[]},
  {n:'gpt-oss-120b',v:'latest',ready:'캐싱됨',cn:3,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-10 09:44:51',eng:'vLLM',base:'Custom Build',
-  arch:{p:'120B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'160',r:'아니요',g:'제한 없음'},store:'model-registry/gpt-oss-120b:latest',mode:'단일',deps:[{n:'gpt-oss-120b-symphony',ws:'ai-service-team',st:'정상'}]},
+  arch:{p:'120B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'160',r:'아니요',g:'Universal / Any'},store:'model-registry/gpt-oss-120b:latest',mode:'MONOLITHIC',deps:[{n:'gpt-oss-120b-symphony',ws:'ai-service-team',st:'정상'}]},
  {n:'gemma-4-31b-it-fp8-block',v:'1.0.0',ready:'캐싱됨',cn:3,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-05 17:22:03',eng:'vLLM',base:'Official Base',
-  arch:{p:'31B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'제한 없음'},store:'model-registry/gemma-4-31b-it-fp8-block:v1.0.0',mode:'단일',deps:[{n:'gemma-4-31b-fp8-failed',ws:'test-npu',st:'생성 실패'}]},
+  arch:{p:'31B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'Universal / Any'},store:'model-registry/gemma-4-31b-it-fp8-block:v1.0.0',mode:'MONOLITHIC',deps:[{n:'gemma-4-31b-it-fp8-block-symphony',ws:'ai-service-team',st:'정상'}]},
  {n:'qwen3-6-35b-a3b-fp8',v:'1.0.0',ready:'캐싱됨',cn:3,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-01 13:07:38',eng:'vLLM',base:'Official Base',
-  arch:{p:'35B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'제한 없음'},store:'model-registry/qwen3-6-35b-a3b-fp8:v1.0.0',mode:'단일',deps:[{n:'qwen3-6-35b-a3b-fp8-bench',ws:'ml-research',st:'유휴'}]},
+  arch:{p:'35B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'Universal / Any'},store:'model-registry/qwen3-6-35b-a3b-fp8:v1.0.0',mode:'MONOLITHIC',deps:[{n:'qwen3-6-35b-a3b-fp8-symphony',ws:'ai-service-team',st:'정상'}]},
  /* 같은 모델의 여러 버전 — 목록 행 단위를 비교하기 위한 데모 데이터 */
  {n:'qwen3-32b',v:'v3.6',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',tags:['추천'],by:'임승주(sj.lim)',at:'2026-08-01 09:12:00',eng:'vLLM',base:'Official Base',
-  arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.6',mode:'단일',deps:[]},
- {n:'qwen3-32b',v:'v3.2',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',tags:['추천'],by:'성유진(yj.seong)',at:'2026-06-11 15:40:22',eng:'vLLM',base:'Official Base',
-  arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.2',mode:'단일',deps:[]},
+  arch:{p:'32B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.6',mode:'MONOLITHIC',deps:[]},
+ {n:'qwen3-32b',v:'v3.2',ready:'캐싱됨',cn:3,use:'배포 중',scope:'전역',ws:'-',tags:['추천'],by:'성유진(yj.seong)',at:'2026-06-11 15:40:22',eng:'vLLM',base:'Official Base',
+  arch:{p:'32B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.2',mode:'MONOLITHIC',deps:[{n:'qwen3-32b-chat-prod',ws:'ai-service-team',st:'정상'},{n:'qwen3-32b-batch',ws:'llm-research',st:'정상'}]},
  {n:'qwen3-32b',v:'v3.1',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'성유진(yj.seong)',at:'2026-04-02 11:05:10',eng:'vLLM',base:'Official Base',
-  arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.1',mode:'단일',deps:[]},
+  arch:{p:'32B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.1',mode:'MONOLITHIC',deps:[]},
  {n:'qwen3-32b',v:'v3.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'성유진(yj.seong)',at:'2026-02-15 10:00:00',eng:'vLLM',base:'Official Base',
-  arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.0',mode:'단일',deps:[]},
+  arch:{p:'32B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.0',mode:'MONOLITHIC',deps:[]},
  {n:'llama-3.2-1b-instruct',v:'v2.0',ready:'캐싱됨',cn:3,use:'미사용',scope:'워크스페이스 전용',ws:'ai-service-team',by:'유지현(jh.yu)',at:'2026-07-20 16:33:41',eng:'vLLM',base:'Custom Build',
-  arch:{p:'1B',c:'8,192',q:'적용 안 함',d:'BF16'},infra:{v:'8',r:'아니요',g:'제한 없음'},store:'model-registry/llama-3.2-1b-instruct:v2.0',mode:'단일',deps:[]}
+  arch:{p:'1B',c:'8,192',q:'NONE',d:'BF16'},infra:{v:'8',r:'아니요',g:'Universal / Any'},store:'model-registry/llama-3.2-1b-instruct:v2.0',mode:'MONOLITHIC',deps:[]}
 ];
 const WGT=[
  {n:'gpt-oss-20b',v:'1.0.0',ready:'빌드 중',path:'s3://concerto-models/gpt-oss-20b',size:'2.02 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-04-15 10:58:00',tok:'gpt-oss-20b/tokenizer.json',built:'gpt-oss-20b:latest',
-  arch:{p:'20B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'48',r:'아니요',g:'제한 없음'}},
+  arch:{p:'20B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'48',r:'아니요',g:'Universal / Any'}},
  {n:'qwen3.5-122b-a10b-fp8',v:'1.0.0',ready:'미빌드',path:'s3://concerto-models/qwen3.5-122b-a10b-fp8',size:'12.23 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-28 09:02:11',tok:'-',built:'',
-  arch:{p:'122B',c:'-',q:'FP8',d:'-'},infra:{v:'96',r:'아니요',g:'제한 없음'}},
+  arch:{p:'122B',c:'-',q:'FP8',d:'-'},infra:{v:'96',r:'아니요',g:'Universal / Any'}},
  {n:'solar-open-100b',v:'1.0.0',ready:'미빌드',path:'s3://concerto-models/solar-open-100b',size:'1.71 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 13:40:22',tok:'-',built:'',
-  arch:{p:'100B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'160',r:'아니요',g:'제한 없음'}},
+  arch:{p:'100B',c:'-',q:'NONE',d:'-'},infra:{v:'160',r:'아니요',g:'Universal / Any'}},
  {n:'qwen3-next-80b-a3b-thinking',v:'latest',ready:'미빌드',path:'s3://concerto-models/qwen3-next-80b-a3b-thinking',size:'12.23 MB',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-20 09:50:03',tok:'-',built:'',
-  arch:{p:'80B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'128',r:'아니요',g:'제한 없음'}},
+  arch:{p:'80B',c:'-',q:'NONE',d:'-'},infra:{v:'128',r:'아니요',g:'Universal / Any'}},
  {n:'llama-3.2-1b',v:'latest',ready:'미빌드',path:'s3://concerto-models/llama-3.2-1b',size:'6.71 MB',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-18 15:20:17',tok:'llama-3.2-1b/tokenizer.json',built:'',
-  arch:{p:'1B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'8',r:'아니요',g:'제한 없음'}},
+  arch:{p:'1B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'8',r:'아니요',g:'Universal / Any'}},
  {n:'gpt-oss-120b',v:'1.0.0',ready:'미빌드',path:'s3://concerto-models/gpt-oss-120b',size:'2.02 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-10 09:30:44',tok:'-',built:'',
-  arch:{p:'120B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'160',r:'아니요',g:'제한 없음'}}
+  arch:{p:'120B',c:'131,072',q:'NONE',d:'BF16'},infra:{v:'160',r:'아니요',g:'Universal / Any'}}
 ];
 const NODES=[
  {n:'furiosa',acc:'rngd',cpu:'128',mem:'1,007 GB',cached:true},
@@ -958,9 +931,7 @@ const RB2={'정상':'ok','경고':'wa','위험':'cr'};
    정상 사용 중이므로 .ok 다(용어집 5.2) */
 const UB={'배포 중':'ok','미사용':'mu'};
 /* 배포 목업과 같은 목록이다. `전체` 는 스위처가 따로 두므로 목록에 넣지 않는다 */
-/* 삭제 중·삭제 실패 워크스페이스는 등록·배포 대상이 되지 않는다.
-   ⚠ 상태는 워크스페이스가 갖고 있다. 화면은 활성만 조회해 받는다(확인 항목) */
-const WSLIST=['공용 워크스페이스','ai-service-team','ml-research','test-npu'];
+const WSLIST=['공용 워크스페이스','ai-service-team','llm-research','npu-bench'];
 
 let tab='A', state='default', role='super', cur=null;
 const canWrite=()=>role!=='viewer';
@@ -971,7 +942,7 @@ const canWrite=()=>role!=='viewer';
 let wsCur='전체', wsQ='', composing=false;
 /* 상세 진입 전 범위를 기억한다. 돌아갈 때 되돌린다 */
 let wsBack=null;
-const MYWS={ super:[], admin:['ai-service-team'], editor:['ai-service-team','ml-research'], viewer:['ai-service-team'] };
+const MYWS={ super:[], admin:['ai-service-team'], editor:['ai-service-team','llm-research'], viewer:['ai-service-team'] };
 const isSuper=()=>role==='super';
 const isAll=()=>wsCur==='전체';
 
@@ -1104,7 +1075,7 @@ const FDEF={
         보이나 필터는 두 갈래로 좁힌다 */
      {k:'scope',l:'표시 범위',opts:['전역','워크스페이스 전용']},
      {k:'eng',  l:'엔진',    opts:['vLLM']},
-     {k:'gpu',  l:'요구 가속기',opts:['제한 없음','NVIDIA-H200','Furiosa RNGD']}],
+     {k:'gpu',  l:'요구 가속기',opts:['Universal / Any','NVIDIA-H200','Furiosa RNGD']}],
   B:[{k:'ready',l:'빌드 상태',opts:['미빌드','빌드 중','빌드됨','빌드 실패']},
      {k:'scope',l:'표시 범위',opts:['전역','워크스페이스']}]
 };
@@ -1121,7 +1092,7 @@ const COLDEF={
     +'<dt>미빌드</dt><dd>아직 이미지로 만들지 않았습니다.</dd>'
     +'<dt>빌드 실패</dt><dd>이미지 생성에 실패했습니다. 다시 시도할 수 있습니다.</dd></dl>',
   use:'이 모델을 쓰는 배포 건수입니다. 건수에 손을 올리면 배포 이름을 보입니다.'
-    +'<dl><dt>건수</dt><dd>이 모델을 쓰는 배포가 있습니다. 배포를 먼저 종료해야 모델을 지울 수 있습니다.</dd>'
+    +'<dl><dt>건수</dt><dd>이 모델을 쓰는 배포가 있습니다. 배포를 먼저 지워야 모델을 지울 수 있습니다.</dd>'
     +'<dt>-</dt><dd>쓰는 배포가 없습니다.</dd></dl>',
   eng:'모델 이미지에 결합된 서빙 엔진을 표시합니다.',
   gpu:'이 모델을 배포하는 데 필요한 가속기를 벤더·유형으로 표시합니다.',
@@ -1238,6 +1209,8 @@ function rows(){
 }
 function render(){
   const el=document.getElementById('listArea'),pg=document.getElementById('pager');
+  document.getElementById('cntA').textContent=scoped(IMG).length;
+  document.getElementById('cntB').textContent=scoped(WGT).length;
   document.getElementById('pact').style.display=canWrite()?'flex':'none';
 
   if(state==='loading'){pg.style.display='none';
@@ -1258,8 +1231,7 @@ function render(){
      값만 봐도 전역인지 알 수 있어 표시 범위 컬럼을 따로 두지 않는다.
      종전에는 전체 선택 시에만 컬럼을 두고 이름 셀에 `전용` 배지를 붙였으나,
      좁혀 보면 전용 모델이 어디 것인지 확인할 수단이 사라졌다 */
-  /* 컬럼 순서 — 공통정책 2.2 를 따르되 담당자 자리에 등록자를 둔다(모델은 담당자를 두지 않는다).
-     이름 → 상태 → 유형 → 표시 범위 → 등록자 → 등록일시 → 작업 */
+  /* 컬럼 순서 — 공통정책 2.2: 이름 → 상태 → 유형 → 워크스페이스 → 생성자 → 생성일시 → 작업 */
   /* 컬럼 순서 — 공통정책 2.2 / 상태 컬럼에 도움말 팝오버(2.3) + 필터(3.2) */
   /* 컬럼 순서 — 공통정책 2.2 / 정렬 3.1 / 상태 컬럼 도움말 2.3 + 필터 3.2 */
   const th = isA
@@ -1270,9 +1242,9 @@ function render(){
      +'<th class="thcell">'+thFilter('eng')+'</th>'
      +'<th class="thcell">'+thFilter('gpu')+'</th>'
      +'<th class="thcell">'+thHelp('vram','최소 vRAM')+'</th>'
-     +(showWs?'<th>표시 범위</th>':'')+'<th>등록자</th>'+sortTh('at','등록일시')+'<th style="width:64px">작업</th>'
+     +(showWs?'<th>표시 범위</th>':'')+'<th>등록자</th>'+sortTh('at','등록일시')+'<th style="width:44px"></th>'
    : sortTh('n','모델명')+'<th class="thcell">'+thFilter('ready')+'</th><th>경로·출처</th><th>용량</th>'
-     +(showWs?'<th>표시 범위</th>':'')+'<th>등록자</th>'+sortTh('at','등록일시')+'<th style="width:64px">작업</th>';
+     +(showWs?'<th>표시 범위</th>':'')+'<th>등록자</th>'+sortTh('at','등록일시')+'<th style="width:44px"></th>';
 
   el.innerHTML='<div class="tblwrap"><table class="tbl"><thead><tr>'+th+'</tr></thead><tbody>'+importRow()+
     d.map(m=>{const idx=(isA?IMG:WGT).indexOf(m);
@@ -1297,10 +1269,10 @@ function render(){
   const ws='<td>'+(m.scope==='전역'? '전역'
       : (m.ws==='-'? '<span class="dash">-</span>' : m.ws))+'</td>';
       const menu = isA
-        ? '<button onclick="openCache(\''+m.n+'\')"'+(busy?' disabled title="'+busyMsg(m)+'"':'')+'>노드 캐싱</button><button onclick="goDeploy(\''+m.n+'\',\''+m.ready+'\')">배포</button>'
-        : '<button onclick="build(\''+m.n+'\')"'+(busy?' disabled title="'+busyMsg(m)+'"':'')+'>이미지 빌드</button>';
+        ? '<button onclick="openCache(\''+m.n+'\')"'+(busy?' disabled':'')+'>노드 캐싱</button><button onclick="goDeploy(\''+m.n+'\',\''+m.ready+'\')">배포</button>'
+        : '<button onclick="build(\''+m.n+'\')"'+(busy?' disabled':'')+'>이미지 빌드</button>';
       const act=canWrite()
-        ? '<td onclick="event.stopPropagation()"><div class="more" id="m'+(isA?'i':'w')+idx+'"><button class="morebtn" onclick="tgMore(event,\'m'+(isA?'i':'w')+idx+'\')">⋯</button><div class="rowmenu">'+menu+'<hr><button class="d" onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+','+(m._vcnt||1)+')">삭제</button></div></div></td>'
+        ? '<td onclick="event.stopPropagation()"><div class="more" id="m'+(isA?'i':'w')+idx+'"><button class="morebtn" onclick="tgMore(event,\'m'+(isA?'i':'w')+idx+'\')">⋯</button><div class="rowmenu">'+menu+'<hr><button class="d" onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+')">삭제</button></div></div></td>'
         : '<td></td>';
       return '<tr onclick="openPanel('+idx+')">'+name+rd+mid+ws+'<td>'+userRef(m.by)+'</td><td>'+m.at+'</td>'+act+'</tr>';
     }).join('')+'</tbody></table></div>';
@@ -1357,12 +1329,6 @@ function sec(title,body,key){
 function tgSec(k){const el=document.getElementById('sec_'+k); if(el) el.classList.toggle('closed');}
 function help(k){const d=ITEMDEF[k]; return d?'<span class="dtic">?<span class="dtpop">'+d+'</span></span>':'';}
 function dv(v){return (v===''||v==='-'||v==null)?'<span class="dash">-</span>':v}
-/* 상태로 잠시 막히는 작업은 비활성으로 두고 사유를 안내한다.
-   권한 없는 기능의 미노출(공통정책 7.10)과 구분한다 */
-function busyMsg(m){
-  return '지금은 '+m.ready+' 상태라 실행할 수 없습니다.';
-}
-
 function openPanel(i){
   const isA=tab==='A'; const m=(isA?IMG:WGT)[i]; cur={m,isA};
   const busy = m.ready==='캐싱 중'||m.ready==='빌드 중';
@@ -1417,7 +1383,7 @@ function openPanel(i){
       +   (m.cn? cnCell(m)+'<span class="mver">'+cnNames(m).join(' · ')+'</span>'
                 : '<span class="dash">-</span>')+'</dd>'
       + '</dl>'
-      + (canWrite()?'<div class="secact"><button class="btn ghost sm" '+(busy?'disabled title="'+busyMsg(m)+'"':'')+' onclick="openCache(\''+m.n+'\')">'+(busy?'캐싱 중…':'노드 캐싱')+'</button>'
+      + (canWrite()?'<div class="secact"><button class="btn ghost sm" '+(busy?'disabled':'')+' onclick="openCache(\''+m.n+'\')">'+(busy?'캐싱 중…':'노드 캐싱')+'</button>'
         +'<button class="btn sm" onclick="goDeploy(\''+m.n+'\',\''+m.ready+'\')">배포</button></div>':'')
       + (m.ready==='미캐싱'?'<div class="secnote">노드에 캐싱되지 않은 이미지는 배포할 수 있으나 초기 기동이 지연됩니다.</div>':''), 'ready');
 
@@ -1439,11 +1405,12 @@ function openPanel(i){
       + '<dt>빌드 상태</dt><dd><span class="stbadge '+RB[m.ready]+(m.ready.indexOf('중')>-1?' load':'')+'"><span class="d"></span>'+m.ready+'</span></dd>'
       + '<dt>빌드 산출 이미지</dt><dd>'+(m.built?'<a href="#" class="mname" onclick="goImg(\''+m.built+'\');return false">'+m.built+'</a>':'<span class="dash">-</span>')+'</dd>'
       + '</dl>'
-      + (canWrite()?'<div class="secact"><button class="btn ghost sm" '+(busy?'disabled title="'+busyMsg(m)+'"':'')+' onclick="build(\''+m.n+'\')">'+(busy?'빌드 중…':'이미지 빌드')+'</button></div>':'')
+      + (canWrite()?'<div class="secact"><button class="btn ghost sm" '+(busy?'disabled':'')+' onclick="build(\''+m.n+'\')">'+(busy?'빌드 중…':'이미지 빌드')+'</button></div>':'')
       + '<div class="secnote">원천 가중치는 배포 대상이 아닙니다. 이미지로 빌드한 뒤 배포할 수 있습니다.</div>', 'ready');
   }
   document.getElementById('pnBody').innerHTML=h;
   document.getElementById('panel').classList.add('on');
+  document.getElementById('pnbg').classList.add('on');
   const list=rows(), pos=list.indexOf(m);
   document.querySelectorAll('table.tbl tbody tr').forEach(r=>r.classList.remove('rowsel'));
   if(pos>=0){const tr=document.querySelectorAll('table.tbl tbody tr')[pos]; if(tr)tr.classList.add('rowsel');}
@@ -1498,7 +1465,7 @@ function drawDetail(){
   /* 액션은 그 액션이 걸리는 대상 옆에 둔다(공통정책 3.6).
      `삭제` 는 모델 전체에 걸리므로 화면 헤더, `수정` 은 기본 정보 카드에 걸리므로 그 제목 옆이다 */
   document.getElementById('dAct').innerHTML = canWrite()
-    ? '<button class="btn danger-line" onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+','+(m._vcnt||1)+')">삭제</button>'
+    ? '<button class="btn danger-line" onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+')">삭제</button>'
     : '';
 
   let h='';
@@ -1540,7 +1507,7 @@ function drawDetail(){
     h+='<div class="tblwrap"><table class="tbl"><thead><tr>'
      + '<th>버전</th><th>'+(isA?'캐싱 상태':'빌드 상태')+'</th>'
    + (isA?'<th>캐싱 노드</th><th>사용 여부</th>':'')
-     + '<th>저장 경로</th><th>등록자</th><th>등록일시</th><th style="width:64px">작업</th></tr></thead><tbody>'
+     + '<th>저장 경로</th><th>등록자</th><th>등록일시</th><th style="width:44px"></th></tr></thead><tbody>'
      + vers.map(function(v,vi){
         const busy = v.ready==='캐싱 중'||v.ready==='빌드 중';
         return '<tr>'
@@ -1554,11 +1521,11 @@ function drawDetail(){
          + '<td>'+v.by+'</td><td>'+v.at+'</td>'
          + '<td>'+(canWrite()
              ? '<div class="more" id="vm'+vi+'"><button class="morebtn" onclick="tgMore(event,\'vm'+vi+'\')">⋯</button><div class="rowmenu">'
-               + '<button '+(busy?'disabled title="지금은 '+v.ready+' 상태라 실행할 수 없습니다."':'')+' onclick="act(\''+(isA?'노드 캐싱':'이미지 빌드')+'을 요청했습니다.\')">'+(isA?'노드 캐싱':'이미지 빌드')+'</button>'
+               + '<button '+(busy?'disabled':'')+' onclick="act(\''+(isA?'노드 캐싱':'이미지 빌드')+'을 요청했습니다.\')">'+(isA?'노드 캐싱':'이미지 빌드')+'</button>'
                + (isA?'<button onclick="act(\'배포 화면으로 이동합니다.\')">배포</button>':'')
                /* 배포에 쓰이는 버전은 삭제할 수 없다(정책 2.5) */
                + '<hr><button class="d"'+(v.use==='배포 중'?' disabled title="배포에 사용 중인 버전은 삭제할 수 없습니다."':'')
-               + ' onclick="delVer(\''+v.v+'\')">삭제</button>'
+               + ' onclick="act(\'버전을 삭제했습니다.\')">삭제</button>'
                + '</div></div>' : '')+'</td></tr>';
        }).join('')
      + '</tbody></table></div>';
@@ -1579,21 +1546,13 @@ function expandDetail(){ if(cur) openDetail((cur.isA?IMG:WGT).indexOf(cur.m)); }
 function openEditFrom(){ if(dCur){ cur=dCur; openEdit(); } }
 function openVerAdd(){ act('버전 추가 화면으로 이동합니다. 모델명은 고정되고 버전·소스만 입력합니다.'); }
 
-function closePanel(){document.getElementById('panel').classList.remove('on');
+function closePanel(){document.getElementById('panel').classList.remove('on');document.getElementById('pnbg').classList.remove('on');
   document.querySelectorAll('table.tbl tbody tr').forEach(r=>r.classList.remove('rowsel'));}
-/* 패널은 닫기 버튼과 ESC 로 닫는다. 배경 클릭을 가로채는 레이어를 두지 않는다(공통정책 4.2.4·4.2.5) */
-document.addEventListener('keydown',function(e){ if(e.key==='Escape') closePanel(); });
 /* 기본 정보 수정 (공통정책 4.5 모달 · 7.11 수정 불가 항목은 읽기 전용) */
 let eInit={};
 function openEdit(){
   if(!cur) return;
   const m=cur.m, isA=cur.isA;
-  /* 진행 중인 자산은 고치지 않는다. 표시 범위가 바뀌면 캐싱·빌드 대상이 달라진다.
-     버전 메뉴(노드 캐싱·이미지 빌드)와 같은 기준이다 */
-  if(m.ready==='캐싱 중' || m.ready==='빌드 중'){
-    openConfirm('수정할 수 없습니다', busyMsg(m), null, '확인');
-    return;
-  }
   document.getElementById('eName').value = m.n;
   document.getElementById('eVer').value = m.v;
   document.getElementById('eDesc').value = isA?'서빙 엔진 드라이버가 결합된 배포용 컨테이너 이미지입니다.':'S3에서 반입한 원천 가중치입니다.';
@@ -1605,10 +1564,9 @@ function openEdit(){
   const mine = WSLIST.filter(function(w){
     return w!=='공용 워크스페이스' && (isSuper() || (MYWS[role]||[]).indexOf(w)>=0);
   });
-  /* 전역 상태 `cur`(패널에 열린 대상)과 이름이 겹치면 함수 전체에서 전역이 가려진다 */
-  const curWs = (m.ws && m.ws!=='-')? m.ws : '';
-  const opts = (curWs? '' : '<option value="">선택해 주세요.</option>')
-   + mine.map(function(w){ return '<option'+(w===curWs?' selected':'')+'>'+w+'</option>'; }).join('');
+  const cur = (m.ws && m.ws!=='-')? m.ws : '';
+  const opts = (cur? '' : '<option value="">선택해 주세요.</option>')
+   + mine.map(function(w){ return '<option'+(w===cur?' selected':'')+'>'+w+'</option>'; }).join('');
   if(role==='super'){
     p.innerHTML='<label><input type="radio" name="escope" '+(m.scope==='전역'?'checked':'')+' onchange="editScope(\'global\')"><span>전역</span><small>모든 워크스페이스</small></label>'
               + '<label><input type="radio" name="escope" '+(m.scope!=='전역'?'checked':'')+' onchange="editScope(\'ws\')"><span>워크스페이스 전용</span>'
@@ -1639,7 +1597,7 @@ function isEditChanged(){
 function editValid(){ document.getElementById('eSubmit').disabled = !isEditChanged(); }
 function submitEdit(){ document.getElementById('mdEdit').classList.remove('on'); toast('ok','수정이 완료되었습니다.'); }
 
-function panelDel(){if(cur)del(cur.m.n, useOf(cur.m)==='배포 중', cur.m._vcnt||1);}
+function panelDel(){if(cur)del(cur.m.n, useOf(cur.m)==='배포 중');}
 function panelAct(){if(!cur)return;cur.isA?openCache(cur.m.n):build(cur.m.n);}
 function goImg(name){setTab('A');sconds=[{val:name.split(':')[0]}];drawChips();render();
   toast('ok','모델 이미지 탭으로 이동했습니다.');}
@@ -1789,13 +1747,9 @@ function submitReg(){
   const name=document.getElementById('rName').value.trim();
   const ver=document.getElementById('rVer').value.trim();
   const path=document.getElementById('rPath').value.trim();
-  /* 폼에서 고른 표시 범위를 그대로 넣는다. 종전에는 전역으로 고정되어 있었다 */
-  const wsSel=document.getElementById('rWs');
-  const scope = regScope==='global' ? '전역' : '워크스페이스 전용';
-  const ws = regScope==='global' ? '-' : (wsSel ? wsSel.value : '-');
   closeReg(); resetSearch();
   toast('ok','모델 반입을 요청했습니다.');
-  importing={n:name,v:ver,path:path,scope:scope,ws:ws,step:0,pct:0};
+  importing={n:name,v:ver,path:path,step:0,pct:0};
   setTab('B');
   const tick=setInterval(function(){
     importing.pct+=10;
@@ -1803,7 +1757,7 @@ function submitReg(){
     if(importing.step>=3){
       clearInterval(tick);
       WGT.unshift({n:importing.n,v:importing.v,ready:'미빌드',path:importing.path,size:'2.02 MB',
-        scope:importing.scope,ws:importing.ws,by:'성유진(yj.seong)',
+        scope:'전역',ws:'-',by:'성유진(yj.seong)',
         at:new Date().toISOString().slice(0,19).replace('T',' '),tok:'-',built:'',
         arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'},gpu:'-',vram:'-'});
       importing=null; render();
@@ -1817,10 +1771,7 @@ function importRow(){
   if(!importing || tab!=='B') return '';
   const pct=importing.pct;
   return '<tr><td colspan="9"><div class="prog">'
-    /* 어디에 반입되는지 함께 보인다. 끝나면 그 범위로 목록에 들어간다 */
-    + '<div class="plabel"><span><b>'+importing.n+'</b> 반입 중'
-    +   '<span class="mver">'+(importing.scope==='전역' ? '전역' : importing.ws)+'</span></span>'
-    +   '<span>'+IMPORT_STEPS[importing.step]+' '+pct+'%</span></div>'
+    + '<div class="plabel"><span><b>'+importing.n+'</b> 반입 중</span><span>'+IMPORT_STEPS[importing.step]+' '+pct+'%</span></div>'
     + '<div class="pbar"><div class="pfill" style="width:'+pct+'%"></div></div>'
     + '<div class="psteps">'+IMPORT_STEPS.map(function(t,i){
         return '<span class="pstep'+(i<importing.step?' done':(i===importing.step?' on':''))+'">'+t+'</span>';
@@ -1882,7 +1833,7 @@ function build(name){
     if(!IMG.some(x=>x.n===m.n&&x.v===m.v)){
       IMG.unshift({n:m.n,v:m.v,ready:'미캐싱',cn:0,use:'미사용',scope:m.scope,ws:m.ws,by:m.by,
         at:new Date().toISOString().slice(0,19).replace('T',' '),eng:'vLLM',base:'Custom Build',
-        arch:m.arch,infra:m.infra,store:'model-registry/'+m.n+':'+m.v,mode:'단일',deps:[],
+        arch:m.arch,infra:m.infra,store:'model-registry/'+m.n+':'+m.v,mode:'MONOLITHIC',deps:[],
         gpu:m.infra.g,vram:m.infra.v,sys:false});
     }
     render(); if(cur&&cur.m===m) openPanel(WGT.indexOf(m));
@@ -1900,27 +1851,11 @@ function resetSearch(){sconds=[];drawChips();document.getElementById('q').value=
 function reconcile(){resetSearch();toast('ok','저장소 동기화를 요청했습니다.');}
 function act(msg){toast('ok',msg);}
 /* 삭제 — 공통정책 7.5. 연결 데이터로 삭제 불가 시 클릭 전 사전 감지해 선제 안내 */
-/* 버전 삭제도 확인 알럿을 탄다(공통정책 7.5). 마지막 버전을 지우면 모델이 함께 사라지므로
-   그 사실을 먼저 알린다(모델정책 2.5) */
-function delVer(ver){
-  if(!dCur) return;
-  const m = dCur.m;
-  const vers = m._vers || [m];
-  const last = vers.length<=1;
-  openConfirm('버전 삭제',
-    '<b>'+m.n+' '+ver+'</b>을(를) 삭제하면 복구할 수 없습니다.'
-    + (last? '<br>마지막 버전이라 모델도 함께 사라집니다.' : ''),
-    function(){ toast('ok','버전을 삭제했습니다.'); }, '삭제');
-}
-
-function del(name,inUse,vcnt){
+function del(name,inUse){
   if(inUse){ openConfirm('삭제할 수 없습니다',
-      '<b>'+name+'</b> 모델은 배포에 사용 중이므로 삭제할 수 없습니다. 연결된 배포를 먼저 종료해 주세요.',
+      '<b>'+name+'</b> 모델은 배포에 사용 중이므로 삭제할 수 없습니다. 연결된 배포를 먼저 삭제해 주세요.',
       null,'확인'); return; }
-  /* 모델을 지우면 버전이 다 사라진다. 몇 개가 함께 없어지는지 밝힌다(모델정책 2.5) */
-  const n = vcnt||1;
-  openConfirm('모델 삭제',
-    '<b>'+name+'</b>을(를) 삭제하면 버전 '+n+'개가 함께 제거되며 복구할 수 없습니다.',
+  openConfirm('모델 삭제','<b>'+name+'</b>을(를) 삭제하면 복구할 수 없습니다.',
     function(){ resetSearch(); toast('ok','모델 삭제가 완료되었습니다.'); },'삭제');
 }
 function openConfirm(title,body,onOk,okLabel){
