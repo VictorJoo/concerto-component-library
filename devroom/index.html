@@ -1,1 +1,3566 @@
+<!--
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.3 (2026-08-26)
+  CDE 정책 기준.
 
+  ── 화면 부제 (2026-08-26) ────────────────────
+  개발룸 설정·CDE 신청 화면 부제에서 `· 개발룸` 을 뺐다. 제목이 `개발룸 설정` 인데
+  부제에 개발룸이 또 있었고, 브레드크럼에도 개발룸이 들어간다. 부제는 어느 워크스페이스
+  소속인지만 밝힌다 — 개발룸 목록 화면과 같은 규격이다.
+
+  ── 가속기 단위 (2026-08-26) ──────────────────
+  단위를 `개` 에서 `장` 으로 바꿨다. 용어집 5장이 `장` 을 쓰고 `개` 를 쓰지 말라고 정한다.
+  다른 목업(워크스페이스·배포·내 작업함·플랫폼 설정)도 모두 `장` 이다. 색·컴포넌트 규격은 워크스페이스 목업을 따른다.
+
+  [검토용 임시 장치 — 확정 후 삭제]
+  하단 데모 바의 `내 CDE` 로 본인 CDE 상태를 바꿔 상태별 조작을 확인한다.
+  사용자당 하나 규칙(정책 3.3)을 지키려면 본인 것을 여러 건 둘 수 없어
+  데이터로는 상태별 확인이 되지 않는다.
+  하단 데모 바(데이터 상태 · 권한 · 테마)는 시안 확인용이다.
+
+  ── v0.21 변경 ──────────────────────────────────
+  ⚠ CDE 에 이름을 두었으나 현행은 이름 없이 유저명으로 식별한다. 신청 폼에도 목록에도
+    이름이 없다. 공통정책 2.2 를 따라 첫 컬럼에 `CDE명` 을 두었고 작업 이력의 CDE 컬럼이
+    이 값을 참조한다 — 확인 대상(정책 9. 21번).
+  · 기동 시각(현행 Uptime)을 두지 않는다. 상태마다 뜻이 달라 한 값으로 쓸 수 없고
+    유휴는 절전이 자동으로 처리한다. 회수 판단에 필요한 것은 최근에 쓰였는지이므로
+    마지막 접속 시각을 확인 대상으로 올렸다(정책 9. 28번).
+  · 작업 로그 모달 헤더를 정리했다. 제목이 작업 ID 이고 부제가 유형·제출자·CDE·제출 시각을
+    라벨과 함께 2열로 보인다. `job-... · train · 성유진 · yj-jupyter-01` 처럼 값만 늘어놓아
+    무엇이 무엇인지 읽는 사람이 맞춰야 했다. 제출 시각은 목록에 없어 함께 넣었다.
+  · 개발룸 설정 폼 섹션을 셋으로 정리했다 — 기본 정보(대상 클러스터) · 자원 · 스토리지·네트워크.
+    대상 클러스터가 어느 섹션에도 속하지 않고 알림 박스 뒤에 홀로 떠 있었다.
+  · 데모 바에서 라벨과 버튼을 그룹(.dgrp)으로 묶었다. 따로 두면 줄바꿈 지점에서 갈려
+    `유형:일반` 처럼 라벨과 첫 버튼만 남는다. 워크스페이스·플랫폼 설정도 같이 맞췄다.
+    `유형` 라벨을 `워크스페이스` 로 바꿨다 — 무엇의 유형인지 드러나지 않았다.
+  · 삭제된 계정 표기를 반영했다(공통정책 1.6). 참조 자리에서는 이름을 보이지 않고
+    `삭제됨` 으로 두고 호버 시 `삭제된 계정입니다.` 를 안내한다.
+    보관 기간이 지나면 물리 삭제되므로 이름을 남겨 둘 근거가 없고, 삭제된 사람의 이름이
+    여러 화면에 흩어지는 것도 막는다. 추적이 필요하면 감사 로그에서 확인한다.
+  · 개발룸 설정 안내를 2문장으로 줄였다. 회수와 작업 지연은 저장한 뒤에 일어나는 일이라
+    개발룸 화면의 자원 카드 툴팁으로 옮겼다 — 회수를 겪는 자리가 그쪽이다.
+  · 가속기 라벨에서 vRAM 을 빼고 툴팁으로 옮겼다. `NVIDIA-H200 MIG 16GB` 가
+    라벨 폭(150px)을 넘어 줄이 바뀌면서 행 높이가 갈렸다. 라벨은 줄을 바꾸지 않는다 —
+    툴팁 아이콘이 라벨 안에 있어 말줄임을 걸면 아이콘이 잘린다.
+  · 폼 행 안 읽기 전용 값(.frow .rov)의 패딩을 줄였다. 행이 이미 여백을 갖는데
+    값에 또 9px 을 줘 라벨(7px)과 높이가 어긋났다.
+  · 읽기 전용 값과 textarea 를 .qrowbox 에서 .frow 로 옮겼다 — 대상 클러스터 · 공유 볼륨 ·
+    Egress 허용 도메인. .qrowbox 는 아래에 막대·에러가 붙는 자원 입력 행 규격이라
+    .qrhead 의 margin-bottom 이 남아 간격이 뜨고 border-bottom 이 줄을 그었다.
+    라벨과 본문만 필요한 것은 신청 폼과 같은 .frow 를 쓴다.
+  · 섹션 마지막 행의 밑줄을 지웠다. `.qrowbox` 의 border-bottom 과 푸터의 border-top 이
+    겹쳐 저장 버튼 위에 줄이 두 번 그어졌다.
+  · 개발룸 설정 폼을 자원·스토리지·네트워크 두 섹션으로 나눴다. 현행도 그렇게 나뉘어 있고
+    신청 폼은 이미 섹션 구조다.
+  · 생성 차단 안내를 되살렸다. 현행 주의 문구와 정책 3.3 에 `운영 중인 모델이 이미
+    해당 분량을 쓰고 있으면 생성 실패` 가 있는데 안내를 줄이면서 빠졌다.
+    ⚠ 현행은 CPU·Memory 를 `비우면 기본값` 으로 받는다 — 확인 대상(정책 9. 26번).
+    ⚠ 현행은 실행 모드가 프레임워크보다 앞이다 — 확인 대상(정책 9. 27번).
+  · 기본 정보를 2열로 배치했다(.dl.two). 값이 짧아 1열로 두면 오른쪽이 크게 비고
+    6행이 세로로 늘어졌다. 패널·상세는 폭이 좁아 1열을 유지한다.
+    ⚠ 공통정책에 다열 배치 기준이 없다 — 개정 제안 대상.
+  · 워크스페이스 목업과 문구를 맞췄다. 같은 동작을 두 화면에서 다르게 말하고 있었다.
+      · 개발룸 생성 — `개발룸을 만들고 있습니다` → `개발룸 생성을 요청했습니다. 준비가 끝나면`
+      · CDE 반납 — `반납을 요청했습니다. 처리가 끝나면` → `CDE 반납을 요청했습니다. 자원 회수가 끝나면`
+      · 데이터 가져오기 — `데이터를 내려받고 있습니다` → `데이터 가져오기를 요청했습니다`
+    토스트 뒷문장은 무엇이 끝나는지 밝힌다(배포 목업 규격) — `완료되면` 대신
+    `준비가 끝나면` · `처리가 끝나면` · `자원 회수가 끝나면` 으로 나눈다.
+    워크스페이스 목업의 CDE 접속 라벨도 `웹 IDE 접속` 으로 맞췄다(공통정책 1.1).
+  · 공용 워크스페이스 분기를 넣었다. 8/10 회의 1.2 는 개발룸을 일반과 같게 제공하고
+    1.3 은 자원 배정 기능이 없다고 정했다. 상한이 없어 점유 막대를 그릴 수 없다.
+      · 자원 카드 — 막대 대신 사용 방식 안내
+      · 개발룸 설정 — 자원 입력을 두지 않는다
+      · CDE 신청 — 잔여에 따라 지연될 수 있음을 알린다
+    데모 바 `유형` 으로 전환해 확인한다.
+  · 공유 볼륨을 생성 시에만 받는다. 8/10 회의 4.3 이 `신청 시에도 조정` 으로 정했으나
+    8/12 회의 1.5 가 `생성 후 변경 불가. 관리자만 설정` 으로 뒤집었다.
+    8/10 만 보고 확인 항목으로 열어 두고 있었다 — 18·19번을 닫았다.
+    개발룸 설정에서는 값만 보인다. 워크스페이스 정책 3.4 도 함께 정정했다.
+  · 모달 타이틀을 명사형으로 통일했다. 배포 목업이 전부 명사형이고 워크스페이스는
+    의문형과 섞여 있었다 — `개발룸을 삭제할까요?` → `개발룸 삭제`.
+    차단 안내(`신청 중인 CDE가 있습니다`)는 평서로 둔다. 실행 확인이 아니라 상태 안내다.
+    차단 안내 본문은 규칙 → 조치 순으로 둔다. 제목이 이미 무엇이 막혔는지 말하므로
+    본문에서 되풀이하지 않는다(워크스페이스 목업 `역할 변경 불가` 규격).
+    실행 확인 본문은 대상 → 결과 순으로 둔다.
+    워크스페이스 목업의 룸 생성·삭제 모달도 함께 고쳤다.
+  · 가속기 유형 선택지에 vRAM 을 병기했다. 한 장당 용량을 알아야 몇 장이 필요한지
+    정해진다(8/10 회의 2.2). 워크스페이스 목업이 모델명에 붙이는 방식을 택했고 같게 둔다.
+    현행은 괄호로 잔여 장수를 보이나 여기서는 `배분 가능` 이 따로 알린다.
+  · 기본 정보 섹션을 두었다. 생성 시 정한 값(대상 클러스터·공유 볼륨·Egress)이
+    화면에 없어 설정을 열어야 확인됐다.
+    자원을 위에 둔다 — 워크스페이스 상세와 같은 순서이고, 이 화면에 들어오는 이유가
+    CDE 를 신청·관리하려는 것이라 자원이 매번 보는 판단 근거다.
+    네임스페이스는 두지 않는다 — 워크스페이스명에서 만들어지고 조작할 수 없다(7.9).
+  · 역할 강등 시 처리를 CDE 정책 7.1 에 정하고 반영했다.
+    편집자가 뷰어로 바뀌어도 CDE 는 유지하되 접속·반입·반납만 되고 연장은 막는다 —
+    연장은 새로 자원을 잡는 행위라 신청과 같다.
+    강등 직후 접속을 막으면 저장한 작업을 꺼낼 방법이 없다.
+    만료일에 자원이 회수되므로 별도 회수 절차를 두지 않는다.
+  · 뷰어에게 목록이 비도록 했다. 조회 범위를 `isMine` 으로만 판정해 역할을 바꿔도
+    본인 CDE 가 계속 보였다. 뷰어는 신청할 수 없어 본인 것이 생길 수 없다.
+    작업 이력도 같다 — 제출할 수 없으므로 본인 건이 없다.
+  · 빈 목록과 검색 결과 없음을 갈랐다. 조건을 걸지 않았는데 `검색 결과가 없습니다` 가
+    떴다. 뷰어는 신청할 수 없어 안내도 갈린다 —
+    `사용 중인 CDE가 없습니다 / 워크스페이스 관리자에게 편집자 역할을 요청해 주세요`.
+    없는 권한 이름을 쓰지 않고 역할로 말한다 — 정책에 있는 것은 `편집자` 이지
+    `CDE 사용 권한` 이 아니다. 워크스페이스 목업의 `~에게 ~을 요청해 주세요` 형태를 따른다.
+  · 뒤로가기 문구를 `이전 화면으로 돌아갑니다` 로 바꿨다. 개발룸은 목록에서도 상세에서도
+    들어오는데 `워크스페이스 상세로` 로 고정되어 있었다.
+    워크스페이스 목업이 진입 경로를 기억하므로(roomFrom) 여기서는 특정하지 않는다.
+    브레드크럼의 `상세` 는 계층 표시라 그대로 둔다.
+  · 가속기를 종류별로 다룬다(8/10 회의 2.2 `벤더별·유형별로 구분해 할당`).
+    개발룸 자원이 종류 구분 없이 하나로 묶여 있어 `배분 가능 2` 가 어느 장비인지
+    알 수 없었다. MIG 로 분할된 것도 별도 타입으로 둔다.
+      · 개발룸 설정 — 가속기 행을 종류별로 반복한다
+      · CDE 신청 — 유형을 먼저 고르고 그 종류의 잔여가 개수 상한이 된다
+      · 목록·패널 — 개수 옆에 종류를 함께 보인다
+    ⚠ 백엔드가 종류별로 내려주는지 확인 대상(정책 9. 20번).
+  · 뷰어에게도 목록을 그대로 두되 내역이 비고 안내 문구가 갈린다.
+    조회 범위가 본인 것뿐인데 신청할 수 없어 목록이 늘 빈다.
+    워크스페이스 목업과 같은 방식으로 제목을 상황에 맞게 바꾸고 본문은 요청 문장으로 둔다.
+  · 뷰어도 개발룸에 들어온다. 기술문서 3.2 가 VIEWER 를 `워크스페이스 내 자원의 상태 조회`
+    로 정의하고 개발룸 자원 현황이 그 대상이다 — 만들지 않고 얼마나 쓰이는지 보러 온다.
+    목록은 본인 것만 보이므로 빈 상태 문구를 갈랐다. `신청하면 만들어집니다` 는
+    신청할 수 있는 사람에게만 맞는 말이다.
+  · 자원 명칭을 `가속기` 로 통일했다(공통정책 1.1). 화면마다 `AI 가속기` 와 `가속기` 를
+    섞어 쓰고 있었다. 기술문서·회의록·정책이 모두 `가속기` 이고 배포 목업도 그렇다.
+  · 자원 수치를 워크스페이스 목업과 맞췄다. 개발룸 몫과 워크스페이스 할당량을 같은 값으로
+    두고 있어 운영룸 몫이 0 이 됐다. 워크스페이스 ai-service-team 의 devq 를 기준으로
+    개발룸 32 Cores · 128 Gi · 가속기 2, 워크스페이스 64 · 256 · 4 로 정리했다.
+    use 는 자원을 점유한 CDE(준비 중·구동 중·절전) 합계 20 · 80 · 2 로 맞췄다.
+    ⚠ 워크스페이스 목업의 CDE 표기(상태 `정상`, IDE `Jupyter Lab`, 실행 방식 `비동기 위임`)가
+      이 목업과 다르다. 개발룸을 덜어낼 때 함께 정리한다.
+  · 신청 폼 섹션명을 워크스페이스 목업 CDE 폼과 맞췄다 — `기간·사유` → `사용 기간`.
+    섹션 다섯(환경·자원·볼륨·접근 제한·사용 기간)과 순서는 이미 같다.
+    ⚠ CDE 이름 입력이 없다. 목록 첫 컬럼이 `CDE명` 인데 신청 폼에 항목이 없어
+      시스템이 만드는 것으로 두었으나 규칙이 정해진 적이 없다 — 확인 대상(정책 9. 21번).
+    ⚠ AI 에이전트는 화면에 두지 않았다. 기술문서 5.4 가 `옵션으로 제공` 이라 하나
+      무엇을 고르는 것인지 정해지지 않았다 — 확인 대상(정책 9. 10·11번).
+  · 가속기 유형을 항상 보인다. 개수가 0 이면 숨기고 있어 무엇을 더 정해야 하는지
+    모른 채 넘어갔다. 조건이 안 되면 비활성으로 두고 사유를 붙인다.
+    라벨도 `가속기` 에서 `가속기` 로 워크스페이스와 맞췄다.
+  · Memory 증가 단위를 8 에서 1 로 바꿨다. 8 은 근거 없이 정한 값이었다.
+  · 자원 회수 시 `실행 중인 작업은 대기 상태로 바뀐다` 를 되살렸다.
+    워크스페이스 정책 5.2 에 있는데 5.1 만 보고 없다고 판단해 뺐다.
+    회수는 임시 상태이고 작업은 종료가 아니라 지연된다 — 이 점을 빼면
+    회수를 데이터가 사라지는 것으로 읽는다.
+  · 개인 볼륨 문구를 정책 5.2 표기(`공유 볼륨을 뺀 나머지에서 개인별 할당`)에 맞췄다.
+    ⚠ 개발룸 가속기가 종류 구분 없이 하나로 묶여 있다 — 확인 대상(정책 9. 20번).
+  · CDE 신청 폼 툴팁에서 사용 중 수치를 뺐다. 신청자는 얼마를 쓸 수 있는지만 알면 되고
+    그건 `배분 가능` 이 알린다. 하한이 걸리는 개발룸 설정에서만 사용 중을 보인다.
+    ⚠ 공유 볼륨은 하한 근거가 다르다 — 저장된 데이터 양이어야 하는데 화면이 알 수 없다.
+      지금은 개인 볼륨 사용량을 하한으로 두고 있어 확인 대상(정책 9. 19번).
+  · 남의 CDE·작업 이력을 관리자 이상만 보도록 했다. 8/10 회의 5장이 API Key 발급 화면을
+    `권한이 있는 모델만 노출`, 6.1 이 전용 모델을 `해당 워크스페이스에서만 조회` 로 정해
+    권한·소속에 맞춰 목록을 좁히는 방향이다.
+    총량은 개발룸 자원 카드가 알리므로 신청 여부는 그것으로 판단한다.
+    CDE 정책 4.1·7장·8장을 함께 정정했다.
+  · 공유 볼륨을 확인 항목으로 올렸다(정책 9. 18번). 8/10 회의 4.3 은
+    `개발환경 신청 시에도 조정할 수 있다` 로 정했으나 개발룸 전체가 함께 쓰는 값이라
+    한 사람의 신청으로 바뀌면 다른 CDE 에 영향이 간다. 개발룸 설정에서만 바꾸도록 두었다.
+  · 상태 배지 툴팁을 뺐다. 조작이 왜 막혔는지 알리는 문구(blockMsg)를 붙이고 있어
+    `구동 중` 에 호버해도 `본인의 CDE에만 사용할 수 있습니다` 가 떴다.
+    상태 설명이 아니고, 값별 의미는 컬럼 헤더 도움말에 이미 있다.
+  · 개발룸 설정 안내 문구를 세 문장에서 두 문장으로 줄였다.
+    `실행 중인 작업은 대기 상태로 전환됩니다` 는 워크스페이스 정책 5.1 에 없어 뺐다.
+    `운영 중인 모델이 쓰는 자원은 옮길 수 없다` 는 각 항목 하한 오류 문구가 이미 알린다.
+  · 만료 예정에 도움말을 달았다. 날짜만 보여 그날 언제 끊기는지 알 수 없었다.
+    `이 날짜가 지나면 회수` 로 두되 ⚠ 만료 처리 시각은 확인 대상(정책 9. 16번) —
+    만료일 자정인지 신청 시각 기준인지 기술문서에 없다.
+  · 사용 중 수치를 툴팁으로 옮겼다. 개발룸 설정은 라벨 아래 보조 텍스트로, CDE 신청은
+    아예 없어 화면마다 표기가 갈렸다. 워크스페이스 목업이 툴팁에 두므로 거기 맞춘다 —
+    라벨 아래 두면 행이 두 줄이 된다.
+  · 작업 이력 탭에도 데이터 상태(로딩·빈 상태·오류)를 적용했다. 탭 분기가 상태 처리보다
+    앞에 있어 CDE 목록에만 걸렸다. 같은 화면 안 목록 둘이 로딩·오류 표현이 다르면
+    어느 쪽이 문제인지 흐려진다(공통정책 4.1).
+  · 신청 폼 스테퍼를 워크스페이스 규격으로 맞췄다. `−`·`＋` 문자를 쓰고 있어
+    한도에 닿아도 눌렸다 — .stbtn 과 SVG 로 바꾸고 비활성 처리를 넣었다.
+    배분 가능 수치도 소수 한 자리까지만 보인다.
+  · 날짜 입력에 하한을 두었다. 신청은 오늘부터, 연장은 현재 만료일 다음 날부터 고른다.
+    컴포넌트에서 막고 저장 버튼 검증에도 같은 조건을 둔다.
+  · CDE 섹션 제목을 뺐다. 탭 라벨과 같은 말이 두 번 나온다 —
+    배포 상세도 탭 위에 제목을 두지 않는다. 설명은 탭 라벨 옆 툴팁으로 옮기고
+    신청 버튼은 탭 줄 우측에 둔다. 헤더에 두면 개발룸 전체 액션으로 읽힌다.
+  · 개발룸 자원을 워크스페이스 목업 룸 화면과 같은 규격(.rsgrid)으로 맞췄다.
+    같은 개발룸을 두 화면에서 보는데 자원 표현이 다르면 값이 달라 보인다.
+  · 작업 로그를 목록 규격으로 맞췄다 — 검색(3.3) + 헤더 필터(3.2) + 페이지네이션(3.7).
+    유형 칩으로 걸러 보게 두었으나 로그라고 다른 규칙을 쓸 이유가 없다.
+    모달 헤더에 제출자·CDE 를 함께 보인다 — 작업 ID 만으로는 누구 것인지 알 수 없다.
+  · 작업 이력에 검색을 되돌렸다. 상태 필터만 두었으나 같은 화면 안 목록 둘이
+    형태가 달라 어디서 무엇을 찾는지 갈렸다.
+  · 검색 툴바를 본문과 분리했다. 함께 다시 그리면 한 글자 칠 때마다 포커스가 날아간다.
+    검색은 Enter 로 실행하고 입력 안 우측에 지우기 버튼을 둔다 — 목록과 같은 규격이다.
+    조건 초기화(검색어+필터)는 빈 상태의 별도 버튼이라 범위가 갈린다.
+  · 만료 상태에서 연장을 뺐다. 기술문서 5.2 가 `사용 기간 만료 시 자원을 회수한다` 로
+    되어 있어 되살릴 대상이 없다 — 다시 쓰려면 새로 신청한다.
+    절전은 자원만 내린 것이고 만료일은 그대로 흘러가므로 연장 대상으로 둔다.
+    ⚠ CDE 정책 6장이 만료를 `연장 승인 → 구동 중` 으로 두고 있어 함께 정정했다.
+  · 작업 로그 컬럼명을 `일시` · `유형` 으로 바꿨다(공통정책 1.3).
+  · 작성 중 이탈 시 확인 알럿을 둔다(공통정책 7.2). 취소 버튼·뒤로가기·브레드크럼
+    어디로 나가든 같은 확인을 거친다. 열 때의 값과 비교해 바뀐 것이 없으면 바로 닫는다.
+    모달(연장 신청·데이터 가져오기)은 취소 시 바로 닫는다 — 모달 안에서 확인 알럿을
+    띄우지 않는다(공통정책 4.5).
+  · 타이틀 설명문을 툴팁으로 옮겼다. 다른 목업과 통일한다.
+    위에 자원 블록이나 헤더가 있어 위로 열면 잘리므로 아래로 연다.
+  · 패널 섹션을 넷으로 줄였다 — 기본 정보 / 신청·승인 / 환경 / 자원.
+    신청과 승인은 둘 다 이 CDE 가 만들어진 경위라 묶고, 볼륨도 자원이라 합쳤다.
+  · 개발룸 자원 툴팁을 아래로 열도록 바꿨다. 화면 최상단이라 위로 열면 잘렸다.
+  · 개발룸 미생성일 때 이 화면에서 만든다. 워크스페이스로 보내지 않는다 —
+    설정·삭제도 여기서 하는데 생성만 넘길 이유가 없다. 받는 값이 같아 같은 모달을 쓴다.
+  · 신청 폼에 가속기 유형과 접근 허용 IP 를 넣었다. 개수만 받으면 어느 장비인지
+    정해지지 않는다. IP 는 기술문서 5.3 근거다.
+  · 사용 기간을 일수 선택에서 날짜 지정으로 바꿨다. `30일` 은 언제 끝나는지 계산해야 하고
+    프로젝트 마감에 맞추기 어렵다. 기술문서 5.2 도 `만료 시간` 으로 시점을 말한다.
+    연장 신청도 같은 형식으로 맞췄다.
+  · 작업 이력에 CDE 컬럼을 넣었다. CDE 를 반납해도 작업은 남아 어디서 돌린 것인지
+    연결이 끊긴다.
+  · 작업 강제 취소를 넣었다(기술문서 6.2). 되돌릴 수 없어 확인을 받는다.
+       · 작업 상세를 신설했다(명세 16·18). 목록만으로는 학습이 잘 됐는지 볼 수 없고
+         산출물을 모델로 넘길 자리도 없었다. 패널이 아니라 페이지로 둔다 — 지표 차트가
+         들어가 패널 폭으로 수용할 수 없다(공통정책 4.2). 작업 ID 에 밑줄을 두어
+         다른 목록과 규격을 맞췄다.
+         ⚠ 사전 진단·학습 지표·산출물 셋 다 백엔드 제공 여부가 확인 대상이다.
+           값이 없으면 섹션을 비우고 안내 문구를 둔다.
+         ⚠ 학습 지표 키가 사용자 정의라 Loss·Accuracy 로 고정할 수 없다 — 확인 대상.
+         ⚠ 산출물이 S3 인지 CDE 볼륨인지에 따라 모델 등록 소스가 갈린다 — 확인 대상.
+  · 만료·실패 상태에서 성립하지 않는 항목을 메뉴에서 뺐다. 만료는 접속 대상이 아니고
+    실패는 뜬 적이 없어 반납할 자원이 없다 — `삭제` 로 둔다.
+  · 접속 라벨을 `웹 IDE 접속` 으로 통일했다(공통정책 1.1). 목록은 `접속`,
+    패널은 `웹 IDE 접속` 으로 갈려 있었다. `접속` 만으로는 어디에 붙는지 드러나지 않는다.
+    절전 상태면 깨우는 중임을 알린다 — ⚠ 걸리는 시간은 확인 대상.
+  · 브레드크럼을 워크스페이스 목업과 같은 규격으로 두고 화면에 따라 갱신한다.
+    신청 폼 경로에 `상세` 가 빠져 있었다. 뒤로가기도 동작을 붙였다.
+  · 페이지당 건수 옵션에 100 건을 더했다. 공통정책 3.7 은 20/50/100 을 기본 옵션으로
+    정하는데 20/50 만 두고 있었다. 배포·워크스페이스·플랫폼 설정 목업은 셋을 두고 있다.
+  · 반납·회수 시 `종료 중` 을 거치게 했다. 기술문서 전이도가
+    `ACTIVE → TERMINATING → [*]` 로 자원 해제 구간을 두는데 바로 `종료` 로 넘기고 있었다.
+    토스트는 `요청했습니다` 인데 상태는 즉시 완료라 말과 동작이 어긋났다.
+    파드를 내리는 동안 자원을 잡고 있으므로 목록에도 남긴다.
+  · 상태 도움말을 목록에 나오는 값만 남겼다. 승인 대기·반려·종료는 목록에서 빠져 있는데
+    설명에는 들어 있었다.
+  · 연장 신청에 폼을 두었다. 연장도 결재를 거치므로 승인자가 판단할 사유가 필요하고,
+    며칠 연장하는지도 받아야 한다. 연장 후 만료일을 계산해 함께 보인다 —
+    숫자만 두면 언제까지인지 세어 봐야 한다. 입력 둘이라 모달로 둔다(공통정책 4.5).
+    ⚠ 연장 가능 기간·횟수 제한은 확인 대상(CDE 정책 9. 4번).
+  · 패널 섹션을 성격으로 나눴다 — 기본 정보(귀속) / 신청 정보 / 환경 / 자원 / 볼륨.
+    신청과 승인은 한 건에 대한 이력이라 한 섹션에 둔다. 승인 전에는 뒤 두 항목이
+    없을 뿐 섹션 구성은 그대로다 — 나누면 화면마다 섹션 수가 달라진다.
+    섹션 5 개로 공통정책 4.2.1 상한(6개) 안에 있다.
+  · 작업 이력 컬럼을 근거 있는 값으로 바꿨다. 프레임워크를 빼고 자원(--gpu ·
+    --local-storage-gb)을 두었다. 유형은 확인된 `train` 만 둔다 —
+    `전처리·양자화` 는 기술문서 본문 서술이라 실제 인자 값인지 모른다.
+  · 더보기 메뉴가 열리지 않던 것을 고쳤다. CSS 는 `.more.open` 으로 판정하는데
+    스크립트가 `on` 을 붙이고 있었다. 아래 공간이 모자라면 위로 여는 처리도 함께 넣었다.
+  · 승인 대기 알림을 뺐다. 승인 대기 건은 이 목록에 나오지 않고 승인·반려도
+    내 작업함에서 처리한다. GNB 내 작업함 배지가 이미 건수를 알린다.
+  · 작업 이력을 CDE 목록과 같은 규격으로 맞췄다 — 검색·다운로드·페이지네이션.
+    열 편집은 두지 않는다. 컬럼이 8개 이하라 가로 스크롤이 생기지 않는다(공통정책 3.4).
+    건수를 제목 옆이 아니라 페이지네이션에 둔다. 작업은 계속 쌓이므로 검색이 더 필요하다.
+  · 개발룸 설정을 이 화면에서 처리한다. 기획서는 워크스페이스 소관으로 넘겼으나
+    이 화면이 개발룸을 다루는 자리이고 삭제도 여기서 한다 — 만드는 것은 워크스페이스,
+    고치고 지우는 것은 개발룸으로 가른다. 배포도 목록에서 만들고 상세에서 고친다.
+    입력 6개에 탭이 없어 모달로 둔다(공통정책 4.5).
+    자원은 워크스페이스 할당량에서 나눠 오므로 배분 가능량을 함께 보이고,
+    지금 쓰고 있는 만큼보다 줄이면 구동 중인 CDE 가 멈추므로 하한을 둔다.
+  · 작업 이력·데이터 가져오기를 두었다. 기술문서 5.3(외부 데이터 반입)과
+    concerto run 배치 제출이 근거다.
+  · CDE 목록과 작업 이력을 탭으로 나눴다. 같은 개발룸을 대상으로 하는 목록 둘이라
+    세로로 쌓으면 어느 쪽을 보는지 흐려진다. 배포 상세·워크스페이스 상세와 같은 구조다.
+    자원 현황과 알림은 어느 탭에서든 판단 근거라 탭 밖에 둔다.
+    ⚠ 공통정책에 페이지 안 탭 기준이 없다 — 개정 제안 대상.
+  · 데이터 가져오기를 모달로 뺐다. 조회 화면 하단에 입력 폼이 있으면 성격이 섞이고,
+    대상 CDE 를 목록에서 이미 보고 있는데 드롭다운에서 다시 고르게 된다.
+    공통정책 4.5 — 짧은 입력(탭 없이 단일 목적)은 모달로 둔다.
+    구동 중인 본인 CDE 에만 넣을 수 있어 조건이 안 되면 메뉴에 노출하지 않는다.
+  · 작업 로그는 행 끝 `로그 보기` 로 연다. 할 수 있는 작업이 하나뿐이라 더보기 메뉴로
+    감싸지 않는다 — 감싸면 두 번 눌러야 한다.
+    작업 ID 에는 밑줄을 두지 않는다. 다른 목록에서 밑줄은 그 대상의 상세로 간다는
+    신호인데 작업은 상세가 없다.
+    끝나지 않은 작업은 로그가 없어 `-` 로 둔다.
+    ⚠ 기술문서 6.2 의 강제 취소가 들어오면 더보기 메뉴로 바꾼다.
+  · 실패 사유 툴팁을 뺐다. 툴팁은 항목 설명에 쓰고 그 건에 무슨 일이 있었는지는
+    로그에서 본다(라이브러리 툴팁/hint/알림 박스 구분 기준).
+    조회 범위는 CDE 목록과 같게 둔다 — 기술문서 3.2 가 VIEWER 를 `워크스페이스 내 자원의
+    상태를 조회` 로 정한다. ⚠ 본인 건인지 전체인지는 확인 대상(정책 9. 12번).
+  · 개발룸 자원이 꽉 차면 안내한다. 막힌 뒤에 알리지 말고 미리 알린다.
+    조치가 역할마다 달라 안내도 갈린다 — 할당량 조정은 관리자 소관이다.
+  · 목록에 자원을 잡고 있는 건만 둔다 — 준비 중·구동 중·절전·실패·만료.
+    현행도 CDE 상태를 `ACTIVE` 하나로만 본다. 승인 대기·반려·종료는 자원을 잡지 않아
+    자원 목록에 섞이면 판단이 흐려진다. 승인·반려와 신청 현황은 내 작업함에서 본다.
+  · 신청 버튼을 없애지 않는다. 신청 중인 건이 목록에 보이지 않으므로 버튼까지 사라지면
+    왜 못 하는지 알 수 없다. 누르면 이유와 갈 곳을 알린다.
+  · 공용 CDE 유형을 뺐다. 8/12 회의 3.2 는 `공동으로 쓰면 데이터가 꼬인다` 로
+    결론지었고 공유는 공유 볼륨으로 정했다. `공용이 필요하면` 은 별도 기능을 만들라는
+    뜻이 아니라 관리자가 CDE 를 만들어 쓰면 된다는 운영 방법으로 읽는다.
+    기술문서·현행 화면에도 공용 CDE 가 없다.
+  · 본인 CDE 행 강조와 `내 CDE` 배지를 뺐다. 신청자 컬럼에 이름이 있어 이미 구분된다.
+  · 목록 컬럼명을 `이름` 에서 `CDE명` 으로 바꿨다. 배포는 `배포명`, 알림 채널은 `채널명` 이다.
+  · 이름 컬럼 툴팁을 항목 설명으로 바꿨다. 공유 정책을 설명하고 있어 사용자에게
+    알릴 내용이 아니었다(라이브러리 툴팁 기준).
+
+  ── 화면 ────────────────────────────────────────
+  · CDE 목록 WKSP-CDE-D01 — 워크스페이스 전체를 조회하고 조작은 본인 것만(정책 4.1)
+  · CDE 상세 패널 WKSP-CDE-D01.P01
+  · CDE 신청 WKSP-CDE-F01 — 결재 잠금형. 승인 시점에 개발룸 몫에서 차감(정책 3.1)
+       · 작업 상세 WKSP-CDE-D01.D02 — 작업 이력 행에서 진입. 사전 진단·학습 지표·산출물(명세 16·18)
+
+  ── 상태 ────────────────────────────────────────
+  · 승인 대기 · 반려 · 준비 중 · 구동 중 · 절전 · 실패 · 만료 · 종료
+  · 워크스페이스와 달리 정상 상태가 대부분이 아니라 모든 상태에 배지를 표시한다
+  · 상태별로 가능한 조작이 다르다(정책 6장). 막힌 작업은 비활성으로 두고 사유를 안내한다
+
+  ── 실행 방식 ───────────────────────────────────
+  · 위임 할당(기본) — 작업 실행 시점에 가속기를 쓴다. 쉬는 동안 다른 사용자가 쓸 수 있다
+  · 직접 할당 — 기동 즉시 가속기를 독점 점유한다
+  · 내부 명칭(delegated·direct)은 화면에 노출하지 않는다(공통정책 7.9)
+-->
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<title>콘체르토 매니저 — CDE</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+
+/* ===== 컴포넌트 라이브러리 역할 토큰 (정본) ===== */
+:root{
+  --background:#f4f6fc; --foreground:#171d33;
+  --card:#ffffff; --card-foreground:#171d33;
+  --muted:#eef1f9; --muted-foreground:#565f7e;
+  /* 용도별 표면 — 표면·호버·선택을 한 토큰으로 쓰면 인접했을 때 구분이 사라진다 */
+  --hover:#fafbfe; --hover-strong:#dce2f1; --selected:#dde6f8; --selected-soft:#f2f6fd; --thead:#edf0f7;
+  --border:#dce2f1; --border-strong:#b9c3dd; --input:#dce2f1;
+  --primary:#3346c9; --primary-foreground:#ffffff; --primary-hover:#26368f;
+  --accent:#4f6fe6; --accent-foreground:#0a1026;
+  --success:#2f9e6a; --warning:#c98a2e; --destructive:#d64a51; --destructive-hover:#b93b42;
+  --ring:#4f6fe6; --underline:#a8b0c8;
+  --font:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+  --radius:12px;
+  /* 레이아웃 전용 (라이브러리 미정의 · 개정 대상) */
+  --flyout:#ffffff; --card-2:#f0f3fb; --faint:#8b93ad;
+  --shadow:rgba(23,29,51,.10);
+  --header-h:58px; --panel-w:440px; --gnb-w:236px;
+}
+.dark{
+  --background:#0d0f14; --foreground:#e6e8ee;
+  --card:#16181f; --card-foreground:#e6e8ee;
+  --muted:#1c1f27; --muted-foreground:#969ba6;
+  --hover:#1b1e26; --hover-strong:#262a33; --selected:#252b38; --selected-soft:#1e2430; --thead:#212530;
+  --border:#262a33; --border-strong:#3d4454; --input:#262a33;
+  --primary:#4159d6; --primary-foreground:#ffffff; --primary-hover:#35489f;
+  --accent:#7d97f0; --accent-foreground:#0a1026;
+  --success:#46b17f; --warning:#d9a441; --destructive:#e0585f; --destructive-hover:#c74a51;
+  --ring:#7d97f0; --underline:#4d5566;
+  --flyout:#181b22; --card-2:#1c1f27; --faint:#6f7686;
+  --shadow:rgba(0,0,0,.55);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--background);color:var(--foreground);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;color-scheme:light}
+body.dark{color-scheme:dark}
+button{font-family:inherit;color:inherit;cursor:pointer}
+a{color:inherit}
+.app{display:grid;grid-template-columns:var(--gnb-w) 1fr;grid-template-rows:var(--header-h) 1fr;height:calc(100vh - 46px);overflow:hidden;grid-template-areas:"brand header" "gnb main"}
+
+/* ===== 공통 레이아웃 ===== */
+.brand{grid-area:brand;display:flex;align-items:center;gap:10px;padding:0 18px;background:var(--card);border-bottom:1px solid var(--border)}
+.logo-mark svg{width:24px;height:24px}
+.brand b{font-size:15.5px;font-weight:700}
+.brand b .ai{color:var(--accent)}
+.header{grid-area:header;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--card);border-bottom:1px solid var(--border)}
+.breadcrumb{color:var(--muted-foreground);font-size:13px}
+.breadcrumb b{color:var(--foreground);font-weight:600}
+.breadcrumb a{color:var(--muted-foreground);text-decoration:none}
+.breadcrumb a:hover{color:var(--foreground)}
+.hr{display:flex;align-items:center;gap:9px}
+.ws{display:flex;align-items:center;gap:8px;padding:6px 11px;background:var(--card-2);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer}
+.ws .chev{display:grid;place-items:center;color:var(--muted-foreground)}
+.ws .chev svg{width:14px;height:14px}
+.gnb{grid-area:gnb;display:flex;flex-direction:column;background:var(--card);border-right:1px solid var(--border);overflow:visible}
+.banner{margin:14px 12px 8px;height:120px;border-radius:12px;background:linear-gradient(135deg,#7386b2 0%,#8698c4 100%);position:relative;overflow:hidden;display:flex;align-items:center;padding:0 18px}
+.banner .bt{font-size:21px;font-weight:800;color:#fff;line-height:1.05;z-index:1;letter-spacing:.5px}
+.banner .kv{position:absolute;right:-26px;bottom:-34px;width:170px;height:170px;z-index:0}
+.banner .ph-tag{position:absolute;bottom:8px;right:10px;font-size:9px;color:rgba(255,255,255,.62);z-index:1}
+.nav{padding:6px 12px}
+.nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:3px;position:relative}
+.nav a svg{width:19px;height:19px;flex:0 0 auto}
+.nav a:hover{background:var(--hover);color:var(--foreground)}
+.nav a.active{background:var(--selected);color:var(--foreground);font-weight:600}
+.nav a.has-fly::after{content:"›";margin-left:auto;color:var(--faint);font-size:16px}
+.flywrap{position:relative}
+.flyout{position:absolute;left:calc(100% + 6px);top:0;width:210px;background:var(--flyout);border:1px solid var(--border);border-radius:11px;padding:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateX(-6px);transition:.13s;z-index:70}
+.flywrap:hover .flyout{opacity:1;visibility:visible;transform:translateX(0)}
+.flyout a{display:flex;align-items:center;padding:9px 11px;border-radius:8px;color:var(--muted-foreground);text-decoration:none;font-size:13.5px;margin-bottom:2px}
+.flyout a:hover{background:var(--hover);color:var(--foreground)}
+.flyout a .tb{font-size:9.5px;color:var(--faint);border:1px solid var(--border);border-radius:5px;padding:1px 5px;margin-left:6px}
+.gnb-bottom{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
+.worklist{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);font-size:14px;margin-bottom:3px;cursor:pointer}
+.worklist svg{width:19px;height:19px;color:var(--muted-foreground)}
+.cbadge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--primary);color:var(--primary-foreground);font-size:12px;font-weight:700;display:grid;place-items:center}
+.worklist:hover{background:var(--hover);color:var(--foreground)}
+/* 내 작업함 화면에서는 지금 보고 있는 곳임을 밝힌다. GNB 메뉴와 같은 규격이다(.nav a.active) */
+.worklist.active{background:var(--selected);color:var(--foreground);font-weight:600}
+.worklist.active svg{color:var(--foreground)}
+.notice-common{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:10px}
+.notice-common svg{width:19px;height:19px}
+.worklist .cbadge,.notice-common .cbadge{margin-left:auto}
+.notice-common:hover{background:var(--hover);color:var(--foreground)}
+
+.persona{position:relative}
+.persona .pbtn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:var(--card-2);border:1px solid var(--border-strong);width:100%}
+.av{width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--accent) 18%,transparent);display:grid;place-items:center;font-size:12px;color:var(--accent);flex:0 0 auto}
+.persona .who{line-height:1.25;text-align:left}
+.persona .who b{font-size:13px;display:block}
+.persona .who span{font-size:11px;color:var(--faint)}
+.persona .up{margin-left:auto;display:grid;place-items:center;color:var(--faint)}
+.persona .up svg{width:14px;height:14px}
+.main{grid-area:main;overflow:auto;position:relative}
+/* ===== 페이지 ===== */
+/* 페이지는 화면 폭을 다 쓴다. 우측 여백을 두지 않는다.
+   패널이 열리면 목록 영역이 패널 폭만큼 줄어 전체 폭 = 목록 + 패널이 된다 */
+.page{padding:26px 28px 48px;max-width:none;transition:padding-right .22s ease}
+body.panel-on .page{padding-right:calc(var(--panel-w) + 28px)}
+.phead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+.phead h1{font-size:21px;margin:0 0 5px;letter-spacing:-.3px}
+.phead p{margin:0;font-size:13px;color:var(--muted-foreground)}
+.pact{display:flex;gap:8px;flex:0 0 auto}
+.btn{padding:8px 15px;background:var(--primary);color:var(--primary-foreground);border:0;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+.btn:hover:not(:disabled){background:var(--primary-hover)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;border:1px solid var(--border-strong);color:var(--foreground)}
+.btn.ghost:hover:not(:disabled){background:var(--hover);border-color:var(--foreground)}
+.btn.danger{background:var(--destructive);color:#fff}
+/* 진입 버튼은 외곽선, 최종 확인만 채움 */
+.btn.danger-line{background:transparent;border:1px solid color-mix(in srgb,var(--destructive) 45%,var(--border));color:var(--destructive)}
+.btn.danger-line:hover:not(:disabled){background:color-mix(in srgb,var(--destructive) 8%,transparent);border-color:var(--destructive)}
+.btn.danger:hover:not(:disabled){background:var(--destructive-hover)}
+.btn svg{width:14px;height:14px}
+.btn.sm{padding:6px 11px;font-size:12px}
+
+/* 탭 */
+/* 탭 줄 — 탭과 액션을 한 줄에 둔다. 섹션 제목을 두면 탭 라벨과 같은 말이 두 번 나온다 */
+.tabrow{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+  border-bottom:1px solid var(--border);margin-bottom:16px}
+.tabrow .tabs{border-bottom:0;margin-bottom:0}
+.tabrow > div:last-child{padding-bottom:8px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tabs button{padding:10px 16px;background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted-foreground);font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+.tabs button.on{color:var(--foreground);border-bottom-color:var(--primary)}
+.tabs .cnt{font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:20px;background:var(--muted);color:var(--muted-foreground)}
+.tabs button.on .cnt{background:var(--primary);color:var(--primary-foreground)}
+
+/* 툴바 */
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:7px;padding:0 11px;background:var(--card);border:1px solid var(--border);border-radius:8px;min-width:260px}
+.search svg{width:14px;height:14px;color:var(--muted-foreground);flex:0 0 auto}
+.search input{border:0;background:transparent;color:var(--foreground);font-family:inherit;font-size:13px;padding:9px 0;width:100%;outline:none}
+.sel{padding:9px 11px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--muted-foreground);font-size:12.5px;font-family:inherit;color-scheme:light dark}
+.tspacer{margin-left:auto}
+.cbtn{width:34px;height:34px;display:grid;place-items:center;background:var(--card);border:1px solid var(--border-strong);border-radius:8px;color:var(--muted-foreground)}
+.cbtn:hover{color:var(--foreground);border-color:var(--accent)}
+.cbtn svg{width:15px;height:15px}
+
+/* 테이블 */
+.tblwrap{background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:visible}
+
+table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+/* 헤더 배경은 --muted, 행 호버는 --hover 로 분리한다.
+   같은 토큰을 쓰면 마우스를 올린 행이 헤더처럼 보인다 */
+table.tbl th{text-align:left;color:var(--muted-foreground);font-weight:600;padding:10px 12px;
+  border-bottom:1px solid var(--border);background:var(--thead);white-space:nowrap;user-select:none}
+table.tbl th.sortable{cursor:pointer}
+table.tbl th.sortable:hover{color:var(--foreground)}
+table.tbl th .sar{color:var(--accent);margin-left:3px;font-size:10px}
+table.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--foreground);vertical-align:middle}
+table.tbl tr:last-child td{border-bottom:0}
+table.tbl tbody tr{cursor:pointer}
+table.tbl tbody tr:hover{background:var(--hover)}
+/* 패널이 열려 있는 대상 표시. .sel 은 select 요소 클래스(126행)와 이름이 겹쳐 쓰지 않는다 */
+table.tbl tbody tr.rowsel{background:var(--selected)}
+table.tbl tbody tr.rowsel:hover{background:var(--selected)}
+.wcard.rowsel{border-color:var(--accent);background:var(--selected)}
+/* 행 이름 — 클릭해 다른 화면으로 가는 것만 밑줄을 둔다.
+   .mname 은 이동 대상, .rname 은 강조만 하는 식별자(키 이름·작업 ID·사용자명 등) */
+.mname{display:inline-block;font-weight:600;color:var(--foreground);cursor:pointer;
+  text-decoration:underline;text-decoration-color:var(--underline);text-underline-offset:3px}
+a.mname:hover{text-decoration-color:var(--foreground)}
+tr:hover .mname{text-decoration-color:var(--foreground)}
+.rname{font-weight:600;color:var(--foreground);text-decoration:none}
+.mver{color:var(--muted-foreground);font-size:11.5px;margin-left:6px}
+.dash{color:var(--muted-foreground)}
+.path{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted-foreground);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle}
+
+/* 상태 배지 */
+.stbadge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 11px;border-radius:20px;border:1px solid var(--border);white-space:nowrap}
+.stbadge.ok{color:var(--success);border-color:var(--success)}
+.stbadge.wa{color:var(--warning);border-color:var(--warning)}
+.stbadge.wn{color:var(--warning);border-color:var(--warning)}
+.stbadge.cr{color:var(--destructive);border-color:var(--destructive)}
+.stbadge.mu{color:var(--muted-foreground)}
+.stbadge.ac{color:var(--accent);border-color:var(--accent)}
+.stbadge.load::before{animation:pulse 1.1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;background:color-mix(in srgb,var(--primary) 12%,transparent);color:var(--primary);border:1px solid color-mix(in srgb,var(--primary) 25%,transparent);white-space:nowrap}
+
+/* 더보기 */
+.more{position:relative;display:inline-block}
+.morebtn{width:28px;height:28px;display:grid;place-items:center;background:transparent;border:0;border-radius:7px;color:var(--muted-foreground);font-size:16px;line-height:1}
+.morebtn:hover{background:var(--hover);color:var(--foreground)}
+.rowmenu{position:absolute;right:0;top:calc(100% + 4px);min-width:160px;background:var(--flyout);border:1px solid var(--border);border-radius:10px;padding:6px;box-shadow:0 12px 30px var(--shadow);z-index:85;display:none}
+.more.open{z-index:85}
+.more.open .rowmenu{display:block}
+/* 아래 공간이 부족하면 위로 펼친다 — 스크롤 영역 경계에서 잘리는 것을 막는다 */
+.more.up .rowmenu{top:auto;bottom:calc(100% + 4px)}
+.rowmenu button{display:block;width:100%;text-align:left;padding:8px 10px;border:0;background:transparent;border-radius:7px;font-size:12.5px;color:var(--foreground)}
+.rowmenu button:hover{background:var(--hover)}
+.rowmenu button.d{color:var(--destructive)}
+/* 상태로 일시적으로 막힌 작업 — 있다는 것은 알리되 지금은 실행할 수 없음을 보인다 */
+.rowmenu button:disabled{color:var(--faint);cursor:not-allowed}
+.rowmenu button:disabled:hover{background:transparent}
+.rowmenu hr{border:0;border-top:1px solid var(--border);margin:5px 0}
+
+/* 페이지네이션 */
+.pager{display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:12.5px;color:var(--muted-foreground)}
+.pgnum{display:flex;align-items:center;gap:6px}
+.pgnum button{width:29px;height:29px;display:grid;place-items:center;border:1px solid var(--border);background:var(--card);border-radius:7px;font-size:13px;color:var(--muted-foreground);cursor:pointer}
+.pgnum button:hover:not(:disabled){border-color:var(--accent);color:var(--foreground)}
+.pgnum button:disabled{opacity:.4;cursor:not-allowed}
+.pgnum .pgin{width:46px;height:29px;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:7px;color:var(--foreground);font-size:12.5px;font-family:inherit;color-scheme:light dark}
+.pgnum .pgtot{font-size:12.5px;color:var(--muted-foreground)}
+
+/* 상태 화면 */
+.state{padding:64px 20px;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:11px}
+.state svg{width:38px;height:38px;color:var(--muted-foreground);opacity:.5;margin-bottom:12px}
+.state h3{margin:0 0 6px;font-size:14px;font-weight:600}
+.state p{margin:0 0 16px;font-size:12.5px;color:var(--muted-foreground)}
+.skrow{height:14px;border-radius:5px;background:linear-gradient(90deg,var(--muted) 25%,var(--border) 50%,var(--muted) 75%);background-size:200% 100%;animation:sk 1.3s infinite}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* 사이드 패널 */
+/* 목록이 패널 폭만큼 줄어들어 가려지지 않으므로 배경막을 두지 않는다 */
+.panel{position:fixed;top:var(--header-h);right:0;bottom:0;width:var(--panel-w);max-width:92vw;background:var(--card);border-left:1px solid var(--border);z-index:90;transform:translateX(102%);transition:transform .2s ease;display:flex;flex-direction:column;box-shadow:-14px 0 40px var(--shadow)}
+.panel.on{transform:translateX(0)}
+.pnhead{padding:18px 20px 14px;border-bottom:1px solid var(--border);flex:0 0 auto}
+.pnhead .r1{display:flex;align-items:flex-start;gap:10px}
+.pnhead h2{margin:0;font-size:16px;letter-spacing:-.2px;flex:1;word-break:break-all}
+.pnhead .ver{font-size:12px;color:var(--muted-foreground);font-weight:400;margin-left:7px}
+.pnexp{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--border-strong);background:transparent;border-radius:7px;color:var(--muted-foreground);cursor:pointer;flex:0 0 auto}
+.pnexp:hover{border-color:var(--accent);color:var(--foreground)}
+.pnexp svg{width:14px;height:14px}
+.pnclose{width:28px;height:28px;display:grid;place-items:center;border:0;background:transparent;border-radius:7px;color:var(--muted-foreground);font-size:17px;flex:0 0 auto}
+.pnclose:hover{background:var(--hover)}
+.pntags{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+.pnbody{padding:6px 20px 20px;overflow:auto;flex:1}
+.sec{padding:16px 0;border-bottom:1px solid var(--border)}
+.sec:last-child{border-bottom:0}
+.sec h4{margin:0 0 11px;font-size:12.5px;font-weight:700;color:var(--muted-foreground);letter-spacing:.2px;display:flex;align-items:center;gap:6px}
+.dl{display:grid;grid-template-columns:112px 1fr;gap:8px 12px;font-size:12.5px}
+/* 본문 폭 전체를 쓰는 섹션은 2열로 둔다. 패널·상세처럼 좁은 곳은 1열을 유지한다 */
+.dl.two{grid-template-columns:112px minmax(0,1fr) 112px minmax(0,1fr);gap:10px 12px}
+.dl.two dd{padding-right:24px}
+@media (max-width:860px){ .dl.two{grid-template-columns:112px 1fr} .dl.two dd{padding-right:0} }
+.dl dt{color:var(--muted-foreground)}
+.dl dd{margin:0;word-break:break-all}
+.desc{font-size:12.5px;color:var(--muted-foreground);line-height:1.65;background:var(--muted);border:1px solid var(--border);border-radius:9px;padding:11px 12px;margin-bottom:12px}
+/* 이동 링크 — 색이 아니라 밑줄로 구분한다 */
+.secact{display:flex;gap:7px;margin-top:12px}
+.emptyline{font-size:12.5px;color:var(--muted-foreground);font-style:italic}
+
+/* 모달 */
+.mdbg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.mdbg.on{display:flex}
+.modal{width:440px;max-width:100%;max-height:88vh;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.modal.w520{width:520px}
+.mdhead{padding:20px 22px 0}
+.mdhead h3{margin:0 0 5px;font-size:15.5px}
+.mdhead p{margin:0;font-size:12.5px;color:var(--muted-foreground);line-height:1.6}
+.mdbody{padding:18px 22px}
+.cfname{margin:0 22px 4px;padding-top:15px;border-top:1px solid var(--border)}
+.cfname label{display:block;font-size:12px;color:var(--muted-foreground);margin-bottom:8px;line-height:1.55}
+.cfname label b{color:var(--foreground);font-weight:600}
+.mdfoot{padding:14px 22px 20px;display:flex;justify-content:flex-end;gap:8px}
+.f{margin-bottom:16px}
+/* 폼 라벨 — 라이브러리 .field > label 규격. 굵기를 주지 않아 입력값이 앞선다 */
+.f label{display:block;font-size:12.5px;color:var(--muted-foreground);margin-bottom:6px}
+.f label .req{color:var(--destructive);margin-left:3px}
+.inp{width:100%;padding:9px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--foreground);font-size:13px;font-family:inherit;color-scheme:light dark}
+/* 조건이 안 되어 막힌 입력 — 값은 읽히되 조작이 안 된다는 것이 보여야 한다 */
+.inp:disabled,.inp[readonly]{background:var(--muted);color:var(--muted-foreground);cursor:default}
+.inp:focus{outline:2px solid var(--ring);outline-offset:-1px;border-color:var(--ring)}
+.inp.err{border-color:var(--destructive)}
+.hint{font-size:11.5px;color:var(--muted-foreground);margin-top:5px;line-height:1.55}
+.errmsg{font-size:11.5px;color:var(--destructive);margin-top:5px}
+.row2{display:grid;grid-template-columns:150px 1fr;gap:8px}
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pick label{display:block;padding:12px;border:1px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;font-size:12.5px;font-weight:600;margin:0}
+.pick label small{display:block;font-weight:400;color:var(--muted-foreground);font-size:11px;margin-top:3px}
+.pick input{display:none}
+.pick input:checked + span{color:var(--primary)}
+.pick label:has(input:checked){border-color:var(--primary);background:var(--selected)}
+.noderow{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer}
+.noderow:has(input:checked){border-color:var(--primary);background:var(--selected)}
+.noderow .nn{font-weight:600;font-size:13px}
+.noderow .nm2{font-size:11.5px;color:var(--muted-foreground);font-family:ui-monospace,Menlo,monospace;margin-top:2px}
+.noderow .rt{margin-left:auto}
+.selall{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--muted);border:1px solid var(--border);border-radius:9px;margin-bottom:10px;font-size:12.5px;font-weight:600}
+.selall button{border:0;background:transparent;color:var(--muted-foreground);font-size:12px;font-weight:600}
+
+/* 토스트 */
+.toast-wrap{position:fixed;top:74px;right:22px;z-index:300;display:flex;flex-direction:column;gap:10px;width:340px;max-width:calc(100vw - 44px)}
+.toast{display:flex;align-items:center;gap:10px;padding:12px 15px;background:var(--card);border:1px solid var(--border);border-radius:10px;font-size:12.5px;box-shadow:0 10px 30px var(--shadow);min-width:280px}
+.toast .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.toast.ok .dot{background:var(--success)}
+.toast.cr .dot{background:var(--destructive)}
+.toast .x{margin-left:auto;border:0;background:transparent;color:var(--muted-foreground);font-size:14px}
+
+/* 검증 컨트롤 (목업 전용) */
+
+
+
+
+
+
+
+
+/* 스크린 ID 표기 (목업 전용 · 핸드오프용) */
+
+
+
+
+
+.notebox{display:flex;gap:9px;padding:10px 12px;background:color-mix(in srgb,var(--warning) 10%,transparent);border:1px solid color-mix(in srgb,var(--warning) 30%,transparent);border-radius:9px;font-size:12px;color:var(--foreground);margin-bottom:14px;line-height:1.6}
+.notebox b{color:var(--warning)}
+.secnote{font-size:11.5px;color:var(--muted-foreground);line-height:1.6;margin-top:9px;padding:9px 11px;background:var(--muted);border:1px solid var(--border);border-radius:8px}
+
+/* 검색 (공통정책 3.3) */
+/* 검색창과 조건 초기화를 한 줄에 둔다. 세로 배치는 조건 칩을 쌓던 때 구조라
+   칩을 없앤 지금은 검색창 아래가 비어 도구 영역 높이가 흔들린다 */
+/* 검색창은 남는 폭을 다 쓴다. 조건 초기화는 각 필터에 있어 별도 버튼을 두지 않는다 */
+.searchzone{display:flex;align-items:center;flex:1;min-width:280px}
+.searchzone .searchbar{flex:1;min-width:0}
+.searchbar{position:relative;display:flex;align-items:center;gap:0;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.searchbar:focus-within{outline:2px solid var(--ring);outline-offset:-1px;border-color:var(--ring)}
+
+
+
+.searchbar .sicon{width:14px;height:14px;color:var(--muted-foreground);margin-left:11px;flex:0 0 auto}
+.searchbar input{border:0;background:transparent;color:var(--foreground);font-family:inherit;font-size:13px;padding:9px 30px 9px 11px;width:100%;outline:none}
+
+
+
+
+
+
+.chips{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.schip{display:inline-flex;align-items:center;gap:7px;padding:4px 8px 4px 10px;background:var(--muted);border:1px solid var(--border);border-radius:7px;font-size:12px;color:var(--foreground)}
+
+.schip button{border:0;background:transparent;color:var(--muted-foreground);font-size:13px;line-height:1;padding:0;cursor:pointer}
+.schip button:hover{color:var(--destructive)}
+.chips .clr{border:0;background:transparent;color:var(--muted-foreground);font-size:12px;font-weight:600;padding:4px 6px}
+.andmark{font-size:11px;color:var(--faint);font-weight:700;letter-spacing:.5px}
+
+/* 다중 선택 필터 (공통정책 3.2) */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 툴팁 (공통정책 4.7 · 컴포넌트 라이브러리 원본) */
+.tbltop{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted-foreground)}
+/* 라벨과 아이콘 사이 간격. 붙어 있으면 라벨 일부처럼 읽힌다 */
+.tip-anchor{position:relative;display:inline-flex;align-items:center;margin-left:5px;vertical-align:middle}
+.tip-anchor .tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:var(--flyout);color:var(--foreground);border:1px solid var(--border-strong);font-size:12px;font-weight:400;line-height:1.5;padding:8px 11px;border-radius:7px;opacity:0;visibility:hidden;transition:.12s;z-index:70;pointer-events:auto;box-shadow:0 6px 18px var(--shadow);width:max-content;max-width:340px;white-space:normal;text-align:left}
+/* 화살표는 툴팁 표면색을 쓰고 테두리 위로 1px 겹쳐 이음매를 가린다 */
+.tip-anchor .tip::after{content:"";position:absolute;top:calc(100% - 1px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--flyout)}
+.tip-anchor:hover .tip,.tip-anchor:focus-within .tip{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.tip-ic{width:16px;height:16px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);font-size:11px;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex:0 0 auto}
+.tip-anchor:hover .tip-ic,.tip-anchor:focus-within .tip-ic{border-color:var(--foreground);color:var(--foreground)}
+.phead h1{display:inline-flex;align-items:center;gap:8px}
+
+/* 페이지 타이틀 툴팁 — 화면 상단이라 아래로 펼침(잘림 방지) */
+/* 모달 안에서는 아래로 연다. 위로 열면 모달 상단 경계에서 잘린다.
+   모달은 overflow:auto 라 밖으로 나갈 수 없다 */
+.tip-anchor.below .tip,.modal .tip-anchor .tip{top:calc(100% + 8px);bottom:auto;left:0;transform:translateX(0) translateY(-4px)}
+.modal .tip-anchor:hover .tip,.modal .tip-anchor:focus-within .tip{transform:translateX(0) translateY(0)}
+.modal .tip-anchor .tip::after{top:auto;bottom:100%;left:14px;transform:none;border-top-color:transparent;border-bottom-color:var(--flyout)}
+.modal .tip-anchor .tip::before{bottom:auto;top:-10px}
+/* 모달 폭 안에 들어오게 제한한다 */
+.modal .tip-anchor .tip{max-width:280px}
+
+/* 페이지 타이틀은 화면 최상단이라 위로 열면 잘린다. 아래로 연다 */
+.dhead .tip-anchor .tip,
+.phead .tip-anchor .tip{top:calc(100% + 8px);bottom:auto;left:0;transform:translateX(0) translateY(-4px);max-width:300px}
+.dhead .tip-anchor:hover .tip,.dhead .tip-anchor:focus-within .tip,
+.phead .tip-anchor:hover .tip,.phead .tip-anchor:focus-within .tip{transform:translateX(0) translateY(0)}
+.dhead .tip-anchor .tip::after,
+.phead .tip-anchor .tip::after{top:auto;bottom:100%;left:14px;transform:none;border-top-color:transparent;border-bottom-color:var(--flyout)}
+.dhead .tip-anchor .tip::before,
+.phead .tip-anchor .tip::before{bottom:auto;top:-10px}
+
+/* 사이드 패널(.pnbody)과 본문(.main)은 overflow:auto 라 밖으로 나갈 수 없다.
+   가운데 정렬하면 좁은 영역에서 왼쪽이 잘리므로 앵커 기준 왼쪽 정렬하고 폭을 제한한다.
+   패널이 열리면 본문 폭이 더 줄어 상세·룸 화면도 같은 처리를 한다 */
+.pnbody .tip-anchor .tip,
+#detailBody .tip-anchor .tip,
+#roomBody .tip-anchor .tip,
+#roomForm .tip-anchor .tip,
+#infoBox .tip-anchor .tip,
+#quotaBox .tip-anchor .tip,
+#jobBox .tip-anchor .tip,
+#formBody .tip-anchor .tip{left:0;transform:translateX(0) translateY(4px);max-width:260px}
+/* 기본 정보·자원은 화면 상단이라 위로 열면 잘린다. 아래로 연다 */
+#infoBox .tip-anchor .tip,
+#quotaBox .tip-anchor .tip{top:calc(100% + 8px);bottom:auto;transform:translateX(0) translateY(-4px)}
+#infoBox .tip-anchor:hover .tip,#infoBox .tip-anchor:focus-within .tip,
+#quotaBox .tip-anchor:hover .tip,#quotaBox .tip-anchor:focus-within .tip{transform:translateX(0) translateY(0)}
+#infoBox .tip-anchor .tip::after,
+#quotaBox .tip-anchor .tip::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:var(--flyout)}
+#infoBox .tip-anchor .tip::before,
+#quotaBox .tip-anchor .tip::before{bottom:auto;top:-10px}
+.pnbody .tip-anchor:hover .tip,.pnbody .tip-anchor:focus-within .tip,
+#detailBody .tip-anchor:hover .tip,#detailBody .tip-anchor:focus-within .tip,
+#roomBody .tip-anchor:hover .tip,#roomBody .tip-anchor:focus-within .tip,
+#roomForm .tip-anchor:hover .tip,#roomForm .tip-anchor:focus-within .tip,
+#infoBox .tip-anchor:hover .tip,#infoBox .tip-anchor:focus-within .tip,
+#quotaBox .tip-anchor:hover .tip,#quotaBox .tip-anchor:focus-within .tip,
+#jobBox .tip-anchor:hover .tip,#jobBox .tip-anchor:focus-within .tip,
+#formBody .tip-anchor:hover .tip,#formBody .tip-anchor:focus-within .tip{transform:translateX(0) translateY(0)}
+.pnbody .tip-anchor .tip::after,
+#detailBody .tip-anchor .tip::after,
+#roomBody .tip-anchor .tip::after,
+#roomForm .tip-anchor .tip::after,
+#infoBox .tip-anchor .tip::after,
+#quotaBox .tip-anchor .tip::after,
+#jobBox .tip-anchor .tip::after,
+#formBody .tip-anchor .tip::after{left:14px;transform:none}
+.tip-anchor.below:hover .tip,.tip-anchor.below:focus-within .tip{transform:translateX(0) translateY(0)}
+.tip-anchor.below .tip::after{top:auto;bottom:100%;left:14px;transform:none;border-top-color:transparent;border-bottom-color:var(--flyout)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 다중 선택 필터 (공통정책 3.2) */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 툴팁 유지 — 말풍선 위에서도 호버가 끊기지 않도록 간격을 브리지로 연결 */
+.tip-anchor .tip::before{content:"";position:absolute;left:0;right:0;height:10px;bottom:-10px}
+.tip-anchor.below .tip::before{bottom:auto;top:-10px}
+
+/* 하단 미리보기 바 (시안 확인용) */
+/* ===== 수정사항 안내 (검토용 · 확정 후 삭제) =====
+   회의에서 무엇이 바뀌었는지 짚고 해당 화면으로 바로 가기 위한 장치다 */
+.chgbtn{position:fixed;right:20px;bottom:64px;z-index:820;display:flex;align-items:center;gap:8px;
+  background:#151a2c;color:#e6e9f5;border:1px solid #2f3654;border-radius:11px;padding:10px 15px;
+  font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;
+  box-shadow:0 10px 26px rgba(0,0,0,.42)}
+.chgbtn:hover{border-color:#48507a}
+.chgbtn .cnt{background:var(--primary);color:#fff;border-radius:10px;padding:1px 8px;font-size:11px}
+.chgwrap{position:fixed;inset:0;z-index:830;display:none}
+.chgwrap.on{display:block}
+.chgwrap .chgbg{position:absolute;inset:0;background:rgba(8,11,20,.5)}
+.chgpanel{position:absolute;right:0;top:0;bottom:0;width:520px;max-width:92vw;background:#151a2c;
+  color:#c9cfe0;border-left:1px solid #2f3654;display:flex;flex-direction:column;
+  box-shadow:-18px 0 44px rgba(0,0,0,.45)}
+.chgpanel .ch{padding:16px 18px;border-bottom:1px solid #2a2f45;display:flex;align-items:center;gap:10px}
+.chgpanel .ch b{font-size:14px;color:#fff}
+.chgpanel .ch .sub{font-size:11.5px;color:#7f88a8}
+.chgpanel .ch .x{margin-left:auto;background:transparent;border:0;color:#7f88a8;cursor:pointer;
+  font-size:18px;line-height:1;padding:2px 6px;border-radius:6px;font-family:inherit}
+.chgpanel .ch .x:hover{color:#fff}
+.chgpanel .cb{flex:1;overflow:auto;padding:14px 18px 24px}
+.chgsec{font-size:11px;font-weight:700;letter-spacing:.3px;color:#7f88a8;margin:16px 0 8px}
+.chgsec:first-child{margin-top:0}
+.chgitem{border:1px solid #2a2f45;border-radius:10px;margin-bottom:8px;overflow:hidden;background:#11162a}
+.chgitem > button{width:100%;text-align:left;background:transparent;border:0;color:#e6e9f5;
+  font-family:inherit;font-size:12.5px;font-weight:600;padding:12px 14px;cursor:pointer;
+  display:flex;align-items:flex-start;gap:9px;line-height:1.5}
+.chgitem > button:hover{background:#181e33}
+.chgitem .no{flex:0 0 auto;background:#2a3150;color:#a8b1d0;border-radius:6px;
+  font-size:10.5px;font-weight:700;padding:2px 7px;margin-top:1px}
+.chgbody{display:none;padding:0 14px 14px;font-size:12px;line-height:1.65}
+.chgitem.on .chgbody{display:block}
+.chgbody .chgba{color:#6f7686;font-size:11.5px;text-decoration:line-through;text-decoration-color:#3d4460}
+.chgbody .chgaf{color:#e6e9f5;font-size:12.5px;font-weight:600;margin-top:3px}
+.chgtb{width:100%;border-collapse:collapse;margin-top:10px;font-size:11.5px}
+.chgtb td{padding:5px 0;vertical-align:top;border-top:1px solid #232842;color:#a8b1d0}
+.chgtb tr:first-child td{border-top:0}
+.chgtb td:first-child{width:34%;color:#e6e9f5;padding-right:10px}
+.chgtb td:last-child{width:34%;color:#6f7686;padding-left:10px}
+.chgbody .src{margin-top:10px;padding-top:9px;border-top:1px solid #232842;font-size:11px;color:#6f7686;line-height:1.7}
+.chggo{margin-top:11px;background:transparent;border:1px solid #3f6bd8;color:#8fb4f2;border-radius:8px;
+  padding:6px 12px;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer}
+.chggo:hover{background:rgba(63,107,216,.14)}
+.chgpanel .cf{padding:11px 18px;border-top:1px solid #2a2f45;color:#5f677f;font-size:11.5px}
+/* 이동 후 해당 영역을 잠시 강조한다 */
+.chgflash{position:fixed;z-index:825;border:2px solid var(--primary);border-radius:12px;pointer-events:none;
+  animation:chgfl 2.4s ease forwards}
+@keyframes chgfl{0%{opacity:0}10%{opacity:1}72%{opacity:1}100%{opacity:0}}
+
+.demo-bar{position:fixed;left:0;right:0;bottom:0;z-index:800;background:#0f1320;color:#c9cfe0;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;font-size:12px;border-top:1px solid #2a2f45;}
+
+.demo-bar .demo-label{color:#7f88a8;margin-right:4px;}
+/* 라벨과 버튼을 한 덩어리로 묶어 그룹째 줄이 바뀌게 한다 */
+.demo-bar .dgrp{display:inline-flex;align-items:center;gap:6px;margin-right:14px;}
+/* 목록 구획 제목 — 성격이 다른 항목을 가른다 */
+/* 값 태그 — 읽기만 하는 라벨. 배경 없이 테두리로 구분 (라이브러리 v0.4) */
+/* 본인 CDE 행 — 목록에서 내 것을 바로 찾을 수 있게 한다 */
+table.tbl tbody tr.rowme{background:var(--hover)}
+table.tbl tbody tr.rowme:hover{background:var(--hover-strong)}
+.vtag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:5px;background:transparent;border:1px solid var(--border);color:var(--muted-foreground)}
+/* 공용 표시 — 라이브러리의 .vtag 를 쓴다. 새 클래스를 만들지 않는다.
+   강조색은 선택 상태와 혼동되고 회색 텍스트만 두면 비활성으로 읽힌다.
+   테두리가 있어야 라벨로 읽힌다. 이름 링크 밖에 두어 클릭 영역과 분리한다(2.3)
+   카드는 우측 상단에 더보기 버튼이 있어 배지가 겹치지 않도록 이름 영역을 좁힌다 */
+.wcard .ch .vtag{margin-left:6px;flex:0 0 auto}
+.wcard .ch .stwrap{margin-left:6px;flex:0 0 auto}
+.wcard .ch .stbadge{font-size:11px;padding:2px 9px}
+/* 배지 자체가 앵커다. 목록 상단 카드는 위로 열면 잘리므로 아래로 연다 */
+.stwrap{display:inline-flex}
+.stwrap .tip{top:calc(100% + 8px);bottom:auto;left:0;transform:translateX(0) translateY(-4px);max-width:280px}
+.stwrap:hover .tip,.stwrap:focus-within .tip{transform:translateX(0) translateY(0)}
+.stwrap .tip::after{top:auto;bottom:100%;left:14px;transform:none;border-top-color:transparent;border-bottom-color:var(--flyout)}
+.stwrap .tip::before{bottom:auto;top:-10px}
+table.tbl .wsname .vtag{margin-left:8px}
+.demo-bar button{background:#1c2136;border:1px solid #2f3654;color:#c9cfe0;border-radius:6px;padding:5px 10px;font-size:12px;font-family:inherit;cursor:pointer;}
+.demo-bar button:hover{border-color:var(--accent);color:#fff;}
+.demo-bar .sw.on,
+.demo-bar .ms.on,
+.demo-bar .vw.on,.demo-bar .st.on,.demo-bar .rl.on,.demo-bar .gw.on,.demo-bar .mb.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+.demo-bar button.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600;}
+
+/* GNB 접기 */
+.gnb-fold{display:flex;align-items:center;justify-content:flex-end;margin-top:10px}
+.foldbtn{width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--border-strong);background:transparent;border-radius:8px;color:var(--muted-foreground);cursor:pointer}
+.foldbtn:hover{border-color:var(--accent);color:var(--foreground)}
+.foldbtn svg{width:14px;height:14px}
+
+body.gnb-fold-on{--gnb-w:68px}
+body.gnb-fold-on .brand b,
+body.gnb-fold-on .nav > a .lb,
+body.gnb-fold-on .nav .flywrap > a .lb,
+body.gnb-fold-on .worklist .lb,
+body.gnb-fold-on .notice-common .lb,
+body.gnb-fold-on .persona .who,
+body.gnb-fold-on .persona .up,
+body.gnb-fold-on .banner .bt,
+body.gnb-fold-on .banner .ph-tag{display:none}
+body.gnb-fold-on .banner{display:none}
+body.gnb-fold-on .brand{justify-content:center;padding:0}
+body.gnb-fold-on .nav{padding:14px 8px 6px}
+body.gnb-fold-on .nav a{justify-content:center;padding:11px 0}
+body.gnb-fold-on .nav a.has-fly::after{content:none}
+body.gnb-fold-on .gnb-bottom{padding:10px 8px}
+body.gnb-fold-on .worklist,
+body.gnb-fold-on .notice-common{justify-content:center;padding:10px 0}
+body.gnb-fold-on .worklist .cbadge,
+body.gnb-fold-on .notice-common .cbadge{position:absolute;top:4px;right:6px;left:auto;margin:0;min-width:16px;height:16px;font-size:10px;padding:0 4px}
+body.gnb-fold-on .persona .pbtn{justify-content:center;padding:8px 0}
+body.gnb-fold-on .gnb-fold{justify-content:center}
+
+/* 필터 (공통정책 3.2) — 선택지가 적어 펼쳐 제공. 단일 필드 다중 값 OR / 필드 간 AND */
+
+
+
+
+
+
+
+
+
+
+
+
+
+.fclear:hover,.chips .clr:hover,.selall button:hover{color:var(--foreground);text-decoration:underline;text-underline-offset:3px}
+
+/* 컬럼 헤더 — 도움말 팝오버(2.3) + 필터(3.2) */
+th .thwrap{display:inline-flex;align-items:center;gap:5px}
+.thic{width:15px;height:15px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);font-size:10px;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex:0 0 auto}
+.thfilter{width:18px;height:18px;display:inline-grid;place-items:center;border:0;background:transparent;color:var(--muted-foreground);border-radius:4px;cursor:pointer;flex:0 0 auto}
+.thfilter:hover{background:var(--hover-strong);color:var(--foreground)}
+.thfilter.on{color:var(--primary)}
+.dark .thfilter.on{color:var(--accent)}
+.thfilter svg{width:12px;height:12px}
+.thpop{position:absolute;left:0;top:calc(100% + 6px);width:230px;background:var(--flyout);border:1px solid var(--border);border-radius:9px;padding:9px 10px;font-size:12px;font-weight:400;color:var(--foreground);line-height:1.55;box-shadow:0 12px 30px var(--shadow);z-index:75;display:none;white-space:normal;text-align:left}
+th.thcell{position:relative}
+/* 클릭이 아니라 호버·포커스로 연다. 다른 툴팁과 방식을 맞춘다 */
+th.thcell:hover .thpop,th.thcell:focus-within .thpop{display:block}
+.fdd{position:absolute;left:0;top:calc(100% + 6px);min-width:210px;background:var(--flyout);border:1px solid var(--border);border-radius:10px;padding:7px;box-shadow:0 12px 30px var(--shadow);z-index:80;display:none;font-weight:400}
+th.thcell.fdd-on .fdd{display:block}
+.fdd label{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:7px;font-size:12.5px;color:var(--foreground);cursor:pointer;white-space:nowrap}
+.fdd label:hover{background:var(--hover)}
+.fdd label input{accent-color:var(--primary)}
+.fdd label .fc{margin-left:auto;font-size:11px;color:var(--faint)}
+.fdd hr{border:0;border-top:1px solid var(--border);margin:6px 0}
+.fdd .fbtns{display:flex;justify-content:flex-end;gap:6px;padding:2px}
+.fdd .fbtns button{padding:5px 11px;border-radius:7px;font-size:12px;font-family:inherit;cursor:pointer;border:1px solid var(--border-strong);background:transparent;color:var(--muted-foreground)}
+.fdd .fbtns button.pri{background:var(--primary);border-color:var(--primary);color:var(--primary-foreground);font-weight:600}
+
+/* 상세 패널 섹션 접기 — 기본 펼침, 개별 접기 가능 */
+.sec > h4{cursor:pointer;user-select:none}
+.sec > h4 .fold{margin-left:auto;display:grid;place-items:center;color:var(--muted-foreground);transition:transform .15s}
+.sec > h4 .fold svg{width:14px;height:14px}
+.sec.closed > h4 .fold{transform:rotate(-90deg)}
+.sec.closed .secbody{display:none}
+.secbody{padding-top:2px}
+/* 패널 항목 도움말 */
+.dl dt{display:flex;align-items:center;gap:5px}
+/* 반입 진행률 (기술문서 §7.3 — 3단계 디커플링) */
+.prog{margin-top:8px}
+.prog .plabel{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted-foreground);margin-bottom:5px}
+.prog .pbar{height:5px;border-radius:3px;background:var(--muted);overflow:hidden}
+.prog .pfill{height:100%;background:var(--primary);border-radius:3px;transition:width .4s}
+.prog .psteps{display:flex;gap:4px;margin-top:6px}
+.prog .pstep{flex:1;font-size:10.5px;text-align:center;color:var(--faint);padding:3px 0;border-radius:5px;background:var(--muted)}
+.prog .pstep.on{color:var(--primary);font-weight:600;background:color-mix(in srgb,var(--primary) 12%,transparent)}
+.prog .pstep.done{color:var(--success)}
+
+/* ── 배포 마법사 ─────────────────────────────────────── */
+.wiz{display:grid;grid-template-columns:230px 1fr;gap:22px;align-items:start}
+.wnav{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 12px;position:sticky;top:0}
+.wnav h5{margin:0 0 10px;font-size:11px;font-weight:700;color:var(--muted-foreground);letter-spacing:.4px}
+.wstep{display:flex;align-items:flex-start;gap:10px;padding:9px 8px;border-radius:8px;cursor:pointer;margin-bottom:2px}
+.wstep:hover{background:var(--hover)}
+.wstep .no{width:22px;height:22px;flex:0 0 auto;border-radius:50%;border:1px solid var(--border);display:grid;place-items:center;font-size:10.5px;font-weight:700;color:var(--muted-foreground)}
+.wstep .tx{font-size:12.5px;color:var(--muted-foreground);line-height:1.45;padding-top:2px}
+.wstep .tx b{display:block;font-size:12.5px;color:var(--foreground);font-weight:600}
+.wstep .tx span{font-size:11px;color:var(--faint)}
+.wstep.on{background:color-mix(in srgb,var(--primary) 10%,transparent)}
+.wstep.on .no{background:var(--primary);border-color:var(--primary);color:var(--primary-foreground)}
+.wstep.on .tx b{color:var(--primary)}
+.dark .wstep.on .tx b{color:var(--accent)}
+.wstep.done .no{background:color-mix(in srgb,var(--success) 16%,transparent);border-color:var(--success);color:var(--success)}
+.wstep.err .no{background:color-mix(in srgb,var(--destructive) 14%,transparent);border-color:var(--destructive);color:var(--destructive)}
+.wstep.lock{opacity:.5;cursor:not-allowed}
+.wbody{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:22px 24px;min-height:420px;display:flex;flex-direction:column}
+.wbody h3{margin:0 0 4px;font-size:16px;letter-spacing:-.2px}
+.wbody .sub{font-size:12.5px;color:var(--muted-foreground);margin-bottom:18px;line-height:1.6}
+.wfoot{margin-top:auto;padding-top:18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.wfoot .cnt{font-size:12px;color:var(--faint)}
+.wfoot .btns{display:flex;gap:8px;align-items:center}
+
+/* 마법사 폼 */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.fgrid .full{grid-column:1/-1}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld label{font-size:12px;font-weight:600;color:var(--muted-foreground)}
+.fld .hint{font-size:11px;color:var(--faint);line-height:1.5}
+.optcard{display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border:1px solid var(--border);border-radius:10px;cursor:pointer;background:transparent}
+.optcard:hover{border-color:var(--accent)}
+.optcard.on{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 7%,transparent)}
+.optcard input{margin-top:3px;accent-color:var(--primary)}
+.optcard .oc-t{font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:3px}
+.optcard .oc-d{font-size:11.5px;color:var(--muted-foreground);line-height:1.55}
+.optcard .oc-tag{display:inline-block;margin-top:6px;font-size:10.5px;padding:2px 7px;border-radius:5px;background:var(--muted);color:var(--faint)}
+.optcard.on .oc-tag{background:color-mix(in srgb,var(--primary) 14%,transparent);color:var(--primary)}
+.dark .optcard.on .oc-tag{color:var(--accent)}
+
+.adv{border:1px solid var(--border);border-radius:10px;margin-top:16px;overflow:hidden}
+.adv > summary{padding:11px 14px;font-size:12.5px;font-weight:600;color:var(--foreground);cursor:pointer;background:var(--muted);list-style:none;display:flex;align-items:center;justify-content:space-between}
+.adv > summary::-webkit-details-marker{display:none}
+.adv > summary .chg{font-size:11px;font-weight:600;color:var(--primary)}
+.advbody{padding:14px}
+.advgrp{margin-bottom:14px}
+.advgrp:last-child{margin-bottom:0}
+.advgrp h6{margin:0 0 8px;font-size:10.5px;font-weight:700;letter-spacing:.4px;color:var(--faint)}
+.advrow{display:grid;grid-template-columns:1fr 130px;gap:8px;align-items:center;padding:5px 0}
+.advrow label{font-size:12px;color:var(--foreground)}
+.advrow .sw{justify-self:end}
+
+.review{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.review h6{margin:0;padding:10px 14px;font-size:11.5px;font-weight:700;background:var(--muted);color:var(--muted-foreground)}
+.review dl{margin:0;padding:12px 14px;display:grid;grid-template-columns:150px 1fr;gap:8px 12px;font-size:12.5px}
+.review dt{color:var(--muted-foreground)}
+.review dd{margin:0;color:var(--foreground);word-break:break-all}
+.errbox{border:1px solid color-mix(in srgb,var(--destructive) 30%,transparent);background:color-mix(in srgb,var(--destructive) 8%,transparent);border-radius:10px;padding:12px 14px;margin-bottom:14px}
+.errbox b{display:block;font-size:12.5px;color:var(--destructive);margin-bottom:7px}
+.errbox a{display:block;font-size:12px;color:var(--foreground);padding:3px 0;cursor:pointer;text-decoration:none}
+.errbox a:hover{color:var(--destructive)}
+.code{background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:11px 13px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--foreground);line-height:1.65;white-space:pre;overflow-x:auto}
+.sw{position:relative;width:38px;height:21px;border-radius:11px;background:var(--border);cursor:pointer;transition:.15s;flex:0 0 auto}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:var(--card);transition:.15s}
+.sw.on{background:var(--primary)}
+.sw.on::after{left:19px}
+.warnbox{display:flex;gap:9px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 9%,transparent);border-radius:9px;font-size:12px;line-height:1.6;color:var(--foreground);margin-top:10px}
+.warnbox b{color:var(--warning)}
+
+/* ── 배포 상세 페이지 DEP-L01.D01 ─────────────────── */
+.dhead{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px}
+/* 룸 화면 액션 — 개발룸은 별도로 만들고 지우는 대상이라 헤더 우측에 진입점을 둔다 */
+.dact{margin-left:auto;display:flex;gap:8px;flex:0 0 auto}
+.back,.dhead .back{width:32px;height:32px;flex:0 0 auto;display:grid;place-items:center;border:1px solid var(--border-strong);background:var(--card);border-radius:8px;color:var(--muted-foreground);cursor:pointer}
+.back:hover,.dhead .back:hover{border-color:var(--accent);color:var(--foreground)}
+.dhead .dinfo{flex:1;min-width:0}
+.dhead h1{margin:0 0 6px;font-size:20px;letter-spacing:-.3px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.dhead .dmeta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dcards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.dcard{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px}
+.dcard .ct{font-size:11.5px;color:var(--muted-foreground);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.dcard .cv{font-size:15px;font-weight:600;color:var(--foreground);word-break:break-all}
+.dcard .cv.sm{font-size:12.5px;font-weight:400;font-family:ui-monospace,Menlo,monospace}
+.dtabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.dtabs button{padding:10px 16px;border:0;background:transparent;font-size:13.5px;color:var(--muted-foreground);font-family:inherit;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.dtabs button:hover{color:var(--foreground)}
+.dtabs button.on{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.dark .dtabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
+.dsec{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px 18px;margin-bottom:14px}
+.dsec > h4{margin:0 0 12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.mcard{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px}
+.mcard .mt{font-size:11px;color:var(--muted-foreground);margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.mcard .mv{font-size:19px;font-weight:700;color:var(--foreground);letter-spacing:-.4px}
+.mcard .mv small{font-size:12px;font-weight:400;color:var(--muted-foreground);margin-left:3px}
+.mcard .mu{font-size:10.5px;color:var(--faint);margin-top:4px}
+.chart{height:150px;background:var(--muted);border:1px solid var(--border);border-radius:9px;display:flex;align-items:flex-end;gap:3px;padding:12px}
+.chart .bar{flex:1;background:color-mix(in srgb,var(--primary) 55%,transparent);border-radius:2px 2px 0 0;min-height:3px}
+.logbox{background:var(--muted);border:1px solid var(--border);border-radius:9px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;line-height:1.85;max-height:260px;overflow-y:auto;padding:10px 12px}
+.logrow{display:flex;gap:9px;white-space:nowrap}
+.logrow .ln{color:var(--faint);flex:0 0 22px;text-align:right}
+.logrow .ch{flex:0 0 62px;font-weight:600}
+.logrow .ch.app{color:var(--success)}
+.logrow .ch.infra{color:var(--warning)}
+.logrow .ch.system{color:var(--accent)}
+.logrow .tm{color:var(--faint);flex:0 0 74px}
+.logrow .msg{color:var(--foreground);white-space:pre-wrap}
+.logbar{display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+.chbtn{padding:5px 11px;border:1px solid var(--border-strong);background:transparent;border-radius:20px;font-size:12px;color:var(--muted-foreground);font-family:inherit;cursor:pointer}
+.chbtn.on{background:color-mix(in srgb,var(--primary) 14%,transparent);border-color:var(--primary);color:var(--primary);font-weight:600}
+.dark .chbtn.on{color:var(--accent);border-color:var(--accent)}
+.live{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--success);margin-left:auto}
+.live .ld{width:6px;height:6px;border-radius:50%;background:var(--success);animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.bmgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 16px}
+.bmgrid .full{grid-column:1/-1}
+
+/* ── 외부 배포 가져오기 DEP-L01.F01 ────────────────── */
+.impbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.impbar .found{font-size:13px;color:var(--foreground)}
+.impbar .found b{color:var(--primary)}
+.dark .impbar .found b{color:var(--accent)}
+.impnote{display:flex;gap:9px;padding:12px 14px;border:1px solid color-mix(in srgb,var(--warning) 30%,transparent);background:color-mix(in srgb,var(--warning) 8%,transparent);border-radius:9px;font-size:12px;line-height:1.65;color:var(--foreground);margin-bottom:16px}
+.impnote b{color:var(--warning);display:block;margin-bottom:3px}
+.podcell{display:flex;flex-direction:column;gap:3px}
+.podcell .pn{font-size:13px;font-weight:600;color:var(--foreground)}
+.hwtag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:5px;background:var(--muted);color:var(--muted-foreground);font-family:ui-monospace,Menlo,monospace}
+.impfoot{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.impfoot .sel{font-size:13px;color:var(--muted-foreground)}
+.impfoot .sel b{color:var(--foreground)}
+table.tbl tr.need td{background:color-mix(in srgb,var(--destructive) 5%,transparent)}
+
+/* ── 진단 (기술문서 §10.5 — 원인 설명 + 조치 권고) ── */
+.diag{display:flex;gap:12px;padding:14px 16px;border-radius:11px;margin-bottom:18px;
+  border:1px solid color-mix(in srgb,var(--destructive) 30%,transparent);
+  background:color-mix(in srgb,var(--destructive) 7%,transparent)}
+.diag.warn{border-color:color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 8%,transparent)}
+.diag .dic{width:20px;height:20px;flex:0 0 auto;margin-top:1px;color:var(--destructive)}
+.diag.warn .dic{color:var(--warning)}
+.diag .dtx{flex:1;min-width:0}
+.diag .dtt{font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:5px}
+.diag .dds{font-size:12.5px;color:var(--muted-foreground);line-height:1.65;margin-bottom:8px}
+.diag .drc{font-size:12.5px;color:var(--foreground);line-height:1.65;padding:8px 11px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.diag .drc b{color:var(--muted-foreground);font-size:11px;display:block;margin-bottom:3px}
+.diag .dact{margin-top:10px;display:flex;gap:8px}
+
+/* ── 설정 변경 모달 ── */
+.cfggrp{margin-bottom:18px}
+.cfggrp:last-child{margin-bottom:0}
+.cfggrp .gh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.cfggrp .gh h5{margin:0;font-size:12.5px;font-weight:600;color:var(--foreground)}
+.cfggrp .gh .gtag{font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.cfggrp .gh .gtag.now{background:color-mix(in srgb,var(--success) 14%,transparent);color:var(--success)}
+.cfggrp .gh .gtag.rst{background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)}
+.cfggrp .gd{font-size:11.5px;color:var(--faint);line-height:1.55;margin-bottom:10px}
+.cfgrow{display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:center;padding:7px 0}
+.cfgrow label{font-size:12.5px;color:var(--foreground)}
+.cfgrow .chgd{font-size:10.5px;color:var(--warning);margin-left:6px}
+.rstwarn{display:flex;gap:9px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 9%,transparent);border-radius:9px;font-size:12px;line-height:1.6;color:var(--foreground);margin-top:14px}
+.rstwarn b{color:var(--warning)}
+
+/* 컬럼 도움말 — 상태값 목록 */
+.thpop dl{margin:8px 0 0;display:grid;grid-template-columns:auto 1fr;gap:5px 9px;font-size:11.5px}
+.thpop dt{font-weight:600;color:var(--foreground);white-space:nowrap}
+.thpop dd{margin:0;color:var(--muted-foreground);line-height:1.5}
+.thpop{width:290px}
+
+/* ── 워크스페이스 ─────────────────────────────────── */
+.wsname{display:flex;align-items:center;gap:9px}
+.roomcell{display:flex;gap:6px;flex-wrap:wrap}
+.quota{display:flex;flex-direction:column;gap:4px;min-width:120px}
+.quota .qrow{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted-foreground)}
+.quota .qv{font-variant-numeric:tabular-nums;color:var(--foreground);font-size:11px;flex:0 0 auto}
+
+/* 워크스페이스 상세 — 탭 */
+.wtabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.wtabs button{padding:10px 16px;border:0;background:transparent;font-size:13.5px;color:var(--muted-foreground);font-family:inherit;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.wtabs button:hover{color:var(--foreground)}
+.wtabs button.on{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.dark .wtabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* 자원 점유 현황 카드 */
+/* 상세 자원 카드 — 항목이 4개로 고정이라 열 수도 고정한다 */
+.qcards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:20px}
+@media (max-width:1080px){ .qcards{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:640px){  .qcards{grid-template-columns:1fr} }
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px}
+.qcard .qnote{font-size:11px;color:var(--faint);margin-top:6px}
+.qcard .qt{font-size:11.5px;color:var(--muted-foreground);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.qcard .qn{font-size:17px;font-weight:700;color:var(--foreground);letter-spacing:-.3px;margin-bottom:8px}
+.qcard .qn small{font-size:12px;font-weight:400;color:var(--muted-foreground)}
+/* 멤버 역할 선택 */
+.rolesel{padding:5px 9px;border:1px solid var(--border);background:transparent;border-radius:7px;font-size:12px;color:var(--foreground);font-family:inherit}
+.avatar{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;
+  background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent);flex:0 0 auto}
+.memcell{display:flex;align-items:center;gap:9px}
+
+/* API Key */
+.keyrow{display:flex;align-items:center;gap:8px}
+.keyval{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted-foreground);background:var(--muted);border:1px solid var(--border);border-radius:6px;padding:3px 8px}
+
+/* 신청 이력 */
+.reqtype{font-size:11px;padding:2px 8px;border-radius:5px;background:var(--muted);color:var(--muted-foreground);font-weight:600}
+
+/* 패널 타이틀 하단 설명 — 무엇인지 바로 알 수 있게 상단에 둔다 */
+.pndesc{margin:0 0 9px;font-size:12.5px;line-height:1.6;color:var(--muted-foreground)}
+.pndesc.none{color:var(--faint)}
+
+/* ── 카드 뷰 ─────────────────────────────────────── */
+.viewtg{display:flex;gap:2px;background:var(--muted);border:1px solid var(--border-strong);border-radius:8px;padding:2px}
+.viewtg button{width:30px;height:26px;display:grid;place-items:center;border:0;background:transparent;border-radius:6px;color:var(--muted-foreground);cursor:pointer}
+.viewtg button.on{background:var(--card);color:var(--foreground);box-shadow:0 1px 2px var(--shadow)}
+.viewtg svg{width:14px;height:14px}
+/* 카드 목록 — 열 수를 고정하고 폭에 맞춰 늘린다.
+   auto-fill 은 화면이 넓어질수록 열이 계속 늘어 카드가 잘게 쪼개진다 */
+.cardgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+@media (max-width:1440px){ .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (max-width:1080px){ .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:720px){  .cardgrid{grid-template-columns:1fr} }
+/* 패널이 열리면 목록 영역이 패널 폭만큼 줄어드므로 열도 하나 줄인다 */
+body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:1440px){ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:1080px){ body.panel-on .cardgrid{grid-template-columns:1fr} }
+/* 카드는 그리드 셀 높이를 채우고 푸터를 바닥에 붙인다.
+   내용이 적은 카드도 같은 높이가 되어 목록이 흐트러지지 않는다 */
+.wcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;position:relative;transition:border-color .15s;
+  display:flex;flex-direction:column}
+.wcard:hover{border-color:var(--accent)}
+.wcard .ch{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px;padding-right:28px}
+.wcard .ch .wsic{width:30px;height:30px;flex:0 0 auto;border-radius:8px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent)}
+.wcard .ch .wsic svg{width:16px;height:16px}
+.wcard .ch .nm{flex:1;min-width:0}
+.wcard .ch .nm b{display:block;font-size:14px;font-weight:600;color:var(--foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wcard .cdesc{font-size:12px;color:var(--muted-foreground);line-height:1.55;margin-bottom:12px;min-height:19px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wcard .cdesc.none{color:var(--faint)}
+.wcard .crooms{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;min-height:30px}
+/* 갈 수 없는 룸 — 상태로 막힌 작업이라 미노출이 아니라 비활성으로 둔다 */
+.roombtn:disabled{border-color:var(--border);color:var(--faint);cursor:default}
+.roombtn{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--border-strong);background:transparent;border-radius:7px;font-size:11.5px;color:var(--muted-foreground);cursor:pointer;font-family:inherit}
+.roombtn:hover{border-color:var(--accent);color:var(--foreground)}
+.roombtn .rdot{display:inline-block;width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+/* 환경 셀 — 룸 상태를 점과 라벨로 나열한다. 룸이 늘어도 컬럼이 늘지 않는다 */
+.envcell{display:inline-flex;align-items:center;gap:14px;white-space:nowrap}
+.envone{display:inline-flex;align-items:baseline;gap:7px}
+.envlb{font-size:11.5px;color:var(--faint)}
+.envv{font-size:12px;color:var(--foreground)}
+.envv.err{color:var(--destructive);font-weight:600}
+.envv.mu{color:var(--muted-foreground)}
+/* 패널 환경 탭 — 운영룸·개발룸 구분 */
+.roombtn.add{color:var(--primary);border-style:dashed}
+.roombtn .rdot.ok{background:var(--success)}
+.roombtn .rdot.cr{background:var(--destructive)}
+.roombtn .rdot.mu{background:var(--faint)}
+.roombtn .rdot.ac{background:var(--warning)}
+.wcard .cfoot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:11px;border-top:1px solid var(--border);font-size:12px;color:var(--muted-foreground)}
+.wcard .cres{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:11.5px;color:var(--muted-foreground)}
+.wcard .cres b{font-weight:600;color:var(--foreground)}
+/* 이동 버튼 — 화살표를 우측 끝에 고정 (라이브러리 Button 이동 변형) */
+.resblock .rh .all .ar{margin-left:6px}
+/* 다중 선택 · 태그 입력형 (라이브러리 폼·입력 요소) */
+.msel{display:flex;flex-wrap:wrap;gap:6px;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:8px;min-height:40px;align-items:center}
+.msel.err{border-color:var(--destructive)}
+.msel:focus-within{border-color:var(--ring)}
+.msel .tag{display:inline-flex;align-items:center;gap:6px;background:var(--muted);border:1px solid var(--border);border-radius:6px;padding:3px 6px 3px 9px;font-size:12px;color:var(--foreground)}
+.msel .tag button{border:0;background:transparent;color:var(--muted-foreground);cursor:pointer;font-size:14px;line-height:1;padding:0}
+.msel .tag button:hover{color:var(--foreground)}
+.msel input{border:0;background:transparent;outline:none;color:var(--foreground);font-family:inherit;font-size:13px;flex:1;min-width:90px;padding:4px}
+/* 아이콘 선택 — 용도 유형 8종 중 하나 */
+.icopick{display:flex;gap:7px;flex-wrap:wrap}
+.icopick button{width:38px;height:38px;border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--muted-foreground);display:grid;place-items:center;cursor:pointer;padding:0}
+.icopick button svg{width:18px;height:18px}
+.icopick button:hover{border-color:var(--border-strong);color:var(--foreground)}
+.icopick button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
+.mopt{position:relative}
+.mopt .list{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--flyout);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);z-index:40;max-height:190px;overflow:auto;padding:4px}
+.mopt .list button{display:block;width:100%;text-align:left;padding:7px 10px;border:0;background:0;font-family:inherit;font-size:12.5px;color:var(--foreground);cursor:pointer;border-radius:6px}
+.mopt .list button:hover{background:var(--hover)}
+.mopt .list .none{padding:9px 10px;font-size:12px;color:var(--muted-foreground)}
+.wcard .cmore{position:absolute;top:12px;right:12px}
+
+/* 연관 리소스 */
+.resblock{margin-bottom:16px}
+.resblock:last-child{margin-bottom:0}
+.resblock .rh{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.resblock .rh h5{margin:0;font-size:12.5px;font-weight:600;color:var(--foreground)}
+.resblock .rh .cnt{font-size:12px;color:var(--muted-foreground);font-weight:400}
+/* 전체 보기 — 이동이지만 부가 동선이라 흐린 색 + 호버 밑줄 */
+.resblock .rh .all{margin-left:auto;font-size:12px;color:var(--muted-foreground);cursor:pointer;background:0;border:0;font-family:inherit}
+.resblock .rh .all:hover{color:var(--foreground);text-decoration:underline;text-underline-offset:3px}
+
+
+/* 생성 페이지 폼 */
+/* 폼 폭은 요소에서만 제한한다.
+   컨테이너와 요소 양쪽에 제한을 걸면 여백이 두 겹으로 생긴다.
+   입력 필드는 .f / .fsec > .f 에서 폭을 잡고, 컨테이너는 페이지 폭을 그대로 쓴다 */
+.formpage{max-width:560px}   /* 사유만 받는 신청 폼 — 요소가 하나라 컨테이너로 제한한다 */
+.formpage.two,.formpage.mid{max-width:none}
+.fsec{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:18px 20px;margin-bottom:14px}
+.fsec > h4{display:flex;align-items:center;gap:6px;margin:0 0 4px;font-size:13px;font-weight:600}
+.fsec:last-of-type{margin-bottom:0}
+.formfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
+/* 모달 부제 — 라벨과 값을 짝지어 보인다. 값만 늘어놓으면 무엇이 무엇인지 모른다.
+     라벨이 짧아 폭을 줄인다(기본 112px 는 본문 섹션 기준이다) */
+  .mdhead .dl.two{grid-template-columns:64px minmax(0,1fr) 76px minmax(0,1fr);gap:7px 10px;margin-top:10px}
+  .mdhead .dl.two dd{padding-right:12px}
+  @media (max-width:640px){ .mdhead .dl.two{grid-template-columns:64px 1fr} }
+/* 룸 페이지 */
+.roomhead{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.roomnote{display:flex;gap:9px;padding:12px 14px;border:1px solid var(--border);background:var(--muted);border-radius:9px;font-size:12px;line-height:1.65;color:var(--muted-foreground);margin-bottom:18px}
+.roomnote svg{width:16px;height:16px;flex:0 0 auto;margin-top:1px;color:var(--accent)}
+
+/* 폼 2열 배치 — 좁아지면 1열로 */
+/* 폼은 단일 열 기준(공통정책 4.6). 짧은 숫자 입력만 한 줄에 묶는다 */
+.fgrid2 .full,.fgridn .full{grid-column:1/-1}
+/* 폼 2열 배치 — .fgridn 은 같은 규격의 별칭.
+   폼 폭이 넓어져도 입력 칸이 늘어지지 않게 칸 폭 상한을 둔다 */
+.fgrid2,.fgridn{display:grid;grid-template-columns:repeat(2,minmax(0,300px));gap:14px 16px}
+.fgrid2 > div,.fgridn > div{display:flex;flex-direction:column;gap:6px;min-width:0}
+.sublb{display:block;font-size:12.5px;color:var(--muted-foreground)}
+.fgrid2 .inp,.fgridn .inp{width:100%}
+@media (max-width:900px){ .fgrid2,.fgridn{grid-template-columns:1fr} }
+
+/* 자원 카드 — 화면 폭에 따라 열 수 조정 */
+.qcard .qn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* 가용 자원 행 — 값이 잘리지 않게 */
+@media (max-width:820px){
+  }
+
+/* 룸 화면 상단 요약 — 이 환경 몫 대비 점유. 할당량 배분은 워크스페이스 상세에서 본다 */
+.rsgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.rst{font-size:11.5px;color:var(--muted-foreground);margin-bottom:4px}
+.rsv{font-size:14px;font-weight:600;color:var(--foreground);margin-bottom:6px}
+.rsq{font-size:11.5px;font-weight:400;color:var(--muted-foreground)}
+
+/* 이동 버튼 — 라벨과 화살표를 붙인다. 양끝으로 벌리면 셀렉트 박스로 읽힌다.
+   화살표는 방향 표시이므로 라벨보다 흐리게 두고, 색은 버튼 종류가 결정한다 */
+.go{gap:6px}
+.ar{color:var(--muted-foreground);font-weight:400}
+.go .ar{margin-left:0}
+.btn:hover:not(:disabled) .ar{color:inherit}
+/* 설명 셀 — 한 줄 말줄임. 전문은 패널·상세에서 확인한다(공통정책 1.2) */
+.celldesc{display:block;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted-foreground)}
+
+
+/* 알림 박스 — 조건에 따라 나타나는 상태 알림.
+   항목 설명(툴팁)과 구분한다. 조치가 없는 안내만 닫을 수 있다 */
+.alertbox{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;margin-bottom:14px;
+  border:1px solid var(--border);background:var(--muted)}
+.alertbox.info{border-color:color-mix(in srgb,var(--accent) 30%,transparent);background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.alertbox.warn{border-color:color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 8%,transparent)}
+.alertbox.crit{border-color:color-mix(in srgb,var(--destructive) 30%,transparent);background:color-mix(in srgb,var(--destructive) 7%,transparent)}
+.alertbox .aic{width:17px;height:17px;flex:0 0 auto;margin-top:1px}
+.alertbox.info .aic{color:var(--accent)}
+.alertbox.warn .aic{color:var(--warning)}
+.alertbox.crit .aic{color:var(--destructive)}
+.alertbox .atx{flex:1;min-width:0;font-size:12.5px;line-height:1.65;color:var(--foreground)}
+.alertbox .atx b{display:block;margin-bottom:3px}
+.alertbox .aact{margin-top:9px;display:flex;gap:7px}
+.alertbox .aclose{width:22px;height:22px;flex:0 0 auto;display:grid;place-items:center;border:0;background:transparent;
+  color:var(--muted-foreground);cursor:pointer;border-radius:5px;font-size:13px;line-height:1}
+.alertbox .aclose:hover{background:var(--card);color:var(--foreground)}
+
+/* 워크스페이스 전환 드롭다운 — 조회 컨텍스트를 바꾼다.
+   검색은 항목 수와 무관하게 항상 노출한다. 노출 기준값에 근거가 없어 조건 분기를 두지 않았다 */
+.wswrap{position:relative}
+.ws{font-family:inherit;color:var(--foreground)}
+.ws:disabled{cursor:default;opacity:.75}
+.ws:disabled .chev{display:none}
+/* 헤더 우측에 있으므로 오른쪽 끝을 버튼에 맞추고 왼쪽으로 펼친다.
+   left:0 으로 두면 버튼보다 넓은 목록이 화면 밖으로 밀려난다 */
+.wsdd{display:none;position:absolute;top:calc(100% + 5px);right:0;min-width:262px;max-width:min(320px,calc(100vw - 40px));z-index:120;
+  background:var(--flyout);border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 14px 34px var(--shadow);overflow:hidden}
+.wswrap.open .wsdd{display:block}
+.wsdd .wssearch{padding:9px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--flyout)}
+.wsdd .wssearch input{width:100%;padding:7px 10px;border:1px solid var(--border-strong);border-radius:7px;
+  background:transparent;color:var(--foreground);font-size:12.5px;font-family:inherit}
+.wsdd .wslist{max-height:274px;overflow-y:auto;padding:5px}
+.wsdd .wsitem{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;background:transparent;
+  border-radius:7px;font-size:12.5px;color:var(--foreground);font-family:inherit;cursor:pointer;text-align:left}
+.wsdd .wsitem:hover{background:var(--hover)}
+.wsdd .wsitem.on{background:var(--selected);font-weight:600}
+.wsdd .wsitem .wic{width:22px;height:22px;flex:0 0 auto;border-radius:6px;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent)}
+.wsdd .wsitem .wic svg{width:12px;height:12px}
+.wsdd .wsitem .wnm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wsdd .wsitem .wck{color:var(--accent);flex:0 0 auto}
+.wsdd hr{border:0;border-top:1px solid var(--border);margin:5px 0}
+.wsdd .wsempty{padding:16px 12px;text-align:center;font-size:12px;color:var(--faint)}
+
+/* 진입 표 — 행 전체가 다른 화면으로 가는 표.
+   호버 전에도 이동 대상임이 보이도록 우측에 라벨을 둔다 */
+.tbl.enter tbody tr .entgo{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:5px;
+  border:1px solid var(--border-strong);color:var(--muted-foreground);vertical-align:middle;margin-left:7px}
+.tbl.enter tbody tr .entgo svg{width:11px;height:11px}
+.tbl.enter tbody tr:hover .entgo{border-color:var(--foreground);color:var(--foreground);background:var(--card)}
+
+.rolesel:disabled{opacity:.6;cursor:default}
+.cbtn:disabled{opacity:.4;cursor:default;border-color:var(--border)}
+.cbtn:disabled:hover{background:transparent;border-color:var(--border)}
+
+/* ── 다중 선택 목록 ────────────────────────────────
+   항목이 늘어도 모달 높이가 고정되도록 검색 + 스크롤 영역으로 둔다.
+   체크박스 나열은 항목 수가 적을 때만 쓴다 */
+.mselect{border:1px solid var(--border-strong);border-radius:9px;overflow:hidden;background:var(--card)}
+.mselect .mshead{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--muted)}
+.mselect .mssearch{flex:1;min-width:0;position:relative}
+.mselect .mssearch svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--muted-foreground);pointer-events:none}
+.mselect .mssearch input{width:100%;padding:6px 9px 6px 27px;border:1px solid var(--border);border-radius:7px;
+  background:var(--card);color:var(--foreground);font-size:12px;font-family:inherit}
+.mselect .msall{flex:0 0 auto;border:0;background:transparent;color:var(--muted-foreground);
+  font-size:11.5px;font-family:inherit;cursor:pointer;padding:2px 4px;white-space:nowrap}
+.mselect .msall:hover{color:var(--foreground);text-decoration:underline;text-underline-offset:3px}
+.mselect .mslist{max-height:186px;overflow-y:auto}
+.mselect .msitem{display:flex;align-items:center;gap:9px;padding:9px 11px;cursor:pointer;border-bottom:1px solid var(--border)}
+.mselect .msitem:last-child{border-bottom:0}
+.mselect .msitem:hover{background:var(--hover)}
+.mselect .msitem input{width:15px;height:15px;flex:0 0 auto;accent-color:var(--primary);margin:0}
+.mselect .msitem .mnm{flex:1;min-width:0;font-size:12.5px;color:var(--foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mselect .msitem.off{opacity:.5;cursor:default}
+.mselect .msitem.off:hover{background:transparent}
+.mselect .msfoot{padding:7px 11px;border-top:1px solid var(--border);background:var(--muted);
+  font-size:11.5px;color:var(--muted-foreground);display:flex;align-items:center;gap:6px}
+.mselect .msfoot b{color:var(--foreground);font-weight:600}
+.mselect .msempty{padding:18px 12px;text-align:center;font-size:12px;color:var(--faint)}
+
+/* 패널 환경 행 — 두 룸을 나란히 두고 바로 진입한다.
+   우측 아이콘은 패널 확장 버튼과 같은 모양으로 두어 '화면으로 이동'임을 드러낸다 */
+.pnroom{display:flex;align-items:center;gap:9px;width:100%;padding:10px 11px;margin-bottom:7px;
+  border:1px solid var(--border);background:transparent;border-radius:9px;
+  font-family:inherit;font-size:12.5px;color:var(--foreground);cursor:pointer;text-align:left}
+.pnroom:last-of-type{margin-bottom:0}
+.pnroom:hover{border-color:var(--foreground)}
+.pnroom .prn{font-weight:600;flex:0 0 auto}
+.pnroom .prc{margin-left:auto;color:var(--muted-foreground);font-size:12px;white-space:nowrap}
+.pnroom .prgo{flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;border-radius:6px;
+  border:1px solid var(--border-strong);color:var(--muted-foreground)}
+.pnroom .prgo svg{width:12px;height:12px}
+.pnroom:hover .prgo{border-color:var(--foreground);color:var(--foreground);background:var(--hover)}
+.pnroom.off{cursor:default;opacity:.6}
+.pnroom.off:hover{border-color:var(--border)}
+
+/* 할당량 입력 행 — 입력과 근거를 한 덩어리로 둔다 */
+.qrowbox{padding:11px 0;border-bottom:1px solid var(--border)}
+/* 섹션 마지막 행의 밑줄은 지운다. 섹션 경계선·푸터 border-top 과 겹쳐 두 줄이 된다 */
+  .fsec > .qrowbox:last-child,
+  .fsec > .frow:last-child{border-bottom:0;padding-bottom:0}
+.qrowbox:last-child{border-bottom:0;padding-bottom:0}
+.qrowbox:first-child{padding-top:0}
+/* 라벨 폭을 고정한다. flex:1 이면 짧은 라벨도 칸을 다 차지해 스테퍼가 멀리 밀린다 */
+/* 스펙 보조 텍스트가 붙는 행이 있어 상단 정렬로 둔다 */
+.qrhead{display:flex;align-items:flex-start;gap:14px;margin-bottom:9px}
+.qrhead .stepper,.qrhead .qrcap,.qrhead .qrdel{margin-top:1px}
+.qrhead .qrlb{flex:0 0 150px;min-width:0;font-size:12.5px;color:var(--muted-foreground)}
+.qrhead .qrname{display:block}
+/* 항목의 스펙 — 이름과 구분되도록 아래 줄에 흐린 색으로 둔다 */
+.qrhead .qrsub{display:block;margin-top:2px;font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums}
+.qrhead .qrcap{flex:0 0 auto;font-size:11.5px;color:var(--muted-foreground);font-variant-numeric:tabular-nums}
+/* 제거 버튼 자리를 모든 행에 두어 우측 정렬을 맞춘다 */
+.qrhead .qrdel{flex:0 0 26px;display:flex;justify-content:flex-end}
+.qrowbox.err .qrcap{color:var(--destructive)}
+/* 부가정보 블록 — 입력이 아닌 참조값·계산 결과는 표면 배경으로 분리한다.
+   간격은 4의 배수로 맞춘다 */
+.subbox{padding:16px;border-radius:10px;background:var(--muted);border:1px solid var(--border);
+  display:flex;flex-direction:column;gap:12px}
+.subbox > .sbt{font-size:12px;font-weight:600;color:var(--muted-foreground)}
+.splitbar{margin-top:24px;max-width:520px}
+.splitbar .sb{display:flex;align-items:center;gap:12px;font-size:12px}
+.splitbar .sbl{width:64px;flex:0 0 auto;color:var(--muted-foreground)}
+.splitbar .sbar{flex:1;height:8px;border-radius:4px;background:color-mix(in srgb,var(--success) 38%,var(--card));overflow:hidden;min-width:64px}
+.splitbar .sdev{display:block;height:100%;background:var(--primary)}
+.splitbar .sbv{flex:0 0 auto;color:var(--foreground);font-variant-numeric:tabular-nums}
+/* 선택 카드 3열 — 항목이 3개일 때 */
+.pick.pick3{grid-template-columns:repeat(3,1fr)}
+@media (max-width:520px){ .pick.pick3{grid-template-columns:1fr} }
+
+/* 클러스터 잔여 카드 — 표면 박스 위에 놓이므로 막대 트랙을 카드색으로 둔다 */
+.clgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px}
+.clbar{height:6px;border-radius:3px;background:var(--card);overflow:hidden}
+.clfill{height:100%;border-radius:3px;background:var(--primary)}
+.clfill.wa{background:var(--warning)}
+.clfill.cr{background:var(--destructive)}
+.clt{font-size:11.5px;color:var(--muted-foreground);margin-bottom:4px}
+.clv{font-size:15px;font-weight:600;color:var(--foreground);margin-bottom:8px;font-variant-numeric:tabular-nums}
+.clq{font-size:11.5px;font-weight:400;color:var(--muted-foreground)}
+.clitem.none .clv{color:var(--destructive)}
+.clnote{font-size:11px;color:var(--destructive);margin-top:6px}
+.clsub{font-size:11px;color:var(--muted-foreground);margin-top:7px;font-variant-numeric:tabular-nums}
+.clpc{color:var(--faint)}
+/* 가속기 잔여 — 종류가 계속 늘어나므로 카드로 흩뿌리지 않고 한 블록에 목록으로 모은다 */
+.clacctitle{display:flex;align-items:center;gap:6px;margin-top:18px;padding-top:16px;margin-bottom:10px;
+  border-top:1px solid var(--border);font-size:11.5px;color:var(--muted-foreground)}
+.clacclist{display:flex;flex-direction:column;gap:9px}
+.clacc{display:grid;grid-template-columns:1fr 74px 120px 150px 70px;align-items:center;gap:12px;font-size:12px}
+.clacc .can{color:var(--foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clacc .cav{color:var(--faint);font-size:11px}
+.clacc .caf{text-align:right;font-size:14px;font-weight:600;color:var(--foreground);font-variant-numeric:tabular-nums}
+.clacc.none .caf{color:var(--destructive)}
+.clacc .cab .clbar{display:block}
+.clacc .cas{font-size:11px;color:var(--muted-foreground);font-variant-numeric:tabular-nums}
+.clacc .clnote{margin-top:0;font-size:11px}
+@media (max-width:900px){
+  .clacc{grid-template-columns:1fr auto;gap:4px 12px}
+  .clacc .cab,.clacc .cas{grid-column:1 / -1}
+}
+
+/* 가속기 — 라벨은 자원 유형 하나. 종류는 그 아래 행으로 반복한다.
+   종류가 늘어도 라벨·컬럼 구조는 그대로다 */
+.qrhead.accgrp{align-items:flex-start}
+.accbody{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.accrow{display:flex;flex-direction:column;gap:4px}
+.accline{display:flex;align-items:center;gap:14px}
+.accname{flex:0 0 200px;min-width:0;font-size:12.5px;color:var(--foreground);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.accrow.err .accname{color:var(--destructive)}
+/* 합계 — 라이선스가 vRAM 단가로 산정되어 총량이 판단 기준이다.
+   행마다 환산값을 두지 않고 아래 한 줄로 모은다 */
+.accsum{margin-top:2px;padding-top:10px;border-top:1px solid var(--border);
+  font-size:12.5px;font-weight:600;color:var(--foreground);font-variant-numeric:tabular-nums}
+.accsum span{display:block;margin-top:4px;font-size:11.5px;font-weight:400;color:var(--muted-foreground)}
+.accsum .acclic{margin-top:3px;color:var(--foreground);font-variant-numeric:tabular-nums}
+.accsum.err{color:var(--destructive)}
+.accsum .accerr{color:var(--destructive)}
+
+/* 가속기 추가 드롭다운 */
+/* 필터 드롭다운(.fdd)과 같은 층에 둔다. 60이면 다른 떠 있는 요소에 가린다.
+   버튼 우측 기준이면 왼쪽으로 열려 좁은 폭에서 잘리므로 좌측 기준으로 연다 */
+.accpop{position:absolute;top:calc(100% + 5px);left:0;min-width:220px;max-height:240px;overflow-y:auto;z-index:80;padding:5px;
+  background:var(--flyout);border:1px solid var(--border);border-radius:9px;box-shadow:0 12px 30px var(--shadow)}
+.accpop button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:0;background:transparent;
+  border-radius:6px;font-size:12.5px;color:var(--foreground);font-family:inherit;cursor:pointer;text-align:left}
+.accpop button:hover:not(:disabled){background:var(--hover)}
+.accpop button:disabled{opacity:.45;cursor:default}
+.accpop .af{margin-left:auto;font-size:11px;color:var(--muted-foreground)}
+/* 폼 필드 폭 — 입력이 가로로 늘어나면 시선 이동이 커진다.
+   모달은 모달 폭이 이미 좁아 제한하지 않는다 */
+.fsec .f{max-width:520px}
+.fsec .f textarea.inp{max-width:none}
+
+/* 필수·선택 표시 — 라이브러리 규격. 필수는 별표, 선택은 라벨 */
+.req{color:var(--destructive);margin-left:2px}
+.opt{margin-left:5px;padding:1px 6px;border-radius:4px;background:var(--muted);
+  color:var(--muted-foreground);font-size:10.5px;font-weight:400;vertical-align:middle}
+
+/* 칩 입력 — 목록형 값을 자유 입력 대신 항목으로 관리한다 */
+.chipin{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:9px 10px;
+  border:1px solid var(--border-strong);border-radius:8px;background:var(--card);min-height:42px}
+.ichip{display:inline-flex;align-items:center;gap:6px;padding:4px 6px 4px 10px;border-radius:6px;
+  background:var(--muted);font-size:12px;color:var(--foreground)}
+.ichip button{width:16px;height:16px;display:grid;place-items:center;border:0;background:transparent;
+  color:var(--muted-foreground);cursor:pointer;border-radius:4px;font-size:10px;line-height:1}
+.ichip button:hover{background:var(--card);color:var(--destructive)}
+.chipadd{border:1px dashed var(--border-strong);background:transparent;border-radius:6px;
+  padding:4px 10px;font-size:12px;color:var(--muted-foreground);font-family:inherit;cursor:pointer}
+.chipadd:hover{border-color:var(--foreground);color:var(--foreground)}
+
+/* 섹션 안 소제목 — 한 섹션에 성격이 다른 묶음이 들어갈 때 */
+.sublb2{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
+  color:var(--muted-foreground);margin:28px 0 12px;padding-top:20px;border-top:1px solid var(--border)}
+.fsec > .sublb2:first-of-type{margin-top:0;padding-top:0;border-top:0}
+.subbox + .sublb2{margin-top:24px;padding-top:0;border-top:0}
+
+/* 숫자 스테퍼 — 버튼·입력을 한 덩어리로 둔다 */
+.stepper{display:inline-flex;align-items:center;flex:0 0 auto;
+  border:1px solid var(--border-strong);border-radius:8px;overflow:hidden;background:var(--card)}
+.stepper.err{border-color:var(--destructive)}
+.stepper .stbtn{width:30px;height:32px;flex:0 0 auto;display:grid;place-items:center;border:0;
+  background:transparent;color:var(--muted-foreground);cursor:pointer;padding:0}
+.stepper .stbtn svg{width:12px;height:12px}
+.stepper .stbtn:hover:not(:disabled){background:var(--hover);color:var(--foreground)}
+.stepper .stbtn:disabled{opacity:.3;cursor:default}
+/* 단위를 입력 안 우측에 붙인다.
+   절대 위치 대신 흐름 배치를 써서 단위 길이에 맞춰 폭이 잡히게 한다 */
+.stepper .stfield{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px;
+  border-left:1px solid var(--border);border-right:1px solid var(--border)}
+.stepper .inp{width:56px;height:auto;border:0;padding:0;border-radius:0;background:transparent;
+  text-align:right;font-variant-numeric:tabular-nums}
+.stepper .inp:focus{outline:none}
+.stepper .stfield:focus-within{background:var(--hover)}
+.stepper .stunit{flex:0 0 auto;font-size:11.5px;color:var(--muted-foreground);pointer-events:none}
+/* 스테퍼 전용 배치 — 폭이 고정이라 그리드 칸에 맞추지 않고 내용 크기로 둔다.
+   2열 그리드(300px 칸)에 넣으면 남는 폭만큼 항목 사이가 벌어진다 */
+.stgrid{display:flex;flex-wrap:wrap;gap:16px 24px}
+.stgrid > div{display:flex;flex-direction:column;gap:6px}
+.stgrid .stepper .inp{width:56px}
+
+/* 가속기 추가 — 목록 끝에 두고 무엇을 추가하는지 라벨에 밝힌다 */
+.accadd{position:relative;display:inline-block;margin:12px 0 4px}
+
+/* 검색어 지우기 — 입력 안 우측. 그 입력값만 지운다.
+   조건 초기화(검색어+필터 전부)는 별도 버튼이라 범위가 갈린다 */
+.searchbar{position:relative}
+.searchbar .qclr{position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  width:20px;height:20px;display:grid;place-items:center;border:0;background:transparent;
+  color:var(--muted-foreground);cursor:pointer;border-radius:4px;padding:0}
+.searchbar .qclr svg{width:12px;height:12px}
+.searchbar .qclr:hover{background:var(--hover);color:var(--foreground)}
+/* 화면에 보이지 않으나 보조기기에 읽히는 텍스트 */
+.sronly{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* 사용률 막대 — 컨테이너와 무관하게 정의한다.
+   `.quota .qfill` 로 감싸 두었으나 `.quota` 는 마크업에 없어 룸 자원 막대에 색이 안 걸렸다.
+   70% 이상 주의, 90% 이상 위험 */
+.qbar{height:5px;border-radius:3px;background:var(--muted);overflow:hidden}
+.qfill{height:100%;border-radius:3px;background:var(--primary)}
+.qfill.hi{background:var(--warning)}
+.qfill.full{background:var(--destructive)}
+.rsitem .qbar{height:4px;border-radius:2px}
+.rsitem .qfill{border-radius:2px}
+
+/* 자격 증명 표시 — 값 대신 상태와 조작을 둔다 */
+.credbox{display:flex;align-items:center;gap:10px;padding:9px 11px;
+  border:1px solid var(--border);border-radius:8px;background:var(--muted)}
+.credat{font-size:11.5px;color:var(--muted-foreground);font-variant-numeric:tabular-nums}
+.credact{margin-left:auto;display:flex;gap:6px}
+
+/* 처리 중 스피너 — 라이브러리 규격 */
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);
+  border-top-color:currentColor;animation:sp .7s linear infinite;display:inline-block;
+  vertical-align:-2px;margin-right:7px}
+.btn.ghost .spin,.btn.danger-line .spin{border-color:var(--border);border-top-color:var(--muted-foreground)}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+
+/* ===== CDE 목업 전용 — 워크스페이스 목업에 없는 클래스만 정의 ===== */
+.toasts{position:fixed;right:20px;bottom:64px;z-index:900;display:flex;flex-direction:column;gap:8px}
+.pnbg{position:fixed;inset:0;background:rgba(8,11,20,.42);z-index:88;opacity:0;visibility:hidden;transition:.18s}
+.pnbg.on{opacity:1;visibility:visible}
+.num{font-variant-numeric:tabular-nums}
+
+/* 폼 — 라벨 좌측 고정. 항목이 늘어도 값 열이 흔들리지 않는다 */
+.fsec{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px 18px 14px;margin-bottom:14px}
+.fsec > h3{margin:14px 0 6px;font-size:13px;font-weight:600}
+.frow{display:flex;align-items:flex-start;gap:14px;padding:11px 0;border-bottom:1px solid var(--border)}
+.frow:last-child{border-bottom:0}
+.flb{flex:0 0 150px;min-width:0;font-size:12.5px;color:var(--muted-foreground);padding-top:7px}
+/* 라벨은 줄을 바꾸지 않는다. 툴팁 아이콘이 라벨 안에 있어 말줄임을 걸면 아이콘이 잘린다.
+     라벨이 150px 을 넘지 않도록 짧게 쓰고, 덧붙일 값은 툴팁에 둔다 */
+  .flb,.qrlb{white-space:nowrap}
+.fbd{flex:1;min-width:0}
+.fbd .inp{width:100%;max-width:420px}
+.fnote{margin-top:6px;font-size:11.5px;color:var(--faint);line-height:1.6}
+.rov{display:inline-flex;align-items:baseline;gap:9px;font-size:13px;color:var(--foreground);padding:9px 0}
+/* 폼 행 안에서는 행 자체가 여백을 갖는다. 값에 또 패딩을 주면 라벨과 높이가 어긋난다 */
+  .frow .rov{padding:6px 0}
+.rov span{font-size:11.5px;color:var(--faint)}
+.qline{display:flex;align-items:center;gap:14px}
+.formfoot{display:flex;justify-content:flex-end;gap:8px;padding:16px 0 40px}
+
+/* 개발룸 안의 섹션 제목 — 자원 다음에 오는 하위 목록임을 드러낸다 */
+.secttl{display:flex;align-items:center;gap:10px;margin:4px 0 12px}
+.secttl h3{margin:0;font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px}
+.secttl .cnt{font-size:12px;font-weight:400;color:var(--muted-foreground)}
+.secttl > div{margin-left:auto}
+
+/* 선택지가 2~3개인 값은 드롭다운 대신 나란히 둔다. 한 번에 보이고 한 번에 고른다 */
+.seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:9px;overflow:hidden}
+.seg button{background:transparent;border:0;border-right:1px solid var(--border);color:var(--muted-foreground);
+  font-family:inherit;font-size:12.5px;padding:8px 15px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--hover)}
+.seg button.on{background:var(--primary);color:var(--primary-foreground);font-weight:600}
+
+/* 안내 문구 안의 이동 링크 — 색이 아니라 밑줄로 구분한다 */
+.ablink{color:inherit;text-decoration:underline;text-decoration-color:var(--underline);text-underline-offset:3px}
+.ablink:hover{text-decoration-color:var(--foreground)}
+  /* 일시를 등폭으로 두어 세로로 맞춘다 */
+  .logtbl td.num{font-variant-numeric:tabular-nums;font-family:ui-monospace,Menlo,monospace;font-size:11.5px}
+  .logtbl td{vertical-align:top}
+  .logtbl tbody tr{cursor:default}
+  .logtbl tbody tr:hover{background:transparent}
+
+  /* 필터 드롭다운의 초기화 — 텍스트 버튼. 흐린 색, 호버 시 밑줄 */
+  .lvclr{border:0;background:transparent;color:var(--muted-foreground);font-size:12px;
+    font-family:inherit;padding:4px 6px;cursor:pointer}
+  .lvclr:hover{color:var(--foreground);text-decoration:underline;text-underline-offset:3px}
+  /* 필터 드롭다운 하단 — 초기화·적용 */
+  .fddfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:8px 10px 2px;border-top:1px solid var(--border);margin-top:6px}
+</style>
+</head>
+<body class="dark">
+<div class="app">
+
+  <div class="brand"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9.2" stroke-width="1.4" opacity=".35"/><circle cx="12" cy="12" r="6" stroke-width="1.5" opacity=".6"/><circle cx="12" cy="12" r="2.6" fill="currentColor" stroke="none"/></svg></span><b>Concerto <span class="ai">AI</span></b></div>
+
+  <header class="header">
+    <!-- 메뉴 경로까지만 표기한다(공통정책 4.3). `상세` 는 메뉴가 아니라 화면 종류다 -->
+    <div class="breadcrumb" id="bc"><a href="#">콘체르토 플랫폼</a> / <a href="#">워크스페이스</a> / <b>개발룸</b></div>
+    <div class="hr">
+      <div class="ws"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="width:15px;height:15px"><rect x="4" y="3" width="10" height="18" rx="1"/><path d="M14 8h5a1 1 0 011 1v11a1 1 0 01-1 1H4"/><path d="M7 7h3M7 11h3M7 15h3"/></svg> <span>ai-service-team</span> <span class="chev">▾</span></div>
+    </div>
+  </header>
+
+  <nav class="gnb">
+    <div class="banner">
+      <div class="bt">CONCERTO<br>A.I.</div>
+      <svg class="kv" viewBox="0 0 170 170" fill="none"><circle cx="118" cy="118" r="70" fill="#5f73a6" opacity=".55"/><circle cx="118" cy="118" r="46" fill="#516596" opacity=".7"/><circle cx="118" cy="118" r="22" fill="#43567f"/></svg>
+      <span class="ph-tag">키비주얼 영역 · 디자인 확정 시 교체</span>
+    </div>
+    <div class="nav">
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="lb">홈</span></a>
+      <a href="#" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg><span class="lb">워크스페이스</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg><span class="lb">모델</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 15c-1.5 1.5-2 4-2 4s2.5-.5 4-2m3-1l7-7M13 5s4 0 6 2 2 6 2 6l-9 5-4-4 5-9z"/></svg><span class="lb">배포</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg><span class="lb">모니터링</span></a>
+      <div class="flywrap" id="setWrap">
+        <a href="#" class="has-fly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 00-1.7-1L15 3H9l-.4 2.6a7.6 7.6 0 00-1.7 1l-2.3-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 001.7 1L9 21h6l.4-2.6a7.6 7.6 0 001.7-1l2.3 1 2-3.4z"/></svg><span class="lb">플랫폼 설정</span></a>
+        <div class="flyout">
+          <a href="#">사용자 및 역할</a>
+          <a href="#">보안 및 감사</a>
+          <a href="#">인프라 자원</a>
+          <a href="#">카탈로그</a>
+          <a href="#">연동 및 알림</a>
+        </div>
+      </div>
+    </div>
+    <div class="gnb-bottom">
+      <div class="worklist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg><span class="lb">내 작업함 </span><span class="cbadge" id="wlCnt">2</span></div>
+      <a href="#" class="notice-common"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 8a6 6 0 1112 0c0 7 3 7 3 9H3c0-2 3-2 3-9z"/><path d="M10 21a2 2 0 004 0"/></svg><span class="lb">알림</span><span class="cbadge">12</span></a>
+      <div class="persona"><div class="pbtn"><span class="av">유</span><span class="who"><b>성유진</b><span id="roleName">최고 관리자</span></span><span class="up">▴</span></div></div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <!-- 개발룸 WKSP-CDE-D01 -->
+    <div class="page" id="pgList">
+      <div class="dhead">
+        <!-- 목록에서 들어왔으면 목록으로, 상세에서 들어왔으면 상세로 돌아간다.
+             워크스페이스 목업이 진입 경로를 기억한다(roomFrom) — 여기서는 특정하지 않는다 -->
+        <button class="back" title="이전으로" onclick="act('이전 화면으로 돌아갑니다.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <div class="dinfo">
+          <h1>개발룸 <span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span><span class="tip">멤버가 개발·실험에 사용하는 환경입니다. 자원은 관리자 승인 후 할당되며 사용 기한이 지나면 회수됩니다.</span></span></h1>
+          <div class="dmeta"><span style="font-size:12.5px;color:var(--muted-foreground)">ai-service-team</span></div>
+        </div>
+        <div class="dact" id="roomAct"></div>
+      </div>
+
+      <!-- 자원이 먼저다. 워크스페이스 상세와 같은 순서이고, 이 화면에 들어오는 이유가
+           CDE 를 신청·관리하려는 것이라 자원이 매번 보는 판단 근거다.
+           생성 시 정한 값은 그 아래에서 확인한다 -->
+      <div id="quotaBox"></div>
+      <div id="infoBox"></div>
+
+      <div id="pendBox"></div>
+
+      <!-- 같은 개발룸을 대상으로 하는 목록 둘이라 탭으로 나눈다.
+           배포 상세·워크스페이스 상세와 같은 구조다.
+           섹션 제목을 따로 두지 않는다 — 탭 라벨과 같은 말이 두 번 나온다.
+           액션은 그 액션이 걸리는 대상 옆에 둔다(공통정책 3.6) — `CDE 신청` 은 CDE 목록에 새 항목을
+           더하는 것이라 목록 위 툴바에 둔다. 탭 줄에는 액션을 두지 않는다 -->
+      <div class="tabs" id="cdeTabs"></div>
+
+      <div class="toolbar" id="cdeToolbar">
+        <div class="searchzone">
+          <div class="searchbar">
+            <svg class="sicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input id="q" placeholder="항목 이름 또는 값을 입력해 주세요." onkeydown="onSearchKey(event)">
+            <button class="qclr" id="qclr" hidden onclick="clearQ()" title="검색어 지우기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+          </div>
+          <div class="chips" id="chips"></div>
+        </div>
+        <div class="tspacer"></div>
+        <button class="cbtn" title="다운로드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg></button>
+        <!-- 그 목록에 새 항목을 더하는 액션이라 목록 위 툴바에 둔다(공통정책 3.6).
+             탭 줄에는 액션을 두지 않는다 -->
+        <span id="pact"></span>
+      </div>
+
+      <div id="listArea"></div>
+
+      <div class="pager" id="pager">
+        <span id="pgtxt">총 6건</span>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="pgnum">
+            <button disabled aria-label="이전">‹</button>
+            <input class="pgin" value="1"><span class="pgtot">/ <span>1</span></span>
+            <button disabled aria-label="다음">›</button>
+          </div>
+          <select class="sel" style="padding:7px 10px"><option>20개씩 보기</option><option>50개씩 보기</option><option>100개씩 보기</option></select>
+        </div>
+      </div>
+
+      <!-- 작업 이력 탭 — concerto run 으로 제출한 배치 작업.
+           툴바를 본문과 분리한다. 함께 다시 그리면 입력 중 포커스가 날아간다 -->
+      <div id="jobTool" style="display:none">
+        <div class="toolbar">
+          <div class="searchzone"><div class="searchbar">
+            <svg class="sicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input id="jq" placeholder="항목 이름 또는 값을 입력해 주세요." onkeydown="onJobKey(event)">
+            <button class="qclr" id="jqclr" hidden onclick="clearJobQ()" aria-label="검색어 지우기">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div></div>
+          <div class="tspacer"></div>
+          <button class="cbtn" title="다운로드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg></button>
+        </div>
+      </div>
+      <div id="jobBox"></div>
+    </div>
+
+    <!-- 작업 상세 WKSP-CDE-D01.D02 — 작업 이력 행에서 진입한다.
+         사전 진단·학습 지표·산출물이 한 화면에 모여야 결과를 보고 다음을 정할 수 있다(명세 16·18).
+         패널이 아니라 페이지로 둔다 — 지표 차트가 들어가 패널 폭으로 수용할 수 없다(공통정책 4.2) -->
+    <div class="page" id="pgJob" style="display:none">
+      <div class="dhead">
+        <button class="back" onclick="closeJob()" title="작업 이력으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <div class="dinfo"><h1 id="jdTitle">작업 상세</h1></div>
+        <div class="dact" id="jdAct"></div>
+      </div>
+      <div id="jdBody"></div>
+    </div>
+
+    <!-- 개발룸 설정 WKSP-CDE-F02
+         운영룸·개발룸·할당량 수정이 모두 페이지다.
+         생성과 같은 항목을 받으므로 형태도 같게 둔다 -->
+    <div class="page" id="pgRoom" style="display:none">
+      <div class="dhead">
+        <button class="back" onclick="cancelRoomCfg()" title="개발룸으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <div class="dinfo"><h1>개발룸 설정<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span><span class="tip">개발룸이 워크스페이스 할당량에서 가져올 자원을 정합니다. 남는 만큼이 운영룸 몫이 됩니다.</span></span></h1>
+          <div class="dmeta"><span style="font-size:12.5px;color:var(--muted-foreground)">ai-service-team</span></div>
+        </div>
+      </div>
+      <div id="roomForm"></div>
+      <div class="formfoot">
+        <button class="btn ghost" onclick="cancelRoomCfg()">취소</button>
+        <button class="btn" id="rcSave" onclick="submitRoomCfg()">저장</button>
+      </div>
+    </div>
+
+    <!-- CDE 신청 WKSP-CDE-F01 -->
+    <div class="page" id="pgForm" style="display:none">
+      <div class="dhead">
+        <button class="back" onclick="cancelForm()" title="목록으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <div class="dinfo"><h1 id="fTitle">CDE 신청<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span><span class="tip">개발룸 안에 개인 작업 환경을 만듭니다. 관리자 승인 후 사용할 수 있으며 사용 기한이 지나면 회수됩니다.</span></span></h1>
+          <div class="dmeta"><span style="font-size:12.5px;color:var(--muted-foreground)">ai-service-team</span></div>
+        </div>
+      </div>
+      <div id="formBody"></div>
+      <div class="formfoot">
+        <button class="btn ghost" onclick="cancelForm()">취소</button>
+        <button class="btn" id="fSubmit" onclick="submitForm()">신청</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- 상세 패널 WKSP-CDE-D01.P01 -->
+<div class="pnbg" id="pnbg" onclick="closePanel()"></div>
+<aside class="panel" id="panel">
+  <div class="pnhead">
+    <div class="r1">
+      <h2 id="pnName">—</h2>
+      <div class="more" id="pnMore">
+        <button class="morebtn" onclick="tgMore(event,'pnMore')">⋯</button>
+        <div class="rowmenu" id="pnMenu"></div>
+      </div>
+      <button class="pnclose" onclick="closePanel()">✕</button>
+    </div>
+    <div class="pntags" id="pnTags"></div>
+  </div>
+  <div class="pnbody" id="pnBody"></div>
+</aside>
+
+<!-- 연장 신청 — 만료일과 사유만 받는다. 환경·자원은 그대로 두므로
+     짧은 입력이라 모달로 둔다(공통정책 4.5) -->
+<div class="mdbg" id="mdExt">
+  <div class="modal" style="width:440px">
+    <div class="mdhead"><h3>연장 신청</h3><p id="extTarget"></p></div>
+    <div class="mdbody" id="extForm"></div>
+    <div class="mdfoot">
+      <button class="btn ghost" onclick="closeExt()">취소</button>
+      <button class="btn" id="extBtn" disabled onclick="submitExt()">신청</button>
+    </div>
+  </div>
+</div>
+
+<!-- 데이터 가져오기 — 대상 CDE 하나에 넣는 짧은 입력이라 모달로 둔다(공통정책 4.5) -->
+<div class="mdbg" id="mdDl">
+  <div class="modal" style="width:460px">
+    <div class="mdhead"><h3>데이터 가져오기</h3><p id="dlTarget"></p></div>
+    <div class="mdbody">
+      <div class="fld"><label>소스<span class="req">*</span></label>
+        <select class="inp" id="dlSrc"><option>HuggingFace</option><option>S3</option></select></div>
+      <div class="fld" style="margin-top:14px"><label>리포지토리<span class="req">*</span></label>
+        <input class="inp" id="dlRepo" placeholder="meta-llama/Llama-3-8B" oninput="dlValid()"></div>
+      <div class="fld" style="margin-top:14px"><label>폴더명<span class="req">*</span></label>
+        <input class="inp" id="dlDir" placeholder="my_data" oninput="dlValid()"></div>
+      <!-- 어디에 떨어지는지 보여준다. 바꿀 수 없는 값이라 읽기 전용이다 -->
+      <div class="fld" style="margin-top:14px"><label>저장 경로</label>
+        <input class="inp" value="/workspace/shared/datasets/" readonly></div>
+      <p class="pnote">다운로드는 백그라운드로 처리되어 화면을 닫아도 계속됩니다.</p>
+    </div>
+    <div class="mdfoot">
+      <!-- 모달은 취소 시 바로 닫는다. 모달 안에서 확인 알럿을 띄우지 않는다(공통정책 4.5) -->
+      <button class="btn ghost" onclick="closeDl()">취소</button>
+      <button class="btn" id="dlBtn" disabled onclick="submitDl()">가져오기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 작업 로그 -->
+<div class="mdbg" id="mdLog">
+  <!-- 로그는 메시지가 길어 목록보다 폭이 필요하다 -->
+  <div class="modal" style="width:760px">
+    <!-- 부제에 정의 목록을 넣으므로 p 가 아니라 div 로 둔다 -->
+      <div class="mdhead"><h3 id="logTitle">작업 로그</h3><div id="logTarget"></div></div>
+    <div class="mdbody">
+      <!-- 툴바를 본문과 분리한다. 함께 다시 그리면 입력 중 포커스가 날아간다 -->
+      <div class="toolbar" style="margin-bottom:12px">
+        <div class="searchzone"><div class="searchbar">
+          <svg class="sicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input id="lq" placeholder="항목 이름 또는 값을 입력해 주세요." onkeydown="onLogKey(event)">
+          <button class="qclr" id="lqclr" hidden onclick="clearLogQ()" aria-label="검색어 지우기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div></div>
+        <div class="tspacer"></div>
+        <button class="cbtn" title="다운로드" onclick="act('로그를 내려받습니다.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg></button>
+      </div>
+      <div id="logBody"></div>
+    </div>
+    <div class="mdfoot"><button class="btn ghost" onclick="closeLog()">닫기</button></div>
+  </div>
+</div>
+
+<div class="mdbg" id="mdConfirm">
+  <div class="modal" style="width:440px">
+    <div class="mdhead"><h3 id="cfTitle">확인</h3></div>
+    <div class="mdbody"><p id="cfBody" style="font-size:13px;line-height:1.7;color:var(--muted-foreground)"></p></div>
+    <div class="cfname" id="cfNameWrap" style="display:none">
+      <label id="cfNameLb"></label>
+      <input class="inp" id="cfName" autocomplete="off" oninput="cfCheck()">
+    </div>
+    <div class="mdfoot" id="cfFoot"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<div class="demo-bar" id="demoBar">
+  <!-- 라벨과 버튼을 그룹으로 묶는다. 따로 두면 줄바꿈 지점에서 갈려 라벨만 남는다 -->
+  <!-- 화면 전환 — 신청·설정·연장은 조건이 맞아야 정상 동선으로 열린다 -->
+  <span class="dgrp"><span class="demo-label">화면:</span>
+    <button class="vw on" onclick="demoView('list',this)">개발룸</button>
+    <button class="vw" onclick="demoView('form',this)">CDE 신청</button>
+    <button class="vw" onclick="demoView('roomcfg',this)">개발룸 설정</button>
+    <button class="vw" onclick="demoView('ext',this)">연장 신청</button></span>
+  <span class="dgrp"><span class="demo-label">데이터:</span>
+    <button class="st on" onclick="setState('default',this)">기본</button>
+    <button class="st" onclick="setState('empty',this)">빈 상태</button>
+    <button class="st" onclick="setState('loading',this)">로딩</button>
+    <button class="st" onclick="setState('error',this)">오류</button></span>
+  <span class="dgrp"><span class="demo-label">개발룸:</span>
+    <button class="rm on" onclick="setRoom(true,this)">생성됨</button>
+    <button class="rm" onclick="setRoom(false,this)">미생성</button></span>
+  <span class="dgrp"><span class="demo-label">워크스페이스:</span>
+    <button class="sw on" onclick="setSysWs(false,this)">일반</button>
+    <button class="sw" onclick="setSysWs(true,this)">공용</button></span>
+  <span class="dgrp"><span class="demo-label">내 CDE:</span>
+    <button class="ms on" onclick="setMyState('구동 중',this)">구동 중</button>
+    <button class="ms" onclick="setMyState('절전',this)">절전</button>
+    <button class="ms" onclick="setMyState('실패',this)">실패</button>
+    <button class="ms" onclick="setMyState('만료',this)">만료</button></span>
+  <span class="dgrp"><span class="demo-label">권한:</span>
+    <button class="rl on" onclick="setRole('super',this)">최고 관리자</button>
+    <button class="rl" onclick="setRole('admin',this)">WS 관리자</button>
+    <button class="rl" onclick="setRole('editor',this)">편집자</button>
+    <button class="rl" onclick="setRole('viewer',this)">뷰어</button></span>
+  <span class="dgrp"><span class="demo-label">테마:</span>
+    <button onclick="document.body.classList.remove('dark')">라이트</button>
+    <button onclick="document.body.classList.add('dark')">다크</button></span>
+</div>
+
+<script>
+/* ═══════════ 데모 데이터 ═══════════ */
+
+/* 개발룸 자원 — 워크스페이스 할당량에서 이관받은 몫(워크스페이스 정책 5.2) */
+/* 개발룸 자원 — 워크스페이스 할당량에서 이관받은 몫(워크스페이스 정책 5.2) */
+/* 개발룸에 배정된 가속기 — 벤더별·유형별로 구분한다(8/10 회의 2.2).
+   MIG 로 분할된 것도 별도 타입으로 둔다. 워크스페이스 목업 CLUSTER.gpu 와 같은 구조다.
+   한 장당 vRAM 은 백엔드가 디바이스 모델 스펙으로 내려준다 */
+const ACC = [
+  {k:'nvidia',     n:'NVIDIA-H200',      vram:141, q:1, use:1},
+  {k:'furiosa',    n:'Furiosa RNGD',     vram:48,  q:1, use:1},
+  {k:'nvidia-mig', n:'NVIDIA-H200 MIG',  vram:16,  q:4, use:0}
+];
+function accSum(f){ return ACC.reduce(function(a,g){ return a+g[f]; },0); }
+
+/* 워크스페이스 목업 ai-service-team 의 devq 와 같은 값이다.
+   use 는 자원을 점유한 CDE(준비 중·구동 중·절전) 합계다 */
+const ROOM = { cpu:{q:32, use:20}, ram:{q:128, use:80},
+               get gpu(){ return {q:accSum('q'), use:accSum('use')}; } };
+/* 개발룸 기본 정보 — 생성 시 정한 값이다. 화면에서 바꾸려면 개발룸 설정으로 간다 */
+const ROOM_INFO = { cls:'remote-cluster-main', egress:'', at:'2026-07-01 09:00:00', by:'성유진(yj.seong)' };
+
+/* 공용 워크스페이스는 자원을 배정받지 않는다(8/10 회의 1.3).
+   다른 워크스페이스에 배분하고 남은 자원을 쓰므로 상한 대비 점유를 그릴 수 없다.
+   개발룸은 일반 워크스페이스와 같게 제공한다(1.2) */
+let isSysWs = false;
+
+/* 개발룸 존재 여부 — 미생성이면 생성 화면으로 진입한다 */
+let roomExists = true;
+
+/* 개발룸 볼륨 — 공유 볼륨은 관리자가 개발룸 설정에서 정하고,
+   개인 볼륨은 나머지 안에서 CDE 신청 시 개별 할당한다(정책 5.2) */
+/* total 은 워크스페이스 전체 저장소 용량(정책 5.2). shared 는 개발룸 공유 볼륨,
+   used 는 자원을 점유한 CDE 의 개인 볼륨 합계다 */
+const VOL = { total:500, shared:50, used:75 };
+
+/* 소속 워크스페이스 — 삭제 확인 문구에서 대상을 특정할 때 쓴다 */
+const WS_NAME = 'ai-service-team';
+const ME = 'yj.seong';
+
+/* 상태 8종 — 정책 6장.
+   워크스페이스와 달리 정상 상태가 대부분이 아니라 모든 상태에 배지를 표시한다 */
+/* 배치 작업 — CDE 터미널에서 concerto run 으로 제출한다(기술문서).
+   API 경로가 개발룸에 종속되어 있어 이 화면에 둔다.
+   ⚠ 조회 범위가 본인 건인지 전체인지 확인 대상 — 지금은 전체로 둔다 */
+/* concerto run 인자에서 오는 값을 둔다 — --gpu(가속기) · --local-storage-gb(로컬 스토리지).
+   기술문서 3단계 예시 참조.
+   ⚠ 유형(--type)은 `train` 하나만 확인됐다. 기술문서 6장 서두의 `훈련·전처리·양자화` 는
+     본문 서술이라 실제 인자 값인지 모른다 — 확인 대상.
+   ⚠ 실행 시간도 근거가 없다 — 확인 대상 */
+/* 상세 필드 — chk 사전 진단(명세 16) · mt 학습 지표(명세 18) · out 산출물(명세 18).
+   셋 다 백엔드 제공 여부가 확인 대상이라 값이 없으면 해당 섹션을 비운다 */
+const JOBS = [
+  {id:'job-20260820-01', at:'2026-08-20 09:14:02', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', gpu:1, disk:50,  dur:'1시간 22분', st:'완료',
+   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', rec:''},
+   mt:{loss:[2.41,1.88,1.52,1.31,1.19,1.12], acc:[0.42,0.58,0.67,0.72,0.75,0.77]},
+   out:{path:'/workspace/outputs/job-20260820-01/', size:'13.2 GB', kind:'safetensors'}},
+  {id:'job-20260820-02', at:'2026-08-20 14:31:20', u:'임승주(sj.lim)',  uid:'sj.lim',   cde:'sj-vscode-01',  t:'train', gpu:0, disk:20,  dur:'12분', st:'실행 중',
+   chk:{r:'경고', why:'가속기 없이 실행합니다. 학습 시간이 길어질 수 있습니다.', rec:'가속기 1'},
+   mt:{loss:[2.55,2.10,1.94], acc:[0.31,0.47,0.55]}, out:null},
+  {id:'job-20260819-07', at:'2026-08-19 22:07:45', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', gpu:2, disk:100, dur:'-', st:'실패',
+   err:'가속기 메모리가 부족해 중단되었습니다.',
+   chk:{r:'경고', why:'요청한 자원으로 메모리가 부족할 수 있습니다.', rec:'가속기 4'}, mt:null, out:null},
+  {id:'job-20260819-03', at:'2026-08-19 11:52:10', u:'유지현(jh.yu)',   uid:'jh.yu',    cde:'',              t:'train', gpu:1, disk:30,  dur:'34분', st:'완료',
+   chk:null, mt:null,
+   out:{path:'/workspace/outputs/job-20260819-03/', size:'6.8 GB', kind:'safetensors'}}
+];
+/* 중단됨은 실패와 가른다 — 실패는 시스템 사유이고 중단은 사람의 판단이다(기획서 5.1) */
+const JB={'대기':'mu','실행 중':'ac load','완료':'ok','실패':'cr','중단됨':'mu'};
+
+const CDE = [
+ /* 공용 CDE 유형을 두지 않고 신청 폼에 `전체 공개` 옵션도 두지 않는다(정책 2.5).
+    8/12 회의 3.2 는 `공동으로 쓰면 데이터가 꼬인다` 로 결론지었고 공유는 공유 볼륨으로
+    정했다. `공용이 필요하면` 은 별도 기능을 만들라는 뜻이 아니라 관리자가 CDE 를
+    만들어 쓰면 된다는 운영 방법이다 */
+ {n:'yj-jupyter-01', acc:'NVIDIA-H200', by:'성유진', id:'yj.seong', st:'구동 중', ide:'JupyterLab', fw:'PyTorch 2.4',
+  mode:'위임 할당', cpu:8, ram:32, gpu:1, vol:20, at:'2026-08-01 10:12:00', until:'2026-09-01', reason:'추천 모델 파인튜닝', apBy:'김병건(bg.kim)', apAt:'2026-08-01 11:04:22'},
+ {n:'sj-vscode-01', acc:'', by:'임승주', id:'sj.lim', st:'절전', ide:'VS Code Web', fw:'TensorFlow 2.16',
+  mode:'위임 할당', cpu:4, ram:16, gpu:0, vol:5, at:'2026-07-22 14:30:00', until:'2026-09-12', reason:'전처리 파이프라인 개발', apBy:'김병건(bg.kim)', apAt:'2026-07-22 11:04:22'},
+ {n:'jh-jupyter-01', acc:'Furiosa RNGD', by:'유지현', id:'jh.yu', st:'구동 중', ide:'JupyterLab', fw:'PyTorch 2.4',
+  mode:'직접 할당', cpu:8, ram:32, gpu:1, vol:50, at:'2026-07-15 09:05:00', until:'2026-09-05', reason:'비전 모델 실험', apBy:'김병건(bg.kim)', apAt:'2026-07-15 11:04:22'},
+ {n:'kh-jupyter-01', acc:'NVIDIA-H200 MIG', by:'오경환', id:'kh.oh', st:'승인 대기', ide:'JupyterLab', fw:'PyTorch 2.4',
+  mode:'위임 할당', cpu:4, ram:16, gpu:1, vol:20, at:'2026-08-11 16:44:00', until:'2026-09-11', reason:'벤치마크 재현'},
+ {n:'mj-vscode-01', acc:'', by:'박민준', id:'mj.park', st:'만료', ide:'VS Code Web', fw:'PyTorch 2.4',
+  mode:'위임 할당', cpu:4, ram:16, gpu:0, vol:5, at:'2026-05-02 11:00:00', until:'2026-08-02', reason:'데이터 검증', apBy:'김병건(bg.kim)', apAt:'2026-05-02 11:04:22'},
+ {n:'sh-jupyter-01', acc:'NVIDIA-H200 MIG', by:'최서현', id:'sh.choi', st:'실패', ide:'JupyterLab', fw:'PyTorch 2.4',
+  mode:'직접 할당', cpu:8, ram:32, gpu:2, vol:20, at:'2026-08-10 13:20:00', until:'2026-09-10', reason:'대형 모델 학습', apBy:'김병건(bg.kim)', apAt:'2026-08-10 11:04:22'}
+];
+
+/* 시안 확인용 — 내 CDE 상태를 바꿔 상태별 조작을 확인한다.
+   사용자당 하나 규칙(정책 3.3)을 지키려면 본인 것을 여러 건 둘 수 없다 */
+function setSysWs(v,btn){
+  document.querySelectorAll('#demoBar .sw').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  isSysWs=v; closePanel(); render();
+}
+function setMyState(v,btn){
+  document.querySelectorAll('#demoBar .ms').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  const m=CDE.find(function(x){ return x.id===ME; });
+  if(!m) return;
+  m.st=v;
+  /* 실패는 뜬 적이 없어 자원을 잡지 않는다 */
+  m.until = (v==='만료')? '2026-08-02' : '2026-09-01';
+  closePanel();
+  /* CDE 탭에서만 목록이 바뀐다. 작업 이력 탭에 있으면 눈에 띄지 않아 옮겨 준다 */
+  cdeTab=0;
+  render();
+}
+
+/* 상태별 색 — 진행 중은 점멸 */
+const SB = {'승인 대기':'ac','반려':'cr','준비 중':'ac load','구동 중':'ok','절전':'mu',
+            '실패':'cr','만료':'cr','종료 중':'ac load','종료':'mu'};
+
+/* ═══════════ 상태 ═══════════ */
+let role='super', state='default', cur=null, sq='', formOpen=false;
+/* 같은 개발룸을 대상으로 하는 목록 둘이라 탭으로 나눈다(배포 상세와 같은 구조) */
+let cdeTab=0;
+/* CDE 목록과 같은 규격으로 둔다 — 검색(3.3) + 헤더 필터(3.2) + 페이지네이션(3.7).
+   같은 화면 안 목록 둘이 다른 형태면 어디서 무엇을 찾는지 갈린다 */
+let jq='', jSel=[], jTmp=[];
+function setCdeTab(i){ cdeTab=i; render(); }
+const isSuper=()=>role==='super';
+const isAdmin=()=>role==='super'||role==='admin';
+const canApply=()=>role!=='viewer';
+const isMine=(m)=>m.id===ME;
+
+/* 상태별 조작 — 정책 6장.
+   막힌 작업은 미노출이 아니라 비활성으로 두고 사유를 안내한다.
+   강등된 사용자는 접속·반입·반납만 되고 연장은 막힌다(정책 7.1) */
+/* 조작은 본인 것만 된다. 다만 항목을 없애지 않고 비활성으로 두어 사유를 알린다
+   (정책 원칙 4 — 조회는 워크스페이스 전체, 조작은 본인 것만) */
+function usable(m){ return isMine(m); }
+function canAccess(m){ return usable(m) && (m.st==='구동 중'||m.st==='절전'); }
+/* 만료되면 자원이 회수되어 되살릴 수 없다(기술문서 5.2). 연장은 만료 전에만 한다.
+   절전은 자원만 내린 것이고 만료일은 그대로 흘러가므로 연장 대상이다 */
+/* 연장은 새로 자원을 잡는 행위라 신청과 같다. 뷰어로 강등되면 막힌다(정책 7.1) */
+function canExtend(m){ return isMine(m) && canApply() && (m.st==='구동 중'||m.st==='절전'); }
+function canReturn(m){ return isMine(m) && (m.st==='구동 중'||m.st==='절전'); }
+function blockMsg(m){
+  if(m.st==='종료 중') return '반납 처리 중입니다.';
+  /* 강등된 사용자는 연장할 수 없다(정책 7.1) */
+  if(isMine(m) && !canApply()) return '연장은 편집자 이상이 신청할 수 있습니다.';
+  if(!isMine(m)) return '본인의 CDE에만 사용할 수 있습니다.';
+  if(m.st==='승인 대기') return '승인 전에는 사용할 수 없습니다.';
+  if(m.st==='반려')     return '반려된 신청입니다. 다시 신청해 주세요.';
+  if(m.st==='준비 중')  return '환경을 만들고 있습니다. 준비가 끝나면 알림으로 안내됩니다.';
+  if(m.st==='실패')     return '기동에 실패했습니다. 다시 시도하거나 삭제할 수 있습니다.';
+  if(m.st==='만료')     return '사용 기간이 끝나 자원이 회수되었습니다. 다시 쓰려면 새로 신청해 주세요.';
+  if(m.st==='종료')     return '반납·회수된 CDE입니다.';
+  return '';
+}
+
+/* ═══════════ 목록 ═══════════ */
+/* 자원을 잡고 있는 건만 둔다 — 현행도 CDE 상태를 `ACTIVE` 하나로만 본다.
+   승인 대기·반려·종료는 자원을 잡지 않아 자원 목록에 섞이면 판단이 흐려진다.
+   승인·반려는 내 작업함에서 처리하고 신청 현황도 거기서 본다 */
+/* 종료 중은 파드를 아직 내리는 중이라 자원을 잡고 있다(기술문서 TERMINATING) */
+const LIVE = ['준비 중','구동 중','절전','실패','만료','종료 중'];
+/* 남의 CDE 는 관리자 이상만 본다. 8/10 회의 5장이 API Key 발급 화면을
+   `권한이 있는 모델만 노출` 로, 6.1 이 전용 모델을 `해당 워크스페이스에서만 조회` 로
+   정해 권한·소속에 맞춰 목록을 좁히는 방향이다.
+   다만 화면 진입은 전 역할에 열어 둔다. 기술문서 3.2 가 VIEWER 를
+   `워크스페이스 내 자원의 상태 조회` 로 정의하고, 개발룸 자원 현황이 그 대상이다 —
+   뷰어는 만들지 않고 얼마나 쓰이는지 보러 온다 */
+/* 삭제된 계정은 이름을 보이지 않고 `삭제됨` 으로 둔다(공통정책 1.6).
+   보관 기간이 지나면 물리 삭제되므로 이름을 남겨 둘 근거가 없고,
+   삭제된 사람의 이름이 여러 화면에 흩어지는 것도 막는다 */
+const DELETED_USERS=['mj.park'];
+function userRef(txt){
+  const m=String(txt).match(/\(([^)]+)\)$/);
+  const id=m? m[1] : txt;
+  if(DELETED_USERS.indexOf(id)<0) return txt;
+  return '<span class="tip-anchor"><span class="dash" tabindex="0">삭제됨</span>'
+   + '<span class="tip">삭제된 계정입니다.</span></span>';
+}
+
+function visible(m){
+  if(LIVE.indexOf(m.st) < 0) return false;
+  if(isAdmin()) return true;
+  /* 뷰어는 신청할 수 없어 본인 CDE 가 생길 수 없다.
+     ⚠ 편집자였다가 강등되면 남아 있을 수 있다 — 처리 미정(정책 9. 22번) */
+  if(!canApply()) return false;
+  return isMine(m);
+}
+function base(){
+  return CDE.filter(visible)
+    .filter(m=>!sq || (m.n+m.by+m.ide+m.fw).toLowerCase().includes(sq.toLowerCase()));
+}
+
+function render(){
+  /* 작업 상세가 열린 채로 목록을 다시 그리면 두 페이지가 겹친다.
+     데모 바의 상태 전환은 목록을 대상으로 하므로 상세를 먼저 닫고 이어서 그린다 */
+  if(jdCur){
+    jdCur=null;
+    document.getElementById('pgJob').style.display='none';
+    document.getElementById('pgList').style.display='';
+    syncBc();
+  }
+  const el=document.getElementById('listArea'), pg=document.getElementById('pager');
+  /* 개발룸이 없으면 자원·CDE 목록이 성립하지 않는다. 생성 안내로 대체한다 */
+  if(!roomExists){ drawEmptyRoom(); return; }
+  document.getElementById('quotaBox').style.display='';
+  document.getElementById('pager').style.display='flex';
+  document.getElementById('cdeToolbar').style.display='';
+  document.getElementById('cdeTabs').style.display='flex';
+  drawQuota(); drawInfo(); drawPend(); drawAct(); drawRoomAct(); drawTabs();
+  /* 탭에 따라 아래를 갈아 끼운다. 검색·페이지네이션은 CDE 목록 전용이다 */
+  const isJob = cdeTab===1;
+  document.getElementById('cdeToolbar').style.display = isJob? 'none' : '';
+  document.getElementById('listArea').style.display   = isJob? 'none' : '';
+  document.getElementById('pager').style.display      = isJob? 'none' : 'flex';
+  document.getElementById('jobTool').style.display    = isJob? '' : 'none';
+  document.getElementById('jobBox').style.display     = isJob? '' : 'none';
+  if(isJob){ drawJobs(); return; }
+  /* 조회 범위에 든 것만 센다. 안 보이는 건을 세면 숫자와 목록이 어긋난다 */
+
+  if(state==='loading'){ pg.style.display='none';
+    el.innerHTML='<div class="tblwrap" style="padding:14px">'+Array(5).fill('<div class="skrow" style="margin:13px 0"></div>').join('')+'</div>'; return; }
+  if(state==='error'){ pg.style.display='none';
+    el.innerHTML='<div class="state"><h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p><button class="btn ghost" onclick="setState(\'default\')">다시 시도</button></div>'; return; }
+  /* 뷰어는 신청할 수 없어 안내가 달라야 한다. 워크스페이스 목업과 같은 방식으로
+     제목을 상황에 맞게 바꾸고 본문은 요청 문장으로 둔다 */
+  if(state==='empty'){ pg.style.display='none';
+    el.innerHTML='<div class="state">'
+      +'<h3>'+(canApply()?'CDE가 없습니다.':'사용 중인 CDE가 없습니다.')+'</h3>'
+      +(canApply()
+        ? '<p>신청하면 관리자 승인 후 만들어집니다.</p><button class="btn" onclick="openForm()">CDE 신청</button>'
+        : '<p>워크스페이스 관리자에게 편집자 역할을 요청해 주세요.</p>')
+      +'</div>'; return; }
+
+  const d=base();
+  /* 검색어가 있으면 검색 결과, 없으면 빈 목록이다. 둘을 같은 문구로 두면
+     조건을 걸지 않았는데 `검색 결과가 없습니다` 가 뜬다.
+     뷰어는 신청할 수 없어 안내가 갈린다 */
+  if(!d.length){ pg.style.display='none';
+    el.innerHTML='<div class="state">'
+      +(sq
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><h3>검색 결과가 없습니다.</h3><p>다른 조건으로 검색해 주세요.</p>'
+          +'<button class="btn ghost" onclick="clearQ()">조건 초기화</button>'
+        : '<h3>'+(canApply()?'CDE가 없습니다.':'사용 중인 CDE가 없습니다.')+'</h3>'
+          +(canApply()
+            ? '<p>신청하면 관리자 승인 후 만들어집니다.</p><button class="btn" onclick="openForm()">CDE 신청</button>'
+            : '<p>워크스페이스 관리자에게 편집자 역할을 요청해 주세요.</p>'))
+      +'</div>'; return; }
+  pg.style.display='flex';
+  document.getElementById('pgtxt').textContent='총 '+d.length+'건';
+
+  /* 컬럼 순서 — 이름 → 상태 → 사용자 → … (공통정책 2.2) */
+  el.innerHTML='<div class="tblwrap"><table class="tbl"><thead><tr>'
+   + '<th class="thcell">'+thHelp('own','CDE명')+'</th><th class="thcell">'+thHelp('st','상태')+'</th><th>사용자</th>'
+   + '<th>IDE</th><th class="thcell">'+thHelp('mode','실행 방식')+'</th>'
+   + '<th>자원</th><th class="thcell">'+thHelp('exp','만료 예정')+'</th><th style="width:64px">작업</th>'
+   + '</tr></thead><tbody>'
+   + d.map(function(m,i){
+      /* 본인 것을 따로 강조하지 않는다. 사용자 컬럼에 이름이 있어 이미 구분된다 */
+      return '<tr onclick="openPanel('+CDE.indexOf(m)+')">'
+       + '<td><div class="wsname"><span class="mname">'+m.n+'</span></div></td>'
+       /* 배지에 툴팁을 두지 않는다. blockMsg 는 조작이 왜 막혔는지 알리는 문구라
+          상태 설명이 아니고, 값별 의미는 컬럼 헤더 도움말에 이미 있다 */
+       + '<td><span class="stbadge '+(SB[m.st]||'mu')+'">'+m.st+'</span></td>'
+       + '<td>'+userRef(m.by+'('+m.id+')')+'</td>'
+       + '<td>'+m.ide+'</td>'
+       + '<td>'+m.mode+'</td>'
+       /* 가속기는 종류를 함께 보인다. 개수만으로는 어느 장비인지 알 수 없다(8/10 회의 2.2) */
+       + '<td class="num">'+m.cpu+' Cores · '+m.ram+' Gi'
+       +   (m.gpu? ' · '+(m.acc||'가속기')+' '+m.gpu : '')+'</td>'
+       + '<td>'+m.until+'</td>'
+       + '<td onclick="event.stopPropagation()">'+rowMenu(m,i)+'</td>'
+       + '</tr>';
+     }).join('')
+   + '</tbody></table></div>';
+}
+
+/* 상태로 막힌 항목은 비활성으로 두고 사유를 알린다(공통정책 7.10 — 권한은 미노출,
+   상태는 비활성). 다만 그 상태에서 아예 성립하지 않는 것은 넣지 않는다 —
+   만료된 CDE 에 접속·반납을 띄워 두면 무엇을 해야 할지 흐려진다 */
+function rowMenu(m,i){
+  /* 항목을 늘 두고 비활성으로 막는다. 버튼을 없애면 왜 못 하는지 알 수 없다 —
+     남의 CDE 든 만료 상태든 사유를 알려 주는 편이 낫다.
+     ⚠ 공통정책 7.10 은 권한 없는 기능을 미노출로 정하나 여기서는 사유를 보이는 쪽을
+       택했다. 조작 가능 여부가 상태·소유에 따라 자주 바뀌어 항목이 사라지면
+       목록마다 메뉴 구성이 달라진다 — 개정 제안 대상 */
+  const items=[];
+  /* 라벨을 화면 전체에서 같게 둔다(공통정책 1.1). `접속` 만으로는 어디에 붙는지
+     드러나지 않는다 — 브라우저에서 JupyterLab·VS Code 가 열린다 */
+  items.push(btn('웹 IDE 접속', canAccess(m), 'openIde(\''+m.n+'\')', blockMsg(m)));
+  items.push(btn('데이터 가져오기', canImport(m), 'openDl(\''+m.n+'\')',
+    m.st==='절전' && isMine(m) ? '접속해 깨운 뒤 내려받을 수 있습니다.' : blockMsg(m)));
+  items.push(btn('연장 신청', canExtend(m), 'openExt(\''+m.n+'\')', blockMsg(m)));
+  /* 실패는 한 번도 뜨지 못한 것이라 다시 올려 볼 수 있다 */
+  items.push(btn('다시 시도', isMine(m) && m.st==='실패', 'act(\'다시 시도를 요청했습니다.\')',
+    !isMine(m) ? blockMsg(m) : '기동에 실패한 CDE에만 사용할 수 있습니다.'));
+  /* 실패는 뜬 적이 없고 만료는 이미 회수되어 반납할 자원이 없다. 삭제로 치운다(정책 6장).
+     반납이 비활성으로만 남으면 만료된 CDE 를 목록에서 치울 수단이 사라진다 */
+  const gone = m.st==='실패' || m.st==='만료';
+  items.push('<hr>'+(gone
+    ? btn('삭제', isMine(m), 'askReturn(\''+m.n+'\')', blockMsg(m), true)
+    : btn('반납', canReturn(m), 'askReturn(\''+m.n+'\')', blockMsg(m), true)));
+  /* 회수는 관리자만 쓴다. 권한이 없으면 항목을 두지 않는다 —
+     역할로 갈리는 것은 상태와 달라 사유를 알려도 할 수 있게 되지 않는다 */
+  if(isAdmin()){
+    items.push(btn('회수', !isMine(m) && (m.st==='구동 중'||m.st==='절전'),
+      'askRevoke(\''+m.n+'\')',
+      isMine(m) ? '본인 CDE는 반납으로 정리합니다.' : blockMsg(m), true));
+  }
+  return wrapMenu(items,i);
+}
+function wrapMenu(items,i){
+  if(!items.length) return '';
+  return '<div class="more" id="rm'+i+'"><button class="morebtn" onclick="tgMore(event,\'rm'+i+'\')">⋯</button>'
+   + '<div class="rowmenu">'+items.join('')+'</div></div>';
+}
+function btn(label, ok, fn, why, danger){
+  return '<button'+(danger?' class="d"':'')+(ok?'':' disabled title="'+why+'"')
+   + (ok?' onclick="'+fn+'"':'')+'>'+label+'</button>';
+}
+
+/* 개발룸 자원 — 승인 시점에 여기서 차감한다(정책 3.1) */
+/* 개발룸 미생성 — 만들 수단을 함께 둔다 */
+function drawEmptyRoom(){
+  document.getElementById('infoBox').innerHTML='';
+  document.getElementById('quotaBox').style.display='none';
+  document.getElementById('pendBox').innerHTML='';
+  document.getElementById('pager').style.display='none';
+  document.getElementById('cdeToolbar').style.display='none';
+  document.getElementById('cdeTabs').style.display='none';
+  document.getElementById('roomAct').innerHTML='';
+  /* 개발룸이 없으면 그 안에 CDE 도 작업도 없다. 탭을 남기면 눌러도 반응이 없다.
+     할 일은 개발룸을 만드는 것 하나뿐이라 그 안내만 남긴다 */
+  document.getElementById('jobTool').style.display='none';
+  document.getElementById('jobBox').style.display='none';
+  document.getElementById('listArea').style.display='';
+  document.getElementById('listArea').innerHTML =
+    '<div class="state" style="padding:60px 0">'
+  + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg>'
+  + '<h3>개발룸이 없습니다.</h3>'
+  + '<p>개발룸을 만들면 멤버가 CDE를 신청할 수 있습니다. 할당한 자원만큼 운영룸 한도에서 옮겨집니다.</p>'
+  /* 이 화면이 개발룸을 다루는 자리다. 만들러 다른 화면으로 보내지 않는다 —
+     설정·삭제도 여기서 한다.
+     개발룸에는 신청 흐름을 두지 않는다. 8/12 회의 1.8 은 신청 로직을 CDE 등
+     워크스페이스 안에서 발생하는 작업에만 적용하기로 했고, 1.9 룸 상태값에도
+     승인 대기가 없다 — 관리자는 바로 만들고 그 외에는 사람에게 요청한다 */
+  + (isAdmin()
+      ? '<button class="btn" onclick="openRoomCfg(true)">개발룸 생성</button>'
+      : '<p style="font-size:11.5px;color:var(--faint)">워크스페이스 관리자에게 개발룸 생성을 요청해 주세요.</p>')
+  + '</div>';
+}
+/* 워크스페이스 목업 룸 화면과 같은 규격(.rsgrid) 을 쓴다.
+   같은 개발룸을 두 화면에서 보는데 자원 표현이 다르면 값이 달라 보인다 */
+function qCls(p){ return p>=90?'full':(p>=70?'hi':''); }
+/* 기본 정보 — 생성 시 정한 값이라 여기서는 조회만 한다.
+   ⚠ 귀속(워크스페이스)·속성(클러스터)·자원(공유 볼륨)·설정(Egress)이 한 섹션에 섞여 있다.
+     항목이 여섯뿐이라 나누지 않았다 — 확인 대상(정책 9. 25번) */
+function drawInfo(){
+  document.getElementById('infoBox').innerHTML =
+    '<div class="dsec"><h4>기본 정보</h4>'
+    /* 값이 짧아 1열로 두면 오른쪽이 크게 빈다. 좌우로 나눠 6행을 3행으로 줄인다 */
+    + '<dl class="dl two">'
+    + '<dt>워크스페이스</dt><dd>'+WS_NAME+'</dd>'
+    + '<dt>공유 볼륨'+tip('개발룸 멤버가 함께 쓰는 볼륨입니다. 생성 시에 정하며 이후에는 바꿀 수 없습니다. 개인 볼륨은 나머지에서 CDE 신청 시 할당됩니다.')+'</dt>'
+    +   '<dd>'+VOL.shared+' GB</dd>'
+    /* 네임스페이스는 노출하지 않는다(공통정책 7.9). 워크스페이스명에서 만들어진다 */
+    + '<dt>대상 클러스터'+tip('개발룸이 만들어진 클러스터입니다. 생성 후에는 바꿀 수 없습니다.')+'</dt>'
+    +   '<dd>'+ROOM_INFO.cls+'</dd>'
+    /* `Egress 허용 도메인` 은 라벨 폭(112px)을 넘어 줄이 바뀐다. 뜻이 같으면서 짧은 말로 둔다 */
+    + '<dt>Egress 허용'+tip('개발룸에서 접근할 수 있는 외부 주소입니다. 비우면 외부 접근이 차단됩니다.')+'</dt>'
+    +   '<dd>'+(ROOM_INFO.egress || '<span class="dash">제한 없음</span>')+'</dd>'
+    /* 배포 상세도 담당자·생성일시를 함께 둔다 */
+    + '<dt>생성자</dt><dd>'+ROOM_INFO.by+'</dd>'
+    + '<dt>생성일시</dt><dd>'+ROOM_INFO.at+'</dd>'
+    + '</dl></div>';
+}
+function drawQuota(){
+  /* 배정이 없으면 상한 대비 점유를 그릴 수 없다. 사용 방식만 안내한다 */
+  if(isSysWs){
+    document.getElementById('quotaBox').innerHTML =
+      '<div class="dsec"><h4>개발룸 자원'
+      + '<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span>'
+      + '<span class="tip">공용 워크스페이스는 자원을 배정받지 않습니다. 다른 워크스페이스에 배분하고 남은 자원을 사용합니다.</span></span></h4>'
+      + '<div class="secnote">별도 자원을 배정받지 않습니다. 다른 워크스페이스에 배분하고 남은 자원을 사용하며, 잔여가 없으면 CDE 기동이 지연될 수 있습니다.</div>'
+      + '</div>';
+    return;
+  }
+  const rows=[['CPU',ROOM.cpu.use,ROOM.cpu.q,'Cores'],
+              ['Memory',ROOM.ram.use,ROOM.ram.q,'Gi'],
+              ['가속기',ROOM.gpu.use,ROOM.gpu.q,'장']];
+  document.getElementById('quotaBox').innerHTML =
+    '<div class="dsec"><h4>개발룸 자원'
+    /* 화면 최상단이라 위로 열면 잘린다. 아래로 연다 */
+    + '<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span>'
+    + '<span class="tip">개발룸이 최대로 쓸 수 있는 양입니다. 운영룸 자원이 부족해지면 이 중 일부가 회수되며, 실행 중인 작업은 대기 상태로 바뀌었다가 여유가 생기면 다시 진행됩니다.</span></span></h4>'
+    + '<div class="rsgrid">'
+    + rows.map(function(r){
+        const p = r[2]? Math.round(r[1]/r[2]*100) : 0;
+        return '<div class="rsitem"><div class="rst">'+r[0]+'</div>'
+         + '<div class="rsv">'+r[1]+' <span class="rsq">/ '+r[2]+' '+r[3]+'</span></div>'
+         + '<div class="qbar"><div class="qfill '+qCls(p)+'" style="width:'+Math.min(100,p)+'%"></div></div>'
+         + '</div>';
+      }).join('')
+    + '</div></div>'
+    /* 자원이 꽉 차면 신청해도 승인이 나지 않는다. 막힌 뒤에 알리지 말고 미리 알린다.
+       조치가 역할마다 달라 안내도 갈린다 — 할당량 조정은 관리자 소관이다 */
+    + (function(){
+        if(isSysWs) return '';
+        const full=[];
+        if(ROOM.cpu.use>=ROOM.cpu.q) full.push('CPU');
+        if(ROOM.ram.use>=ROOM.ram.q) full.push('Memory');
+        if(ROOM.gpu.use>=ROOM.gpu.q) full.push('가속기');
+        if(!full.length) return '';
+        /* 원인만 알리지 않고 조치 경로를 함께 준다(라이브러리 차단 안내 규칙).
+           자원을 늘릴 수 있는 역할에만 버튼을 둔다 */
+        return alertBox('warn', full.join(' · ')+' 여유가 없습니다.',
+          '새 CDE를 신청해도 승인할 수 없습니다. '
+          + (isAdmin()
+             ? '개발룸 자원을 늘리거나, 사용하지 않는 CDE를 반납받아 주세요.'
+             : '사용하지 않는 CDE를 반납하거나 관리자에게 자원 조정을 요청해 주세요.'),
+          isAdmin()
+            ? '<button class="btn sm" onclick="openRoomCfg()">개발룸 설정</button>'
+            : '');
+      })();
+}
+
+
+/* 승인 대기 알림을 두지 않는다. 승인 대기 건은 이 목록에 나오지 않고
+   승인·반려도 내 작업함에서 처리한다. GNB 내 작업함 배지가 이미 건수를 알리므로
+   같은 것을 두 번 말하게 된다 */
+function drawPend(){
+  document.getElementById('pendBox').innerHTML = '';
+}
+
+/* 개발룸은 별도로 만들고 지우는 대상이라 설정·삭제 진입점을 둔다(워크스페이스 정책 3.4) */
+function drawRoomAct(){
+  document.getElementById('roomAct').innerHTML = isAdmin()
+    ? '<button class="btn ghost sm" onclick="openRoomCfg()">설정</button>'
+      + '<button class="btn danger-line sm" onclick="askDelRoom()">삭제</button>'
+    : '';
+}
+/* 개발룸을 지우면 미생성으로 돌아간다. CDE와 공유 볼륨이 함께 사라진다 */
+function askDelRoom(){
+  const n=CDE.filter(function(m){ return m.st!=='종료'; }).length;
+  const target=WS_NAME+' 개발룸';
+  openConfirm('개발룸 삭제',
+    '<b>'+target+'</b>을 삭제합니다. CDE '+n+'건과 공유 볼륨이 함께 제거되고 배정된 자원은 운영룸으로 반환됩니다.',
+    function(){ roomExists=false; render(); toast('ok','개발룸 삭제를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.'); },
+    '삭제', target);
+}
+/* 사용자당 하나만 둔다(정책 3.3). 다만 버튼을 없애지 않는다 —
+   신청 중인 건이 목록에 보이지 않으므로 버튼까지 사라지면 왜 못 하는지 알 수 없다.
+   누르면 이유와 갈 곳을 알린다 */
+function myCde(){
+  return CDE.find(m=>isMine(m) && m.st!=='종료' && m.st!=='반려');
+}
+function drawTabs(){
+  /* 탭 라벨 옆에 설명을 둔다. 섹션 제목을 없앴으므로 여기가 유일한 자리다 */
+  const t=[['CDE','개발룸 안에서 개인이 사용하는 작업 공간입니다. 신청 후 관리자 승인을 거쳐 만들어지며, 사용 기간이 지나면 회수됩니다.'],
+           ['작업 이력','CDE 터미널에서 제출한 학습·전처리 작업입니다. 편집기와 별도로 백그라운드에서 실행됩니다.']];
+  /* 탭 배지 — 그 건수가 탭을 열기 전 판단에 쓰인다. CDE 는 자원을 얼마나 쓰고 있는지,
+     작업 이력은 돌고 있는 것이 있는지가 재료다 */
+  const cnt=[CDE.filter(visible).length, JOBS.length];
+  document.getElementById('cdeTabs').innerHTML =
+    t.map(function(x,i){
+      return '<button class="'+(cdeTab===i?'on':'')+'" onclick="setCdeTab('+i+')">'+x[0]
+       + '<span class="cnt">'+cnt[i]+'</span>'
+       + '<span class="tip-anchor below" onclick="event.stopPropagation()"><span class="tip-ic" tabindex="0">?</span>'
+       + '<span class="tip">'+x[1]+'</span></span></button>';
+    }).join('');
+}
+function drawAct(){
+  document.getElementById('pact').innerHTML = canApply()
+    ? '<button class="btn" onclick="tryApply()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>CDE 신청</button>'
+    : '';
+}
+function tryApply(){
+  const m=myCde();
+  if(!m){ openForm(); return; }
+  if(m.st==='승인 대기'){
+    openConfirm('신청 중인 CDE가 있습니다',
+      '승인되면 사용할 수 있습니다. <b>'+m.n+'</b>의 신청 현황은 내 작업함에서 확인합니다.',
+      function(){ act('내 작업함으로 이동합니다.'); }, '내 작업함');
+    return;
+  }
+  /* 원인과 조치를 나눈다(라이브러리 — 차단 안내 모달). 조건이 본인 조작으로 풀리므로
+     푸는 방법을 함께 준다 */
+  /* 차단 안내는 제목이 무엇이 막혔는지, 본문이 규칙과 조치를 말한다.
+   제목에서 이미 말한 것을 본문에서 되풀이하지 않는다(워크스페이스 목업 규격) */
+  openConfirm('이미 사용 중인 CDE가 있습니다',
+    '사용자당 하나만 쓸 수 있습니다. <b>'+m.n+'</b>을 반납하면 새로 신청할 수 있습니다.',
+    null, '확인');
+}
+
+/* ═══════════ 작업 이력 ═══════════ */
+/* CDE 터미널에서 제출한 배치 작업이다. 편집기와 별도로 백그라운드에서 돈다.
+   실패한 작업은 왜 실패했는지 알아야 다시 돌릴지 판단이 선다.
+   남이 무슨 작업을 돌렸는지는 자원 상태가 아니라 업무 내용이라 관리자 이상만 본다
+   (기술문서 2.1~2.3) */
+/* 작업 이력도 CDE 목록과 같은 범위다 */
+function jobsFor(){
+  if(isAdmin()) return JOBS;
+  /* 뷰어는 배치 작업을 제출할 수 없어 본인 건이 생길 수 없다 */
+  if(!canApply()) return [];
+  return JOBS.filter(function(j){ return j.uid===ME; });
+}
+/* 헤더 필터 — 배포 목업과 같은 규격. 임시 선택(jTmp)을 두고 적용 시 반영한다 */
+/* 필터 옵션·건수는 검색 결과 안에서 센다. 전체를 기준으로 하면
+   검색으로 사라진 값이 필터에 남는다(배포 목업과 같은 규격) */
+function jBase(){
+  const q=jq.trim().toLowerCase();
+  return jobsFor().filter(function(j){
+    return !q || [j.id,j.u,j.t,j.cde,j.st].some(function(x){
+      return String(x).toLowerCase().indexOf(q)>=0;
+    });
+  });
+}
+function jFilter(){
+  const all=jBase();
+  const opts=['대기','실행 중','완료','실패'].filter(function(o){
+    return all.some(function(j){ return j.st===o; });
+  });
+  const on=jSel;
+  return '<span class="thwrap">상태'
+   + (COLDEF.jst?'<span class="thic" tabindex="0">?</span>':'')
+   + '<button class="thfilter'+(on.length?' on':'')+'" onclick="tgJdd(event)" title="필터">'
+   + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button></span>'
+   + (COLDEF.jst?'<div class="thpop">'+COLDEF.jst+'</div>':'')
+   + '<div class="fdd" onclick="event.stopPropagation()">'
+   + '<label><input type="checkbox" '+(on.length===0?'checked':'')+' onchange="jPickAll()">전체<span class="fc">'+all.length+'</span></label><hr>'
+   + opts.map(function(o){
+       const c=all.filter(function(j){ return j.st===o; }).length;
+       return '<label><input type="checkbox" '+(jTmp.indexOf(o)>=0?'checked':'')
+        + ' onchange="jPick(\''+o+'\',this.checked)">'+o+'<span class="fc">'+c+'</span></label>';
+     }).join('')
+   + '<div class="fddfoot"><button class="lvclr" onclick="jReset()">초기화</button>'
+   + '<button class="btn sm" onclick="jApply()">적용</button></div>'
+   + '</div>';
+}
+function tgJdd(e){
+  e.stopPropagation();
+  const th=e.target.closest('th');
+  const o=th.classList.contains('fdd-on');
+  document.querySelectorAll('th').forEach(function(x){ x.classList.remove('fdd-on'); });
+  if(!o){ jTmp=jSel.slice(); th.classList.add('fdd-on'); }
+}
+function jPick(v,on){
+  const i=jTmp.indexOf(v);
+  if(on && i<0) jTmp.push(v);
+  if(!on && i>=0) jTmp.splice(i,1);
+}
+function jPickAll(){
+  jTmp=[];
+  const th=document.querySelector('th.fdd-on');
+  if(th) th.querySelectorAll('.fdd label input').forEach(function(cb,i){ cb.checked=(i===0); });
+}
+function jApply(){
+  const all=jBase();
+  const opts=['대기','실행 중','완료','실패'].filter(function(o){
+    return all.some(function(j){ return j.st===o; });
+  });
+  let v=jTmp.slice();
+  if(v.length===opts.length) v=[];
+  jSel=v;
+  document.querySelectorAll('th').forEach(function(x){ x.classList.remove('fdd-on'); });
+  drawJobs();
+}
+function onJobKey(e){
+  if(e.key==='Enter'){
+    jq=e.target.value.trim();
+    document.getElementById('jqclr').hidden=!jq;
+    drawJobs();
+  }
+}
+function clearJobQ(){
+  document.getElementById('jq').value=''; jq='';
+  document.getElementById('jqclr').hidden=true;
+  drawJobs();
+}
+function jReset(){
+  jq=''; jTmp=[]; jSel=[];
+  const el=document.getElementById('jq'); if(el) el.value='';
+  const cl=document.getElementById('jqclr'); if(cl) cl.hidden=true;
+  document.querySelectorAll('th').forEach(function(x){ x.classList.remove('fdd-on'); });
+  drawJobs();
+}
+
+function drawJobs(){
+  const box=document.getElementById('jobBox'), tool=document.getElementById('jobTool');
+  /* 데이터 상태는 CDE 목록과 같은 규격으로 둔다. 같은 화면 안 목록 둘이
+     로딩·오류 표현이 다르면 어느 쪽이 문제인지 흐려진다 */
+  if(state==='loading'){
+    tool.style.display='none';
+    box.innerHTML='<div class="tblwrap" style="padding:14px">'
+      +Array(5).fill('<div class="skrow" style="margin:13px 0"></div>').join('')+'</div>';
+    return;
+  }
+  if(state==='error'){
+    tool.style.display='none';
+    box.innerHTML='<div class="state"><h3>데이터를 불러오지 못했습니다.</h3>'
+      +'<p>잠시 후 다시 시도해 주세요.</p>'
+      +'<button class="btn ghost" onclick="setState(\'default\')">다시 시도</button></div>';
+    return;
+  }
+  if(state==='empty'){
+    tool.style.display='none';
+    box.innerHTML='<div class="state"><h3>실행된 작업이 없습니다.</h3>'
+      +'<p>CDE 터미널에서 배치 작업을 제출하면 여기에 표시됩니다.</p></div>';
+    return;
+  }
+  tool.style.display='';
+  const J = jBase().filter(function(j){
+    return !jSel.length || jSel.indexOf(j.st)>=0;
+  });
+  document.getElementById('jobBox').innerHTML =
+    (J.length
+       ? '<div class="tblwrap"><table class="tbl"><thead><tr>'
+         /* 이름 → 상태 → 유형 → 담당자 순(공통정책 2.2). CDE 목록과 같은 순서다 */
+         + '<th>작업 ID</th>'
+         + '<th class="thcell">'+jFilter()+'</th>'
+         + '<th>유형</th><th>제출자</th><th>CDE</th><th>자원</th><th>실행 시간</th>'
+         + '<th style="width:100px">로그</th>'
+         + '</tr></thead><tbody>'
+         + J.map(function(j,i){
+             /* 이름에 밑줄을 두지 않는다. 다른 목록에서 밑줄은 그 대상의 상세로 간다는
+                신호인데 작업은 상세가 없다. 진입점은 더보기 메뉴 하나로 둔다 */
+             const done = j.st==='실패' || j.st==='완료';
+             return '<tr onclick="openJob(\''+j.id+'\')"><td class="num"><span class="mname">'+j.id+'</span></td>'
+              /* 실패 사유를 툴팁에 두지 않는다. 툴팁은 항목 설명에 쓰고
+                 그 건에 무슨 일이 있었는지는 로그에서 본다(라이브러리 구분 기준) */
+              + '<td><span class="stbadge '+(JB[j.st]||'mu')+'">'+j.st+'</span></td>'
+              + '<td>'+j.t+'</td><td>'+userRef(j.u)+'</td>'
+              /* CDE 를 반납해도 작업은 남는다. 어디서 돌린 것인지 연결을 남긴다 */
+              + '<td>'+(j.cde? j.cde : '<span class="dash">반납됨</span>')+'</td>'
+              /* concerto run 에 넘긴 값이다. 자원이 얼마나 물려 있는지 알아야
+                 실행 중인 작업이 개발룸 몫을 얼마나 잡고 있는지 판단이 선다 */
+              + '<td class="num">'+(j.gpu? '가속기 '+j.gpu+' · ' : '')+j.disk+' GB</td>'
+              + '<td>'+(j.dur!=='-'? j.dur : '<span class="dash">-</span>')+'</td>'
+              /* 할 수 있는 작업이 하나뿐이라 더보기 메뉴로 감싸지 않는다. 감싸면 두 번 눌러야 한다.
+                 끝난 작업에만 로그가 남는다.
+                 ⚠ 기술문서 6.2 의 강제 취소를 넣으면 액션이 둘이 되어 더보기 메뉴로 바꾼다
+                   — 확인 대상(정책 9. 29번). 행 클릭이 상세로 가므로 버튼은 전파를 막는다 */
+              + '<td>'+(done
+                 ? '<button class="btn ghost sm" onclick="event.stopPropagation();openLog(\''+j.id+'\')">로그 보기</button>'
+                 : '<span class="dash">-</span>')+'</td></tr>';
+           }).join('')
+         + '</tbody></table></div>'
+         + '<div class="pager"><span>총 '+J.length+'건</span>'
+         + '<div style="display:flex;align-items:center;gap:14px">'
+         +   '<div class="pgnum"><button disabled aria-label="이전">‹</button>'
+         +     '<input class="pgin" value="1"><span class="pgtot">/ <span>1</span></span>'
+         +     '<button disabled aria-label="다음">›</button></div>'
+         +   '<select class="sel" style="padding:7px 10px"><option>20개씩 보기</option><option>50개씩 보기</option><option>100개씩 보기</option></select>'
+         + '</div></div>'
+       : '<div class="state"><h3>'
+         + ((jq||jSel.length)? '검색 결과가 없습니다.'
+              : (canApply()? '실행된 작업이 없습니다.' : '제출한 작업이 없습니다.'))+'</h3>'
+         + '<p>'+((jq||jSel.length)
+             ? '다른 조건으로 검색해 주세요.'
+             : (canApply()
+                ? 'CDE 터미널에서 배치 작업을 제출하면 여기에 표시됩니다.'
+                : '워크스페이스 관리자에게 편집자 역할을 요청해 주세요.'))+'</p>'
+         + ((jq||jSel.length)? '<button class="btn ghost" onclick="jReset()">조건 초기화</button>' : '')
+         + '</div>');
+}
+
+
+/* ═══════════ 개발룸 설정 ═══════════ */
+/* 개발룸 자원은 워크스페이스 할당량에서 나눠 온다(워크스페이스 정책 3.3).
+   여기서 늘리면 운영룸 몫이 그만큼 줄어든다.
+   이 화면이 개발룸을 다루는 자리이므로 설정을 워크스페이스로 넘기지 않는다 —
+   삭제도 여기서 한다 */
+const RC = { cpu:'', ram:'', vol:'', egress:'' };
+ACC.forEach(function(g){ RC['acc_'+g.k]=''; });
+/* 워크스페이스 할당량 — 개발룸이 가져올 수 있는 최대. 지금 쓰는 만큼보다 줄일 수 없다 */
+/* 워크스페이스 할당량. 가속기는 종류별로 나뉜다(8/10 회의 2.2) */
+const WSQ = { cpu:64, ram:256, vol:500,
+              acc:{'nvidia':2, 'furiosa':2, 'nvidia-mig':8} };
+
+/* 생성과 설정은 받는 값이 같다. 처음 만들 때는 0 에서 시작하고 이미 있으면 현재 값을 채운다 */
+let rcNew=false;
+/* 운영룸·개발룸·할당량 수정이 워크스페이스 목업에서 모두 페이지다.
+   생성과 설정이 같은 항목을 받으므로 형태도 같게 둔다 */
+let roomCfgOpen=false;
+/* 작성 중 이탈 판정 */
+let rcInit='';
+function rcSnap(){ return JSON.stringify(RC); }
+function cancelRoomCfg(){
+  if(rcSnap()!==rcInit){
+    openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.',
+      function(){ closeRoomCfg(); }, '취소', '', '계속 작성');
+    return;
+  }
+  closeRoomCfg();
+}
+function openRoomCfg(isNew){
+  if(jdCur) closeJob();
+  rcNew=!!isNew; roomCfgOpen=true;
+  RC.cpu=rcNew?'0':String(ROOM.cpu.q); RC.ram=rcNew?'0':String(ROOM.ram.q);
+  RC.vol=rcNew?'0':String(VOL.shared);
+  ACC.forEach(function(g){ RC['acc_'+g.k]= rcNew?'0':String(g.q); });
+  RC.egress='';
+  /* textContent 로 쓰면 툴팁이 지워진다. 라벨만 바꾸고 툴팁은 유지한다 */
+  document.querySelector('#pgRoom .dinfo h1').innerHTML =
+    (rcNew? '개발룸 생성' : '개발룸 설정')
+    + '<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span>'
+    + '<span class="tip">개발룸이 워크스페이스 할당량에서 가져올 자원을 정합니다. 남는 만큼이 운영룸 몫이 됩니다.</span></span>';
+  document.getElementById('rcSave').textContent = rcNew? '생성' : '저장';
+  document.getElementById('pgList').style.display='none';
+  document.getElementById('pgForm').style.display='none';
+  document.getElementById('pgRoom').style.display='';
+  rcInit=rcSnap();
+  drawRoomCfg(); syncBc(); window.scrollTo(0,0);
+}
+function closeRoomCfg(){
+  roomCfgOpen=false;
+  document.getElementById('pgRoom').style.display='none';
+  document.getElementById('pgList').style.display='';
+  syncBc();
+}
+function rcStep(k,d,cap,min){
+  let v=(parseFloat(RC[k])||0)+d;
+  if(v<min) v=min; if(v>cap) v=cap;
+  RC[k]=String(Math.round(v*10)/10); drawRoomCfg();
+}
+/* 배분 가능량은 워크스페이스 할당량 전부다. 다만 지금 쓰고 있는 만큼보다 줄이면
+   구동 중인 CDE 가 멈추므로 하한을 둔다 */
+function rcBtn(k,delta,cap,min,label){
+  const v=parseFloat(RC[k])||0;
+  const off=(delta<0 && v<=min) || (delta>0 && v>=cap);
+  return '<button class="stbtn"'+(off?' disabled':'')+' onclick="rcStep(\''+k+'\','+delta+','+cap+','+min+')" tabindex="-1" aria-label="'+label+'">'
+   + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">'
+   + (delta>0?'<path d="M12 5v14M5 12h14"/>':'<path d="M5 12h14"/>')+'</svg></button>';
+}
+/* ⚠ 하한은 점유량이다. 워크스페이스 정책 3.4 `배포된 리소스의 재시작이 발생하지 않는
+   범위에서 가능` 을 이렇게 해석했다 — 확인 대상(정책 9. 24번).
+   절전 중인 CDE 도 점유로 세고 있어 하한 계산이 달라질 수 있다 */
+function rcRow(k,label,unit,cap,min,step,desc){
+  const v=parseFloat(RC[k])||0, over=v>cap, under=v<min;
+  return '<div class="qrowbox'+(over||under?' err':'')+'">'
+   /* 사용 중 수치는 툴팁에 둔다. 라벨 아래에 두면 행이 두 줄이 되고
+      워크스페이스 목업과 표기가 갈린다 */
+   + '<div class="qrhead"><span class="qrlb">'
+   +   '<span class="qrname">'+label+'<span class="req">*</span>'
+   +     tip((desc? desc+' ' : '')+'지금 '+min+' '+unit+' 사용 중입니다.')+'</span>'
+   + '</span>'
+   +   '<span class="stepper'+(over||under?' err':'')+'">'
+   /* 워크스페이스 목업과 같은 규격 — .stbtn 클래스와 SVG 아이콘을 쓴다 */
+   +     rcBtn(k,-step,cap,min,'줄이기')
+   +     '<span class="stfield"><input class="inp" value="'+RC[k]+'" inputmode="decimal" oninput="RC.'+k+'=this.value;drawRoomCfg()"><span class="stunit">'+unit+'</span></span>'
+   +     rcBtn(k,step,cap,min,'늘리기')
+   +   '</span>'
+   /* 소수는 한 자리까지만 보인다. CPU 는 0.5 단위라 값이 길어진다 */
+   +   '<span class="qrcap">배분 가능 '+cap.toFixed(cap%1?1:0)+'</span>'
+   + '</div>'
+   + (over? '<div class="errmsg" style="display:block">워크스페이스 할당량은 '+cap+' '+unit+'입니다.</div>'
+      : under? '<div class="errmsg" style="display:block">지금 쓰고 있는 '+min+' '+unit+'보다 줄일 수 없습니다.</div>'
+      : '')
+   + '</div>';
+}
+function drawRoomCfg(){
+  const minC=rcNew?0:ROOM.cpu.use, minR=rcNew?0:ROOM.ram.use, minV=rcNew?0:VOL.used;
+  /* 가속기는 종류마다 상한·하한이 다르다 */
+  const accBad = ACC.some(function(g){
+    const v=parseFloat(RC['acc_'+g.k]);
+    return v>(WSQ.acc[g.k]||0) || v<(rcNew?0:g.use);
+  });
+  const bad = isSysWs? false :
+              (parseFloat(RC.cpu)>WSQ.cpu) || (parseFloat(RC.cpu)<minC)
+           || (parseFloat(RC.ram)>WSQ.ram) || (parseFloat(RC.ram)<minR)
+           || accBad
+           /* 공유 볼륨은 생성 시에만 받는다 */
+           || (rcNew && ((parseFloat(RC.vol)>WSQ.vol) || (parseFloat(RC.vol)<minV)));
+  document.getElementById('roomForm').innerHTML =
+     /* 워크스페이스 정책 5.1·5.2 — 기본값은 전부 운영룸이고 개발룸이 떼어 온다.
+        개발룸 자원은 최후 후순위라 운영룸이 부족해지면 회수된다 */
+     /* 워크스페이스 정책 5.2 — 회수는 임시 상태이고 작업은 종료가 아니라 지연된다.
+        이 점을 빼면 회수를 데이터가 사라지는 것으로 읽는다 */
+     (isSysWs
+       ? alertBox('info','공용 워크스페이스는 자원을 배정받지 않습니다.',
+           '다른 워크스페이스에 배분하고 남은 자원을 사용합니다. 자원 항목은 상한이 없어 입력받지 않습니다.','',false)
+       /* 지금 입력할 때 필요한 것만 둔다. 회수·지연은 저장한 뒤에 일어나는 일이라
+          개발룸 화면의 자원 카드 툴팁으로 옮겼다 */
+       : alertBox('info','개발룸 자원은 운영룸에서 옮겨 옵니다.',
+       '배정한 만큼 운영룸 한도가 줄어듭니다. 운영 중인 모델이 쓰고 있는 자원은 옮길 수 없습니다.','',false))
+   /* 클러스터는 생성 시 정해지고 바꿀 수 없다. 값만 보인다.
+      섹션 밖에 두면 어느 묶음에 속하는지 알 수 없어 기본 정보로 감싼다 */
+   + '<div class="fsec"><h3>기본 정보</h3>'
+   + row('대상 클러스터'
+       + tip(rcNew? '개발룸을 만들 클러스터입니다. 만든 뒤에는 바꿀 수 없습니다.'
+                  : '개발룸이 만들어진 클러스터입니다. 생성 후에는 바꿀 수 없습니다.'),
+       rcNew,
+       (rcNew
+        ? '<select class="inp" style="max-width:220px"><option>remote-cluster-main</option></select>'
+        : '<span class="rov">remote-cluster-main</span>'))
+   + '</div></div>'
+   + '</div>'
+   /* 신청 폼과 같이 섹션으로 나눈다. 자원과 스토리지·네트워크는 성격이 다르다 */
+   + (isSysWs? '' : '<div class="fsec"><h3>자원</h3>')
+   /* 공용 워크스페이스는 배정 상한이 없어 자원을 입력받지 않는다(8/10 회의 1.3) */
+   /* 만들 때는 쓰고 있는 자원이 없어 하한이 0 이다 */
+   + (isSysWs? '' :
+     rcRow('cpu','CPU','Cores',WSQ.cpu,rcNew?0:ROOM.cpu.use,1,'워크스페이스 할당량에서 옮겨집니다. 남는 만큼이 운영룸 몫입니다.')
+   + rcRow('ram','Memory','Gi',WSQ.ram,rcNew?0:ROOM.ram.use,1,'')
+   /* 가속기는 종류별로 배정한다. 워크스페이스에서 종류별로 나눈 것이
+      개발룸으로 넘어오면서 뭉뚱그려지면 계산이 맞지 않는다(8/10 회의 2.2) */
+   /* vRAM 은 라벨이 아니라 툴팁에 둔다. 라벨 폭(150px)을 넘으면 줄이 바뀌어 행 높이가 갈린다 */
+   + ACC.map(function(g,i){
+       return rcRow('acc_'+g.k, g.n, '장', WSQ.acc[g.k]||0, rcNew?0:g.use, 1,
+                    '한 장당 '+g.vram+'GB.'+(i===0? ' 벤더·유형별로 구분해 배정합니다.' : ''));
+     }).join('') + '</div>')
+   + '<div class="fsec"><h3>스토리지·네트워크</h3>'
+   /* 공유 볼륨은 생성 시에만 정한다(8/12 회의 1.5 `생성 후 변경 불가. 관리자만 설정`).
+      이미 데이터가 쌓인 볼륨을 줄이면 무엇이 사라지는지 화면이 알 수 없다 */
+   + (rcNew
+      ? rcRow('vol','공유 볼륨','GB',WSQ.vol,0,10,'개발룸 멤버가 함께 쓰는 볼륨입니다. 만든 뒤에는 바꿀 수 없습니다.')
+      /* 자원 행(.qrowbox)은 아래에 막대·에러가 붙는 규격이라 읽기 전용 값에 쓰면
+         여백과 밑줄이 남는다. 라벨+본문만 필요한 것은 신청 폼과 같은 .frow 를 쓴다 */
+      : row('공유 볼륨'+tip('개발룸 멤버가 함께 쓰는 볼륨입니다. 생성 시에 정하며 이후에는 바꿀 수 없습니다.'),
+            false, '<span class="rov">'+VOL.shared+' GB</span>'))
+   + row('Egress 허용 도메인'+tip('개발룸에서 접근할 수 있는 외부 주소입니다. 비우면 외부 접근이 차단됩니다.'),
+         false,
+         '<textarea class="inp" rows="2" placeholder="한 줄에 하나씩 입력합니다." oninput="RC.egress=this.value">'+RC.egress+'</textarea>',
+         '비우면 외부 접근이 차단됩니다.')
+   + '</div>';
+  document.getElementById('rcSave').disabled = bad;
+}
+function submitRoomCfg(){
+  if(rcNew){ roomExists=true; }
+  ROOM.cpu.q=parseFloat(RC.cpu)||ROOM.cpu.q;
+  ROOM.ram.q=parseFloat(RC.ram)||ROOM.ram.q;
+  ACC.forEach(function(g){ g.q=parseFloat(RC['acc_'+g.k]); if(isNaN(g.q)) g.q=0; });
+  if(rcNew) VOL.shared=parseFloat(RC.vol)||VOL.shared;
+  ROOM_INFO.egress=RC.egress;
+  closeRoomCfg(); render();
+  /* 워크스페이스 목업과 같은 문구로 둔다. 같은 동작을 두 화면에서 다르게 말하지 않는다 */
+  toast('ok', rcNew? '개발룸 생성을 요청했습니다. 준비가 끝나면 알림으로 안내됩니다.'
+                   : '개발룸 설정을 저장했습니다.');
+}
+
+/* ═══════════ 연장 신청 ═══════════ */
+/* 연장도 결재를 거친다(정책 3.1). 승인자가 판단할 사유를 받고,
+   연장 후 만료일을 계산해 보여준다 — 며칠 늘어나는지 숫자로만 두면 언제까지인지 모른다.
+   ⚠ 연장 가능 기간·횟수 제한은 확인 대상(CDE 정책 9. 4번) */
+let extCur=null, extDays='30', extWhy='';
+function openExt(name){
+  extCur = CDE.find(function(m){ return m.n===name; });
+  if(!extCur) return;
+  extDays=''; extWhy='';
+  document.getElementById('extTarget').textContent = extCur.n;
+  drawExt();
+  document.getElementById('mdExt').classList.add('on');
+}
+function closeExt(){ document.getElementById('mdExt').classList.remove('on'); }
+
+function drawExt(){
+  document.getElementById('extForm').innerHTML =
+     '<dl class="dl">'
+   + '<dt>현재 만료 예정</dt><dd>'+(extCur.until==='—'? '<span class="dash">-</span>' : extCur.until)+'</dd>'
+   + '</dl>'
+   /* 신청 폼과 같은 형식으로 날짜를 받는다. `30일` 은 언제 끝나는지 계산해야 하고
+      프로젝트 마감에 맞추기 어렵다. 기술문서 5.2 도 `만료 시간` 으로 시점을 말한다 */
+   + '<div class="fld" style="margin-top:16px"><label>연장 만료일<span class="req">*</span></label>'
+   /* 현재 만료일 다음 날부터 고를 수 있다. 그 이전은 연장이 아니다 */
+   +   '<input class="inp" type="date" min="'+(extCur.until!=='—'? nextDay(extCur.until) : today())+'" value="'+extDays+'" onchange="extDays=this.value;extValid()">'
+   +   '<div class="hint">현재 만료일보다 뒤여야 합니다.</div></div>'
+   + '<div class="fld" style="margin-top:14px"><label>사유<span class="req">*</span></label>'
+   +   '<textarea class="inp" rows="3" placeholder="연장이 필요한 이유를 입력해 주세요." oninput="extWhy=this.value;extValid()">'+extWhy+'</textarea></div>';
+  extValid();
+}
+function extValid(){
+  const b=document.getElementById('extBtn');
+  if(!b) return;
+  /* 현재 만료일보다 뒤여야 연장이다 */
+  const okDate = extDays && (extCur.until==='—' || extDays>extCur.until);
+  b.disabled = !(okDate && extWhy.trim());
+}
+function submitExt(){
+  closeExt();
+  toast('ok','연장 신청을 접수했습니다. 승인 결과는 알림으로 안내됩니다.');
+}
+
+/* ═══════════ 데이터 가져오기 ═══════════ */
+/* 기술문서 5.3 — 리포지토리 경로와 폴더명을 넣으면 백그라운드로 내려받는다.
+   대상 CDE 하나에 넣는 짧은 입력이라 모달로 둔다(공통정책 4.5).
+   목록에서 대상을 고른 뒤 열므로 대상 선택 드롭다운이 필요 없다 */
+let dlCur=null;
+function canImport(m){ return isMine(m) && m.st==='구동 중'; }
+function openDl(name){
+  dlCur = CDE.find(function(m){ return m.n===name; });
+  if(!dlCur) return;
+  document.getElementById('dlTarget').textContent = dlCur.n;
+  ['dlRepo','dlDir'].forEach(function(id){ document.getElementById(id).value=''; });
+  dlValid();
+  document.getElementById('mdDl').classList.add('on');
+}
+function closeDl(){ document.getElementById('mdDl').classList.remove('on'); }
+
+
+/* 웹 IDE 접속 — 새 탭으로 연다. 로그인 폼을 거치지 않는다(기술문서 2.2 Zero-Login).
+   절전 상태면 접속하면서 깨어나고 작업 상태가 그대로 복원된다(기술문서 5.2).
+   ⚠ 깨어나는 데 걸리는 시간이 확인되지 않았다 — 그동안 무엇을 보일지 정해야 한다 */
+function openIde(name){
+  const m=CDE.find(function(x){ return x.n===name; });
+  if(!m) return;
+  if(m.st==='절전'){
+    toast('ok','절전 상태를 해제하고 있습니다. 준비되면 새 탭으로 열립니다.');
+    return;
+  }
+  act('웹 IDE를 새 탭으로 엽니다.');
+}
+function dlValid(){
+  const r=document.getElementById('dlRepo'), d=document.getElementById('dlDir'), b=document.getElementById('dlBtn');
+  if(!r||!d||!b) return;
+  b.disabled = !(r.value.trim() && d.value.trim());
+}
+function submitDl(){
+  closeDl();
+  toast('ok','데이터 가져오기를 요청했습니다. 공유 볼륨에 내려받으며, 내려받기가 끝나면 알림으로 안내됩니다.');
+}
+
+/* ═══════════ 작업 로그 ═══════════ */
+/* 기술문서 6.2 `아카이브 로그 조회` — 완료 후 S3 에 백업한 로그를 뷰어에서 검색·추적한다.
+   ⚠ 아래 로그 내용은 형태를 보이기 위한 예시다. 실제로는 스크립트 표준 출력에
+     플랫폼 기록이 섞일 수 있고 유형 구분이 오는지도 확인되지 않았다(정책 9. 14번).
+   원문 텍스트로 두면 유형별로 걸러 볼 수 없다. 일시·유형·메시지로 나눠 테이블로 둔다.
+   ⚠ 백엔드가 구조화된 항목으로 내려주는지 확인 대상(정책 확인 항목) */
+function logLines(j){
+  return j.err
+    ? [['2026-08-19 14:02:03','정보','작업을 시작합니다.'],
+       ['2026-08-19 14:02:41','정보','데이터셋을 불러옵니다. 12,480건'],
+       ['2026-08-19 14:03:55','경고','가속기 메모리 사용률이 94%입니다.'],
+       ['2026-08-19 14:04:02','오류',j.err],
+       ['2026-08-19 14:04:02','오류','작업을 중단합니다.']]
+    : [['2026-08-20 09:12:03','정보','작업을 시작합니다.'],
+       ['2026-08-20 09:12:41','정보','데이터셋을 불러옵니다. 12,480건'],
+       ['2026-08-20 09:20:11','정보','1 에폭을 마쳤습니다.'],
+       ['2026-08-20 10:38:19','정보','작업을 완료했습니다.']];
+}
+const LGB={'정보':'mu','경고':'wa','오류':'cr'};
+let logCur=null, logLv=[], logTmp=[], logQ='';
+/* ===== 작업 상세 WKSP-CDE-D01.D02 ===== */
+let jdCur=null;
+
+function openJob(id){
+  jdCur = JOBS.find(function(x){ return x.id===id; });
+  if(!jdCur) return;
+  document.getElementById('pgList').style.display='none';
+  document.getElementById('pgJob').style.display='';
+  drawJobDetail(); syncBc(); window.scrollTo(0,0);
+}
+function closeJob(){
+  jdCur=null;
+  document.getElementById('pgJob').style.display='none';
+  document.getElementById('pgList').style.display='';
+  syncBc(); window.scrollTo(0,0);
+}
+
+/* 지표 추이 — 값을 선으로만 그린다. 축·눈금 규격은 확인 대상이라 지금은 흐름만 보인다 */
+function spark(vals, lo, hi){
+  if(!vals || !vals.length) return '';
+  const w=300, h=56, n=vals.length;
+  const min = (lo!=null)? lo : Math.min.apply(null, vals);
+  const max = (hi!=null)? hi : Math.max.apply(null, vals);
+  const sp = (max-min)||1;
+  const pts = vals.map(function(v,i){
+    return (i*(w/((n-1)||1))).toFixed(1)+','+(h-(v-min)/sp*h).toFixed(1);
+  }).join(' ');
+  return '<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" style="width:200px;height:40px;vertical-align:middle;margin-right:10px">'
+    + '<polyline fill="none" stroke="var(--primary)" stroke-width="2" points="'+pts+'"/></svg>';
+}
+
+function drawJobDetail(){
+  const j=jdCur; if(!j) return;
+  document.getElementById('jdTitle').textContent = j.id;
+  const running = (j.st==='실행 중' || j.st==='대기');
+
+  /* 실행 중이면 중단, 끝났으면 산출물 등록이 주 액션이다.
+     파괴적 액션은 외곽선으로 두고 확인 알럿의 최종 실행만 채운다 */
+  document.getElementById('jdAct').innerHTML =
+      (running ? '<button class="btn danger-line" onclick="askCancelJob(\''+j.id+'\')">작업 중단</button>' : '')
+    + ((!running && j.out) ? '<button class="btn" onclick="toModel()">모델로 등록</button>' : '')
+    + ((j.st==='실패' || j.st==='완료') ? '<button class="btn ghost" onclick="openLog(\''+j.id+'\')">로그 보기</button>' : '');
+
+  let h='';
+  /* .dl.two 는 4열 그리드다. 항목이 홀수면 마지막 행이 한쪽만 차 비뚤어지므로 짝수로 맞춘다 */
+  h += '<div class="dsec"><h4>기본 정보</h4><dl class="dl two">'
+    + '<dt>상태</dt><dd><span class="stbadge '+(JB[j.st]||'mu')+'">'+j.st+'</span></dd>'
+    + '<dt>유형</dt><dd>'+j.t+'</dd>'
+    + '<dt>제출자</dt><dd>'+userRef(j.u)+'</dd>'
+    + '<dt>CDE</dt><dd>'+(j.cde? j.cde : '<span class="dash">반납됨</span>')+'</dd>'
+    + '<dt>제출 일시</dt><dd>'+j.at+'</dd>'
+    + '<dt>실행 시간</dt><dd>'+(j.dur!=='-'? j.dur : '<span class="dash">-</span>')+'</dd>'
+    + '<dt>자원</dt><dd>'+(j.gpu? '가속기 '+j.gpu+' \u00b7 ' : '')+j.disk+' GB</dd>'
+    + '<dt></dt><dd></dd>'
+    + '</dl>'
+    + (j.err? '<div class="secnote">'+j.err+'</div>' : '')
+    + '</div>';
+
+  h += '<div class="dsec"><h4>사전 진단'+tip('작업을 제출할 때 요청한 자원으로 실행할 수 있는지 확인한 결과입니다.')+'</h4>';
+  if(j.chk){
+    h += '<dl class="dl">'
+      + '<dt>판정</dt><dd><span class="stbadge '+(j.chk.r==='통과'?'ok':(j.chk.r==='차단'?'cr':'wa'))+'">'+j.chk.r+'</span></dd>'
+      + '<dt>사유</dt><dd>'+j.chk.why+'</dd>'
+      + '<dt>추천 자원</dt><dd>'+(j.chk.rec || '<span class="dash">-</span>')+'</dd>'
+      + '</dl>';
+  } else { h += '<p class="secnote">진단 결과가 없습니다.</p>'; }
+  h += '</div>';
+
+  h += '<div class="dsec"><h4>학습 지표'+tip('학습 중 기록한 값입니다. 어떤 값을 남길지는 작업 스크립트가 정합니다.')+'</h4>';
+  if(j.mt){
+    /* 차트가 들어가 2열로는 좁다. 1열로 둔다 */
+    h += '<dl class="dl">'
+      + '<dt>Loss</dt><dd>'+spark(j.mt.loss)+'<span class="num">'+j.mt.loss[j.mt.loss.length-1].toFixed(2)+'</span></dd>'
+      + '<dt>Accuracy</dt><dd>'+spark(j.mt.acc,0,1)+'<span class="num">'+(j.mt.acc[j.mt.acc.length-1]*100).toFixed(0)+'%</span></dd>'
+      + '</dl>';
+  } else { h += '<p class="secnote">기록된 지표가 없습니다.</p>'; }
+  h += '</div>';
+
+  h += '<div class="dsec"><h4>산출물</h4>';
+  if(j.out){
+    h += '<dl class="dl">'
+      + '<dt>경로</dt><dd class="num">'+j.out.path+'</dd>'
+      + '<dt>용량</dt><dd>'+j.out.size+'</dd>'
+      + '<dt>형식</dt><dd>'+j.out.kind+'</dd>'
+      + '</dl>';
+  } else { h += '<p class="secnote">'+(running? '작업이 끝나면 표시됩니다.' : '남은 산출물이 없습니다.')+'</p>'; }
+  h += '</div>';
+
+  document.getElementById('jdBody').innerHTML=h;
+}
+
+/* 산출물을 모델로 등록한다(통합기능명세서 18 휴먼인더루프).
+   모델 화면의 등록 모달이 산출물 경로가 채워진 상태로 열린다(모델 기획서 REQ-MODEL-062).
+   ⚠ 산출물이 S3 인지 CDE 볼륨인지에 따라 등록 소스가 갈린다 — 확인 대상(5.3 C-13) */
+function toModel(){
+  if(!jdCur || !jdCur.out) return;
+  act('모델 등록 화면으로 이동합니다. 소스 경로가 ' + jdCur.out.path + ' 로 채워진 상태로 열립니다.');
+}
+
+/* 기술문서 6.2 — 스크립트 오류나 오동작이 감지되면 강제 취소한다.
+   되돌릴 수 없고 그때까지 쓴 자원도 돌아오지 않아 확인을 받는다 */
+function askCancelJob(id){
+  const j=JOBS.find(function(x){ return x.id===id; });
+  if(!j) return;
+  openConfirm('작업 중단',
+    '<b>'+j.id+'</b> 을 중단합니다. 지금까지 진행한 연산은 저장되지 않습니다.',
+    function(){ toast('ok','작업 중단을 요청했습니다. 중단되면 상태가 중단됨으로 바뀝니다.'); }, '중단하기');
+}
+function openLog(id){
+  logCur=JOBS.find(function(x){ return x.id===id; });
+  if(!logCur) return;
+  logLv=[]; logTmp=[]; logQ='';
+  const el=document.getElementById('lq'); if(el) el.value='';
+  const cl=document.getElementById('lqclr'); if(cl) cl.hidden=true;
+  /* 제목이 작업을 가리키고 부제가 나머지를 설명한다.
+     값만 가운뎃점으로 늘어놓으면 무엇이 무엇인지 읽는 사람이 맞춰야 한다 */
+  document.getElementById('logTitle').textContent = logCur.id;
+  document.getElementById('logTarget').innerHTML =
+    '<dl class="dl two">'
+    + '<dt>유형</dt><dd>'+logCur.t+'</dd>'
+    + '<dt>제출자</dt><dd>'+userRef(logCur.u)+'</dd>'
+    /* CDE 를 반납해도 작업 기록은 남는다. 어디서 돌린 것인지 연결을 남긴다 */
+    + '<dt>CDE</dt><dd>'+(logCur.cde? logCur.cde : '<span class="dash">반납됨</span>')+'</dd>'
+    + '<dt>제출 시각</dt><dd>'+logCur.at+'</dd>'
+    + '</dl>';
+  drawLog();
+  document.getElementById('mdLog').classList.add('on');
+}
+function tgLogLv(v){
+  const i=logLv.indexOf(v);
+  if(i<0) logLv.push(v); else logLv.splice(i,1);
+  drawLog();
+}
+/* 목록 규격을 따른다 — 검색(3.3) + 헤더 필터(3.2) + 페이지네이션(3.7).
+   로그라고 다르게 두면 같은 제품 안에서 규칙이 갈린다 */
+function logBase(){
+  const q=logQ.trim().toLowerCase();
+  return logLines(logCur).filter(function(r){
+    return !q || r[2].toLowerCase().indexOf(q)>=0 || r[0].indexOf(q)>=0;
+  });
+}
+function logFilter(){
+  const all=logBase();
+  const opts=['정보','경고','오류'].filter(function(o){
+    return all.some(function(r){ return r[1]===o; });
+  });
+  return '<span class="thwrap">유형'
+   + '<button class="thfilter'+(logLv.length?' on':'')+'" onclick="tgLdd(event)" title="필터">'
+   + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button></span>'
+   + '<div class="fdd" onclick="event.stopPropagation()">'
+   + '<label><input type="checkbox" '+(logLv.length===0?'checked':'')+' onchange="lPickAll()">전체<span class="fc">'+all.length+'</span></label><hr>'
+   + opts.map(function(o){
+       const c=all.filter(function(r){ return r[1]===o; }).length;
+       return '<label><input type="checkbox" '+(logTmp.indexOf(o)>=0?'checked':'')
+        + ' onchange="lPick(\''+o+'\',this.checked)">'+o+'<span class="fc">'+c+'</span></label>';
+     }).join('')
+   + '<div class="fddfoot"><button class="lvclr" onclick="lReset()">초기화</button>'
+   + '<button class="btn sm" onclick="lApply()">적용</button></div>'
+   + '</div>';
+}
+function tgLdd(e){
+  e.stopPropagation();
+  const th=e.target.closest('th');
+  const o=th.classList.contains('fdd-on');
+  document.querySelectorAll('th').forEach(function(x){ x.classList.remove('fdd-on'); });
+  if(!o){ logTmp=logLv.slice(); th.classList.add('fdd-on'); }
+}
+function lPick(v,on){
+  const i=logTmp.indexOf(v);
+  if(on && i<0) logTmp.push(v);
+  if(!on && i>=0) logTmp.splice(i,1);
+}
+function lPickAll(){
+  logTmp=[];
+  const th=document.querySelector('th.fdd-on');
+  if(th) th.querySelectorAll('.fdd label input').forEach(function(cb,i){ cb.checked=(i===0); });
+}
+function lApply(){
+  const all=logBase();
+  const opts=['정보','경고','오류'].filter(function(o){
+    return all.some(function(r){ return r[1]===o; });
+  });
+  let v=logTmp.slice();
+  if(v.length===opts.length) v=[];
+  logLv=v;
+  document.querySelectorAll('th').forEach(function(x){ x.classList.remove('fdd-on'); });
+  drawLog();
+}
+/* 검색은 Enter 로 실행한다. 목록과 같은 규격이다 */
+function onLogKey(e){
+  if(e.key==='Enter'){
+    logQ=e.target.value.trim();
+    document.getElementById('lqclr').hidden=!logQ;
+    drawLog();
+  }
+}
+/* 검색어만 지운다. 조건 초기화(검색어+필터)는 별도 버튼이라 범위가 갈린다 */
+function clearLogQ(){
+  document.getElementById('lq').value=''; logQ='';
+  document.getElementById('lqclr').hidden=true;
+  drawLog();
+}
+function lReset(){
+  logQ=''; logTmp=[]; logLv=[];
+  const el=document.getElementById('lq'); if(el) el.value='';
+  const cl=document.getElementById('lqclr'); if(cl) cl.hidden=true;
+  document.querySelectorAll('th').forEach(function(x){ x.classList.remove('fdd-on'); });
+  drawLog();
+}
+function closeLog(){ document.getElementById('mdLog').classList.remove('on'); }
+function drawLog(){
+  const rows=logBase().filter(function(r){
+    return !logLv.length || logLv.indexOf(r[1])>=0;
+  });
+  document.getElementById('logBody').innerHTML =
+    (rows.length
+       ? '<div class="tblwrap"><table class="tbl logtbl"><thead><tr>'
+         + '<th style="width:150px">일시</th>'
+         + '<th class="thcell" style="width:88px">'+logFilter()+'</th>'
+         + '<th>메시지</th>'
+         + '</tr></thead><tbody>'
+         + rows.map(function(r){
+             return '<tr><td class="num">'+r[0]+'</td>'
+              + '<td><span class="stbadge '+(LGB[r[1]]||'mu')+'">'+r[1]+'</span></td>'
+              + '<td>'+r[2]+'</td></tr>';
+           }).join('')
+         + '</tbody></table></div>'
+         + '<div class="pager"><span>총 '+rows.length+'건</span>'
+         + '<div style="display:flex;align-items:center;gap:14px">'
+         +   '<div class="pgnum"><button disabled aria-label="이전">‹</button>'
+         +     '<input class="pgin" value="1"><span class="pgtot">/ <span>1</span></span>'
+         +     '<button disabled aria-label="다음">›</button></div>'
+         +   '<select class="sel" style="padding:7px 10px"><option>20개씩 보기</option><option>50개씩 보기</option><option>100개씩 보기</option></select>'
+         + '</div></div>'
+       : '<div class="state"><h3>'
+         + ((logQ||logLv.length)? '검색 결과가 없습니다.' : '기록된 로그가 없습니다.')+'</h3>'
+         + ((logQ||logLv.length)
+            ? '<p>다른 조건으로 검색해 주세요.</p>'
+              + '<button class="btn ghost" onclick="lReset()">조건 초기화</button>'
+            : '')
+         + '</div>');
+}
+
+
+/* ═══════════ 상세 패널 ═══════════ */
+function openPanel(i){
+  const m=CDE[i]; cur={m};
+  document.getElementById('panel').classList.add('on');
+  document.getElementById('pnbg').classList.add('on');
+  document.getElementById('pnName').textContent=m.n;
+  document.getElementById('pnTags').innerHTML =
+    '<span class="stbadge '+(SB[m.st]||'mu')+'">'+m.st+'</span>'
+;
+  document.getElementById('pnMore').style.display = rowMenu(m,'p')?'':'none';
+  document.getElementById('pnMenu').innerHTML = (function(){
+    const html=rowMenu(m,'p'); const s=html.indexOf('<div class="rowmenu">');
+    return s<0?'':html.slice(s+21, html.lastIndexOf('</div></div>'));
+  })();
+
+  let h='';
+  /* 성격으로 나눈다 — 귀속 / 신청·승인 기록 / 환경 / 자원 / 볼륨.
+     신청과 승인은 한 건에 대한 이력이라 한 섹션에 둔다. 승인 전에는 뒤 두 항목이
+     없을 뿐 섹션 구성은 그대로다 — 나누면 화면마다 섹션 수가 달라진다 */
+  h+=sec('기본 정보',
+    '<dl class="dl">'
+    + '<dt>사용자</dt><dd>'+userRef(m.by+'('+m.id+')')+'</dd>'
+    + '<dt>만료 예정'+help('exp')+'</dt><dd>'+m.until+'</dd>'
+    + '</dl>', 'basic');
+
+  h+=sec('신청 정보',
+    '<dl class="dl">'
+    + '<dt>신청일시</dt><dd>'+m.at+'</dd>'
+    + '<dt>신청 사유</dt><dd>'+m.reason+'</dd>'
+    /* 승인 전에는 승인 기록이 없다 */
+    + (m.apBy
+       ? '<dt>승인자</dt><dd>'+m.apBy+'</dd>'
+         + '<dt>승인일시</dt><dd>'+m.apAt+'</dd>'
+       : '')
+    + '</dl>', 'req');
+
+  h+=sec('환경',
+    '<dl class="dl">'
+    + '<dt>IDE 유형</dt><dd>'+m.ide+'</dd>'
+    + '<dt>이미지 태그</dt><dd>'+m.fw+'</dd>'
+    + '<dt>실행 방식'+help('mode')+'</dt><dd>'+m.mode+'</dd>'
+    + '</dl>', 'env');
+
+  h+=sec('자원',
+    '<dl class="dl">'
+    + '<dt>CPU</dt><dd>'+m.cpu+' Cores</dd>'
+    + '<dt>Memory</dt><dd>'+m.ram+' Gi</dd>'
+    /* 종류를 함께 보인다. 개수만으로는 어느 장비인지 알 수 없다 */
+    + '<dt>가속기</dt><dd>'+(m.gpu? (m.acc? m.acc+' '+m.gpu+'장' : m.gpu+'장') : '<span class="dash">-</span>')+'</dd>'
+    /* 볼륨도 자원이라 같은 섹션에 둔다 */
+    + '<dt>개인 볼륨</dt><dd>'+m.vol+' GB</dd>'
+    + '<dt>공유 볼륨</dt><dd>'+VOL.shared+' GB <span style="color:var(--faint)">· 개발룸 공용</span></dd>'
+    + '</dl>'
+    + (m.mode==='위임 할당'
+        ? '<div class="secnote">위임 할당은 작업을 실행할 때만 가속기를 사용합니다. 쉬는 동안에는 다른 사용자가 쓸 수 있습니다.</div>'
+        : '<div class="secnote">직접 할당은 기동한 동안 가속기를 계속 점유합니다.</div>'), 'res');
+
+
+
+  /* 버튼을 늘 두고 비활성으로 막는다. 없애면 왜 못 하는지 알 수 없다 */
+  h+='<div class="pact" style="display:flex;margin-top:16px">'
+   + btnL('웹 IDE 접속', canAccess(m), 'openIde(\''+m.n+'\')', blockMsg(m))
+   + '</div>';
+  document.getElementById('pnBody').innerHTML=h;
+}
+function btnL(label, ok, fn, why){
+  return '<button class="btn"'+(ok?' onclick="'+fn+'"':' disabled title="'+why+'"')+'>'+label+'</button>';
+}
+function closePanel(){
+  document.getElementById('panel').classList.remove('on');
+  document.getElementById('pnbg').classList.remove('on');
+  cur=null;
+}
+
+/* ═══════════ 신청 폼 WKSP-CDE-F01 ═══════════ */
+const NF={ acc:'NVIDIA H200', ip:'', exp:'',ide:'JupyterLab', fw:'PyTorch 2.4', mode:'위임 할당', cpu:'4', ram:'16', gpu:'0', vol:'20', days:'30', reason:''};
+/* 지난 날짜를 고를 수 없게 막는다. 신청일 이전 만료는 성립하지 않는다 */
+function today(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function nextDay(ymd){
+  const d=new Date(ymd+'T00:00:00');
+  d.setDate(d.getDate()+1);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+/* 작성 중 이탈 판정 — 열 때의 값과 비교한다(공통정책 7.2) */
+let nfInit='';
+function nfSnap(){ return JSON.stringify(NF); }
+function nfDirty(){ return nfSnap()!==nfInit; }
+/* 취소·뒤로가기·브레드크럼 어디로 나가든 같은 확인을 거친다 */
+function cancelForm(){
+  if(nfDirty()){
+    openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.',
+      function(){ closeForm(); }, '취소', '', '계속 작성');
+    return;
+  }
+  closeForm();
+}
+function openForm(){
+  if(jdCur) closeJob();
+  formOpen=true; nfInit=nfSnap();
+  document.getElementById('pgList').style.display='none';
+  document.getElementById('pgForm').style.display='';
+  syncBc();
+  drawForm(); window.scrollTo(0,0);
+}
+function closeForm(){
+  formOpen=false;
+  document.getElementById('pgForm').style.display='none';
+  document.getElementById('pgList').style.display='';
+  syncBc();
+}
+/* 가속기 상한은 고른 종류의 잔여다. 전체 합계로 두면 없는 장비를 신청하게 된다 */
+function accFree(){
+  const g=ACC.find(function(x){ return x.n===NF.acc; });
+  return g? g.q-g.use : 0;
+}
+function drawForm(){
+  const freeC=ROOM.cpu.q-ROOM.cpu.use, freeR=ROOM.ram.q-ROOM.ram.use, freeG=accFree();
+  let h='';
+  h+='<div class="fsec"><h3>환경</h3>'
+   + row('IDE 유형', true, seg('ide',['JupyterLab','VS Code Web']), '')
+   /* ⚠ 기술문서에는 CDE 이미지가 기본·최신 두 벌로 있고 CUDA·Python·PyTorch 버전이
+      함께 묶여 있다. 프레임워크 하나를 고르는 구조가 맞는지, TensorFlow·JAX 를
+      제공하는지 확인 대상(정책 9. 15번) */
+   + row('이미지 태그', true, sel('fw',['PyTorch 2.4','TensorFlow 2.16','JAX 0.4']), '')
+   /* 내부 명칭(delegated·direct)은 노출하지 않는다(공통정책 7.9) */
+   + row('실행 방식', true, seg('mode',['위임 할당','직접 할당']),
+       NF.mode==='위임 할당'
+         ? '작업을 실행할 때만 가속기를 사용합니다. 쉬는 동안에는 다른 사용자가 쓸 수 있습니다.'
+         : '기동한 동안 가속기를 계속 점유합니다. 상시 연산이 필요할 때 선택합니다.')
+   + '</div>';
+
+  h+='<div class="fsec"><h3>자원</h3>'
+   /* 공용 워크스페이스는 배정 상한이 없어 승인 시점의 잔여에 따라 갈린다 */
+   + (isSysWs? '<div class="secnote" style="margin-bottom:14px">공용 워크스페이스는 다른 워크스페이스에 배분하고 남은 자원을 사용합니다. 잔여에 따라 기동이 지연될 수 있습니다.</div>' : '')
+   /* 사용 중 수치를 두지 않는다. 신청자는 얼마를 쓸 수 있는지만 알면 되고
+      그건 `배분 가능` 이 알린다. 하한이 걸리는 개발룸 설정에서만 사용 중을 보인다 */
+   + qrow('cpu','CPU','Cores',freeC,0.5,'0.5 단위로 지정할 수 있습니다.')
+   /* ⚠ 단위가 확정되지 않았다. 현행이 GiB·Gi·GB 를 섞어 쓴다 — 확인 대상(정책 9. 23번).
+      쿠버네티스에 그대로 넘어가는 값이라 Gi 로 둔다 */
+   + qrow('ram','Memory','Gi',freeR,1,'')
+   /* 종류를 먼저 고른다. 종류마다 잔여가 달라 개수 상한이 정해지지 않는다 */
+   /* 모델명에 vRAM 을 붙인다. 워크스페이스 목업과 같은 규격이고
+      한 장당 용량을 알아야 몇 장이 필요한지 정해진다(8/10 회의 2.2) */
+   + row('가속기 유형', true,
+       sel('acc', ACC.map(function(g){ return g.n; }), ACC.map(function(g){ return g.n+' '+g.vram+'GB'; })),
+       '개발룸에 배정된 가속기 중에서 고릅니다.')
+   + qrow('gpu','가속기','장',freeG,1,'')
+   + '</div>';
+
+  /* 공유 볼륨은 관리자가 개발룸 설정에서 정한다. 신청 화면에서는 조정할 수 없다 */
+  const volFree = VOL.total - VOL.shared - VOL.used;
+  h+='<div class="fsec"><h3>볼륨</h3>'
+   /* 정책 5.2 — 볼륨은 워크스페이스 전체 → 개발룸 공유 → CDE 개인 3 단계다 */
+   + qrow('vol','개인 볼륨','GB',volFree,10,'이 CDE 만 쓰는 볼륨입니다. 공유 볼륨을 뺀 나머지에서 할당됩니다.')
+   /* 공유 볼륨은 신청 시 조정할 수 없다. 8/10 회의 4.3 이 `개발환경 신청 시에도 조정` 으로
+      정했으나 8/12 회의 1.5 가 `생성 후 변경 불가. 관리자만 설정` 으로 뒤집었다 */
+   + row('공유 볼륨', false,
+       '<div class="rov">'+VOL.shared+' GB<span>개발룸 공용</span></div>',
+       '관리자가 개발룸 설정에서 정합니다. 신청 시 조정할 수 없습니다.')
+   + '</div>';
+
+  /* 기술문서 5.3 — CDE 생성 시 접속을 허용할 IP 대역(CIDR)을 설정한다.
+     비우면 제한하지 않는다 */
+  h+='<div class="fsec"><h3>접근 제한</h3>'
+   + row('접근 허용 IP', false,
+       '<input class="inp" value="'+(NF.ip||'')+'" placeholder="10.20.0.0/16" oninput="NF.ip=this.value">',
+       '지정한 대역에서만 이 CDE에 접속할 수 있습니다. 비우면 제한하지 않습니다.')
+   + '</div>';
+
+  /* 워크스페이스 목업 CDE 폼과 같은 섹션명·구성이다 */
+  h+='<div class="fsec"><h3>사용 기간</h3>'
+   /* 날짜로 받는다. `30일` 은 언제 끝나는지 계산해야 하고 프로젝트 마감에 맞추기 어렵다.
+      기술문서 5.2 도 `최대 사용 기간(만료 시간)` 으로 시점을 말한다.
+      연장 신청도 같은 형식이라 맞춘다 */
+   + row('사용 만료일', true,
+       '<input class="inp" type="date" min="'+today()+'" value="'+(NF.exp||'')+'" onchange="NF.exp=this.value;validate()">',
+       '이 날짜가 지나면 연산 자원이 회수됩니다. 저장된 데이터는 유지됩니다.')
+   + row('요청 사유', true,
+       '<textarea class="inp" rows="3" placeholder="승인 판단에 필요한 내용을 입력해 주세요." oninput="NF.reason=this.value;validate()">'+NF.reason+'</textarea>', '')
+   + '</div>';
+
+  h+=alertBox('info','',
+    '신청하면 워크스페이스 관리자 승인 후 CDE가 만들어집니다. 승인 시점에 개발룸 자원이 남아 있지 않으면 반려될 수 있습니다.','',false);
+
+  document.getElementById('formBody').innerHTML=h;
+  validate();
+}
+function row(label, req, body, note){
+  return '<div class="frow"><label class="flb">'+label+(req?'<span class="req">*</span>':'')+'</label>'
+   + '<div class="fbd">'+body+(note?'<div class="fnote">'+note+'</div>':'')+'</div></div>';
+}
+function seg(k,opts){
+  return '<div class="seg">'+opts.map(function(o){
+    return '<button type="button" class="'+(NF[k]===o?'on':'')+'" onclick="NF.'+k+'=\''+o+'\';drawForm()">'+o+'</button>';
+  }).join('')+'</div>';
+}
+/* 비활성 가능한 드롭다운. 조건이 안 되면 숨기지 않고 막아 둔다 */
+function selOff(k,opts,off){
+  return '<select class="inp"'+(off?' disabled':'')+' onchange="NF.'+k+'=this.value;drawForm()">'
+   + opts.map(function(o){ return '<option'+(NF[k]===o?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>';
+}
+/* labels 를 주면 값과 표시를 나눈다. 가속기는 값이 모델명이고 표시는 vRAM 병기다 */
+function sel(k,opts,labels){
+  return '<select class="inp" onchange="NF.'+k+'=this.value;drawForm()">'
+   + opts.map(function(o,i){ return '<option value="'+o+'"'+(NF[k]===o?' selected':'')+'>'
+       +((labels&&labels[i])||o)+'</option>'; }).join('')+'</select>';
+}
+/* 워크스페이스 목업과 같은 규격 — .stbtn 클래스와 SVG 아이콘. 한도에 닿으면 비활성 */
+function qBtn(k,delta,step,cap){
+  const v=parseFloat(NF[k])||0;
+  const off=(delta<0 && v<=0) || (delta>0 && v>=cap);
+  return '<button class="stbtn"'+(off?' disabled':'')+' onclick="stepQ(\''+k+'\','+(delta*step)+','+cap+')" tabindex="-1" aria-label="'+(delta>0?'늘리기':'줄이기')+'">'
+   + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">'
+   + (delta>0?'<path d="M12 5v14M5 12h14"/>':'<path d="M5 12h14"/>')+'</svg></button>';
+}
+/* 사용 중·근거 수치는 툴팁에 둔다. 워크스페이스 목업과 같은 방식이다.
+   ⚠ 증가 단위는 CPU 0.5 만 근거가 있다(8/10 회의). Memory·볼륨은 확인 대상(정책 9. 17번) */
+function qrow(k,label,unit,cap,step,desc){
+  const v=parseFloat(NF[k])||0, over=v>cap;
+  return '<div class="frow"><label class="flb">'+label+'<span class="req">*</span>'+(desc?tip(desc):'')+'</label>'
+   + '<div class="fbd"><div class="qline">'
+   +   '<span class="stepper'+(over?' err':'')+'">'
+   +     qBtn(k,-1,step,cap)
+   +     '<span class="stfield"><input class="inp" value="'+NF[k]+'" inputmode="'+(unit==='Cores'?'decimal':'numeric')+'" oninput="NF.'+k+'=this.value;drawForm()"><span class="stunit">'+unit+'</span></span>'
+   +     qBtn(k,1,step,cap)
+   +   '</span>'
+   /* 소수는 한 자리까지만 보인다. CPU 는 0.5 단위라 값이 길어진다 */
+   +   '<span class="qrcap">배분 가능 '+cap.toFixed(cap%1?1:0)+'</span>'
+   + '</div>'
+   + (over?'<div class="errmsg" style="display:block">배분 가능한 최대는 '+cap.toFixed(cap%1?1:0)+' '+unit+'입니다.</div>':'')
+   + '</div></div>';
+}
+function stepQ(k,d,cap){
+  let v=(parseFloat(NF[k])||0)+d;
+  if(v<0) v=0; if(v>cap) v=cap;
+  NF[k]=String(Math.round(v*10)/10); drawForm();
+}
+function validate(){
+  const freeC=ROOM.cpu.q-ROOM.cpu.use, freeR=ROOM.ram.q-ROOM.ram.use, freeG=accFree();
+  const freeV=VOL.total-VOL.shared-VOL.used;
+  /* 만료일은 필수이고 오늘보다 앞설 수 없다 */
+  const ok = NF.reason.trim().length>0
+    && !!NF.exp && NF.exp>=today()
+    && (parseFloat(NF.cpu)||0)>0 && (parseFloat(NF.cpu)||0)<=freeC
+    && (parseFloat(NF.ram)||0)>0 && (parseFloat(NF.ram)||0)<=freeR
+    && (parseFloat(NF.gpu)||0)<=freeG
+    && (parseFloat(NF.vol)||0)>0 && (parseFloat(NF.vol)||0)<=freeV;
+  document.getElementById('fSubmit').disabled=!ok;
+}
+function submitForm(){
+  CDE.unshift({n:ME.split('.')[0]+'-new-01', by:'성유진', id:ME, st:'승인 대기',
+    ide:NF.ide, fw:NF.fw, mode:NF.mode, cpu:+NF.cpu, ram:+NF.ram, gpu:+NF.gpu,
+    vol:+NF.vol,
+    at:'2026-08-12 10:00:00', until:'2026-09-11', reason:NF.reason});
+  closeForm(); render();
+  toast('ok','CDE 신청을 접수했습니다. 승인 결과는 알림으로 안내됩니다.');
+}
+
+/* ═══════════ 액션 ═══════════ */
+function askReturn(name){
+  const t=CDE.find(x=>x.n===name);
+  /* 실패·만료는 이미 자원이 없다. 반납이 아니라 목록에서 치우는 것이라 문구를 나눈다 */
+  if(t && (t.st==='실패' || t.st==='만료')){
+    openConfirm('CDE 삭제',
+      '<b>'+name+'</b>을 삭제합니다. 자원은 이미 회수되었고 개인 볼륨이 함께 사라집니다. 공유 볼륨의 데이터는 남습니다.',
+      function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료'; render(); }
+        toast('ok','CDE를 삭제했습니다.'); }, '삭제');
+    return;
+  }
+  openConfirm('CDE 반납',
+    '<b>'+name+'</b>을 반납합니다. 연산 자원이 개발룸으로 반환되고 개인 볼륨이 삭제됩니다. 공유 볼륨의 데이터는 남습니다.',
+    /* 파드를 내리는 데 시간이 걸린다. 바로 종료로 넘기면 요청과 완료가 구분되지 않는다 */
+    function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료 중'; render(); }
+      toast('ok','CDE 반납을 요청했습니다. 자원 회수가 끝나면 알림으로 안내됩니다.'); }, '반납');
+}
+function askRevoke(name){
+  /* 회수는 남의 것을 지운다. 개인 볼륨이 함께 사라지므로 반납과 같이 밝힌다(회의 3.3) */
+  openConfirm('CDE 회수',
+    '<b>'+name+'</b>을 회수합니다. 연산 자원이 개발룸으로 반환되고 개인 볼륨이 삭제됩니다. 공유 볼륨의 데이터는 남습니다. 사용자에게 알림이 전송됩니다.',
+    function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료 중'; render(); }
+      toast('ok','CDE 회수를 요청했습니다. 자원 회수가 끝나면 알림으로 안내됩니다.'); }, '회수');
+}
+/* 조사 — 받침 유무로 고른다. 영문·숫자로 끝나면 발음 기준으로 판정한다 */
+function hasJong(w){
+  if(!w) return false;
+  const c=w[w.length-1], code=c.charCodeAt(0);
+  if(code>=0xAC00 && code<=0xD7A3) return (code-0xAC00)%28!==0;
+  if(/[a-z]/i.test(c)){
+    const t=w.slice(-2).toLowerCase();
+    if(t==='ch'||t==='sh') return false;
+    return 'aeiouy'.indexOf(c.toLowerCase())<0;
+  }
+  if(/[0-9]/.test(c)) return '0136780'.indexOf(c)>=0;
+  return false;
+}
+function jo(w,type){
+  const P={'을':['을','를'],'이':['이','가'],'은':['은','는']};
+  return P[type][hasJong(w)?0:1];
+}
+/* confirmName — 값이 있으면 그 이름을 다시 입력해야 실행 버튼이 활성화된다(공통정책 7.5) */
+let cfExpect='';
+/* cancelLabel — 작성 취소 알럿은 `계속 작성` 으로 둔다(공통정책 7.2).
+   기본은 `취소` 다 */
+function openConfirm(title, body, onOk, okLabel, confirmName, cancelLabel){
+  document.getElementById('cfTitle').textContent=title;
+  document.getElementById('cfBody').innerHTML=body;
+  document.getElementById('cfFoot').innerHTML =
+    '<button class="btn ghost" onclick="closeConfirm()">'+(cancelLabel||'취소')+'</button>'
+    + (onOk?'<button class="btn danger" id="cfOk">'+(okLabel||'확인')+'</button>':'');
+  const ok=document.getElementById('cfOk');
+  if(ok) ok.onclick=function(){ closeConfirm(); if(onOk) onOk(); };
+
+  cfExpect = confirmName || '';
+  const wrap=document.getElementById('cfNameWrap'), inp=document.getElementById('cfName');
+  wrap.style.display = cfExpect? '' : 'none';
+  inp.value='';
+  if(cfExpect && ok){
+    document.getElementById('cfNameLb').innerHTML='확인을 위해 <b>'+cfExpect+'</b>'+jo(cfExpect,'을')+' 입력해 주세요.';
+    ok.disabled=true;
+    setTimeout(function(){ inp.focus(); },60);
+  }
+  document.getElementById('mdConfirm').classList.add('on');
+}
+function cfCheck(){
+  const ok=document.getElementById('cfOk'); if(!ok) return;
+  ok.disabled = document.getElementById('cfName').value.trim()!==cfExpect;
+}
+function closeConfirm(){ document.getElementById('mdConfirm').classList.remove('on'); }
+function act(msg){ closeAllMore(); toast('ok',msg); }
+
+/* ═══════════ 공통 ═══════════ */
+const COLDEF={
+  /* ⚠ 만료 처리 시각이 확정되지 않았다. 만료일 자정으로 두고 확인 대상으로 남긴다(정책 9. 16번) */
+  exp:'사용 기간이 끝나는 날입니다. 이 날짜가 지나면 연산 자원이 회수되며 저장된 데이터는 유지됩니다.',
+  /* 배치 작업 상태 — 기술문서 6.2 Pending / Running / Succeeded / Failed */
+  jst:'CDE 터미널에서 제출한 작업의 진행 단계입니다.<dl>'
+     +'<dt>대기</dt><dd>자원을 기다리고 있습니다.</dd>'
+     +'<dt>실행 중</dt><dd>연산을 수행하고 있습니다.</dd>'
+     +'<dt>완료</dt><dd>정상적으로 끝났습니다.</dd>'
+     +'<dt>실패</dt><dd>오류로 끝났습니다. 로그에서 원인을 확인합니다.</dd>'
+     +'<dt>중단됨</dt><dd>사용자가 중단했습니다.</dd></dl>',
+  /* 항목 설명에 쓴다. 공유 정책은 사용자에게 알릴 내용이 아니다(라이브러리 툴팁 기준) */
+  own:'CDE 를 구분하는 이름입니다. 신청할 때 정하며 만든 뒤에는 바꿀 수 없습니다.',
+  /* 이 목록에 나오는 값만 설명한다. 승인 대기·반려·종료는 목록에서 빠져 있다 */
+  st:'이 개발룸에서 자원을 쓰고 있는 CDE의 상태입니다.'
+    +'<dl><dt>준비 중</dt><dd>승인 후 환경을 만들고 있습니다.</dd>'
+    +'<dt>구동 중</dt><dd>접속해 사용할 수 있습니다.</dd>'
+    +'<dt>절전</dt><dd>유휴로 자원을 반납했습니다. 재접속하면 복원됩니다.</dd>'
+    +'<dt>실패</dt><dd>기동에 실패했습니다.</dd>'
+    +'<dt>만료</dt><dd>사용 기간이 끝났습니다. 볼륨은 보존됩니다.</dd>'
+    +'<dt>종료 중</dt><dd>자원을 해제하고 있습니다.</dd></dl>',
+  mode:'가속기를 언제 점유하는지가 다릅니다.'
+    +'<dl><dt>위임 할당</dt><dd>작업을 실행할 때만 사용합니다. 쉬는 동안 다른 사용자가 쓸 수 있습니다.</dd>'
+    +'<dt>직접 할당</dt><dd>기동한 동안 계속 점유합니다.</dd></dl>'
+};
+function thHelp(k,label){
+  const d=COLDEF[k];
+  return '<span class="thwrap">'+label+(d?'<span class="thic" tabindex="0">?</span>':'')+'</span>'
+   + (d?'<div class="thpop">'+d+'</div>':'');
+}
+function help(k){ return COLDEF[k]?'<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">'+COLDEF[k]+'</span></span>':''; }
+function tip(txt){ return '<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">'+txt+'</span></span>'; }
+function sec(title,body,key){
+  return '<div class="sec" id="sec_'+key+'"><h4 onclick="tgSec(\''+key+'\')">'+title+'<span class="fold">▾</span></h4>'
+   + '<div class="secbody">'+body+'</div></div>';
+}
+function tgSec(k){ const el=document.getElementById('sec_'+k); if(el) el.classList.toggle('closed'); }
+/* 컴포넌트 라이브러리 규격을 따른다 — 유형 아이콘 + 본문 + 액션(본문 아래) */
+const AICON={
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/>',
+  warn:'<path d="M12 3l9.5 17H2.5z"/><path d="M12 10v4M12 17v.01"/>',
+  crit:'<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.01"/>'
+};
+function alertBox(kind,title,body,action){
+  return '<div class="alertbox '+kind+'">'
+   + '<svg class="aic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">'+(AICON[kind]||AICON.info)+'</svg>'
+   + '<div class="atx">'+(title?'<b>'+title+'</b>':'')+body
+   +   (action?'<div class="aact">'+action+'</div>':'')
+   + '</div></div>';
+}
+function toast(kind,msg){
+  const el=document.createElement('div');
+  el.className='toast '+kind; el.textContent=msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(function(){ el.remove(); }, 3200);
+}
+/* CSS 는 `.more.open .rowmenu` 로 열림을 판정한다. 클래스 이름을 맞춘다 */
+function tgMore(e,id){
+  e.stopPropagation();
+  const el=document.getElementById(id), open=el.classList.contains('open');
+  closeAllMore();
+  if(!open){
+    el.classList.add('open');
+    /* 아래 공간이 모자라면 위로 연다 */
+    const r=el.getBoundingClientRect();
+    el.classList.toggle('up', window.innerHeight - r.bottom < 200);
+  }
+}
+function closeAllMore(){ document.querySelectorAll('.more').forEach(function(m){ m.classList.remove('open'); m.classList.remove('up'); }); }
+document.addEventListener('click', closeAllMore);
+function onSearchKey(e){ if(e.key==='Enter'){ sq=e.target.value.trim(); document.getElementById('qclr').hidden=!sq; render(); } }
+function clearQ(){ document.getElementById('q').value=''; sq=''; document.getElementById('qclr').hidden=true; setState('default'); }
+function setState(s,btn){
+  state=s;
+  document.querySelectorAll('#demoBar .st').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  else { const f=document.querySelector('#demoBar .st'); if(f) f.classList.add('on'); }
+  closePanel(); render();
+}
+/* 시안 확인용 화면 전환. 신청 폼은 본인 CDE 가 있으면 안내 모달만 뜨므로
+   조건을 건너뛰고 바로 연다 */
+/* 브레드크럼 — 워크스페이스 목업과 같은 규격.
+   리소스 이름은 넣지 않는다. 상단 전환 드롭다운과 화면 헤더가 이미 표시한다 */
+function syncBc(){
+  const bc=document.getElementById('bc');
+  const root='<a href="#" onclick="act(\'홈으로 이동합니다.\');return false">콘체르토 플랫폼</a>';
+  const ws  ='<a href="#" onclick="act(\'워크스페이스 목록으로 이동합니다.\');return false">워크스페이스</a>';
+  const det ='<a href="#" onclick="act(\'워크스페이스 상세로 이동합니다.\');return false">상세</a>';
+  const room='<a href="#" onclick="'+(roomCfgOpen?'cancelRoomCfg()':(jdCur?'closeJob()':'cancelForm()'))+';return false">개발룸</a>';
+  bc.innerHTML = jdCur
+      ? root+' / '+ws+' / '+det+' / '+room+' / <b>'+jdCur.id+'</b>'
+    : formOpen
+    ? root+' / '+ws+' / '+det+' / '+room+' / <b>CDE 신청</b>'
+    : roomCfgOpen
+      ? root+' / '+ws+' / '+det+' / '+room+' / <b>'+(rcNew?'개발룸 생성':'개발룸 설정')+'</b>'
+      : root+' / '+ws+' / '+det+' / <b>개발룸</b>';
+}
+function demoView(v,btn){
+  document.querySelectorAll('#demoBar .vw').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  if(jdCur) closeJob();
+  closeForm(); closeRoomCfg(); closeExt();
+  if(v==='form') openForm();
+  else if(v==='roomcfg') openRoomCfg(false);
+  /* 연장은 대상이 필요하다. 본인 것 중 하나를 잡는다.
+     데모 조작이 화면 요소(토스트)를 띄우면 시안이 아닌 것이 섞인다 */
+  else if(v==='ext'){
+    const m=CDE.find(function(x){ return isMine(x) && (x.st==='구동 중'||x.st==='절전'); });
+    if(m) openExt(m.n);
+  }
+}
+function setRoom(v,btn){
+  roomExists=v;
+  document.querySelectorAll('#demoBar .rm').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  closePanel(); render();
+}
+function setRole(r,btn){
+  role=r;
+  /* 버튼 없이 호출되는 초기화에서도 표시가 맞아야 한다 */
+  const IDX={super:0,admin:1,editor:2,viewer:3};
+  const rls=document.querySelectorAll('#demoBar .rl');
+  rls.forEach(function(b){ b.classList.remove('on'); });
+  (btn || rls[IDX[r]]).classList.add('on');
+  /* 퍼스널 영역은 GNB 하단 — 워크스페이스를 벗어난 자리라 플랫폼 역할만 표시한다.
+     워크스페이스 역할은 대상마다 달라 한 값으로 적을 수 없다 */
+  document.getElementById('roleName').textContent = isSuper()? '최고 관리자' : '일반 사용자';
+  closePanel(); render();
+}
+
+setRole('super'); render();
+</script>
+
+</body></html>
