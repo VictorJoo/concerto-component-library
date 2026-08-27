@@ -312,7 +312,8 @@
   <div class="brand"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9.2" stroke-width="1.4" opacity="0.35"/><circle cx="12" cy="12" r="6" stroke-width="1.5" opacity="0.6"/><circle cx="12" cy="12" r="2.6" fill="currentColor" stroke="none"/></svg></span><b>Concerto <span class="ai">AI</span></b></div>
 
   <header class="header">
-    <div class="breadcrumb">콘체르토 플랫폼 / <b>플랫폼 설정</b></div>
+    <!-- 마이페이지는 GNB 퍼스널 영역에서 진입한다. 플랫폼 설정 하위가 아니다 -->
+    <div class="breadcrumb">콘체르토 플랫폼 / <b>마이페이지</b></div>
     <div class="hr">
       <div class="ws"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="width:15px;height:15px"><rect x="4" y="3" width="10" height="18" rx="1"/><path d="M14 8h5a1 1 0 011 1v11a1 1 0 01-1 1H4"/><path d="M7 7h3M7 11h3M7 15h3"/></svg> 전체 <span class="chev">▾</span></div>
     </div>
@@ -433,7 +434,7 @@ var PAGES = {
       <section class="mp-sec">
         <h3>내 정보<button class="btn sm" style="margin-left:auto" onclick="go('mypageEdit')">수정</button></h3>
         <dl class="dl">
-          <dt>계정 아이디${mpTip('로그인에 사용하는 아이디입니다. 변경할 수 없습니다.')}</dt><dd>yj.seong</dd>
+          <dt>아이디${mpTip('로그인에 사용하는 아이디입니다. 변경할 수 없습니다.')}</dt><dd>yj.seong</dd>
           <dt>이름</dt><dd>성유진</dd>
           <dt>이메일 주소${mpTip('알림 수신에 사용됩니다.')}</dt><dd>yj.seong@okestro.com</dd>
         </dl>
@@ -469,12 +470,12 @@ var PAGES = {
   mypageEdit: {crumb:'마이페이지', sub:'기본 정보 수정', html:`
     <div class="mp-ehead">
       <button class="back" onclick="go('mypage')" title="마이페이지로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>
-      <div class="ph" style="margin-bottom:0"><h1>기본 정보 수정${mpTip('이름과 이메일 주소를 수정합니다. 계정 아이디와 소속은 바꿀 수 없습니다.', true)}</h1></div>
+      <div class="ph" style="margin-bottom:0"><h1>기본 정보 수정${mpTip('이름과 이메일 주소를 수정합니다. 아이디와 소속은 바꿀 수 없습니다.', true)}</h1></div>
     </div>
     <div class="mp-form">
       <section class="mp-sec">
         <div class="mp-f">
-          <label>계정 아이디${mpTip('로그인에 사용하는 아이디입니다. 변경할 수 없습니다.')}</label>
+          <label>아이디${mpTip('로그인에 사용하는 아이디입니다. 변경할 수 없습니다.')}</label>
           <div class="rov">yj.seong</div>
         </div>
         <div class="mp-f">
@@ -521,14 +522,16 @@ var PAGES = {
 
 /* 라벨 옆 도움말 — 워크스페이스 목업의 tip() 과 같은 규격 */
 function mpTip(t, below){ return '<span class="tip-anchor'+(below?' below':'')+'"><span class="tip-ic" tabindex="0">?</span><span class="tip">'+t+'</span></span>'; }
-function setCrumb(main, sub){
+/* 메뉴 경로까지만 표기한다(공통정책 4.3). 수정·상세는 넣지 않는다 —
+   화면 제목이 무엇을 보는 화면인지 이미 밝힌다 */
+function setCrumb(main){
   var el=document.querySelector('.breadcrumb');
-  el.innerHTML = '콘체르토 플랫폼 / <b>'+ (sub? main+' ▸ '+sub : main) +'</b>';
+  el.innerHTML = '콘체르토 플랫폼 / <b>'+main+'</b>';
 }
 function render(key, subLabel){
   var p=PAGES[key]; if(!p) return;
   document.getElementById('page').innerHTML = p.html;
-  setCrumb(p.crumb, subLabel || p.sub);
+  setCrumb(p.crumb);
   /* 조회 화면을 다시 그리면 비밀번호 상태 표시가 초기화되므로 복원한다 */
   if(key==='mypage' && typeof drawPwHint==='function') drawPwHint();
   /* 수정 화면을 다시 그리면 본인 확인을 처음부터 받는다 */
