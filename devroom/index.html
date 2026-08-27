@@ -1,15 +1,6 @@
 <!--
-  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.3 (2026-08-26)
-  CDE 정책 기준.
-
-  ── 화면 부제 (2026-08-26) ────────────────────
-  개발룸 설정·CDE 신청 화면 부제에서 `· 개발룸` 을 뺐다. 제목이 `개발룸 설정` 인데
-  부제에 개발룸이 또 있었고, 브레드크럼에도 개발룸이 들어간다. 부제는 어느 워크스페이스
-  소속인지만 밝힌다 — 개발룸 목록 화면과 같은 규격이다.
-
-  ── 가속기 단위 (2026-08-26) ──────────────────
-  단위를 `개` 에서 `장` 으로 바꿨다. 용어집 5장이 `장` 을 쓰고 `개` 를 쓰지 말라고 정한다.
-  다른 목업(워크스페이스·배포·내 작업함·플랫폼 설정)도 모두 `장` 이다. 색·컴포넌트 규격은 워크스페이스 목업을 따른다.
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.21 (2026-08-20)
+  CDE 정책 v0.2 기준. 색·컴포넌트 규격은 워크스페이스 목업을 따른다.
 
   [검토용 임시 장치 — 확정 후 삭제]
   하단 데모 바의 `내 CDE` 로 본인 CDE 상태를 바꿔 상태별 조작을 확인한다.
@@ -235,7 +226,7 @@
     `ACTIVE → TERMINATING → [*]` 로 자원 해제 구간을 두는데 바로 `종료` 로 넘기고 있었다.
     토스트는 `요청했습니다` 인데 상태는 즉시 완료라 말과 동작이 어긋났다.
     파드를 내리는 동안 자원을 잡고 있으므로 목록에도 남긴다.
-  · 상태 도움말을 목록에 나오는 값만 남겼다. 승인 대기·반려·종료는 목록에서 빠져 있는데
+  · 상태 도움말을 목록에 나오는 값만 남겼다. 결재 대기·반려·종료는 목록에서 빠져 있는데
     설명에는 들어 있었다.
   · 연장 신청에 폼을 두었다. 연장도 결재를 거치므로 승인자가 판단할 사유가 필요하고,
     며칠 연장하는지도 받아야 한다. 연장 후 만료일을 계산해 함께 보인다 —
@@ -250,7 +241,7 @@
     `전처리·양자화` 는 기술문서 본문 서술이라 실제 인자 값인지 모른다.
   · 더보기 메뉴가 열리지 않던 것을 고쳤다. CSS 는 `.more.open` 으로 판정하는데
     스크립트가 `on` 을 붙이고 있었다. 아래 공간이 모자라면 위로 여는 처리도 함께 넣었다.
-  · 승인 대기 알림을 뺐다. 승인 대기 건은 이 목록에 나오지 않고 승인·반려도
+  · 승인 대기 알림을 뺐다. 결재 대기 건은 이 목록에 나오지 않고 승인·반려도
     내 작업함에서 처리한다. GNB 내 작업함 배지가 이미 건수를 알린다.
   · 작업 이력을 CDE 목록과 같은 규격으로 맞췄다 — 검색·다운로드·페이지네이션.
     열 편집은 두지 않는다. 컬럼이 8개 이하라 가로 스크롤이 생기지 않는다(공통정책 3.4).
@@ -284,7 +275,7 @@
   · 개발룸 자원이 꽉 차면 안내한다. 막힌 뒤에 알리지 말고 미리 알린다.
     조치가 역할마다 달라 안내도 갈린다 — 할당량 조정은 관리자 소관이다.
   · 목록에 자원을 잡고 있는 건만 둔다 — 준비 중·구동 중·절전·실패·만료.
-    현행도 CDE 상태를 `ACTIVE` 하나로만 본다. 승인 대기·반려·종료는 자원을 잡지 않아
+    현행도 CDE 상태를 `ACTIVE` 하나로만 본다. 결재 대기·반려·종료는 자원을 잡지 않아
     자원 목록에 섞이면 판단이 흐려진다. 승인·반려와 신청 현황은 내 작업함에서 본다.
   · 신청 버튼을 없애지 않는다. 신청 중인 건이 목록에 보이지 않으므로 버튼까지 사라지면
     왜 못 하는지 알 수 없다. 누르면 이유와 갈 곳을 알린다.
@@ -304,7 +295,7 @@
        · 작업 상세 WKSP-CDE-D01.D02 — 작업 이력 행에서 진입. 사전 진단·학습 지표·산출물(명세 16·18)
 
   ── 상태 ────────────────────────────────────────
-  · 승인 대기 · 반려 · 준비 중 · 구동 중 · 절전 · 실패 · 만료 · 종료
+  · 결재 대기 · 반려 · 준비 중 · 구동 중 · 절전 · 실패 · 만료 · 종료
   · 워크스페이스와 달리 정상 상태가 대부분이 아니라 모든 상태에 배지를 표시한다
   · 상태별로 가능한 조작이 다르다(정책 6장). 막힌 작업은 비활성으로 두고 사유를 안내한다
 
@@ -1650,11 +1641,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
       <div class="flywrap" id="setWrap">
         <a href="#" class="has-fly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 00-1.7-1L15 3H9l-.4 2.6a7.6 7.6 0 00-1.7 1l-2.3-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 001.7 1L9 21h6l.4-2.6a7.6 7.6 0 001.7-1l2.3 1 2-3.4z"/></svg><span class="lb">플랫폼 설정</span></a>
         <div class="flyout">
-          <a href="#">사용자 및 역할</a>
-          <a href="#">보안 및 감사</a>
-          <a href="#">인프라 자원</a>
-          <a href="#">카탈로그</a>
-          <a href="#">연동 및 알림</a>
+          <a href="#">사용자 및 역할</a><a href="#">보안 및 감사</a><a href="#">외부 연동</a><a href="#">알림 채널</a>
         </div>
       </div>
     </div>
@@ -1754,14 +1741,13 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
       <div id="jdBody"></div>
     </div>
 
-    <!-- 개발룸 설정 WKSP-CDE-F02
-         운영룸·개발룸·할당량 수정이 모두 페이지다.
+    <!-- 개발룸 설정 WKSP-CDE-F02 — 운영룸·개발룸·할당량 수정이 모두 페이지다.
          생성과 같은 항목을 받으므로 형태도 같게 둔다 -->
     <div class="page" id="pgRoom" style="display:none">
       <div class="dhead">
         <button class="back" onclick="cancelRoomCfg()" title="개발룸으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>
         <div class="dinfo"><h1>개발룸 설정<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span><span class="tip">개발룸이 워크스페이스 할당량에서 가져올 자원을 정합니다. 남는 만큼이 운영룸 몫이 됩니다.</span></span></h1>
-          <div class="dmeta"><span style="font-size:12.5px;color:var(--muted-foreground)">ai-service-team</span></div>
+          <div class="dmeta"><span style="font-size:12.5px;color:var(--muted-foreground)">ai-service-team · 개발룸</span></div>
         </div>
       </div>
       <div id="roomForm"></div>
@@ -1776,7 +1762,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
       <div class="dhead">
         <button class="back" onclick="cancelForm()" title="목록으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>
         <div class="dinfo"><h1 id="fTitle">CDE 신청<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span><span class="tip">개발룸 안에 개인 작업 환경을 만듭니다. 관리자 승인 후 사용할 수 있으며 사용 기한이 지나면 회수됩니다.</span></span></h1>
-          <div class="dmeta"><span style="font-size:12.5px;color:var(--muted-foreground)">ai-service-team</span></div>
+          <div class="dmeta"><span style="font-size:12.5px;color:var(--muted-foreground)">ai-service-team · 개발룸</span></div>
         </div>
       </div>
       <div id="formBody"></div>
@@ -1993,10 +1979,10 @@ const CDE = [
  {n:'yj-jupyter-01', acc:'NVIDIA-H200', by:'성유진', id:'yj.seong', st:'구동 중', ide:'JupyterLab', fw:'PyTorch 2.4',
   mode:'위임 할당', cpu:8, ram:32, gpu:1, vol:20, at:'2026-08-01 10:12:00', until:'2026-09-01', reason:'추천 모델 파인튜닝', apBy:'김병건(bg.kim)', apAt:'2026-08-01 11:04:22'},
  {n:'sj-vscode-01', acc:'', by:'임승주', id:'sj.lim', st:'절전', ide:'VS Code Web', fw:'TensorFlow 2.16',
-  mode:'위임 할당', cpu:4, ram:16, gpu:0, vol:5, at:'2026-07-22 14:30:00', until:'2026-09-12', reason:'전처리 파이프라인 개발', apBy:'김병건(bg.kim)', apAt:'2026-07-22 11:04:22'},
+  mode:'위임 할당', cpu:4, ram:16, gpu:0, vol:5, at:'2026-07-22 14:30:00', until:'2026-08-22', reason:'전처리 파이프라인 개발', apBy:'김병건(bg.kim)', apAt:'2026-07-22 11:04:22'},
  {n:'jh-jupyter-01', acc:'Furiosa RNGD', by:'유지현', id:'jh.yu', st:'구동 중', ide:'JupyterLab', fw:'PyTorch 2.4',
-  mode:'직접 할당', cpu:8, ram:32, gpu:1, vol:50, at:'2026-07-15 09:05:00', until:'2026-09-05', reason:'비전 모델 실험', apBy:'김병건(bg.kim)', apAt:'2026-07-15 11:04:22'},
- {n:'kh-jupyter-01', acc:'NVIDIA-H200 MIG', by:'오경환', id:'kh.oh', st:'승인 대기', ide:'JupyterLab', fw:'PyTorch 2.4',
+  mode:'직접 할당', cpu:8, ram:32, gpu:1, vol:50, at:'2026-07-15 09:05:00', until:'2026-08-15', reason:'비전 모델 실험', apBy:'김병건(bg.kim)', apAt:'2026-07-15 11:04:22'},
+ {n:'kh-jupyter-01', acc:'NVIDIA-H200 MIG', by:'오경환', id:'kh.oh', st:'결재 대기', ide:'JupyterLab', fw:'PyTorch 2.4',
   mode:'위임 할당', cpu:4, ram:16, gpu:1, vol:20, at:'2026-08-11 16:44:00', until:'2026-09-11', reason:'벤치마크 재현'},
  {n:'mj-vscode-01', acc:'', by:'박민준', id:'mj.park', st:'만료', ide:'VS Code Web', fw:'PyTorch 2.4',
   mode:'위임 할당', cpu:4, ram:16, gpu:0, vol:5, at:'2026-05-02 11:00:00', until:'2026-08-02', reason:'데이터 검증', apBy:'김병건(bg.kim)', apAt:'2026-05-02 11:04:22'},
@@ -2026,7 +2012,7 @@ function setMyState(v,btn){
 }
 
 /* 상태별 색 — 진행 중은 점멸 */
-const SB = {'승인 대기':'ac','반려':'cr','준비 중':'ac load','구동 중':'ok','절전':'mu',
+const SB = {'결재 대기':'ac','반려':'cr','준비 중':'ac load','구동 중':'ok','절전':'mu',
             '실패':'cr','만료':'cr','종료 중':'ac load','종료':'mu'};
 
 /* ═══════════ 상태 ═══════════ */
@@ -2059,7 +2045,7 @@ function blockMsg(m){
   /* 강등된 사용자는 연장할 수 없다(정책 7.1) */
   if(isMine(m) && !canApply()) return '연장은 편집자 이상이 신청할 수 있습니다.';
   if(!isMine(m)) return '본인의 CDE에만 사용할 수 있습니다.';
-  if(m.st==='승인 대기') return '승인 전에는 사용할 수 없습니다.';
+  if(m.st==='결재 대기') return '승인 전에는 사용할 수 없습니다.';
   if(m.st==='반려')     return '반려된 신청입니다. 다시 신청해 주세요.';
   if(m.st==='준비 중')  return '환경을 만들고 있습니다. 준비가 끝나면 알림으로 안내됩니다.';
   if(m.st==='실패')     return '기동에 실패했습니다. 다시 시도하거나 삭제할 수 있습니다.';
@@ -2070,7 +2056,7 @@ function blockMsg(m){
 
 /* ═══════════ 목록 ═══════════ */
 /* 자원을 잡고 있는 건만 둔다 — 현행도 CDE 상태를 `ACTIVE` 하나로만 본다.
-   승인 대기·반려·종료는 자원을 잡지 않아 자원 목록에 섞이면 판단이 흐려진다.
+   결재 대기·반려·종료는 자원을 잡지 않아 자원 목록에 섞이면 판단이 흐려진다.
    승인·반려는 내 작업함에서 처리하고 신청 현황도 거기서 본다 */
 /* 종료 중은 파드를 아직 내리는 중이라 자원을 잡고 있다(기술문서 TERMINATING) */
 const LIVE = ['준비 중','구동 중','절전','실패','만료','종료 중'];
@@ -2167,7 +2153,7 @@ function render(){
   el.innerHTML='<div class="tblwrap"><table class="tbl"><thead><tr>'
    + '<th class="thcell">'+thHelp('own','CDE명')+'</th><th class="thcell">'+thHelp('st','상태')+'</th><th>사용자</th>'
    + '<th>IDE</th><th class="thcell">'+thHelp('mode','실행 방식')+'</th>'
-   + '<th>자원</th><th class="thcell">'+thHelp('exp','만료 예정')+'</th><th style="width:64px">작업</th>'
+   + '<th>자원</th><th class="thcell">'+thHelp('exp','만료 예정')+'</th><th style="width:44px"></th>'
    + '</tr></thead><tbody>'
    + d.map(function(m,i){
       /* 본인 것을 따로 강조하지 않는다. 사용자 컬럼에 이름이 있어 이미 구분된다 */
@@ -2208,10 +2194,8 @@ function rowMenu(m,i){
   /* 실패는 한 번도 뜨지 못한 것이라 다시 올려 볼 수 있다 */
   items.push(btn('다시 시도', isMine(m) && m.st==='실패', 'act(\'다시 시도를 요청했습니다.\')',
     !isMine(m) ? blockMsg(m) : '기동에 실패한 CDE에만 사용할 수 있습니다.'));
-  /* 실패는 뜬 적이 없고 만료는 이미 회수되어 반납할 자원이 없다. 삭제로 치운다(정책 6장).
-     반납이 비활성으로만 남으면 만료된 CDE 를 목록에서 치울 수단이 사라진다 */
-  const gone = m.st==='실패' || m.st==='만료';
-  items.push('<hr>'+(gone
+  /* 실패는 뜬 적이 없어 반납할 자원이 없다. 삭제로 치운다 */
+  items.push('<hr>'+(m.st==='실패'
     ? btn('삭제', isMine(m), 'askReturn(\''+m.n+'\')', blockMsg(m), true)
     : btn('반납', canReturn(m), 'askReturn(\''+m.n+'\')', blockMsg(m), true)));
   /* 회수는 관리자만 쓴다. 권한이 없으면 항목을 두지 않는다 —
@@ -2257,7 +2241,7 @@ function drawEmptyRoom(){
      설정·삭제도 여기서 한다.
      개발룸에는 신청 흐름을 두지 않는다. 8/12 회의 1.8 은 신청 로직을 CDE 등
      워크스페이스 안에서 발생하는 작업에만 적용하기로 했고, 1.9 룸 상태값에도
-     승인 대기가 없다 — 관리자는 바로 만들고 그 외에는 사람에게 요청한다 */
+     결재 대기가 없다 — 관리자는 바로 만들고 그 외에는 사람에게 요청한다 */
   + (isAdmin()
       ? '<button class="btn" onclick="openRoomCfg(true)">개발룸 생성</button>'
       : '<p style="font-size:11.5px;color:var(--faint)">워크스페이스 관리자에게 개발룸 생성을 요청해 주세요.</p>')
@@ -2301,7 +2285,7 @@ function drawQuota(){
   }
   const rows=[['CPU',ROOM.cpu.use,ROOM.cpu.q,'Cores'],
               ['Memory',ROOM.ram.use,ROOM.ram.q,'Gi'],
-              ['가속기',ROOM.gpu.use,ROOM.gpu.q,'장']];
+              ['가속기',ROOM.gpu.use,ROOM.gpu.q,'개']];
   document.getElementById('quotaBox').innerHTML =
     '<div class="dsec"><h4>개발룸 자원'
     /* 화면 최상단이라 위로 열면 잘린다. 아래로 연다 */
@@ -2339,7 +2323,7 @@ function drawQuota(){
 }
 
 
-/* 승인 대기 알림을 두지 않는다. 승인 대기 건은 이 목록에 나오지 않고
+/* 승인 대기 알림을 두지 않는다. 결재 대기 건은 이 목록에 나오지 않고
    승인·반려도 내 작업함에서 처리한다. GNB 내 작업함 배지가 이미 건수를 알리므로
    같은 것을 두 번 말하게 된다 */
 function drawPend(){
@@ -2372,13 +2356,9 @@ function drawTabs(){
   /* 탭 라벨 옆에 설명을 둔다. 섹션 제목을 없앴으므로 여기가 유일한 자리다 */
   const t=[['CDE','개발룸 안에서 개인이 사용하는 작업 공간입니다. 신청 후 관리자 승인을 거쳐 만들어지며, 사용 기간이 지나면 회수됩니다.'],
            ['작업 이력','CDE 터미널에서 제출한 학습·전처리 작업입니다. 편집기와 별도로 백그라운드에서 실행됩니다.']];
-  /* 탭 배지 — 그 건수가 탭을 열기 전 판단에 쓰인다. CDE 는 자원을 얼마나 쓰고 있는지,
-     작업 이력은 돌고 있는 것이 있는지가 재료다 */
-  const cnt=[CDE.filter(visible).length, JOBS.length];
   document.getElementById('cdeTabs').innerHTML =
     t.map(function(x,i){
       return '<button class="'+(cdeTab===i?'on':'')+'" onclick="setCdeTab('+i+')">'+x[0]
-       + '<span class="cnt">'+cnt[i]+'</span>'
        + '<span class="tip-anchor below" onclick="event.stopPropagation()"><span class="tip-ic" tabindex="0">?</span>'
        + '<span class="tip">'+x[1]+'</span></span></button>';
     }).join('');
@@ -2391,7 +2371,7 @@ function drawAct(){
 function tryApply(){
   const m=myCde();
   if(!m){ openForm(); return; }
-  if(m.st==='승인 대기'){
+  if(m.st==='결재 대기'){
     openConfirm('신청 중인 CDE가 있습니다',
       '승인되면 사용할 수 있습니다. <b>'+m.n+'</b>의 신청 현황은 내 작업함에서 확인합니다.',
       function(){ act('내 작업함으로 이동합니다.'); }, '내 작업함');
@@ -2720,7 +2700,7 @@ function drawRoomCfg(){
       개발룸으로 넘어오면서 뭉뚱그려지면 계산이 맞지 않는다(8/10 회의 2.2) */
    /* vRAM 은 라벨이 아니라 툴팁에 둔다. 라벨 폭(150px)을 넘으면 줄이 바뀌어 행 높이가 갈린다 */
    + ACC.map(function(g,i){
-       return rcRow('acc_'+g.k, g.n, '장', WSQ.acc[g.k]||0, rcNew?0:g.use, 1,
+       return rcRow('acc_'+g.k, g.n, '개', WSQ.acc[g.k]||0, rcNew?0:g.use, 1,
                     '한 장당 '+g.vram+'GB.'+(i===0? ' 벤더·유형별로 구분해 배정합니다.' : ''));
      }).join('') + '</div>')
    + '<div class="fsec"><h3>스토리지·네트워크</h3>'
@@ -3145,7 +3125,7 @@ function openPanel(i){
     + '<dt>CPU</dt><dd>'+m.cpu+' Cores</dd>'
     + '<dt>Memory</dt><dd>'+m.ram+' Gi</dd>'
     /* 종류를 함께 보인다. 개수만으로는 어느 장비인지 알 수 없다 */
-    + '<dt>가속기</dt><dd>'+(m.gpu? (m.acc? m.acc+' '+m.gpu+'장' : m.gpu+'장') : '<span class="dash">-</span>')+'</dd>'
+    + '<dt>가속기</dt><dd>'+(m.gpu? (m.acc? m.acc+' '+m.gpu+'개' : m.gpu+'개') : '<span class="dash">-</span>')+'</dd>'
     /* 볼륨도 자원이라 같은 섹션에 둔다 */
     + '<dt>개인 볼륨</dt><dd>'+m.vol+' GB</dd>'
     + '<dt>공유 볼륨</dt><dd>'+VOL.shared+' GB <span style="color:var(--faint)">· 개발룸 공용</span></dd>'
@@ -3246,7 +3226,7 @@ function drawForm(){
    + row('가속기 유형', true,
        sel('acc', ACC.map(function(g){ return g.n; }), ACC.map(function(g){ return g.n+' '+g.vram+'GB'; })),
        '개발룸에 배정된 가속기 중에서 고릅니다.')
-   + qrow('gpu','가속기','장',freeG,1,'')
+   + qrow('gpu','가속기','개',freeG,1,'')
    + '</div>';
 
   /* 공유 볼륨은 관리자가 개발룸 설정에서 정한다. 신청 화면에서는 조정할 수 없다 */
@@ -3350,7 +3330,7 @@ function validate(){
   document.getElementById('fSubmit').disabled=!ok;
 }
 function submitForm(){
-  CDE.unshift({n:ME.split('.')[0]+'-new-01', by:'성유진', id:ME, st:'승인 대기',
+  CDE.unshift({n:ME.split('.')[0]+'-new-01', by:'성유진', id:ME, st:'결재 대기',
     ide:NF.ide, fw:NF.fw, mode:NF.mode, cpu:+NF.cpu, ram:+NF.ram, gpu:+NF.gpu,
     vol:+NF.vol,
     at:'2026-08-12 10:00:00', until:'2026-09-11', reason:NF.reason});
@@ -3360,15 +3340,6 @@ function submitForm(){
 
 /* ═══════════ 액션 ═══════════ */
 function askReturn(name){
-  const t=CDE.find(x=>x.n===name);
-  /* 실패·만료는 이미 자원이 없다. 반납이 아니라 목록에서 치우는 것이라 문구를 나눈다 */
-  if(t && (t.st==='실패' || t.st==='만료')){
-    openConfirm('CDE 삭제',
-      '<b>'+name+'</b>을 삭제합니다. 자원은 이미 회수되었고 개인 볼륨이 함께 사라집니다. 공유 볼륨의 데이터는 남습니다.',
-      function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료'; render(); }
-        toast('ok','CDE를 삭제했습니다.'); }, '삭제');
-    return;
-  }
   openConfirm('CDE 반납',
     '<b>'+name+'</b>을 반납합니다. 연산 자원이 개발룸으로 반환되고 개인 볼륨이 삭제됩니다. 공유 볼륨의 데이터는 남습니다.',
     /* 파드를 내리는 데 시간이 걸린다. 바로 종료로 넘기면 요청과 완료가 구분되지 않는다 */
@@ -3443,7 +3414,7 @@ const COLDEF={
      +'<dt>중단됨</dt><dd>사용자가 중단했습니다.</dd></dl>',
   /* 항목 설명에 쓴다. 공유 정책은 사용자에게 알릴 내용이 아니다(라이브러리 툴팁 기준) */
   own:'CDE 를 구분하는 이름입니다. 신청할 때 정하며 만든 뒤에는 바꿀 수 없습니다.',
-  /* 이 목록에 나오는 값만 설명한다. 승인 대기·반려·종료는 목록에서 빠져 있다 */
+  /* 이 목록에 나오는 값만 설명한다. 결재 대기·반려·종료는 목록에서 빠져 있다 */
   st:'이 개발룸에서 자원을 쓰고 있는 CDE의 상태입니다.'
     +'<dl><dt>준비 중</dt><dd>승인 후 환경을 만들고 있습니다.</dd>'
     +'<dt>구동 중</dt><dd>접속해 사용할 수 있습니다.</dd>'
