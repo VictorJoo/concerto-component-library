@@ -492,7 +492,20 @@
   }
   function vSuId(){ const msg=idError(su_id.value.trim()); const e=$('su_idErr'); if(msg){ e.textContent=msg; su_id.classList.add('has-error'); e.classList.add('show'); return false; } su_id.classList.remove('has-error'); e.classList.remove('show'); return true; }
   function vName(){ const v=su_name.value.trim(); showErr(su_name,'su_nameErr',!v); return !!v; }
-  function vEmail(){ const ok=emailRe.test(su_email.value.trim()); showErr(su_email,'su_emailErr',!ok); return ok; }
+  /* 이메일은 확인 버튼을 두지 않는다. 형식이 맞으면 필드를 벗어날 때 중복을 조회한다(계정정책 2.3).
+   아이디와 달리 사용자가 고르는 값이 아니라 이미 정해진 것이라 눌러 확인할 이유가 없다.
+   ⚠ 데모라 `admin@okestro.com` 하나만 사용 중으로 둔다 */
+const MAIL_TAKEN=['admin@okestro.com'];
+function vEmail(){
+  const v=su_email.value.trim();
+  const e=$('su_emailErr');
+  if(!v){ e.textContent='이메일을 입력해주세요.'; showErr(su_email,'su_emailErr',true); return false; }
+  if(!emailRe.test(v)){ e.textContent='올바른 이메일 형식이 아닙니다.'; showErr(su_email,'su_emailErr',true); return false; }
+  if(MAIL_TAKEN.indexOf(v.toLowerCase())>=0){
+    e.textContent='이미 사용 중인 이메일입니다.'; showErr(su_email,'su_emailErr',true); return false;
+  }
+  showErr(su_email,'su_emailErr',false); return true;
+}
   // 비밀번호 강도 (계정 정책 2.2) — 0 약함 · 1 보통 · 2 안전 · 3 매우 안전. 안전(2) 이상부터 사용 가능.
   const PW_LABELS=['약함','보통','안전','매우 안전'];
   const pwMeter=$('pwMeter'), pwLabel=$('pwLabel');
@@ -538,9 +551,11 @@
     su_pw.classList.remove('has-error'); e.classList.remove('show'); return true;
   }
   function vPw2(){ const ok=su_pw2.value!=='' && su_pw2.value===su_pw.value; showErr(su_pw2,'su_pw2Err',!ok); return ok; }
+  /* 중복이면 등록 버튼을 활성화하지 않는다(계정정책 2.1·2.3) */
+  function mailOk(){ const v=su_email.value.trim(); return emailRe.test(v) && MAIL_TAKEN.indexOf(v.toLowerCase())<0; }
   function refreshBtn(){
     signupBtn.disabled = !(su_id.value.trim() && idChecked && su_name.value.trim()
-      && emailRe.test(su_email.value.trim()) && pwLevel(su_pw.value)>=2 && su_pw2.value!=='' && su_pw2.value===su_pw.value);
+      && mailOk() && pwLevel(su_pw.value)>=2 && su_pw2.value!=='' && su_pw2.value===su_pw.value);
   }
   // 뷰 전환·제출 후 회원가입 폼 초기화 (입력 잔존·비밀번호 잔류 방지)
   function resetSignup(){
@@ -556,7 +571,8 @@
     else { idChecked=true; su_id.classList.add('is-ok'); su_id.classList.remove('has-error'); $('su_idErr').classList.remove('show'); su_idOk.classList.add('show'); }
     refreshBtn();
   });
-  su_name.addEventListener('blur', vName); su_email.addEventListener('blur', vEmail); su_pw.addEventListener('blur', vPw); su_pw2.addEventListener('blur', vPw2);
+  su_name.addEventListener('blur', vName); su_email.addEventListener('blur', function(){ vEmail(); refreshBtn(); });
+  su_email.addEventListener('input', function(){ showErr(su_email,'su_emailErr',false); refreshBtn(); }); su_pw.addEventListener('blur', vPw); su_pw2.addEventListener('blur', vPw2);
   su_id.addEventListener('blur', ()=>{ if(su_id.value.trim()) vSuId(); });   // 형식 유효성(길이·시작끝·연속 특수문자) 안내
   [su_name,su_email,su_pw,su_pw2].forEach(el=>el.addEventListener('input', ()=>{ showErr(el, el.id+'Err', false); if(el===su_pw){ updateMeter(); if(su_pw2.value) vPw2(); } refreshBtn(); }));
   $('signupView').addEventListener('submit', e=>{
