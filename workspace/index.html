@@ -1,6 +1,63 @@
 <!--
-  콘체르토 매니저 — 워크스페이스 화면 목업 v0.4 (2026-08-20)
-  이 파일이 색·컴포넌트 규격의 정본이다. 컴포넌트 라이브러리·공통 레이아웃을 여기에 맞춘다.
+  콘체르토 매니저 — 워크스페이스 화면 목업 v0.5 (2026-08-25)
+  색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 여기서 새 값을 만들지 않는다 —
+  필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
+
+  ── 공용 워크스페이스 권한 (2026-08-25) ──────────
+  속성 운영은 지정된 Workspace Admin 이 한다(정책 v0.42 6.1·8장). 최고 관리자 전용이
+  아니다 — 최고 관리자는 존재를 정하는 일(생성·삭제·관리자 지정)만 갖는다(정책 1.1).
+  관리자를 지정하는 이유는 그 관리자가 관리하기 때문이다. 지정만 하고 권한을 주지
+  않으면 지정이 뜻을 갖지 않는다.
+
+  예외는 셋뿐이다.
+    삭제        진입점 미노출(정책 2.5) — 지우면 공용 서빙이 중단된다
+    자원 할당량  진입점 미노출(정책 6.2) — 배정값이 없고 남은 자원을 쓴다
+    이름        읽기 전용(정책 6.1) — 플랫폼에 하나뿐이라 정체성이 이름에 있다
+
+  🔴 8/25 — 설명도 잠갔다. 자산 등록·수정·삭제·자원 할당량이 이미 막혀 있어
+  기본 정보만 열어 두면 기준이 갈린다. 전 사용자가 참조하는 문구라 설치 시 고정한다.
+  이름을 잠근 것은 아이콘과 짝을 맞춘 것이다. 공용 전용 아이콘은 이미 선택지에서
+  빠져 있는데(`WSICO.globe` 의 `sys:true`) 이름만 열려 있어 규격이 갈렸다.
+
+  ⚠ 종전 주석 둘이 `수정·삭제 진입점 미노출` · `수정·삭제는 최고 관리자 전용` 로
+    적혀 있었으나 구현은 Workspace Admin 이었다. A/B 비교안 시절 잔재였고 정리했다.
+  ⚠ 일반 워크스페이스의 이름 변경 가능 여부는 확인 대상이다(정책 10. 7번).
+    확정 전까지 입력을 유지하고 `불가` 로 확정되면 `canEditName()` 를 고쳐 잠근다.
+
+  ── 탭별 액션 (2026-08-25) ───────────────────────
+  액션은 그 액션이 걸리는 대상 옆에 둔다(공통정책 3.6) — 섹션 제목 줄 우측이다.
+  탭 줄에는 두지 않는다. 탭 라벨은 분류를 가리킬 뿐 액션이 걸리는 대상이 아니며,
+  탭을 옮기면 액션도 바뀌어 자리가 흔들린다.
+  ⚠ 8/24 에 탭 줄로 옮겼다가 되돌린 건이다. 탭 줄에 두면 섹션이 둘 이상인 탭에서
+    어느 섹션의 액션인지 갈리지 않는다.
+
+  ── 삭제된 계정 표기 (2026-08-24) ────────────────
+  참조하는 자리(생성자·API Key 소유 계정·작업 제출자)에서는 이름을 보이지 않고
+  `삭제됨` 으로 두고 호버 시 사유를 알린다(공통정책 1.6).
+  멤버 목록에서는 아예 빠진다 — 로그인할 수 없는 계정이 멤버로 남을 이유가 없다.
+
+  ── 연동 탭 프록시 (2026-08-24) ──────────────────
+  현행은 `프록시 서버 사용` 체크박스만 두고 주소를 받지 않는다. 팀장 확인 결과
+  주소를 화면에서 받는 것이 맞다.
+
+  입력 항목은 서버 · 포트 · 인증 계정 · 인증 비밀번호 넷이다.
+  · 서버와 포트를 나눈다 — 한 칸에 받으면 포트를 빼먹거나 구분자를 잘못 쓰기 쉽고,
+    포트는 숫자라 따로 받으면 검증이 된다(Jenkins·Oracle 데스크톱 설정과 같은 형태)
+  · 인증은 프록시 서버에 로그인하는 계정이다. 액세스 토큰과 다른 값이다.
+    표준 형식은 http://user:pass@host:port 이나 한 칸에 넣으면 비밀번호가 그대로 보여
+    나눠 받고 마스킹한다
+  · 연결 확인 버튼을 둔다 — 플랫폼 설정 스토리지와 같은 규격이다
+
+  인증 비밀번호는 액세스 토큰과 같은 규격으로 둔다 — 저장한 값을 되돌려 주지 않고
+  `등록됨` 배지와 변경·삭제 버튼만 보인다. 빈 입력란을 두면 그대로 저장했을 때
+  지워지는지 유지되는지 알 수 없다.
+
+  ⚠ 프록시 예외 목록(NO_PROXY)은 여기 두지 않는다. 클러스터 내부 주소는 워크스페이스마다
+    다르지 않아 플랫폼 설정에 둔다. 예외에 넣지 않으면 MinIO·Harbor 로 가는 요청이
+    프록시로 나가 끊긴다.
+  ⚠ 프록시를 워크스페이스별로 관리할지, 플랫폼 설정에만 두고 여기서는 사용 여부만
+    정할지는 미결이다. 클러스터가 하나라 나가는 경로도 하나일 것으로 보인다 —
+    플랫폼 설정 검토 때 함께 다룬다.
 
   [검토용 임시 장치 — 확정 후 삭제]
   하단 데모 바(화면 · 데이터 상태 · 권한 · 테마)는 시안 확인용이다.
@@ -15,7 +72,86 @@
   · 버튼·클릭 대상 테두리는 --border-strong.
   · 링크는 색이 아니라 밑줄로 구분한다(--underline).
 
-  ── v0.4 변경 ───────────────────────────────────
+  ── 개발룸 화면 이관 (2026-08-26) ─────────────
+   개발룸 화면을 이 파일에서 제외했다. CDE 목록·신청·연장·작업 이력·개발룸 설정은
+   개발룸 화면군(WKSP-CDE-*) 소관이고 개발룸 목업에서 다룬다.
+   여기서는 룸 상태를 보이고 진입만 시킨다 — 개발룸 버튼·환경 섹션·패널 룸 버튼·
+   브레드크럼 링크가 모두 `개발룸 화면으로 이동합니다` 안내로 간다.
+   생성도 개발룸 화면 소관이다 — `＋ 개발룸 생성` 도 같은 안내로 보낸다.
+   ⚠ 운영룸은 워크스페이스 소관이라 그대로 둔다(자원 현황 · 배포된 모델 · 외부 배포).
+   ⚠ `roomTab` · `drawDevRoomForm` · `drawCdeForm` 은 진입점이 없어 도달하지 않는다.
+     개발룸 목업과 대조가 끝나면 지운다.
+
+── 공용 워크스페이스 수정 노출 (2026-08-26) ────
+   목록에서 공용 워크스페이스에도 수정이 떠 있었다. `isSysWs()` 가 패널에 열린 대상만
+   보고 있어 목록을 그릴 때는 그 행이 아니라 직전에 연 대상을 판정하고 있었다.
+   대상을 인자로 받게 고쳤다 — 카드·테이블 모두 행마다 판정한다.
+   공용은 기본 정보 수정과 삭제를 노출하지 않는다(정책 6.1·6.2).
+   ⚠ 연동·외부 배포·API Key 는 공용도 일반과 동일하다(6.2). 기본 정보 수정과 권한 축이
+     달라 `canManageExt()` 로 갈랐다.
+
+── 탭 배지 (2026-08-26) ──────────────────────
+   상세 탭(멤버·연동·API Key)에 건수를 넣었다. 탭을 열기 전에 몇 건인지가 판단 재료다 —
+   멤버는 몇 명인지, 연동·API Key 는 걸려 있는 게 있는지.
+   기준 — 그 건수가 탭을 열기 전 판단에 쓰일 때만 둔다. 성격이 다른 자산을 가르는 탭에는
+   두지 않는다(모델 목록 `이미지 / 가중치`, 배포 상세 `개요 / 모니터링 / 벤치마크`).
+   ⚠ 탭별 건수를 목록 조회와 별도로 받을 수 있는지 확인 대상.
+
+── 계정 상태와 초대 (2026-08-26) ─────────────
+   초대·소유자 후보를 로그인할 수 있는 계정으로 좁혔다 — 승인 + 활성(계정정책 3장).
+   종전에는 이름 배열이라 상태 개념이 없어 비활성 계정도 초대할 수 있었다.
+   쓸 수 없는 권한이 남고, 활성으로 돌아왔을 때 본인도 모르는 소속이 생긴다.
+   ⚠ 상태는 플랫폼 설정이 갖고 있다. 화면은 조회해 받는다(계정정책 8. 17번).
+
+   삭제 실패 안내에서 `원인을 확인한 뒤` 를 뺐다. 상세 진입이 막혀 있어 확인할 화면이 없다.
+   ⚠ 실패 사유를 목록에서 보여줄 수 있는지 확인 대상.
+
+   헤더 주석의 워크스페이스 상태 `6종` 서술을 지웠다. 정책 2.6 은 4종(활성·삭제 중·
+   삭제 실패·삭제됨)이고 다른 주석·WST·필터가 이미 그쪽이었다 — 옛 판 잔존이다.
+
+── 상태로 막힌 작업 (2026-08-26) ─────────────
+   삭제 중·삭제 실패 워크스페이스에도 `수정` 이 활성으로 떠 있었다. 누르면 알럿으로 막히나
+   메뉴에서는 실행할 수 있는 것처럼 보였다. 목록 카드·테이블·패널·상세 넷 모두
+   비활성 + 사유로 바꿨다 — 권한 없는 기능의 미노출(7.10)과 구분한다.
+
+── 행 액션 표기 (2026-08-26) ─────────────────
+   테이블 행의 액션을 아이콘에서 텍스트 버튼으로 바꿨다 — 멤버 제외·나가기, API Key 폐기,
+   외부 배포 해제, 작업 로그 보기. 아이콘만 두면 무엇을 하는 버튼인지 눌러 봐야 알고,
+   같은 성격의 액션이 화면마다 아이콘·텍스트로 갈려 있었다(개발룸은 `로그 보기` 텍스트).
+   파괴적 액션 진입은 외곽선(`.btn.danger-line.sm`), 그 외는 흐린 버튼(`.btn.ghost.sm`)이다.
+   ⚠ 툴바(열 편집·다운로드·새로 고침)와 폼 입력 행의 제거는 아이콘을 유지한다 —
+     자리를 차지하는 것이 아니라 도구다.
+
+   `작업` 열 헤더를 표시했다. 종전에는 `.sronly` 로 숨겨 화면에서 그 열이 무엇인지
+   알 수 없었다. 라이브러리 정본과 공통정책 2.2 가 `작업` 을 두고 있다.
+
+── 외부 배포 섹션 (2026-08-26) ────────────────
+   · 해제를 텍스트 버튼(`.btn.danger-line.sm`)으로 바꿨다. 종전에는 닫기(X) 아이콘이라
+     무엇을 하는 버튼인지 눌러 봐야 알 수 있었다. 파괴적 액션 진입은 외곽선 버튼으로 둔다
+     (라이브러리 — 확인 알럿의 최종 실행만 채운다). 작업 열 폭을 72px 로 넓혔다.
+     ⚠ API Key 폐기는 아직 아이콘 버튼이다. 같은 성격이라 함께 맞출지 확인이 필요하다.
+   · 라벨을 `외부 배포` 로 통일했다. 섹션 제목·등록 버튼은 `외부 배포` 인데
+     해제 버튼·알럿·토스트만 `연동` 이었다(공통정책 1.1).
+
+── 입력 오류 표시 (2026-08-26) ────────────────
+   `.errmsg` 에 기본 숨김 규칙이 없어 모달을 열자마자 오류 문구가 다 보였다.
+   `.show` 로 켜는 코드는 16곳에 있는데 CSS 규칙이 빠져 있었다.
+   라이브러리 정본도 기본 숨김이다 — `display:none` 을 기본으로 두고 `.show` 로 켠다.
+   ⚠ 인라인 `style="display:block"` 으로 켜는 자리(자원 입력 한도 안내)는 그대로 둔다.
+     조건에 따라 그리는 것이라 클래스 토글을 쓰지 않는다.
+
+── v0.4 변경 ───────────────────────────────────
+  · API Key 를 계정 단위 발급으로 바꿨다(정책 7장 · 8/19 회의 3.4).
+    키를 관리하는 도메인이 워크스페이스가 아니라 계정에 있고, 인증·인가에서 발급해
+    워크스페이스가 참조해 쓴다. 계정이 인증 주체이므로 역할과 무관하게 본인 키는
+    본인이 만들고 지운다 — 뷰어도 발급한다.
+    남의 키는 목록에 보이되 폐기 버튼을 두지 않는다. 워크스페이스 관리자도
+    키 값은 못 보고 사용 현황만 본다(정책 7.1).
+    사용 현황으로 `접근 허용 모델`과 `마지막 사용` 을 둔다. 앞은 발급 시 정한 범위이고
+    뒤는 실제로 쓰고 있는지다 — 안 쓰는 키를 찾아 폐기하려면 뒤가 필요하다.
+    마지막 사용 시각은 인증 시점에 기록되므로 인증·인가 도메인이 갖고 있다.
+    ⚠ 호출 수는 게이트웨이 소관이라 여기 두지 않는다(정책 7장 — 유량 제한은 게이트웨이).
+      키 단위 호출 조회는 모니터링 기획에서 다룬다.
   · 상단 워크스페이스 스위처를 조회 필터로 바꿨다(8/19 배포 회의 3.1).
     눌러도 상세로 이동하지 않고 현재 화면의 목록을 거른다.
     상세 진입 바로가기로 두면 상단 표기가 무엇을 뜻하는지 흐려진다.
@@ -27,7 +163,8 @@
   · 라이브러리 v0.3 규격에서 벗어나 있던 것을 맞췄다 —
     포커스 링(box-shadow) · 필수 표시 여백 · 페이지네이션 · 버튼 font-family ·
     모달 그림자 토큰화 · 등장 애니메이션(min·tin).
-    모달 폭(440px)·좌측 단계 sticky·테이블 헤더 white-space 는 이 화면 사정이라 남긴다.
+    모달 폭(440px)·좌측 단계 sticky·테이블 헤더 white-space 는 각각 이유가 있어 남긴다 —
+    입력이 많은 모달, 페이지 스크롤, 정렬 클릭 대상. 주석에 사유를 달았다.
 
   ── 목록 ────────────────────────────────────────
   · 카드 기본 + 테이블 전환. 표현이 바뀌어도 조회 조건과 선택 상태를 유지한다(공통정책 2.4)
@@ -78,7 +215,7 @@
   · 합계는 반복 필드 아래 한 줄로 모은다. vRAM 총량이 판단 기준이다
   · 행마다 환산값을 두지 않는다. 중간 계산이고 가속기 풀이 혼합 구성되면 숫자가 쌓인다
   · MIG로 분할된 가속기는 별도 타입으로 제공한다
-  · 라벨은 자원 유형(AI 가속기) 하나다. 종류는 그 아래 행으로 반복한다 —
+  · 라벨은 자원 유형(가속기) 하나다. 종류는 그 아래 행으로 반복한다 —
     CPU·Memory와 같은 층위로 두어야 종류가 늘어도 구조가 흔들리지 않는다
   · 잔여 카드에서도 카드로 흩뿌리지 않고 한 블록에 목록으로 모은다
   · 자원은 연산(CPU·Memory·가속기) → 저장(공유 볼륨) 순으로 나열한다.
@@ -90,10 +227,10 @@
   · 워크스페이스 할당량은 기본적으로 운영룸이 사용한다.
     개발룸을 만들면 할당한 만큼 운영룸 한도에서 옮겨진다
   · 운영룸이 개발룸보다 우선한다. 운영룸 자원이 부족해지면 개발룸에 배정된 자원을 회수해 사용한다
-  · 워크스페이스 상태는 생성 중 · 활성 · 생성 실패 · 삭제 중 · 삭제 실패 · 삭제됨 6종이다.
-    실패를 단계별로 나눈다 — 생성 실패는 다시 시도하면 되지만
-    삭제 실패는 원인을 정리한 뒤 다시 시도해야 해서 할 일이 다르다
-    `삭제됨`은 목록에서 제외하므로 화면에는 5종이 나온다.
+  · 워크스페이스 상태는 활성 · 삭제 중 · 삭제 실패 · 삭제됨 4종이다(정책 2.6).
+    논리 레코드라 생성 요청과 동시에 만들어져 생성 관련 상태를 두지 않는다 —
+    인프라 생성의 진행·실패는 룸에서 관리한다(정책 3.5).
+    `삭제됨`은 목록에서 제외하므로 화면에는 3종이 나온다.
     워크스페이스는 논리 계층이라 라이프사이클 어휘(활성)를, 룸은 동작을 판정하므로
     헬스 어휘(정상·오류)를 쓴다. 한 대상에 두 계열을 섞지 않는다
     할당량 변경은 찰나라 상태로 두지 않는다
@@ -211,6 +348,9 @@ a{color:inherit}
 .worklist svg{width:19px;height:19px;color:var(--muted-foreground)}
 .cbadge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--primary);color:var(--primary-foreground);font-size:12px;font-weight:700;display:grid;place-items:center}
 .worklist:hover{background:var(--hover);color:var(--foreground)}
+/* 내 작업함 화면에서는 지금 보고 있는 곳임을 밝힌다. GNB 메뉴와 같은 규격이다(.nav a.active) */
+.worklist.active{background:var(--selected);color:var(--foreground);font-weight:600}
+.worklist.active svg{color:var(--foreground)}
 .notice-common{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground);text-decoration:none;font-size:14px;margin-bottom:10px}
 .notice-common svg{width:19px;height:19px}
 .worklist .cbadge,.notice-common .cbadge{margin-left:auto}
@@ -249,9 +389,10 @@ body.panel-on .page{padding-right:calc(var(--panel-w) + 28px)}
 
 /* 탭 */
 .tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:16px}
-.tabs button{padding:10px 16px;background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted-foreground);font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+.tabs button{padding:10px 16px;background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted-foreground);font-size:13.5px;font-family:inherit;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px}
 .tabs button.on{color:var(--foreground);border-bottom-color:var(--primary)}
 .tabs .cnt{font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:20px;background:var(--muted);color:var(--muted-foreground)}
+.wtabs .cnt{margin-left:6px}
 .tabs button.on .cnt{background:var(--primary);color:var(--primary-foreground)}
 
 /* 툴바 */
@@ -396,7 +537,9 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .inp:focus{outline:none;border-color:var(--ring);box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
 .inp.err{border-color:var(--destructive)}
 .hint{font-size:11.5px;color:var(--muted-foreground);margin-top:5px;line-height:1.55}
-.errmsg{font-size:11.5px;color:var(--destructive);margin-top:5px}
+/* 라이브러리 정본은 기본 숨김이고 조건이 맞을 때만 보인다. 이 파일은 `.show` 로 켠다 */
+.errmsg{font-size:11.5px;color:var(--destructive);margin-top:5px;display:none}
+.errmsg.show{display:block}
 .row2{display:grid;grid-template-columns:150px 1fr;gap:8px}
 .pick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .pick label{display:block;padding:12px;border:1px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;font-size:12.5px;font-weight:600;margin:0}
@@ -568,6 +711,8 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
   display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;font-size:12px;border-top:1px solid #2a2f45;}
 
 .demo-bar .demo-label{color:#7f88a8;margin-right:4px;}
+/* 라벨과 버튼을 한 덩어리로 묶어 그룹째 줄이 바뀌게 한다 */
+.demo-bar .dgrp{display:inline-flex;align-items:center;gap:6px;margin-right:14px;}
 /* 목록 구획 제목 — 성격이 다른 항목을 가른다 */
 /* 값 태그 — 읽기만 하는 라벨. 배경 없이 테두리로 구분 (라이브러리 v0.4) */
 /* 본인 CDE 행 — 목록에서 내 것을 바로 찾을 수 있게 한다 */
@@ -687,8 +832,7 @@ th.thcell.fdd-on .fdd{display:block}
 
 /* ── 배포 마법사 ─────────────────────────────────────── */
 .wiz{display:grid;grid-template-columns:230px 1fr;gap:22px;align-items:start}
-/* 폭 230px 은 그리드에서 잡는다(라이브러리와 같은 값).
-   페이지 스크롤이 있어 sticky 를 더했다 — 라이브러리 개정 제안 대상 */
+/* 라이브러리 v0.6 규격이다 — 폭 230px · sticky */
 .wnav{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 12px;position:sticky;top:0}
 .wnav h5{margin:0 0 10px;font-size:11px;font-weight:700;color:var(--muted-foreground);letter-spacing:.4px}
 .wstep{display:flex;align-items:flex-start;gap:10px;padding:9px 8px;border-radius:8px;cursor:pointer;margin-bottom:2px}
@@ -717,6 +861,9 @@ th.thcell.fdd-on .fdd{display:block}
 .fld{display:flex;flex-direction:column;gap:6px}
 .fld label{font-size:12px;font-weight:600;color:var(--muted-foreground)}
 .fld .hint{font-size:11px;color:var(--faint);line-height:1.5}
+/* 두 칸을 한 줄에 둔다 */
+.f2{display:flex;gap:14px;align-items:flex-start}
+.f2>.f{flex:1;min-width:0}
 .optcard{display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border:1px solid var(--border);border-radius:10px;cursor:pointer;background:transparent}
 .optcard:hover{border-color:var(--accent)}
 .optcard.on{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 7%,transparent)}
@@ -762,6 +909,8 @@ th.thcell.fdd-on .fdd{display:block}
 .dact{margin-left:auto;display:flex;gap:8px;flex:0 0 auto}
 .back,.dhead .back{width:32px;height:32px;flex:0 0 auto;display:grid;place-items:center;border:1px solid var(--border-strong);background:var(--card);border-radius:8px;color:var(--muted-foreground);cursor:pointer}
 .back:hover,.dhead .back:hover{border-color:var(--accent);color:var(--foreground)}
+  /* 아이콘 크기를 규칙으로 둔다. 마크업마다 inline 으로 적으면 화면마다 달라진다 */
+  .back svg,.dhead .back svg{width:15px;height:15px}
 .dhead .dinfo{flex:1;min-width:0}
 .dhead h1{margin:0 0 6px;font-size:20px;letter-spacing:-.3px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .dhead .dmeta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -777,6 +926,8 @@ th.thcell.fdd-on .fdd{display:block}
 .dark .dtabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
 .dsec{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px 18px;margin-bottom:14px}
 .dsec > h4{margin:0 0 12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+/* 섹션 액션 — 제목 줄 우측에 붙인다(공통정책 3.6) */
+.secbtns{margin-left:auto;display:flex;gap:6px}
 .mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
 .mcard{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px}
 .mcard .mt{font-size:11px;color:var(--muted-foreground);margin-bottom:7px;display:flex;align-items:center;gap:5px}
@@ -1025,7 +1176,8 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .go{gap:6px}
 .ar{color:var(--muted-foreground);font-weight:400}
 .go .ar{margin-left:0}
-.btn:hover:not(:disabled) .ar,/* 설명 셀 — 한 줄 말줄임. 전문은 패널·상세에서 확인한다(공통정책 1.2) */
+.btn:hover:not(:disabled) .ar{color:inherit}
+/* 설명 셀 — 한 줄 말줄임. 전문은 패널·상세에서 확인한다(공통정책 1.2) */
 .celldesc{display:block;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted-foreground)}
 
 
@@ -1159,7 +1311,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 /* 제거 버튼 자리를 모든 행에 두어 우측 정렬을 맞춘다 */
 .qrhead .qrdel{flex:0 0 26px;display:flex;justify-content:flex-end}
 .qrowbox.err .qrcap{color:var(--destructive)}
-.qrowbox.err .qrowbox.err /* 부가정보 블록 — 입력이 아닌 참조값·계산 결과는 표면 배경으로 분리한다.
+/* 부가정보 블록 — 입력이 아닌 참조값·계산 결과는 표면 배경으로 분리한다.
    간격은 4의 배수로 맞춘다 */
 .subbox{padding:16px;border-radius:10px;background:var(--muted);border:1px solid var(--border);
   display:flex;flex-direction:column;gap:12px}
@@ -1351,8 +1503,11 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
       <div class="flywrap" id="setWrap">
         <a href="#" class="has-fly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 00-1.7-1L15 3H9l-.4 2.6a7.6 7.6 0 00-1.7 1l-2.3-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 001.7 1L9 21h6l.4-2.6a7.6 7.6 0 001.7-1l2.3 1 2-3.4z"/></svg><span class="lb">플랫폼 설정</span></a>
         <div class="flyout">
-          <a href="#">사용자 및 역할 <span class="tb">RBAC</span></a>
-          <a href="#">보안 및 감사</a><a href="#">외부 연동</a><a href="#">알림 채널</a>
+          <a href="#">사용자 및 역할</a>
+          <a href="#">보안 및 감사</a>
+          <a href="#">인프라 자원</a>
+          <a href="#">카탈로그</a>
+          <a href="#">연동 및 알림</a>
         </div>
       </div>
     </div>
@@ -1384,7 +1539,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <div class="searchzone">
           <div class="searchbar">
             <svg class="sicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-            <input id="q" placeholder="항목 이름 또는 값을 입력해 주세요." oninput="onSearch(this.value)">
+            <input id="q" placeholder="항목 이름 또는 값을 입력해 주세요." onkeydown="onSearchKey(event)">
             <button class="qclr" id="qclr" onclick="clearQ()" title="검색어 지우기" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
           </div>
         </div>
@@ -1513,12 +1668,14 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <label>아이콘</label>
         <div class="icopick" id="eIco"></div>
       </div>
-      <div class="f">
-        <label>워크스페이스명<span class="req">*</span></label>
-        <div style="display:flex;gap:8px">
+      <!-- 공용 워크스페이스는 이름을 바꾸지 않는다(정책 6.1). 입력 대신 읽기 전용으로 둔다 -->
+      <div class="f" id="eNameWrap">
+        <label>워크스페이스명<span class="req" id="eNameReq">*</span></label>
+        <div style="display:flex;gap:8px" id="eNameEdit">
           <input class="inp" id="eName" oninput="eChanged()" onblur="eBlur()">
           <button class="btn ghost" style="flex:0 0 auto" id="eDupBtn" onclick="eDup()">중복 확인</button>
         </div>
+        <div class="ro" id="eNameRo" style="display:none"></div>
         <div class="errmsg" id="eNameErr"></div>
         <div class="hint" id="eNameHint">영문 소문자·숫자·하이픈만 사용할 수 있습니다.</div>
       </div>
@@ -1558,9 +1715,36 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
           <div><div class="oc-t">프록시 사용</div><div class="oc-d">외부 연결이 프록시를 거쳐야 하는 망에서 사용합니다.</div></div>
         </div>
       </div>
-      <div class="f" id="cnProxyWrap" style="display:none;margin-bottom:0">
-        <label>프록시 주소</label>
-        <input class="inp" placeholder="http://proxy.internal:3128">
+      <!-- 서버와 포트를 나눠 받는다. 한 칸에 받으면 포트를 빼먹거나 구분자를 잘못 쓰기 쉽고
+           포트는 숫자라 따로 받으면 검증이 된다(Jenkins·Oracle 데스크톱 설정과 같은 형태).
+           인증은 프록시 서버에 로그인하는 계정이다. 액세스 토큰과 다른 값이다 —
+           표준 형식은 http://user:pass@host:port 이나 한 칸에 넣으면 비밀번호가 그대로 보여
+           나눠 받고 마스킹한다 -->
+      <div id="cnProxyWrap" style="display:none">
+        <div class="f2">
+          <div class="f" style="margin-bottom:0">
+            <label>프록시 서버<span class="req">*</span></label>
+            <input class="inp" placeholder="proxy.internal">
+          </div>
+          <div class="f" style="margin-bottom:0;max-width:140px">
+            <label>포트<span class="req">*</span></label>
+            <input class="inp" placeholder="3128" inputmode="numeric">
+          </div>
+        </div>
+        <!-- 인증은 세로로 쌓는다. 비밀번호가 등록되면 `등록됨` 배지와 변경·삭제 버튼이
+             들어가 절반 폭으로는 좁고, 계정과 나란히 두면 두 칸의 높이가 갈린다 -->
+        <div class="f" style="margin-top:14px">
+          <label>인증 계정<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">프록시 서버에 로그인이 필요한 경우에만 입력합니다.</span></span></label>
+          <input class="inp" placeholder="선택 입력">
+        </div>
+        <div class="f" style="margin-bottom:0">
+          <label>인증 비밀번호<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">저장한 값은 다시 조회할 수 없습니다. 바꾸려면 새 비밀번호를 입력해 저장합니다.</span></span></label>
+          <!-- 액세스 토큰과 같은 규격. 저장된 비밀값은 되돌려 주지 않고 등록 여부만 알린다 -->
+          <div id="cnPwBox"></div>
+        </div>
+        <div class="secact" style="margin-top:14px;margin-bottom:0">
+          <button class="btn ghost sm" onclick="act('프록시 연결을 확인했습니다.')">연결 확인</button>
+        </div>
       </div>
     </div>
     <div class="mdfoot">
@@ -1575,7 +1759,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 <div class="mdbg" id="mdExt">
   <div class="modal" style="width:520px">
     <div class="mdhead">
-      <h3>외부 모델 등록</h3>
+      <h3>외부 배포 등록</h3>
       <p>외부 상용 AI API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.</p>
     </div>
     <div class="mdbody">
@@ -1637,71 +1821,81 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 <div class="toast-wrap" id="toasts"></div>
 
 <div class="demo-bar" id="demoBar">
-  <span class="demo-label">화면:</span>
+  
+  <span class="dgrp"><span class="demo-label">화면:</span>
   <button class="vw on" onclick="goList(this)">목록</button>
   <button class="vw" onclick="goDemo('detail',this)">상세</button>
   <button class="vw" onclick="goDemo('dev',this)">개발룸</button>
   <button class="vw" onclick="goDemo('prod',this)">운영룸</button>
   <button class="vw" onclick="goDemo('new',this)">생성</button>
-  <button class="vw" onclick="goDemo('req',this)">신청</button>
-  <span class="demo-label" style="margin-left:12px;">데이터:</span>
+  <button class="vw" onclick="goDemo('req',this)">신청</button></span>
+  <span class="dgrp"><span class="demo-label">데이터:</span>
   <button class="st on" onclick="setState('default',this)">기본</button>
   <button class="st" onclick="setState('empty',this)">빈 상태</button>
   <button class="st" onclick="setState('loading',this)">로딩</button>
-  <button class="st" onclick="setState('error',this)">오류</button>
-  <span class="demo-label" style="margin-left:12px;">권한:</span>
+  <button class="st" onclick="setState('error',this)">오류</button></span>
+  <span class="dgrp"><span class="demo-label">권한:</span>
   <button class="rl on" onclick="setRole('super',this)">최고 관리자</button>
   <button class="rl" onclick="setRole('admin',this)">WS 관리자</button>
   <button class="rl" onclick="setRole('editor',this)">편집자</button>
-  <button class="rl" onclick="setRole('viewer',this)">뷰어</button>
-  <span class="demo-label" style="margin-left:12px;">테마:</span>
+  <button class="rl" onclick="setRole('viewer',this)">뷰어</button></span>
+  <span class="dgrp"><span class="demo-label">테마:</span>
   <button onclick="document.body.classList.remove('dark')">라이트</button>
-  <button onclick="document.body.classList.add('dark')">다크</button>
+  <button onclick="document.body.classList.add('dark')">다크</button></span>
 </div>
 <script>
 /* ===== 데이터 =====
    DEV·PROD는 물리 분리된 환경이며 자원 한도를 각각 책정한다(기술문서 워크스페이스 절).
    개발룸에 할당하고 남은 유휴 쿼터가 운영룸으로 자동 스케줄링된다(현행 운영룸 안내). */
-/* 공용 워크스페이스(현행 Common Workspace) — A/B 비교 대상.
-   A안: 공용 배포가 이 공간에서 실제로 운영된다는 전제. 자원을 쓰는 실체이므로 목록에 표시한다.
-        전 역할이 조회하고 수정·삭제는 최고 관리자 전용(공통정책 9.4에 따라 그 외에는 미노출).
-   B안: 공용 자산을 속성으로만 표현한다는 전제. 목록에 두지 않는다.
+/* 공용 워크스페이스(현행 Common Workspace) — 목록에 표시한다(A안 채택, 정책 6.3).
+   자원을 쓰는 실체이므로 목록에서 빼지 않는다.
+   전 역할이 조회하고(정책 6.1) 속성 운영은 지정된 Workspace Admin 이 한다(정책 6.1·8장).
+   예외는 셋뿐이다 — 삭제(2.5) · 자원 할당량(6.2) · 이름(6.1).
+   ⚠ 종전 주석이 `수정·삭제는 최고 관리자 전용` 으로 적었으나 정책 6.2 `일반과 동일` 과
+     어긋났고 구현도 Workspace Admin 이었다. 정책 v0.42 에서 층위를 갈라 정리했다.
    확인 항목 — 공용 배포가 실제로 이 공간에서 운영되는가 */
 /* 소속 수 — 1이면 소속 워크스페이스를 하나로 좁혀 단일 소속 동작을 재현한다.
    데이터는 그대로 두고 조회 결과만 좁히므로 다른 화면에 영향이 없다 */
 const WS=[
- /* 공용 워크스페이스 — 조회는 일반 워크스페이스와 동일하게 패널·상세를 제공한다.
-    다른 것은 목록에서의 위치(정렬 제외)와 수정·삭제 진입점 미노출뿐이다 */
- {n:'공용 워크스페이스',ico:'globe',st:'활성',desc:'플랫폼 공용 공간. 공통 모델과 데이터셋을 제공한다',
+ /* 공용 워크스페이스 — 조회·수정은 일반 워크스페이스와 동일하다(정책 6.2).
+    다른 것은 목록에서의 위치(정렬 제외)와 예외 셋이다 —
+    삭제 진입점 미노출(2.5) · 자원 할당량 진입점 미노출(6.2) ·
+    기본 정보(이름·설명·아이콘) 수정 진입점 미노출(6.1) */
+ {n:'공용 워크스페이스',ico:'globe',st:'활성',/* 설치 시 고정 문구다. 아무도 바꾸지 않는다(정책 6.1) */
+   desc:'전 사용자가 함께 쓰는 자산을 두는 공간',
   sys:true, prod:'정상', dev:'정상', by:'시스템', at:'2026-01-02 09:00:00',
   /* 공용 워크스페이스는 자원 할당 정책이 없다. 다른 워크스페이스에 배분하고 남은 자원을 쓴다.
      공유 볼륨만 값을 갖는다 */
   quota:{cpu:0,ram:0,gpu:0,vol:50},
   devq:{cpu:0,ram:0,gpu:0},
   use:{cpu:0,ram:0,gpu:0},
-  members:[{n:'박준호',id:'admin',role:'관리자'}],
-  models:[{n:'qwen3-32b',st:'캐싱됨',use:'배포 중'},{n:'gemma-4-12b-it',st:'캐싱됨',use:'배포 중'}],
-  deps:[{n:'qwen3-32b-global',st:'정상',rep:'2 / 2',by:'박준호(admin)'},{n:'gemma-4-12b-global',st:'정상',rep:'2 / 2',by:'성유진(yj.seong)'}],
+  members:[{n:'관리자',id:'admin',role:'관리자'}],
+  models:[{n:'qwen3-32b',st:'캐싱됨',use:'미사용'},{n:'gpt-oss-120b',st:'캐싱됨',use:'배포 중'}],
+  deps:[{n:'furiosa-gpt-oss-120b-biz-prod',st:'정상',rep:'1',by:'-'},{n:'gpt-oss-20b-081valid',st:'정상',rep:'2',by:'-'}],
   ext:[], cdes:[], keys:[], jobs:[]},
  {n:'ai-service-team',ico:'server',st:'활성',desc:'AI 서비스 개발 및 모델 서빙',
   prod:'정상',dev:'정상',by:'성유진(yj.seong)',at:'2026-05-14 10:20:31',
-  quota:{cpu:32,ram:128,gpu:2,vol:100},
-  devq:{cpu:8,ram:32,gpu:1},
-  use:{cpu:28,ram:112,gpu:2},
+  /* 개발룸 목업과 같은 값이다. devq 안에서 CDE 가 20 Cores · 80 Gi · 가속기 2 를 점유한다 */
+  quota:{cpu:64,ram:256,gpu:4,vol:500},
+  devq:{cpu:32,ram:128,gpu:2},
+  use:{cpu:44,ram:176,gpu:3},
   members:[{n:'성유진',id:'yj.seong',role:'관리자'},{n:'임승주',id:'sj.lim',role:'편집자'},{n:'유지현',id:'jh.yu',role:'뷰어'}],
-  models:[{n:'qwen3-6-35b-a3b-fp8',st:'캐싱됨',use:'배포 중'},{n:'gemma-4-12b-it',st:'미캐싱',use:'미사용'}],
-  deps:[{n:'qwen3-6-35b-a3b-fp8-symphony',st:'정상',rep:'2 / 2',by:'성유진(yj.seong)'}],
+  models:[{n:'llama-3.2-1b-instruct',st:'캐싱됨',use:'배포 중'},{n:'gemma-4-12b-it',st:'미캐싱',use:'배포 중'}],
+  deps:[{n:'llama-3-2-1b-prod',st:'정상',rep:'2 / 2',by:'성유진(yj.seong)'},{n:'gpt-oss-120b-symphony',st:'정상',rep:'4 / 4',by:'임승주(sj.lim)'},{n:'gemma-4-12b-it-idle',st:'유휴',rep:'0 / 2',by:'성유진(yj.seong)'},{n:'solar-open-100b-paused',st:'중지됨',rep:'0 / 1',by:'유지현(jh.yu)'}],
   ext:[{n:'gpt-4o',prov:'OpenAI',st:'정상'},{n:'claude-sonnet-4-6',prov:'Anthropic',st:'정상'}],
   hfToken:true, hfTokenAt:'2026-07-14 10:20',
-  cdes:[{u:'yj.seong',env:'Jupyter Lab',fw:'PyTorch (Furiosa)',acc:'Furiosa RNGD 2개',mode:'비동기 위임',
+  cdes:[{u:'yj.seong',env:'Jupyter Lab',fw:'PyTorch (Furiosa)',acc:'Furiosa RNGD 2장',mode:'비동기 위임',
          start:'2026-07-08 17:47:25',exp:'2026-08-08 17:47:00',st:'정상',ip:'10.20.0.0/16'},
-        {u:'sj.lim',env:'VS Code',fw:'PyTorch (CUDA)',acc:'NVIDIA-H200 1개',mode:'대화형',
+        {u:'sj.lim',env:'VS Code',fw:'PyTorch (CUDA)',acc:'NVIDIA-H200 1장',mode:'대화형',
          start:'2026-07-11 09:02:10',exp:'2026-08-11 09:02:00',st:'절전',ip:'-'},
-        {u:'jh.yu',env:'Jupyter Lab',fw:'PyTorch (CUDA)',acc:'NVIDIA-H200 1개',mode:'비동기 위임',
+        {u:'jh.yu',env:'Jupyter Lab',fw:'PyTorch (CUDA)',acc:'NVIDIA-H200 1장',mode:'비동기 위임',
          start:'-',exp:'-',st:'승인 대기',ip:'-',rsn:'실험 환경 필요'},
-        {u:'kh.oh',env:'VS Code',fw:'PyTorch (CUDA)',acc:'NVIDIA-H200 4개',mode:'대화형',
-         start:'-',exp:'-',st:'반려',ip:'-',rsn:'대규모 학습',rej:'가속기 잔여량 부족. 2개 이하로 다시 신청해 주세요.'}],
-  keys:[{n:'lang-chain-agent-prod',type:'일반',exp:'2026-08-28',by:'성유진(yj.seong)'}],
+        {u:'kh.oh',env:'VS Code',fw:'PyTorch (CUDA)',acc:'NVIDIA-H200 4장',mode:'대화형',
+         start:'-',exp:'-',st:'반려',ip:'-',rsn:'대규모 학습',rej:'가속기 잔여량 부족. 2장 이하로 다시 신청해 주세요.'}],
+  keys:[{n:'lang-chain-agent-prod',type:'일반',exp:'2026-08-28',by:'성유진(yj.seong)',
+    scope:['llama-3-2-1b-prod','gemma-4-12b-it-idle'], last:'2026-08-20 14:32:08'},
+   {n:'batch-infer-key',type:'일반',exp:'2026-09-30',by:'임승주(sj.lim)',
+    scope:['llama-3-2-1b-prod'], last:null}],
   jobs:[{id:'job-8f2a',u:'yj.seong',t:'학습',fw:'PyTorch',dur:'1시간 24분',st:'완료'},
         {id:'job-3c91',u:'yj.seong',t:'전처리',fw:'PyTorch',dur:'12분',st:'실행 중'},
         {id:'job-b04e',u:'sj.lim',t:'학습',fw:'PyTorch',dur:'3분',st:'실패',err:'CUDA out of memory. 배치 크기를 줄이거나 가속기를 늘려 주세요.'},
@@ -1711,7 +1905,7 @@ const WS=[
   quota:{cpu:8,ram:32,gpu:0,vol:50},
   devq:{cpu:0,ram:0,gpu:0},
   use:{cpu:2,ram:8,gpu:0},
-  members:[{n:'박준호',id:'admin',role:'관리자'}],
+  members:[{n:'관리자',id:'admin',role:'관리자'}],
   models:[], deps:[], ext:[], cdes:[], keys:[], jobs:[]},
  /* 워크스페이스는 만들어졌고 운영룸 생성이 실패한 경우 */
  {n:'edge-inference',ico:'chip',st:'활성',desc:'엣지 추론 실험',
@@ -1719,7 +1913,7 @@ const WS=[
   quota:{cpu:8,ram:32,gpu:0,vol:50},
   devq:{cpu:0,ram:0,gpu:0},
   use:{cpu:0,ram:0,gpu:0},
-  members:[{n:'박준호',id:'admin',role:'관리자'}],
+  members:[{n:'관리자',id:'admin',role:'관리자'}],
   models:[], deps:[], ext:[], cdes:[], keys:[], jobs:[]},
  /* 워크스페이스만 만들고 룸은 나중에 만드는 경우 */
  {n:'test-npu',ico:'chip',st:'활성',desc:'',
@@ -1727,7 +1921,7 @@ const WS=[
   quota:{cpu:16,ram:64,gpu:1,vol:50},
   devq:{cpu:0,ram:0,gpu:0},
   use:{cpu:4,ram:12,gpu:0},
-  members:[{n:'박준호',id:'admin',role:'관리자'},{n:'성유진',id:'yj.seong',role:'뷰어'}],
+  members:[{n:'관리자',id:'admin',role:'관리자'},{n:'성유진',id:'yj.seong',role:'뷰어'}],
   models:[], deps:[], ext:[], cdes:[], keys:[], jobs:[]},
  {n:'data-platform',ico:'db',st:'활성',desc:'데이터 파이프라인 및 전처리',
   prod:'정상',dev:'정상',by:'임승주(sj.lim)',at:'2026-06-20 13:05:44',
@@ -1745,7 +1939,7 @@ const WS=[
   members:[{n:'성유진',id:'yj.seong',role:'관리자'},{n:'유지현',id:'jh.yu',role:'편집자'}],
   models:[{n:'qwen3-32b',st:'캐싱됨',use:'미사용'}],
   deps:[], ext:[],
-  cdes:[{u:'jh.yu',env:'Jupyter Lab',fw:'PyTorch (CUDA)',acc:'NVIDIA-H200 2개',mode:'비동기 위임',
+  cdes:[{u:'jh.yu',env:'Jupyter Lab',fw:'PyTorch (CUDA)',acc:'NVIDIA-H200 2장',mode:'비동기 위임',
          start:'2026-07-15 10:11:02',exp:'2026-08-15 10:11:00',st:'정상',ip:'-'}],
   keys:[], jobs:[]},
  /* 편집자·뷰어도 여러 워크스페이스에 소속될 수 있다. 역할별 다중 소속을 확인하기 위한 데모 데이터 */
@@ -1764,11 +1958,11 @@ const WS=[
   members:[{n:'오경환',id:'kh.oh',role:'관리자'},{n:'성유진',id:'yj.seong',role:'뷰어'}],
   models:[], deps:[], ext:[], cdes:[], keys:[], jobs:[]}
 ];
-const RB={'정상':'ok','오류':'cr','생성 중':'ac load','미생성':'mu','승인':'ok','승인 대기':'ac','반려':'cr',
+const RB={'정상':'ok','오류':'cr','생성 중':'ac load','미생성':'mu','승인':'ok','승인 대기':'wa','반려':'cr',
           '캐싱됨':'ok','미캐싱':'mu','배포 중':'ok','미사용':'mu',
           /* CDE 라이프사이클 — 기술문서 전이도
              PENDING → PROVISIONING → ACTIVE → TERMINATING, PENDING → REJECTED */
-          '승인 대기':'ac','반려':'cr','준비 중':'ac load','절전':'mu','종료 중':'ac load','만료':'cr',
+          '승인 대기':'wa','반려':'cr','준비 중':'ac load','절전':'mu','종료 중':'ac load','만료':'cr',
           /* 배치 작업 — Pending / Running / Succeeded / Failed */
           '대기':'mu','실행 중':'ac load','완료':'ok','실패':'cr'};
 /* 워크스페이스 아이콘 — 용도 유형 8종. 라인 아이콘(stroke 1.8) 톤 통일. 직접 작성한 path만 사용 */
@@ -1808,25 +2002,54 @@ let state='default', role='super', view='list', listView='card', cur=null, formK
 /* 권한 (RBAC + 자원 배분은 플랫폼 운영자 소관) */
 const isSuper =()=>role==='super';
 const isWsAdmin=()=>role==='super'||role==='admin';
-/* 공용 워크스페이스도 일반 워크스페이스와 같은 구성을 제공한다.
-   콘체르토 가입 계정이 기본으로 소속되는 공간이며, 최고 관리자가 관리자를 지정한다.
-   다만 자원 배정 정책이 없어 할당량 수정 진입점만 노출하지 않고,
-   지우면 공용 서빙이 중단되므로 삭제도 노출하지 않는다 */
-const isSysWs =()=>!!(cur && cur.m && cur.m.sys);
-const canEditInfo =()=>isWsAdmin();   /* 설명 */
+/* 공용 워크스페이스도 일반 워크스페이스와 같은 구성을 제공한다(정책 6.2).
+   최고 관리자가 관리자를 지정하고(6.1) 그 뒤 속성 운영은 Workspace Admin 이 한다 —
+   정책 1.1 이 존재를 정하는 일(생성·삭제·관리자 지정)과 속성 운영을 층위로 가른다.
+   예외는 셋이다 — 자원 배정 정책이 없어 할당량 진입점을 두지 않고(6.2),
+   지우면 공용 서빙이 중단되므로 삭제도 두지 않고(2.5),
+   플랫폼에 하나뿐인 공간이라 정체성이 이름에 있어 이름을 바꾸지 않는다(6.1) */
+const isSysWs =(m)=>{ const t = m || (cur && cur.m); return !!(t && t.sys); };
+/* 공용은 기본 정보(이름·설명·아이콘)를 아무도 바꾸지 않는다(정책 6.1·8장).
+   자산 등록·수정·삭제·자원 할당량이 이미 막혀 있어 기본 정보만 열어 두면 기준이 갈린다.
+   설명은 설치 시 고정 문구로 둔다 — 전 사용자가 참조하는 문구다.
+   진입점을 두지 않는다(공통정책 7.10) */
+const canEditInfo =(m)=>!isSysWs(m) && isWsAdmin();
+/* 연동·외부 배포·API Key 는 공용도 일반과 동일하다(정책 6.2).
+   기본 정보 수정(6.1 미노출)과 권한 축이 다르므로 함수를 가른다 */
+const canManageExt=()=>isWsAdmin();   /* 이름·설명·아이콘 */
+/* 공용은 이름을 바꾸지 않는다(정책 6.1).
+   ⚠ 일반 워크스페이스의 이름 변경 가능 여부는 확인 대상이다(정책 10. 7번) —
+     `불가` 로 확정되면 여기도 읽기 전용으로 바꾼다 */
+const canEditName =()=>!isSysWs();
 /* 자원 할당량 조정은 워크스페이스 관리자가 한다(정책 명세서 2장 ADMIN 권한).
    논리 쿼터라 다른 워크스페이스의 물리 자원을 점유하지 않는다.
    생성·삭제와 초기 배정만 최고 관리자 소관이다 */
-const canEditQuota=()=>isWsAdmin() && !isSysWs();   /* 공용은 배정 정책이 없다 */
+const canEditQuota=(m)=>isWsAdmin() && !isSysWs(m);   /* 공용은 배정 정책이 없다 */
 /* 삭제 진행 중에는 같은 작업을 다시 실행할 수 없다(공통정책 7.4) */
 const isBusy=(m)=>m && m.st && m.st!=='활성';
 const canManageMember=()=>isWsAdmin();
-/* 발급 권한은 해당 모델을 배포한 사용자에게 있다(정책 7장).
-   편집자도 자기가 배포한 모델의 키를 만들 수 있어야 외부 앱을 붙일 수 있다.
-   최고 관리자는 전체 모델에 대해 발급한다 */
-const canIssueKey =()=>role!=='viewer';
-/* 뷰어는 API Key를 조회할 수 없다(정책 8장) */
+/* 키는 계정 단위로 발급한다(정책 7장 · 8/19 회의 3.4).
+   인증·인가 도메인에서 관리하며 워크스페이스가 참조해 쓴다.
+   계정이 인증 주체이므로 역할과 무관하게 본인 키는 본인이 만들고 지운다 */
+/* 삭제된 계정은 이름을 보이지 않고 `삭제됨` 으로 둔다(공통정책 1.6).
+   보관 기간이 지나면 물리 삭제되므로 이름을 남겨 둘 근거가 없고,
+   삭제된 사람의 이름이 여러 화면에 흩어지는 것도 막는다.
+   멤버 목록에서는 아예 빠진다 — 로그인할 수 없는 계정이 멤버로 남을 이유가 없다(계정정책 6장) */
+const DELETED_USERS=['mj.park'];
+function userRef(txt){
+  const m=String(txt).match(/\(([^)]+)\)$/);
+  const id=m? m[1] : txt;
+  if(DELETED_USERS.indexOf(id)<0) return txt;
+  return '<span class="tip-anchor"><span class="dash" tabindex="0">삭제됨</span>'
+   + '<span class="tip">삭제된 계정입니다.</span></span>';
+}
+
+/* 뷰어에게는 API Key 탭을 노출하지 않는다(정책 8장 · 공통정책 7.10).
+   탭이 없으면 발급 경로도 없다 — 종전에는 조회 ✕ 인데 발급 ○ 라 어긋났다 */
 const canViewKey  =()=>role!=='viewer';
+const canIssueKey =()=>canViewKey();
+/* 남의 키는 지울 수 없다. 워크스페이스 관리자도 사용 현황만 본다(정책 7.1) */
+const isMyKey =(k)=>k.by==='성유진(yj.seong)';
 const canCreateWs =()=>isSuper();
 const canRequestWs=()=>!isSuper();    /* 일반 사용자는 신청 */
 const canUseCde   =()=>role!=='viewer';
@@ -1853,9 +2076,11 @@ function goUserSetting(e,id){
 let sq='';
 /* 검색 조건 누적을 두지 않는다. 조건이 쌓이면 칩 줄이 늘어 도구 영역 높이가 흔들리고,
    워크스페이스 목록은 항목 수가 적어 누적 검색의 이점이 크지 않다 */
-function onSearch(v){
-  sq=v;
-  document.getElementById('qclr').hidden = !v;
+/* 공통정책 3.3 — 검색어 입력 후 엔터 시 검색한다. 한 글자마다 조회하지 않는다 */
+function onSearchKey(e){
+  if(e.key!=='Enter') return;
+  sq=e.target.value.trim();
+  document.getElementById('qclr').hidden = !sq;
   syncCondClr(); render();
 }
 function clearQ(){
@@ -1874,7 +2099,7 @@ const COLDEF={
   st:'워크스페이스의 상태입니다. 논리 레코드라 생성은 즉시 완료되며 삭제 관련 상태만 갖습니다.'
     +'<dl><dt>활성</dt><dd>사용할 수 있는 상태입니다.</dd>'
     +'<dt>삭제 중</dt><dd>룸과 하위 자원을 제거하고 있습니다. 시간이 걸립니다.</dd>'
-    +'<dt>삭제 실패</dt><dd>삭제에 실패했습니다. 원인을 확인한 뒤 다시 시도해 주세요.</dd></dl>',
+    +'<dt>삭제 실패</dt><dd>삭제에 실패했습니다. 다시 시도하거나 관리자에게 문의해 주세요.</dd></dl>',
   env:'워크스페이스 안의 두 환경 상태입니다. 운영룸은 게이트웨이, 개발룸은 게이트웨이와 공유 볼륨으로 판정합니다.'
     +'<dl><dt>미생성</dt><dd>아직 만들지 않았습니다. 개발룸에만 해당합니다.</dd>'
     +'<dt>생성 중</dt><dd>네임스페이스와 게이트웨이를 만들고 있습니다.</dd>'
@@ -2052,7 +2277,7 @@ function render(){
 
   const d=rows();
   if(!d.length){pg.style.display='none';
-    el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><h3>검색 결과가 없습니다.</h3><p>검색어나 필터 조건을 변경해보세요.</p><button class="btn ghost" onclick="resetF()">조건 초기화</button></div>';return;}
+    el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><h3>검색 결과가 없습니다.</h3><p>다른 조건으로 검색해 주세요.</p><button class="btn ghost" onclick="resetF()">조건 초기화</button></div>';return;}
 
   pg.style.display='flex';
   document.getElementById('pgtxt').textContent='총 '+d.length+'건';
@@ -2071,8 +2296,11 @@ function roomBtn(m,idx,kind){
   /* 두 룸 모두 선택으로 만들어지므로 미생성이 있다.
      생성은 Workspace Admin 이상이라 그 외에는 진입점을 노출하지 않는다(공통정책 7.10) */
   if(st==='미생성'){
+    /* 개발룸은 개발룸 화면 소관이다. 여기서는 상태만 보이고 진입만 시킨다 */
     if(!wsBusy && canEditQuota()){
-      return '<button class="roombtn add" onclick="event.stopPropagation();openRoom('+idx+',\''+kind+'\')">＋ '+lb+' 생성</button>';
+      return isDev
+        ? '<button class="roombtn add" onclick="event.stopPropagation();goDevRoom()">＋ 개발룸 생성</button>'
+        : '<button class="roombtn add" onclick="event.stopPropagation();openRoom('+idx+',\''+kind+'\')">＋ '+lb+' 생성</button>';
     }
     return '<button class="roombtn off" disabled title="'+(wsBusy? busyMsg(m) : lb+'은 워크스페이스 관리자가 만듭니다.')+'">'
      + '<span class="rdot mu"></span>'+lb+' 미생성</button>';
@@ -2081,8 +2309,10 @@ function roomBtn(m,idx,kind){
      카드의 룸 버튼은 진입 수단이므로 실행 액션을 섞지 않는다 */
   const canEnter = !wsBusy && (st==='정상'||st==='오류');
   const why = wsBusy? busyMsg(m) : roomMsg(st);
+  /* 개발룸은 개발룸 화면으로 보낸다. CDE·작업 이력·설정이 그쪽 소관이다 */
+  const go = isDev ? 'goDevRoom()' : 'openRoom('+idx+',\''+kind+'\')';
   return '<button class="roombtn'+(canEnter?'':' off')+'"'
-   + (canEnter? ' onclick="event.stopPropagation();openRoom('+idx+',\''+kind+'\')"' : ' disabled title="'+why+'"')
+   + (canEnter? ' onclick="event.stopPropagation();'+go+'"' : ' disabled title="'+why+'"')
    + '><span class="rdot '+(DOT[st]||'mu')+'"></span>'+lb+' '+st+'</button>';
 }
 /* 룸 생성·삭제 다시 시도 */
@@ -2122,17 +2352,19 @@ function retryRoom(i,kind){
   if(isDev) m.dev = del? '삭제 중' : '생성 중';
   else      m.prod = del? '삭제 중' : '생성 중';
   render();
-  toast('ok',(isDev?'개발룸':'운영룸')+' '+(del?'삭제':'생성')+'를 다시 요청했습니다. 완료되면 알림으로 안내됩니다.');
+  toast('ok',(isDev?'개발룸':'운영룸')+' '+(del?'삭제':'생성')+'를 다시 요청했습니다. '+(del?'자원 회수가':'준비가')+' 끝나면 알림으로 안내됩니다.');
 }
 function cardView(d){
   return '<div class="cardgrid">'+d.map(function(m){
     const idx=WS.indexOf(m);
     return '<div class="wcard'+(m.sys?' pincard':'')+'" data-i="'+idx+'" onclick="openPanel('+idx+')">'
-     /* 공용도 수정할 수 있다. 삭제만 노출하지 않는다.
+     /* 공용 워크스페이스는 기본 정보를 아무도 바꾸지 않는다(정책 6.1). 수정·삭제를 노출하지 않는다.
         실패 상태에서는 수정 대신 다시 시도를 둔다(정책 2.6 상태별 제약) */
-     + (canEditInfo()?'<div class="cmore more" id="cm'+idx+'" onclick="event.stopPropagation()"><button class="morebtn" onclick="tgMore(event,\'cm'+idx+'\')">⋯</button><div class="rowmenu">'
+     + (canEditInfo(m)?'<div class="cmore more" id="cm'+idx+'" onclick="event.stopPropagation()"><button class="morebtn" onclick="tgMore(event,\'cm'+idx+'\')">⋯</button><div class="rowmenu">'
         +(m.st==='삭제 실패'
-           ?'<button onclick="retryWs('+idx+')">다시 시도</button>'
+         ?'<button onclick="retryWs('+idx+')">다시 시도</button>'
+         : isBusy(m)
+           ?'<button disabled title="'+busyMsg(m)+'">수정</button>'
            :'<button onclick="openEditAt('+idx+')">수정</button>')
         +(canCreateWs()&&!m.sys
            ?'<hr><button class="d"'+(delBlocked(m)?' disabled title="'+busyMsg(m)+'"':'')
@@ -2188,17 +2420,19 @@ function tableView(d){
     + '<th class="thcell">'+thHelp('adm','관리자')+'</th>'
     + '<th class="thcell">'+thHelp('mem','멤버')+'</th>'
     + sortTh('at','생성일시')
-    + '<th style="width:44px"><span class="sronly">작업</span></th>';
+    + '<th style="width:64px">작업</th>';
   /* 공용 워크스페이스는 정렬·필터 대상이 아니므로 첫 행에 고정한다 */
   return '<div class="tblwrap"><table class="tbl"><thead><tr>'+th+'</tr></thead><tbody>'+
     d.map(function(m){
       const idx=WS.indexOf(m);
-      const act=(canEditInfo())
+      const act=(canEditInfo(m))
         ? '<td onclick="event.stopPropagation()"><div class="more" id="wm'+idx+'"><button class="morebtn" onclick="tgMore(event,\'wm'+idx+'\')">⋯</button><div class="rowmenu">'
           /* 실패 상태에서는 수정 대신 다시 시도를 둔다(정책 2.6) */
           +((m.st==='삭제 실패')
-             ?'<button onclick="retryWs('+idx+')">다시 시도</button>'
-             :'<button onclick="openEditAt('+idx+')">수정</button>')
+         ?'<button onclick="retryWs('+idx+')">다시 시도</button>'
+         : isBusy(m)
+           ?'<button disabled title="'+busyMsg(m)+'">수정</button>'
+           :'<button onclick="openEditAt('+idx+')">수정</button>')
             +(canCreateWs()&&!m.sys
              ?'<hr><button class="d"'+(delBlocked(m)?' disabled title="'+busyMsg(m)+'"':'')
               +' onclick="delWs(\''+m.n+'\')">삭제</button>':'')
@@ -2322,7 +2556,9 @@ function openPanel(i){
   document.getElementById('pnMenu').innerHTML =
     /* 실패 상태에서는 수정 대신 다시 시도를 둔다(정책 2.6) */
       ((m.st==='삭제 실패')
-        ? '<button onclick="retryWs('+WS.indexOf(m)+')">다시 시도</button>'
+      ? '<button onclick="retryWs('+WS.indexOf(m)+')">다시 시도</button>'
+      : isBusy(m)
+        ? '<button disabled title="'+busyMsg(m)+'">수정</button>'
         : '<button onclick="openEdit()">수정</button>')
     /* 공용은 지우면 공용 서빙이 중단되므로 삭제를 노출하지 않는다 */
     + (canCreateWs()&&!m.sys
@@ -2347,7 +2583,7 @@ function openPanel(i){
       : '<dl class="dl">'
     + '<dt>CPU</dt><dd>'+(m.quota.cpu-m.use.cpu)+' <span class="mver" style="margin:0">/ '+m.quota.cpu+' Cores</span></dd>'
     + '<dt>Memory</dt><dd>'+(m.quota.ram-m.use.ram)+' <span class="mver" style="margin:0">/ '+m.quota.ram+' Gi</span></dd>'
-    + '<dt>AI 가속기</dt><dd>'+(m.quota.gpu-m.use.gpu)+' <span class="mver" style="margin:0">/ '+m.quota.gpu+'개</span></dd>'
+    + '<dt>가속기</dt><dd>'+(m.quota.gpu-m.use.gpu)+' <span class="mver" style="margin:0">/ '+m.quota.gpu+'장</span></dd>'
     + '</dl>', 'quota');
 
   h+=sec('환경', pnRoomBlock(m), 'rooms');
@@ -2398,7 +2634,7 @@ function syncView(){
         formKind==='quota' ? root+' / '+wsStep+' / '+detailStep+' / <b>할당량 수정</b>'
       : formKind==='devroom' ? root+' / '+wsStep+' / '+detailStep+' / <b>개발룸 생성</b>'
       : (formKind==='cde'||formKind==='cdeExt')
-        ? root+' / '+wsStep+' / '+detailStep+' / <a href="#" onclick="openRoom(null,\'dev\');return false">개발룸</a> / <b>'+(formKind==='cde'?'CDE 신청':'기한 연장 신청')+'</b>'
+        ? root+' / '+wsStep+' / '+detailStep+' / <a href="#" onclick="goDevRoom();return false">개발룸</a> / <b>'+(formKind==='cde'?'CDE 신청':'연장 신청')+'</b>'
       : root+' / '+wsStep+' / <b>'+(formKind==='new'?'생성':'신청')+'</b>';
   else                     bc.innerHTML=root+' / <b>워크스페이스</b>';
 }
@@ -2429,11 +2665,13 @@ function openDetail(){
 function retryWs(i){
   const m=WS[i]; if(!m) return;
   m.st='삭제 중'; render();
-  toast('ok','워크스페이스 삭제를 다시 요청했습니다. 완료되면 알림으로 안내됩니다.');
+  toast('ok','워크스페이스 삭제를 다시 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.');
 }
 function busyMsg(m){
   if(m.st==='삭제 중') return '워크스페이스를 삭제하고 있습니다. 하위 자원을 정리해야 해 시간이 걸립니다.';
-  if(m.st==='삭제 실패') return '삭제에 실패한 워크스페이스입니다. 원인을 확인한 뒤 다시 시도해 주세요.';
+  /* 상세를 열 수 없으므로 화면에서 원인을 확인할 길이 없다. 확인하라고 쓰지 않는다.
+     ⚠ 실패 사유를 목록에서 보여줄 수 있는지 확인 대상(정책 11. 5번) */
+  if(m.st==='삭제 실패') return '삭제에 실패한 워크스페이스입니다. 다시 시도하거나 관리자에게 문의해 주세요.';
   return '지금은 사용할 수 없습니다.';
 }
 /* 룸 상태 사유 — 룸 화면과 목록 환경 컬럼에서 함께 쓴다 */
@@ -2455,6 +2693,12 @@ function openRoom(i,kind){
   if(!cur) return;
   closePanel(); syncWsCtx(); view='room'; roomKind=kind; syncView(); drawRoom();
 }
+/* 개발룸은 별도 화면군이다(WKSP-CDE-*). CDE·작업 이력·개발룸 설정이 딸려 있어
+   개발룸 기획서에서 다룬다. 여기서는 상태를 보이고 진입만 시킨다 */
+function goDevRoom(){
+  act('개발룸 화면으로 이동합니다. CDE·작업 이력·개발룸 설정은 개발룸 화면에서 다룹니다.');
+}
+
 function backFromRoom(){ if(roomFrom==='list') backToList(); else openDetail(); }
 /* 운영룸 생성 — 입력받을 값이 없어 확인 알럿으로 처리한다.
    대상 클러스터를 받게 되면 개발룸처럼 폼으로 바꾼다 */
@@ -2465,7 +2709,7 @@ function askMakeProd(){
     '워크스페이스 할당량 전부를 운영룸이 사용합니다. 개발룸을 만들면 그만큼 운영룸 한도에서 옮겨집니다.',
     function(){
       m.prod='생성 중'; drawRoom(); render();
-      toast('ok','운영룸 생성을 요청했습니다. 완료되면 알림으로 안내됩니다.');
+      toast('ok','운영룸 생성을 요청했습니다. 준비가 끝나면 알림으로 안내됩니다.');
     }, '생성');
 }
 /* 운영룸 삭제 — 배포가 함께 사라진다(공통정책 7.5) */
@@ -2493,7 +2737,7 @@ function delDevRoom(){
       m.dev='미생성'; m.cdes=[];
       m.devq={cpu:0,ram:0,gpu:0};
       view='detail'; syncView(); drawDetail();
-      toast('ok','개발룸 삭제를 요청했습니다. 완료되면 알림으로 안내됩니다.');
+      toast('ok','개발룸 삭제를 요청했습니다. 자원 회수가 끝나면 알림으로 안내됩니다.');
     },'삭제', null, m.n+' 개발룸');
 }
 function drawRoom(){
@@ -2501,7 +2745,7 @@ function drawRoom(){
   const m=cur.m, isDev=roomKind==='dev';
   let h='';
   h+='<div class="dhead">'
-   + '<button class="back" onclick="backFromRoom()" title="'+(roomFrom==='list'?'워크스페이스 목록으로':'워크스페이스 상세로')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>'
+   + '<button class="back" onclick="backFromRoom()" title="'+(roomFrom==='list'?'워크스페이스 목록으로':'워크스페이스 상세로')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>'
    + '<div class="dinfo"><h1>'+(isDev?'개발룸':'운영룸')
    +   tip(isDev?'멤버가 개발·실험에 사용하는 환경입니다. 자원은 관리자 승인 후 할당되며 사용 기한이 지나면 회수됩니다.'
               :'모델을 서비스하는 환경입니다. 배포 생성·설정 변경·종료는 배포 화면에서 처리합니다.')
@@ -2537,7 +2781,7 @@ function drawDetail(){
   const cp=pct(m.use.cpu,m.quota.cpu), rp=pct(m.use.ram,m.quota.ram), gp=pct(m.use.gpu,m.quota.gpu);
   let h='';
   h+='<div class="dhead">'
-   + '<button class="back" onclick="backToList()" title="워크스페이스 목록으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>'
+   + '<button class="back" onclick="backToList()" title="워크스페이스 목록으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>'
    + '<div class="dinfo"><h1>'+m.n+'</h1>'
    + '<div class="dmeta">'+(m.desc?'<span style="font-size:12.5px;color:var(--muted-foreground)">'+m.desc+'</span>':'<span style="font-size:12.5px;color:var(--faint)">-</span>')+'</div>'
    /* 배지는 진행 중·실패 상태에만 표시한다(정책 2.6).
@@ -2552,7 +2796,9 @@ function drawDetail(){
      /* 실패 상태에서는 수정 대신 다시 시도를 둔다(정책 2.6) */
      +((m.st==='삭제 실패')
         ? '<button class="btn ghost" onclick="retryWs('+WS.indexOf(m)+')">다시 시도</button>'
-        : '<button class="btn ghost" onclick="openEdit()">수정</button>')
+        : isBusy(m)
+          ? '<button class="btn ghost" disabled title="'+busyMsg(m)+'">수정</button>'
+          : '<button class="btn ghost" onclick="openEdit()">수정</button>')
      +(canCreateWs()&&!m.sys
         ?'<button class="btn danger-line"'+(delBlocked(m)?' disabled title="'+busyMsg(m)+'"':'')
          +' onclick="delWs(\''+m.n+'\')">삭제</button>':'')+'</div>':'')
@@ -2562,7 +2808,7 @@ function drawDetail(){
      이름·설명·상태는 헤더에 있으므로 여기서는 담당자와 생성 이력만 둔다 */
   h+='<div class="dsec"><h4>기본 정보</h4><dl class="dl">'
    + '<dt>관리자</dt><dd>'+adminLabel(m)+'</dd>'
-   + '<dt>생성자</dt><dd>'+m.by+'</dd>'
+   + '<dt>생성자</dt><dd>'+userRef(m.by)+'</dd>'
    + '<dt>생성일시</dt><dd>'+m.at+'</dd>'
    + '</dl></div>';
 
@@ -2576,7 +2822,7 @@ function drawDetail(){
    : '<div class="qcards">'
    + qcard('CPU 여유', (m.quota.cpu-m.use.cpu)+' <small>Cores</small>', cp, '점유 '+m.use.cpu+' / 할당 '+m.quota.cpu+' Cores')
    + qcard('Memory 여유', (m.quota.ram-m.use.ram)+' <small>Gi</small>', rp, '점유 '+m.use.ram+' / 할당 '+m.quota.ram+' Gi')
-   + qcardNum('AI 가속기 여유', (m.quota.gpu-m.use.gpu)+' <small>개</small>', '점유 '+m.use.gpu+' / 할당 '+m.quota.gpu+'개')
+   + qcardNum('가속기 여유', (m.quota.gpu-m.use.gpu)+' <small>장</small>', '점유 '+m.use.gpu+' / 할당 '+m.quota.gpu+'장')
    /* note 는 수치만 둔다. 항목이 무엇인지는 라벨 툴팁이 담당한다 */
    + qcardNum('공유 볼륨'+help('vol'), m.quota.vol+' <small>GB</small>', '개발룸 공유 볼륨')
    + '</div>';
@@ -2596,16 +2842,16 @@ function drawDetail(){
    + (m.dev==='미생성'? alertBox('info','개발룸이 없습니다.',
        '개발룸을 만들면 멤버가 CDE를 신청할 수 있습니다. 할당한 자원만큼 운영룸 한도에서 옮겨지며, 운영룸 자원이 부족해지면 회수될 수 있습니다.',
        canEditQuota()?'<button class="btn sm" onclick="act(\'개발룸 생성 화면으로 이동합니다.\')">개발룸 생성</button>':'', false) : '')
-   + '<div class="tblwrap" style="border:0"><table class="tbl enter"><thead><tr><th>환경</th><th>상태</th><th>CPU</th><th>Memory</th><th>AI 가속기</th><th>내역</th></tr></thead><tbody>'
-   + '<tr onclick="openRoom(null,\'dev\')" title="개발룸으로 이동"><td><span class="mname">개발룸</span></td>'
+   + '<div class="tblwrap" style="border:0"><table class="tbl enter"><thead><tr><th>환경</th><th>상태</th><th>CPU</th><th>Memory</th><th>가속기</th><th>내역</th></tr></thead><tbody>'
+   + '<tr onclick="goDevRoom()" title="개발룸으로 이동"><td><span class="mname">개발룸</span></td>'
    +   '<td><span class="stbadge '+RB[m.dev]+'">'+m.dev+'</span><span class="entgo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-8 8M10 6H5a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1v-5"/></svg></span></td>'
    +   (m.sys? '<td colspan="3"><span class="dash">배정 없음 · 잔여 사용</span></td>'
-        : '<td>'+m.devq.cpu+' Cores 이하</td><td>'+m.devq.ram+' Gi 이하</td><td>'+m.devq.gpu+'개 이하</td>')
+        : '<td>'+m.devq.cpu+' Cores 이하</td><td>'+m.devq.ram+' Gi 이하</td><td>'+m.devq.gpu+'장 이하</td>')
    +   '<td>CDE '+m.cdes.length+'건</td></tr>'
    + '<tr onclick="openRoom(null,\'prod\')" title="운영룸으로 이동"><td><span class="mname">운영룸</span></td>'
    +   '<td><span class="stbadge '+RB[m.prod]+'">'+m.prod+'</span><span class="entgo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-8 8M10 6H5a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1v-5"/></svg></span></td>'
    +   (m.sys? '<td colspan="3"><span class="dash">배정 없음 · 잔여 사용</span></td>'
-        : '<td>'+pq.cpu+' Cores 이상</td><td>'+pq.ram+' Gi 이상</td><td>'+pq.gpu+'개 이상</td>')
+        : '<td>'+pq.cpu+' Cores 이상</td><td>'+pq.ram+' Gi 이상</td><td>'+pq.gpu+'장 이상</td>')
    +   '<td>배포 '+m.deps.length+'건</td></tr>'
    + '</tbody></table></div>'
    + (canEditQuota()?'<div class="secact" style="margin-top:14px"><button class="btn ghost sm" onclick="openForm(\'quota\')">할당량 수정</button></div>':'')
@@ -2621,19 +2867,30 @@ function drawDetail(){
    + '<div class="resblock"><div class="rh"><h5>배포'+tip('운영룸에서 서비스 중인 배포입니다. 목록과 상세는 운영룸에서 확인합니다.')+'</h5><span class="cnt">'+m.deps.length+'건</span>'
    +   '<button class="all" onclick="openRoom(null,\'prod\')">운영룸으로 이동<span class="ar">→</span></button></div></div>'
    + '<div class="resblock"><div class="rh"><h5>CDE'+tip('개발룸에서 멤버가 사용 중인 CDE입니다. 목록과 상세는 개발룸에서 확인합니다.')+'</h5><span class="cnt">'+m.cdes.length+'건</span>'
-   +   '<button class="all" onclick="openRoom(null,\'dev\')">개발룸으로 이동<span class="ar">→</span></button></div></div>'
+   +   '<button class="all" onclick="goDevRoom()">개발룸으로 이동<span class="ar">→</span></button></div></div>'
    + '</div>';
 
   const TABS=wtabs();
   if(wTab>=TABS.length) wTab=0;
   /* 탭 구성이 역할에 따라 달라지므로 인덱스가 아니라 이름으로 분기한다 */
   const CUR=TABS[wTab];
-  h+='<div class="wtabs">'+TABS.map((t,i)=>'<button class="'+(i===wTab?'on':'')+'" onclick="setWTab('+i+')">'+t+'</button>').join('')+'</div>';
+  /* 탭별 액션은 탭 줄 우측에 둔다(공통정책 3.6). 탭 라벨이 곧 제목이라
+     섹션 제목에 같은 말을 두 번 쓰지 않는다 */
+  /* 탭 줄에는 액션을 두지 않는다(공통정책 3.6). 탭 라벨은 분류를 가리킬 뿐
+     액션이 걸리는 대상이 아니다 — 액션은 그 섹션 제목 옆에 둔다 */
+  /* 탭 배지 — 그 건수가 탭을 열기 전 판단에 쓰일 때 둔다.
+     멤버는 몇 명인지, 연동·API Key 는 걸려 있는 게 있는지가 판단 재료다 */
+  const TABCNT={'멤버':m.members.length, '연동':(m.ext||[]).length, 'API Key':(m.keys||[]).length};
+  h+='<div class="wtabs">'
+   + TABS.map((t,i)=>'<button class="'+(i===wTab?'on':'')+'" onclick="setWTab('+i+')">'+t
+       +'<span class="cnt">'+(TABCNT[t]||0)+'</span></button>').join('')
+   + '</div>';
 
   if(CUR==='멤버'){
     h+='<div class="dsec"><h4>멤버 <span style="font-weight:400;color:var(--muted-foreground)">'+m.members.length+'명</span>'
-     + (canManageMember()?'<button class="btn sm" style="margin-left:auto" onclick="openInvite()">멤버 초대</button>':'')+'</h4>'
-     + '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>이름</th><th>아이디</th><th>역할</th><th style="width:44px"><span class="sronly">작업</span></th></tr></thead><tbody>'
+     + (canManageMember()?'<span class="secbtns"><button class="btn sm" onclick="openInvite()">멤버 초대</button></span>':'')
+     + '</h4>'
+     + '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>이름</th><th>아이디</th><th>역할</th><th style="width:72px">작업</th></tr></thead><tbody>'
      + m.members.map(function(u,i){
          return '<tr><td><div class="memcell"><span class="avatar">'+u.n.charAt(0)+'</span>'+memberName(u)+'</div></td>'
           + '<td>'+u.id+'</td>'
@@ -2646,8 +2903,8 @@ function drawDetail(){
              누른 뒤 막지 않고 미리 사유를 보여준다 */
           + '<td>'+(canManageMember()
               ? (isLastAdmin(m,i)
-                 ? '<button class="cbtn" disabled title="이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 제외할 수 있습니다."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18M6 6l12 12"/></svg></button>'
-                 : '<button class="cbtn" title="'+(u.id==='yj.seong'?'워크스페이스 나가기':'제외')+'" onclick="rmMember('+i+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18M6 6l12 12"/></svg></button>')
+                 ? '<button class="btn danger-line sm" disabled title="이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 제외할 수 있습니다.">제외</button>'
+                 : '<button class="btn danger-line sm" onclick="rmMember('+i+')">'+(u.id==='yj.seong'?'나가기':'제외')+'</button>')
               : '')+'</td></tr>';
        }).join('')
      + '</tbody></table></div>'
@@ -2662,26 +2919,37 @@ function drawDetail(){
   if(CUR==='연동'){
     h+='<div class="dsec"><h4>Hugging Face Hub'+tip('이 워크스페이스에 토큰을 등록하면 플랫폼 전역 토큰보다 먼저 사용됩니다.')+'</h4><dl class="dl">'
      + '<dt>기본 URL</dt><dd>'+(m.hfUrl||'https://huggingface.co')+'</dd>'
-     + '<dt>프록시</dt><dd>'+(m.hfProxy?'사용':'사용 안 함')+'</dd>'
+     /* 켜 두었으면 어디로 나가는지 보인다. `사용` 만으로는 확인이 안 된다 */
+   + '<dt>프록시</dt><dd>'+(m.hfProxy? (m.hfProxyAddr||'proxy.internal:3128') : '<span class="dash">사용 안 함</span>')+'</dd>'
      + '<dt>액세스 토큰'+tip('저장한 값은 다시 조회할 수 없습니다. 바꾸려면 새 토큰을 입력해 저장하고, 비우고 저장하면 등록이 해제됩니다.')+'</dt>'
      +   '<dd>'+(m.hfToken
          ? '<span class="stbadge ok">등록됨</span><span class="mver">'+(m.hfTokenAt||'')+'</span>'
-         : '<span class="dash">미등록</span>')+'</dd>'
+         : '<span class="dash">-</span>')+'</dd>'
      + '</dl>'
-     + (canEditInfo()?'<div class="secact" style="margin-top:12px"><button class="btn ghost sm" onclick="openConn()">연동 설정</button></div>':'')
+     + (canManageExt()?'<div class="secact" style="margin-top:12px"><button class="btn ghost sm" onclick="openConn()">연동 설정</button></div>':'')
      + '</div>';
   }
 
   if(CUR==='API Key'){
     h+='<div class="dsec"><h4>API Key <span style="font-weight:400;color:var(--muted-foreground)">'+m.keys.length+'건</span>'
-     + (canIssueKey()?'<button class="btn sm" style="margin-left:auto" onclick="openKey()">발급</button>':'')+'</h4>'
+     + (canIssueKey()?'<span class="secbtns"><button class="btn sm" onclick="openKey()">API Key 발급</button></span>':'')
+     + '</h4>'
      + (m.keys.length
-       ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>API Key명</th><th>유형</th><th>만료일</th><th>발급자</th><th style="width:44px"><span class="sronly">작업</span></th></tr></thead><tbody>'
+       ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>API Key명</th><th>유형</th><th>접근 허용 모델</th><th>마지막 사용</th><th>만료일</th><th>소유 계정</th><th style="width:72px">작업</th></tr></thead><tbody>'
          + m.keys.map(k=>'<tr><td><span class="rname">'+k.n+'</span></td><td>'+k.type+'</td>'
-           +'<td>'+k.exp+'</td><td>'+k.by+'</td>'
-           +'<td>'+(canIssueKey()?'<button class="cbtn" title="폐기" onclick="revokeKey(\''+k.n+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg></button>':'')+'</td></tr>').join('')
+           /* 어떤 모델에 쓰이고 있는지가 사용 현황이다(정책 7.1).
+              여럿이면 첫 건 외 N건으로 줄인다(공통정책 1.2) */
+           +'<td>'+(k.scope && k.scope.length
+               ? k.scope[0]+(k.scope.length>1? ' <span class="dash">외 '+(k.scope.length-1)+'건</span>' : '')
+               : '<span class="dash">-</span>')+'</td>'
+           /* 쓰고 있는 키인지 알아야 폐기 대상을 가릴 수 있다.
+              인증 시점에 기록되는 값이라 인증·인가 도메인이 갖고 있다 */
+           +'<td>'+(k.last? k.last : '<span class="dash">-</span>')+'</td>'
+           +'<td>'+k.exp+'</td><td>'+userRef(k.by)+'</td>'
+           /* 본인 키만 지운다. 남의 키는 사용 현황만 본다(정책 7.1) */
+       +'<td>'+(isMyKey(k)?'<button class="btn danger-line sm" onclick="revokeKey(\''+k.n+'\')">폐기</button>':'')+'</td></tr>').join('')
          + '</tbody></table></div>'
-       : '<div class="emptyline">발급된 API Key가 없습니다. 외부 앱에서 이 워크스페이스의 배포 모델에 접근하려면 키를 발급해 주세요.</div>')
+       : '<div class="emptyline">발급된 API Key가 없습니다. 외부 앱에서 배포 모델을 호출하려면 키를 발급해 주세요.</div>')
      + '</div>';
   }
 
@@ -2691,7 +2959,7 @@ function drawDetail(){
    목록 셀에는 첫 항목과 건수만 표기하고 전체는 API Key 탭에서 확인한다 */
 function keyLabel(m,d){
   const ks=(m.keys||[]).filter(function(k){ return !k.scope || k.scope.indexOf(d.n)>=0; });
-  if(!ks.length) return '<span class="dash">미등록</span>';
+  if(!ks.length) return '<span class="dash">-</span>';
   return ks[0].n + (ks.length>1? ' <span class="mver" style="margin:0">외 '+(ks.length-1)+'건</span>' : '');
 }
 
@@ -2705,7 +2973,7 @@ function pnRoomBlock(m){
   ];
   return rows.map(function(r){
     const off = r.st==='미생성';
-    return '<button class="pnroom'+(off?' off':'')+'"'+(off?'':' onclick="openRoom(null,\''+r.k+'\')"')+'>'
+    return '<button class="pnroom'+(off?' off':'')+'"'+(off?'':' onclick="'+(r.k==='dev'?'goDevRoom()':'openRoom(null,\''+r.k+'\')')+'"')+'>'
      + '<span class="rdot '+DOT[r.st]+'"></span>'
      + '<span class="prn">'+r.nm+'</span>'
      + '<span class="stbadge '+RB[r.st]+'">'+r.st+'</span>'
@@ -2761,7 +3029,7 @@ function roomTab(m,kind){
          ? '개발룸을 만들면 멤버가 CDE를 신청할 수 있습니다. 할당한 자원만큼 운영룸 한도가 줄어듭니다.'
          : '운영룸을 만들면 모델을 배포할 수 있습니다. 워크스페이스 할당량 전부를 운영룸이 사용합니다.')+'</p>'
      + (canEditQuota()
-        ? '<button class="btn" onclick="'+(isDev?'openForm(\'devroom\')':'askMakeProd()')+'">'+lb+' 생성</button>'
+        ? '<button class="btn" onclick="'+(isDev?'goDevRoom()':'askMakeProd()')+'">'+lb+' 생성</button>'
         :'<p style="font-size:11.5px;color:var(--faint)">워크스페이스 관리자에게 '+lb+' 생성을 요청해 주세요.</p>')
      + '</div></div>';
   }
@@ -2780,7 +3048,7 @@ function roomTab(m,kind){
      운영룸이 개발룸 유휴분까지 쓰는 경우 분모가 늘어나나 그 값은 실시간이라 확인 필요(용어사전 *3) */
   const rows=[['CPU', isDev? Math.min(q.cpu, m.use.cpu) : Math.max(0,m.use.cpu-Math.min(m.devq.cpu,m.use.cpu)), q.cpu, 'Cores'],
               ['Memory', isDev? Math.min(q.ram, m.use.ram) : Math.max(0,m.use.ram-Math.min(m.devq.ram,m.use.ram)), q.ram, 'Gi'],
-              ['가속기', isDev? useC : Math.max(0,m.use.gpu-useC), q.gpu, '개']];
+              ['가속기', isDev? useC : Math.max(0,m.use.gpu-useC), q.gpu, '장']];
   /* 자원이 꽉 차면 이 환경에서 할 수 있는 일이 막히므로 조치 방법을 함께 안내한다.
      할당량 조정은 최고 관리자 소관이라 역할에 따라 안내가 갈린다 */
   const full = rows.filter(function(r){ return r[2] && r[1]>=r[2]; }).map(function(r){ return r[0]; });
@@ -2829,7 +3097,7 @@ function roomTab(m,kind){
 
   if(!isDev){
     /* 배포 액션은 배포 화면 소관. 여기서는 상태만 보여준다 */
-    h+='<div class="dsec"><h4>서빙 중인 모델 <span style="font-weight:400;color:var(--muted-foreground)">'+m.deps.length+'건</span>'
+    h+='<div class="dsec"><h4>배포 <span style="font-weight:400;color:var(--muted-foreground)">'+m.deps.length+'건</span>'
      + (m.deps.length?'<button class="btn ghost sm" style="margin-left:auto" onclick="act(\'배포 화면으로 이동합니다.\')">배포 화면으로 이동<span class="ar">→</span></button>':'')+'</h4>'
      + (m.deps.length
        ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>모델</th><th>배포</th><th>상태</th><th>레플리카</th><th class="thcell">'+thHelp('dkey','접근 키')+'</th></tr></thead><tbody>'
@@ -2841,23 +3109,25 @@ function roomTab(m,kind){
            }).join('')
          + '</tbody></table></div>'
 
-       : '<div class="emptyline">서빙 중인 모델이 없습니다. 배포 화면에서 배포를 생성하면 여기에 표시됩니다.</div>')
+       : '<div class="emptyline">배포된 모델이 없습니다. 배포 화면에서 배포를 만들면 여기에 표시됩니다.</div>')
      + '</div>';
 
     /* 외부 상용 AI API를 등록하면 자체 배포 모델과 같은 게이트웨이로 호출한다(기술문서 4장).
        운영룸이 '이 워크스페이스에서 호출할 수 있는 모델 전부'를 다루는 자리가 된다 */
     const ext=m.ext||[];
-    h+='<div class="dsec"><h4>외부 모델 연동'
+    h+='<div class="dsec"><h4>외부 배포'
      +   tip('외부 상용 AI API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다. API Key도 동일하게 적용됩니다.')
      +   ' <span style="font-weight:400;color:var(--muted-foreground)">'+ext.length+'건</span>'
-     + (canEditInfo()?'<button class="btn sm" style="margin-left:auto" onclick="openExt()">외부 모델 등록</button>':'')+'</h4>'
+     + (canManageExt()?'<button class="btn sm" style="margin-left:auto" onclick="openExt()">외부 배포 등록</button>':'')+'</h4>'
      + (ext.length
-       ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>모델명</th><th>제공자</th><th>상태</th><th style="width:44px"><span class="sronly">작업</span></th></tr></thead><tbody>'
+       ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>모델명</th><th>제공자</th><th>상태</th><th style="width:72px">작업</th></tr></thead><tbody>'
          + ext.map(function(x){ return '<tr style="cursor:default"><td><span class="rname">'+x.n+'</span></td>'
            +'<td>'+x.prov+'</td><td><span class="stbadge '+RB[x.st]+'">'+x.st+'</span></td>'
-           +'<td>'+(canEditInfo()?'<button class="cbtn" title="연동 해제" onclick="rmExt(\''+x.n+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18M6 6l12 12"/></svg></button>':'')+'</td></tr>'; }).join('')
+           /* 파괴적 액션 진입은 외곽선 버튼으로 둔다(라이브러리 — 확인 알럿의 최종 실행만 채운다).
+                아이콘만 두면 무엇을 지우는 것인지 눌러 봐야 안다 */
+             +'<td>'+(canManageExt()?'<button class="btn danger-line sm" onclick="rmExt(\''+x.n+'\')">해제</button>':'')+'</td></tr>'; }).join('')
          + '</tbody></table></div>'
-       : '<div class="emptyline">등록된 외부 모델이 없습니다.'+(canEditInfo()?' OpenAI·Anthropic 같은 상용 API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.':'')+'</div>')
+       : '<div class="emptyline">등록된 외부 배포가 없습니다.'+(canManageExt()?' OpenAI·Anthropic 같은 상용 API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.':'')+'</div>')
      + '</div>';
   }
 
@@ -2876,7 +3146,7 @@ function roomTab(m,kind){
     h+='<div class="dsec"><h4>CDE <span style="font-weight:400;color:var(--muted-foreground)">'+m.cdes.length+'건</span>'
      + (canUseCde()&&!myCde?'<button class="btn sm" style="margin-left:auto" onclick="openCdeForm(\'cde\')">CDE 신청</button>':'')+'</h4>'
      + (m.cdes.length
-       ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>사용자</th><th>환경</th><th>실행 방식</th><th>가속기</th><th class="thcell">'+thHelp('cip','접근 허용 IP')+'</th><th>시작</th><th>만료 예정</th><th class="thcell">'+thHelp('cst','상태')+'</th><th style="width:44px"><span class="sronly">작업</span></th></tr></thead><tbody>'
+       ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>사용자</th><th>환경</th><th>실행 방식</th><th>가속기</th><th class="thcell">'+thHelp('cip','접근 허용 IP')+'</th><th>시작</th><th>만료 예정</th><th class="thcell">'+thHelp('cst','상태')+'</th><th style="width:64px">작업</th></tr></thead><tbody>'
          + m.cdes.map(function(c,i){
              const live = c.st==='정상'||c.st==='절전';
              return '<tr'+(isMine(c)?' class="rowme"':'')+'><td><div class="memcell"><span class="avatar">'+c.u.charAt(0).toUpperCase()+'</span><span class="rname">'+c.u+'</span>'
@@ -2891,7 +3161,7 @@ function roomTab(m,kind){
            /* 접속·연장·반납은 본인 것만. 남의 CDE는 조회만 한다.
               구동 중일 때만 — 승인 대기·반려 건은 조작 대상이 아니다 */
            +'<td>'+(canUseCde()&&live&&isMine(c)?'<div class="more" id="cdm'+i+'"><button class="morebtn" onclick="tgMore(event,\'cdm'+i+'\')">⋯</button><div class="rowmenu">'
-             +'<button onclick="act(\'CDE에 접속합니다.\')">접속</button><button onclick="openCdeForm(\'cdeExt\')">기한 연장 신청</button>'
+             +'<button onclick="act(\'CDE에 접속합니다.\')">접속</button><button onclick="openCdeForm(\'cdeExt\')">연장 신청</button>'
              +'<hr><button class="d" onclick="rmCde(\''+c.u+'\')">반납</button></div></div>':'')+'</td></tr>'; }).join('')
          + '</tbody></table></div>'
        : '<div class="emptyline">CDE가 없습니다.'+(canUseCde()&&!myCde?' 신청하면 관리자 승인 후 사용할 수 있습니다.':'')+'</div>')
@@ -2903,15 +3173,16 @@ function roomTab(m,kind){
          조회 범위는 확인 필요(본인 건인지 전체인지) — 현재는 전체로 둔다 */
       const jobs=m.jobs;
       h+='<div class="dsec"><h4>작업 이력'+tip('CDE 터미널에서 제출한 학습·전처리 작업입니다. 편집기와 별도로 백그라운드에서 실행됩니다.')+' <span style="font-weight:400;color:var(--muted-foreground)">'+jobs.length+'건</span>'
-       + '<button class="cbtn" style="margin-left:auto" title="새로고침" onclick="act(\'작업 이력을 갱신했습니다.\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12a8 8 0 10-2.3 5.6M20 6v5h-5"/></svg></button></h4>'
+       + '<button class="cbtn" style="margin-left:auto" title="새로 고침" onclick="act(\'작업 이력을 갱신했습니다.\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12a8 8 0 10-2.3 5.6M20 6v5h-5"/></svg></button></h4>'
        + (jobs.length
-         ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>작업 ID</th><th>제출자</th><th>유형</th><th>프레임워크</th><th>실행 시간</th><th class="thcell">'+thHelp('jst','상태')+'</th><th style="width:44px"><span class="sronly">작업</span></th></tr></thead><tbody>'
+         ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>작업 ID</th><th>제출자</th><th>유형</th><th>이미지 태그</th><th>실행 시간</th><th class="thcell">'+thHelp('jst','상태')+'</th><th style="width:96px">작업</th></tr></thead><tbody>'
            + jobs.map(function(j,i){ return '<tr><td><span class="rname">'+j.id+'</span></td>'
-             +'<td>'+(j.u||'-')+'</td><td>'+j.t+'</td><td>'+j.fw+'</td>'
+             +'<td>'+(j.u? userRef(j.u) : '<span class="dash">-</span>')+'</td><td>'+j.t+'</td><td>'+j.fw+'</td>'
              +'<td>'+(j.dur!=='-'?j.dur:'<span class="dash">-</span>')+'</td>'
-             +'<td><span class="stbadge '+RB[j.st]+'">'+j.st+'</span>'
-             +  (j.err?tip(j.err):'')+'</td>'
-             +'<td>'+(j.st==='실패'||j.st==='완료'?'<button class="cbtn" title="로그 보기" onclick="openLog(\''+j.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>':'')+'</td></tr>'; }).join('')
+             /* 실패 사유를 툴팁에 두지 않는다. 툴팁은 항목 설명에 쓰고 그 건에 무슨 일이
+                있었는지는 로그에서 본다(라이브러리 구분 기준 · 개발룸 목업과 같은 규격) */
+             +'<td><span class="stbadge '+RB[j.st]+'">'+j.st+'</span></td>'
+             +'<td>'+(j.st==='실패'||j.st==='완료'?'<button class="btn ghost sm" onclick="openLog(\''+j.id+'\')">로그 보기</button>':'')+'</td></tr>'; }).join('')
            + '</tbody></table></div>'
          : '<div class="emptyline">실행된 작업이 없습니다. CDE 터미널에서 배치 작업을 제출하면 여기에 표시됩니다.</div>')
        + '</div>';
@@ -2950,6 +3221,7 @@ function roomTab(m,kind){
 const NF={name:'',desc:'',ico:'cube',owners:[],ownerQ:'',mkProd:true,mkDev:false,devVol:'50',egress:'',cpu:'16',ram:'64',vol:'100',devCpu:'8',devRam:'32',devGpu:'0',cls:[{n:'Small',s:'5Gi'},{n:'Medium',s:'20Gi'},{n:'Large',s:'50Gi'}],byob:false,rsn:''};
 function openForm(kind){
   formKind=kind;
+  fDupOk=false; fDupName=''; fDupMsg='';
   if(kind==='quota'){
     if(!cur) return;
     const m=cur.m;
@@ -3000,7 +3272,7 @@ function qErrs(){
   /* 현재 점유보다 작게 줄이면 이미 떠 있는 자원이 회수 대상이 된다 */
   if(num('cpu')<m.use.cpu) e.push('CPU 할당량이 현재 점유량('+m.use.cpu+' Cores)보다 작습니다.');
   if(num('ram')<m.use.ram) e.push('Memory 할당량이 현재 점유량('+m.use.ram+' Gi)보다 작습니다.');
-  if(gpuAll<m.use.gpu) e.push('AI 가속기 할당량이 현재 점유량('+m.use.gpu+'개)보다 작습니다.');
+  if(gpuAll<m.use.gpu) e.push('가속기 할당량이 현재 점유량('+m.use.gpu+'장)보다 작습니다.');
   /* 클러스터 잔여 + 이 워크스페이스의 현재 할당을 넘을 수 없다 */
   if(num('cpu')>CLUSTER.cpu.free+m.quota.cpu) e.push('CPU 할당량이 배분 가능한 최대를 넘습니다.');
   if(num('ram')>CLUSTER.ram.free+m.quota.ram) e.push('Memory 할당량이 배분 가능한 최대를 넘습니다.');
@@ -3014,15 +3286,45 @@ function qErrs(){
 }
 
 let shownF={};
-function fSet(k,v){ NF[k]=v; if(k==='name') drawFormValidOnly(); }
+function fSet(k,v){
+  NF[k]=v;
+  /* 확인한 값에서 바뀌면 다시 확인해야 한다(공통정책 7.1). 안내도 지운다 */
+  if(k==='name'){
+    if(fDupName!==String(v).trim()){ fDupOk=false; }
+    fDupMsg='';
+    drawForm();
+    const el=document.getElementById('f_name');
+    if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+    return;
+  }
+  drawFormValidOnly();
+}
 function fBlur(k){ shownF[k]=true; drawForm(); }
 function nameErr(){
   const v=NF.name.trim();
   if(!v) return '워크스페이스명을 입력해 주세요.';
   if(!/^[a-z0-9-]+$/.test(v)) return '영문 소문자·숫자·하이픈만 사용할 수 있습니다.';
   if(!/[a-z0-9]/.test(v)) return '영문 또는 숫자를 1자 이상 포함해야 합니다.';
-  if(WS.some(w=>w.n===v)) return '이미 사용 중인 워크스페이스명입니다.';
+  /* 중복은 확인 버튼이 판정한다(워크스페이스 정책 2.2). 입력 즉시 검사하면
+     서버에 매 글자마다 물어야 하고, 값이 바뀌면 다시 확인해야 하는 규칙도 세울 수 없다 */
   return '';
+}
+
+/* 확인 버튼 방식 — 확인 후 값이 바뀌면 재확인한다(공통정책 7.1) */
+let fDupOk=false, fDupName='', fDupMsg='';
+function fDup(){
+  const v=NF.name.trim();
+  fDupMsg='';
+  const e=nameErr();
+  if(e){ shownF.name=true; drawForm(); document.getElementById('f_name').focus(); return; }
+  if(WS.some(function(w){ return w.n===v; })){
+    fDupOk=false; fDupName=''; fDupMsg='이미 사용 중인 워크스페이스명입니다.';
+    drawForm();
+    return;
+  }
+  fDupOk=true; fDupName=v;
+  drawForm();
+  toast('ok','사용 가능한 워크스페이스명입니다.');
 }
 function rsnErr(){ return NF.rsn.trim()?'':'요청 사유를 입력해 주세요.'; }
 function ownerErr(){ return (formKind==='new' && NF.owners.length===0)?'관리자를 1명 이상 지정해 주세요.':''; }
@@ -3042,9 +3344,19 @@ const CLUSTER={
 };
 /* 가속기 유형별 입력 키를 목록에서 만든다. 유형이 늘어도 화면 코드를 고치지 않는다 */
 CLUSTER.gpu.forEach(function(g){ NF[accKey(g)]='0'; });
-const USERS=['성유진(yj.seong)','임승주(sj.lim)','유지현(jh.yu)','오경환(kh.oh)','김병건(bg.kim)'];
+/* 초대·소유자 후보는 로그인할 수 있는 계정만이다 — 승인 + 활성(계정정책 3장).
+   비활성 계정에 역할을 주면 쓸 수 없는 권한이 남고, 미승인 계정은 아직 계정이 아니다.
+   ⚠ 상태는 플랫폼 설정이 갖고 있다. 화면은 조회해서 받는다(확인 항목) */
+const USERS=[
+  {n:'성유진(yj.seong)', apv:'승인', active:true},
+  {n:'임승주(sj.lim)',   apv:'승인', active:true},
+  {n:'유지현(jh.yu)',    apv:'승인', active:false},  /* 관리자가 끈 계정 */
+  {n:'오경환(kh.oh)',    apv:'승인', active:true},
+  {n:'김병건(bg.kim)',   apv:'승인', active:true}
+];
+function joinable(){ return USERS.filter(function(u){ return u.apv==='승인' && u.active; }).map(function(u){ return u.n; }); }
 function ownerCands(){ const q=NF.ownerQ.trim().toLowerCase();
-  return USERS.filter(u=>NF.owners.indexOf(u)<0 && (!q || u.toLowerCase().indexOf(q)>=0)); }
+  return joinable().filter(u=>NF.owners.indexOf(u)<0 && (!q || u.toLowerCase().indexOf(q)>=0)); }
 /* 한글은 조합 중에도 input 이벤트가 발생한다. 그때마다 다시 그리면
    필드가 새로 만들어져 조합이 끊기고 자모가 분리돼 들어간다.
    조합이 끝난 뒤에만 목록을 갱신한다 */
@@ -3077,7 +3389,9 @@ function ownerKey(e){ if(e.key==='Enter' && !e.isComposing && e.keyCode!==229){ 
    승인 시점 잔여는 다를 수 있으나, 신청 시점에 말이 안 되는 값은 막는다 */
 function formValid(){
   if(formKind==='quota') return qDirty() && qErrs().length===0;
-  return !nameErr() && !ownerErr() && qErrs().length===0 && (formKind==='new' || !rsnErr());
+  /* 중복 확인을 마친 이름이어야 한다. 확인 뒤 값이 바뀌면 다시 확인한다 */
+  const dupOk = fDupOk && fDupName===NF.name.trim();
+  return !nameErr() && dupOk && !ownerErr() && qErrs().length===0 && (formKind==='new' || !rsnErr());
 }
 /* 개발룸 생성 입력 — 정책 3.3.
    워크스페이스 할당량 안에서 개발룸 몫을 정하고 그만큼 운영룸에서 옮겨진다.
@@ -3095,7 +3409,7 @@ function devRoomFields(){
    /* 개발룸 몫은 워크스페이스 할당량에서 옮겨온다. 남는 만큼이 운영룸 몫이다 */
    + qRow('devCpu','CPU',cpuCap,cpuCap,0,0,'Cores','워크스페이스 할당량에서 옮겨집니다. 남는 만큼이 운영룸 몫입니다.')
    + qRow('devRam','Memory',ramCap,ramCap,0,0,'Gi','')
-   + qRow('devGpu','AI 가속기',gpuCap,gpuCap,0,0,'개','')
+   + qRow('devGpu','가속기',gpuCap,gpuCap,0,0,'장','')
    + qRow('devVol','공유 볼륨',volCap,volCap,0,0,'GB','개발룸 멤버가 함께 쓰는 볼륨입니다. 관리자가 개발룸 설정에서 변경합니다.')
    + '<div class="f" style="margin-bottom:0"><label>Egress 허용 도메인'+tip('개발룸에서 접근할 수 있는 외부 주소입니다. 비우면 외부 접근이 차단됩니다.')+'</label>'
    +   '<textarea class="inp" rows="2" placeholder="한 줄에 하나씩 입력합니다." oninput="NF.egress=this.value">'+(NF.egress||'')+'</textarea></div>'
@@ -3115,7 +3429,7 @@ function drawForm(){
   const eOwner = shownF.owner? ownerErr() : '';
   let h='';
   h+='<div class="dhead">'
-   + '<button class="back" onclick="cancelForm()" title="워크스페이스 목록으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>'
+   + '<button class="back" onclick="cancelForm()" title="워크스페이스 목록으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>'
    + '<div class="dinfo"><h1>'+(isNew?'워크스페이스 생성':'워크스페이스 신청')
    +   tip(isNew?'조직 또는 프로젝트 단위로 자원과 접근 권한을 격리합니다.'
                 :'신청하면 관리자 승인 후 워크스페이스가 만들어집니다. 승인되면 신청자가 관리자로 배정됩니다.')
@@ -3131,8 +3445,16 @@ function drawForm(){
    +     icoKeys().map(function(k){ return '<button type="button" class="'+(NF.ico===k?'on':'')+'" title="'+WSICO[k].l+'" onclick="NF.ico=\''+k+'\';drawForm()">'+wsIcon(k)+'</button>'; }).join('')
    +   '</div></div>'
    + '<div class="f"><label>워크스페이스명<span class="req">*</span>'+tip('쿠버네티스 네임스페이스명으로 사용됩니다.')+'</label>'
-   +   '<input class="inp'+(eName?' err':'')+'" id="f_name" value="'+NF.name+'" placeholder="ai-service-team" oninput="fSet(\'name\',this.value)" oncompositionstart="onComposeStart()" oncompositionend="onComposeEnd(function(v){fSet(\'name\',v);},this)" onblur="fBlur(\'name\')">'
-   +   (eName?'<div class="errmsg" style="display:block">'+eName+'</div>':'<div class="hint">영문 소문자·숫자·하이픈만 사용할 수 있습니다.</div>')
+   /* 중복 확인은 값을 여러 번 고치며 만드는 항목이라 버튼 방식이다(정책 2.2) */
+   +   '<div style="display:flex;gap:8px">'
+   +     '<input class="inp'+(eName||fDupMsg?' err':'')+'" id="f_name" value="'+NF.name+'" placeholder="ai-service-team" oninput="fSet(\'name\',this.value)" oncompositionstart="onComposeStart()" oncompositionend="onComposeEnd(function(v){fSet(\'name\',v);},this)" onblur="fBlur(\'name\')">'
+   +     '<button class="btn ghost" style="flex:0 0 auto" onclick="fDup()">중복 확인</button>'
+   +   '</div>'
+   +   (eName? '<div class="errmsg" style="display:block">'+eName+'</div>'
+        : fDupMsg? '<div class="errmsg" style="display:block">'+fDupMsg+'</div>'
+        : (fDupOk && fDupName===NF.name.trim())
+          ? '<div class="hint">사용할 수 있는 이름입니다.</div>'
+          : '<div class="hint">영문 소문자·숫자·하이픈만 사용할 수 있습니다. 중복 확인을 해 주세요.</div>')
    + '</div>'
    + '<div class="f"'+(isNew?'':' style="margin-bottom:0"')+'><label>설명</label>'
    +   '<textarea class="inp" rows="2" style="resize:vertical" placeholder="이 워크스페이스의 용도를 입력해 주세요." oninput="fSet(\'desc\',this.value)" oncompositionstart="onComposeStart()" oncompositionend="onComposeEnd(function(v){fSet(\'desc\',v);},this)">'+NF.desc+'</textarea></div>'
@@ -3215,8 +3537,11 @@ function drawForm(){
   h+='</div>';
   document.getElementById('formBody').innerHTML=h;
 }
-/* 개발룸 생성 WKSP-CDE-F02 — 워크스페이스 생성 폼에서 함께 만들 수도 있고
-   여기서 별도로 만들 수도 있다. 입력 항목은 같고 상한만 다르다 —
+/* 개발룸 생성 WKSP-CDE-F02
+   ⚠ 이 화면은 개발룸 목업에도 있다. 개발룸 목업이 완전해지면 여기서 제외한다 —
+     임시로 둘을 함께 둔 것이다. 운영룸은 워크스페이스 소관이라 여기 남는다.
+   워크스페이스 생성 폼에서 함께 만들 수도 있고 여기서 별도로 만들 수도 있다.
+   상한은 워크스페이스 할당량에서 운영룸이 쓰는 만큼을 뺀 나머지다 —
    운영 중인 배포가 쓰는 자원은 가져올 수 없다 */
 function drawDevRoomForm(){
   if(!cur) return;
@@ -3227,7 +3552,7 @@ function drawDevRoomForm(){
         capG=Math.max(0,m.quota.gpu-useG), capV=m.quota.vol;
   let h='';
   h+='<div class="dhead">'
-   + '<button class="back" onclick="cancelForm()" title="돌아가기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>'
+   + '<button class="back" onclick="cancelForm()" title="돌아가기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>'
    + '<div class="dinfo"><h1>개발룸 생성'+tip('멤버가 실험에 사용하는 환경입니다. 할당한 자원만큼 운영룸 한도에서 옮겨집니다.')+'</h1>'
    + '<div class="dmeta"><span style="font-size:12.5px;color:var(--muted-foreground)">'+m.n+'</span></div></div></div>';
 
@@ -3242,7 +3567,7 @@ function drawDevRoomForm(){
   h+='<div class="fsec"><h4>자원</h4>'
    + qRow('devCpu','CPU',m.quota.cpu,capC,0,0,'Cores','워크스페이스 할당량 '+m.quota.cpu+' 중 운영룸이 '+useC+' 사용 중입니다.')
    + qRow('devRam','Memory',m.quota.ram,capR,0,0,'Gi','')
-   + qRow('devGpu','AI 가속기',m.quota.gpu,capG,0,0,'개','')
+   + qRow('devGpu','가속기',m.quota.gpu,capG,0,0,'장','')
    + '</div>';
 
   h+='<div class="fsec"><h4>볼륨</h4>'
@@ -3273,13 +3598,13 @@ function submitDevRoom(){
   m.devq={cpu:+NF.devCpu, ram:+NF.devRam, gpu:+NF.devGpu};
   m.dev='생성 중';
   view='room'; roomKind='dev'; syncView(); drawRoom(); render();
-  toast('ok','개발룸 생성을 요청했습니다. 완료되면 알림으로 안내됩니다.');
+  toast('ok','개발룸 생성을 요청했습니다. 준비가 끝나면 알림으로 안내됩니다.');
 }
 function drawQuotaForm(){
   const m=cur.m, errs=qErrs();
   let h='';
   h+='<div class="dhead">'
-   + '<button class="back" onclick="cancelForm()" title="워크스페이스 상세로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>'
+   + '<button class="back" onclick="cancelForm()" title="워크스페이스 상세로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>'
    + '<div class="dinfo"><h1>할당량 수정'+tip('클러스터 자원을 이 워크스페이스에 배분합니다. 최고 관리자만 변경할 수 있습니다.')+'</h1>'
    + '<div class="dmeta"><span style="font-size:12.5px;color:var(--muted-foreground)">'+m.n+'</span></div></div></div>';
   h+='<div class="formpage two">';
@@ -3347,7 +3672,7 @@ function accBlock(m){
   const rest=CLUSTER.gpu.filter(function(g){ return accRows.indexOf(g.k)<0; });
   const noFree = CLUSTER.gpu.every(function(g){ return g.free<=0 && accRows.indexOf(g.k)<0; });
 
-  /* 라벨은 자원 유형(AI 가속기) 하나다. CPU·Memory와 같은 층위로 둔다.
+  /* 라벨은 자원 유형(가속기) 하나다. CPU·Memory와 같은 층위로 둔다.
      가속기 종류는 유형이 아니라 그 안에서 고르는 값이므로 행 안의 항목으로 둔다.
      종류가 늘어도 행만 늘고 라벨·컬럼 구조는 그대로다 */
   let rows = accRows.map(function(k){
@@ -3398,14 +3723,14 @@ function accBlock(m){
   }
 
   let h = '<div class="qrowbox"><div class="qrhead accgrp">'
-   + '<span class="qrlb"><span class="qrname">AI 가속기'
-   +   tip('이 워크스페이스에 배분할 AI 가속기입니다. 장치 단위로 배정되어 선택한 수량만큼 vRAM 전체가 할당됩니다.')
+   + '<span class="qrlb"><span class="qrname">가속기'
+   +   tip('이 워크스페이스에 배분할 가속기입니다. 장치 단위로 배정되어 선택한 수량만큼 vRAM 전체가 할당됩니다.')
    + '</span></span>'
    + '<span class="accbody">'+rows+add+sum+'</span>'
    + '</div></div>';
 
   if(!accRows.length && noFree){
-    h+=alertBox('warn','배분할 수 있는 AI 가속기가 없습니다.',
+    h+=alertBox('warn','배분할 수 있는 가속기가 없습니다.',
       '클러스터의 모든 가속기가 다른 워크스페이스에 할당되어 있습니다. 다른 워크스페이스의 할당량을 줄이면 배분할 수 있습니다.','',false);
   }
   return h;
@@ -3471,7 +3796,7 @@ function clusterCard(){
    +   cell('Memory',CLUSTER.ram.free,CLUSTER.ram.total,CLUSTER.ram.unit)
    +   cell('공유 볼륨',CLUSTER.vol.free,CLUSTER.vol.total,CLUSTER.vol.unit)
    + '</div>'
-   + '<div class="clacctitle">AI 가속기 배분 가능'
+   + '<div class="clacctitle">가속기 배분 가능'
    +   tip('가속기는 장치 단위로 배정됩니다. 한 장당 vRAM은 모델마다 고정되어 있습니다.')+'</div>'
    + '<div class="clacclist">'+accList+'</div>'
    + '</div>';
@@ -3551,7 +3876,8 @@ function submitForm(){
 function inviteCands(){
   if(!cur) return [];
   const has=cur.m.members.map(function(u){ return u.n+'('+u.id+')'; });
-  return USERS.filter(function(u){ return has.indexOf(u)<0; });
+  /* 로그인할 수 없는 계정은 초대하지 않는다 — 쓸 수 없는 권한이 남는다 */
+  return joinable().filter(function(u){ return has.indexOf(u)<0; });
 }
 function openInvite(){
   const cands=inviteCands();
@@ -3712,7 +4038,17 @@ function openEditAt(i){
 function openEdit(){
   if(!cur) return;
   const m=cur.m;
-  document.getElementById('eTarget').innerHTML='생성일시와 생성자는 변경할 수 없습니다.';
+  /* 공용 워크스페이스는 이름을 바꾸지 않는다(정책 6.1) — 입력 대신 읽기 전용으로 둔다.
+     아이콘도 이미 선택지에서 빠져 있다(공용 전용 아이콘 예약, 정책 6.3) */
+  const nameEditable = canEditName();
+  document.getElementById('eNameEdit').style.display = nameEditable? '' : 'none';
+  document.getElementById('eNameRo').style.display   = nameEditable? 'none' : '';
+  document.getElementById('eNameRo').textContent     = m.n;
+  document.getElementById('eNameReq').style.display  = nameEditable? '' : 'none';
+  document.getElementById('eNameHint').style.display = nameEditable? '' : 'none';
+  document.getElementById('eTarget').innerHTML = nameEditable
+    ? '생성일시와 생성자는 변경할 수 없습니다.'
+    : '공용 워크스페이스는 이름과 자원 할당량을 변경할 수 없습니다.';
   document.getElementById('eName').value=m.n;
   document.getElementById('eDesc').value=m.desc||'';
   eInit={n:m.n,d:m.desc||'',i:m.ico||'cube'}; eDupOk=true; eIcoSel=m.ico||'cube'; drawEIco();
@@ -3801,7 +4137,7 @@ function refresh(){
   }
 }
 
-/* ═══════════ CDE 신청 · 기한 연장 ═══════════
+/* ═══════════ CDE 신청 · 연장 신청 ═══════════
    결재 잠금형이라 신청 후 승인을 기다린다(기술문서 5.1).
    항목은 현행 관측 기준 — IDE 유형 · 실행 모드 · 프레임워크 · 자원 · 볼륨 · 만료일 · 사유.
    접근 허용 IP는 문서에만 있고 현행 폼에 없어 함께 넣었다(확인 필요) */
@@ -3842,8 +4178,8 @@ function drawCdeForm(){
   const em = function(k){ return shownF[k]&&er[k]? '<div class="errmsg" style="display:block">'+er[k]+'</div>' : ''; };
   let h='';
   h+='<div class="dhead">'
-   + '<button class="back" onclick="cancelForm()" title="개발룸으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>'
-   + '<div class="dinfo"><h1>'+(isExt?'기한 연장 신청':'CDE 신청')+'</h1>'
+   + '<button class="back" onclick="cancelForm()" title="개발룸으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>'
+   + '<div class="dinfo"><h1>'+(isExt?'연장 신청':'CDE 신청')+'</h1>'
    + '<div class="dmeta"><span style="font-size:12.5px;color:var(--muted-foreground)">'+(m?m.n+' · 개발룸':'')+'</span></div></div></div>';
 
   h+='<div class="formpage mid">';
@@ -3862,7 +4198,7 @@ function drawCdeForm(){
      +   '<div class="optcard'+(CF.mode==='direct'?' on':'')+'" onclick="cfSet(\'mode\',\'direct\')"><input type="radio" name="cfmode" '+(CF.mode==='direct'?'checked':'')+'>'
      +   '<div><div class="oc-t">대화형</div><div class="oc-d">CDE에 가속기를 직접 연결해 편집기 안에서 바로 연산합니다. 사용하지 않아도 가속기를 점유합니다.</div></div></div>'
      + '</div>'
-     + '<div class="f" style="margin-bottom:0"><label>프레임워크</label>'
+     + '<div class="f" style="margin-bottom:0"><label>이미지 태그</label>'
      +   '<select class="inp" onchange="cfSet(\'fw\',this.value)">'
      +   ['Base (CPU/NPU)','PyTorch (Furiosa)','PyTorch (CUDA)','TensorFlow'].map(function(x){return '<option'+(CF.fw===x?' selected':'')+'>'+x+'</option>';}).join('')
      +   '</select></div>'
@@ -3885,7 +4221,7 @@ function drawCdeForm(){
      +     '<span class="stepper'+(ec('accCnt')?' err':'')+'">'+cfStep('accCnt',-1,1,0,devq.gpu)
      +       '<span class="stfield"><input class="inp" value="'+CF.accCnt+'" inputmode="numeric" oninput="CF.accCnt=this.value;drawCdeForm()" onblur="fBlur(\'accCnt\')"><span class="stunit">개</span></span>'
      +       cfStep('accCnt',1,1,0,devq.gpu)+'</span>'+em('accCnt')
-     +     '<div class="hint">개발룸 상한 '+devq.gpu+'개</div></div>'
+     +     '<div class="hint">개발룸 상한 '+devq.gpu+'장</div></div>'
      + '</div>'
      + ((+CF.accCnt>0)
        ? '<div class="f" style="margin:14px 0 0"><label>가속기 유형<span class="req">*</span></label>'
@@ -3935,7 +4271,7 @@ function submitCde(){
       mode:CF.mode==='async'?'비동기 위임':'대화형',start:'-',exp:'-',st:'승인 대기',ip:CF.ip||'-',rsn:CF.rsn});
   }
   view='room'; roomKind='dev'; syncView(); drawRoom();
-  toast('ok', formKind==='cde'?'CDE 신청을 접수했습니다. 승인 결과는 알림으로 안내됩니다.':'기한 연장 신청을 접수했습니다. 승인 결과는 알림으로 안내됩니다.');
+  toast('ok', formKind==='cde'?'CDE 신청을 접수했습니다. 승인 결과는 알림으로 안내됩니다.':'연장 신청을 접수했습니다. 승인 결과는 알림으로 안내됩니다.');
 }
 
 /* ═══════════ 외부 모델 등록 ═══════════
@@ -3989,7 +4325,7 @@ function dlValid(){
 }
 function submitDl(){
   const d=document.getElementById('dlDir').value.trim();
-  toast('ok','데이터 가져오기를 요청했습니다. 공유 볼륨의 '+d+' 폴더에 내려받으며, 완료되면 알림으로 안내됩니다.');
+  toast('ok','데이터 가져오기를 요청했습니다. 공유 볼륨의 '+d+' 폴더에 내려받으며, 내려받기가 끝나면 알림으로 안내됩니다.');
   document.getElementById('dlRepo').value=''; document.getElementById('dlDir').value=''; dlValid();
 }
 function openLog(id){
@@ -4005,15 +4341,17 @@ function rmCde(u){
   openConfirm('CDE 반납','반납하면 연산 자원이 즉시 회수되고 실행 중인 작업이 중단됩니다. 개인 볼륨에 저장한 데이터는 유지됩니다.',
     function(){ cur.m.cdes=cur.m.cdes.filter(function(c){return c.u!==u;}); drawRoom(); toast('ok','CDE 반납을 요청했습니다. 자원 회수가 끝나면 알림으로 안내됩니다.'); },'반납');
 }
+/* 섹션 제목·등록 버튼과 같은 말을 쓴다. 한 화면에서 `외부 배포` 와 `연동` 을 섞으면
+   같은 것을 가리키는지 알 수 없다(공통정책 1.1) */
 function rmExt(name){
-  openConfirm('연동 해제','<b>'+name+'</b> 연동을 해제하면 이 모델을 호출하던 앱이 더 이상 사용할 수 없게 됩니다.',
-    function(){ cur.m.ext=cur.m.ext.filter(function(x){return x.n!==name;}); refresh(); toast('ok','연동을 해제했습니다.'); },'해제');
+  openConfirm('등록 해제','<b>'+name+'</b> 등록을 해제하면 이 모델을 호출하던 앱이 더 이상 사용할 수 없게 됩니다.',
+    function(){ cur.m.ext=cur.m.ext.filter(function(x){return x.n!==name;}); refresh(); toast('ok','등록을 해제했습니다.'); },'해제');
 }
 function submitExt(){
   const prov=document.querySelector('#xProv input:checked').value;
   cur.m.ext=cur.m.ext||[];
   cur.m.ext.push({n:document.getElementById('xName').value.trim(), prov:prov==='직접 입력'?'사내 API':prov, st:'정상'});
-  closeExt(); refresh(); toast('ok','외부 모델을 등록했습니다.');
+  closeExt(); refresh(); toast('ok','외부 배포를 등록했습니다.');
 }
 
 /* ═══════════ 연동 설정 ═══════════
@@ -4024,6 +4362,21 @@ let cnInit={};
    상태와 변경·삭제 버튼을 두어 무엇을 하는지 명시한다.
    빈 입력란을 두면 그대로 저장했을 때 지워지는지 유지되는지 알 수 없다 */
 let cnTokTouched=false, cnTokEdit=false;
+/* 저장된 프록시 비밀번호도 되돌려 주지 않는다. 액세스 토큰과 같은 규격이다 */
+let cnPwEdit=false, cnPwTouched=false;
+function cnPwMode(on){ cnPwEdit=on; cnPwTouched=false; drawCnPw(); cnChanged(); }
+function cnPwDel(){ cur.m.proxyPw=false; cnPwEdit=false; drawCnPw(); cnChanged(); }
+function drawCnPw(){
+  const box=document.getElementById('cnPwBox');
+  if(!box || !cur) return;
+  const has=!!cur.m.proxyPw;
+  box.innerHTML = (has && !cnPwEdit)
+    ? '<div class="credbox"><span class="stbadge ok">등록됨</span>'
+      + '<span class="credact"><button class="btn ghost sm" onclick="cnPwMode(true)">변경</button>'
+      + '<button class="btn danger-line sm" onclick="cnPwDel()">삭제</button></span></div>'
+    : '<input class="inp" type="password" placeholder="선택 입력" oninput="cnPwTouched=true;cnChanged()">'
+      + (has? '<div class="hint">새 비밀번호를 입력하면 기존 값이 바뀝니다. <button class="lnk" onclick="cnPwMode(false)">변경 취소</button></div>' : '');
+}
 function drawCnTok(){
   const box=document.getElementById('cnTokBox'); if(!box || !cur) return;
   const has=!!cur.m.hfToken;
@@ -4057,10 +4410,10 @@ function openConn(){
   cnTokTouched=false; cnTokEdit=false;
   const m=cur.m;
   document.getElementById('cnUrl').value = m.hfUrl||'https://huggingface.co';
-  drawCnTok();
+  drawCnTok(); cnPwEdit=false; cnPwTouched=false; drawCnPw();
   document.getElementById('cnProxy').checked = !!m.hfProxy;
   cnToggle('proxy', !!m.hfProxy);
-  cnInit={u:document.getElementById('cnUrl').value, p:!!m.hfProxy};
+  cnInit={u:document.getElementById('cnUrl').value, p:!!m.hfProxy, pw:!!m.proxyPw};
   document.getElementById('cnSubmit').disabled=true;
   document.getElementById('mdConn').classList.add('on');
 }
@@ -4076,12 +4429,16 @@ function cnToggle(kind,val){
 function cnChanged(){
   const changed = document.getElementById('cnUrl').value!==cnInit.u
     || document.getElementById('cnProxy').checked!==cnInit.p
-    || (function(){ const e=document.getElementById('cnTok'); return !!(e&&e.value); })();
+    || (function(){ const e=document.getElementById('cnTok'); return !!(e&&e.value); })()
+    || cnPwTouched || cnPwEdit || (cnInit.pw!==!!(cur&&cur.m.proxyPw));
   document.getElementById('cnSubmit').disabled=!changed;
 }
 function submitConn(){
   cur.m.hfUrl=document.getElementById('cnUrl').value;
   cur.m.hfProxy=document.getElementById('cnProxy').checked;
+  /* 프록시 비밀번호도 값을 저장하지 않고 등록 여부만 남긴다 */
+  const pw=document.querySelector('#cnPwBox input');
+  if(pw && pw.value) cur.m.proxyPw=true;
   /* 저장한 값은 다시 조회할 수 없다. 등록 여부와 일시만 남긴다.
      비우고 저장하면 등록을 해제한다 */
   const el=document.getElementById('cnTok');
