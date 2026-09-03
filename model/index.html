@@ -749,6 +749,50 @@ th.thcell.fdd-on .fdd{display:block}
   </div>
 </div>
 
+<!-- 버전 추가 MODEL-L01.D01.T01.M01 -->
+<!-- 등록과 나눈다. 같은 폼으로 두면 모델명을 매번 다시 입력하게 되어 오타 하나로 별개 모델이
+     생긴다(모델정책 2.3). 모델 속성(설명·태그·표시 범위)은 모델에 붙는 값이라 다시 받지 않는다 -->
+<div class="mdbg" id="mdVer">
+  <div class="modal">
+    <div class="mdhead">
+      <h3>버전 추가</h3>
+      <p>기존 모델에 새 버전을 더합니다. 모델 속성은 그대로 이어받습니다.</p>
+    </div>
+    <div class="mdbody">
+      <div class="f">
+        <label>모델명</label>
+        <input class="inp" id="vName" readonly>
+        <div class="hint">모델명은 바꿀 수 없습니다. 다른 이름이 필요하면 새 모델로 등록합니다.</div>
+      </div>
+      <div class="f">
+        <label>소스<span class="req">*</span></label>
+        <select class="inp" id="vSrc" onchange="onVSrcChange()"><option>S3</option><option>HuggingFace</option></select>
+        <div class="hint" id="vSrcHint">플랫폼 스토리지에서 가져옵니다.</div>
+      </div>
+      <div class="f">
+        <label>소스 경로<span class="req">*</span></label>
+        <input class="inp" id="vPath" placeholder="s3://concerto-models/llama-3.2-1b-v2" oninput="verValid()" onblur="verBlur('vPath')">
+        <div class="errmsg" id="vPathErr" style="display:none">가중치 경로를 입력해 주세요.</div>
+      </div>
+      <div class="f">
+        <label>버전<span class="req">*</span></label>
+        <input class="inp" id="vVer" placeholder="1.1.0" oninput="verValid()" onblur="verBlur('vVer')">
+        <div class="errmsg" id="vVerErr" style="display:none">이미 등록된 버전입니다.</div>
+        <div class="hint">모델명과 조합해 중복을 확인합니다.</div>
+      </div>
+      <div class="f" style="margin-bottom:0">
+        <label>토크나이저 경로</label>
+        <input class="inp" id="vTok" placeholder="llama-3.2-1b/tokenizer.json">
+        <div class="hint">입력하지 않으면 벤치마크 실행이 제한됩니다.</div>
+      </div>
+    </div>
+    <div class="mdfoot">
+      <button class="btn ghost" onclick="closeVer()">취소</button>
+      <button class="btn" id="vSubmit" disabled onclick="submitVer()">추가</button>
+    </div>
+  </div>
+</div>
+
 <!-- 노드 캐싱 MODEL-L01.M02 -->
 <div class="mdbg" id="mdCache">
   <div class="modal">
@@ -892,40 +936,40 @@ function userRef(txt){
 /* ===== 데이터 (현행 관측값 기준 · 시스템 컴포넌트 제외 — 7.2 안 A) ===== */
 const IMG=[
  {n:'gpt-oss-120b-furiosa',v:'1.0.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',tags:['추천','대형'],by:'관리자(admin)',at:'2026-07-08 17:47:25',eng:'vLLM',base:'Official Base',
-  arch:{p:'-',c:'-',q:'적용 안 함',d:'-'},infra:{v:'-',r:'아니요',g:'제한 없음'},store:'model-registry/gpt-oss-120b-furiosa:v1.0.0',mode:'단일',deps:[]},
+  arch:{p:'-',c:'-',q:'적용 안 함',d:'-'},infra:{v:'-',r:'아니요',g:'제한 없음'},store:'model-registry/gpt-oss-120b-furiosa:v1.0.0',mode:'단일',prof:0,deps:[]},
  {n:'gpt-oss-20b',v:'latest',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',tags:['경량'],by:'관리자(admin)',at:'2026-04-15 11:02:10',eng:'vLLM',base:'Custom Build',
-  arch:{p:'20B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'48',r:'아니요',g:'제한 없음'},store:'model-registry/gpt-oss-20b:latest',mode:'단일',deps:[]},
+  arch:{p:'20B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'48',r:'아니요',g:'제한 없음'},store:'model-registry/gpt-oss-20b:latest',mode:'단일',prof:0,deps:[]},
  {n:'k-exaone-236b-a23b-nvfp4a16',v:'1.0.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 14:20:00',eng:'vLLM',base:'Official Base',
-  arch:{p:'236B',c:'-',q:'NVFP4',d:'-'},infra:{v:'320',r:'예',g:'NVIDIA-H200'},store:'model-registry/k-exaone-236b-a23b-nvfp4a16:v1.0.0',mode:'프리필·디코드 분리',deps:[]},
+  arch:{p:'236B',c:'-',q:'NVFP4',d:'-'},infra:{v:'320',r:'예',g:'NVIDIA-H200'},store:'model-registry/k-exaone-236b-a23b-nvfp4a16:v1.0.0',mode:'프리필·디코드 분리',prof:0,deps:[]},
  {n:'solar-open-100b-nvfp4a16',v:'1.0.0',ready:'미캐싱',cn:0,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 13:55:41',eng:'vLLM',base:'Official Base',
-  arch:{p:'100B',c:'-',q:'NVFP4',d:'-'},infra:{v:'160',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/solar-open-100b-nvfp4a16:v1.0.0',mode:'단일',deps:[{n:'solar-open-100b-paused',ws:'ai-service-team',st:'중지됨'}]},
+  arch:{p:'100B',c:'-',q:'NVFP4',d:'-'},infra:{v:'160',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/solar-open-100b-nvfp4a16:v1.0.0',mode:'단일',prof:0,deps:[{n:'solar-open-100b-paused',ws:'ai-service-team',st:'중지됨'}]},
  {n:'qwen3-5-122b-a10b-gptq-int4',v:'1.0.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-28 09:11:07',eng:'vLLM',base:'Official Base',
-  arch:{p:'122B',c:'-',q:'GPTQ-INT4',d:'-'},infra:{v:'96',r:'아니요',g:'제한 없음'},store:'model-registry/qwen3-5-122b-a10b-gptq-int4:v1.0.0',mode:'단일',deps:[]},
+  arch:{p:'122B',c:'-',q:'GPTQ-INT4',d:'-'},infra:{v:'96',r:'아니요',g:'제한 없음'},store:'model-registry/qwen3-5-122b-a10b-gptq-int4:v1.0.0',mode:'단일',prof:0,deps:[]},
  {n:'furiosa-qwen3-32b-fp8',v:'latest',ready:'캐싱됨',cn:2,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-25 16:40:33',eng:'vLLM',base:'Official Base',
-  arch:{p:'32B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'Furiosa RNGD'},store:'model-registry/furiosa-qwen3-32b-fp8:latest',mode:'단일',deps:[{n:'furiosa-qwen3-32b-npu',ws:'test-npu',st:'오류'}]},
+  arch:{p:'32B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'Furiosa RNGD'},store:'model-registry/furiosa-qwen3-32b-fp8:latest',mode:'단일',prof:0,deps:[{n:'furiosa-qwen3-32b-npu',ws:'test-npu',st:'오류'}]},
  {n:'qwen-next-80b-a3b-thinking',v:'latest',ready:'미캐싱',cn:0,use:'미사용',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-20 10:05:12',eng:'vLLM',base:'Custom Build',
-  arch:{p:'80B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'128',r:'아니요',g:'제한 없음'},store:'model-registry/qwen-next-80b-a3b-thinking:latest',mode:'단일',deps:[]},
+  arch:{p:'80B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'128',r:'아니요',g:'제한 없음'},store:'model-registry/qwen-next-80b-a3b-thinking:latest',mode:'단일',prof:0,deps:[]},
  {n:'llama-3.2-1b-instruct',v:'latest',ready:'캐싱 중',cn:1,use:'배포 중',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-18 15:32:44',eng:'vLLM',base:'Custom Build',
-  arch:{p:'1B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'8',r:'아니요',g:'제한 없음'},store:'model-registry/llama-3.2-1b-instruct:latest',mode:'단일',deps:[{n:'llama-3-2-1b-prod',ws:'ai-service-team',st:'정상'}]},
+  arch:{p:'1B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'8',r:'아니요',g:'제한 없음'},store:'model-registry/llama-3.2-1b-instruct:latest',mode:'단일',prof:0,deps:[{n:'llama-3-2-1b-prod',ws:'ai-service-team',st:'정상'}]},
  {n:'gemma-4-12b-it',v:'1.0.0',ready:'미캐싱',cn:0,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-15 11:18:29',eng:'vLLM',base:'Official Base',
-  arch:{p:'12B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'32',r:'아니요',g:'제한 없음'},store:'model-registry/gemma-4-12b-it:v1.0.0',mode:'단일',deps:[{n:'gemma-4-12b-it-idle',ws:'ai-service-team',st:'유휴'}]},
+  arch:{p:'12B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'32',r:'아니요',g:'제한 없음'},store:'model-registry/gemma-4-12b-it:v1.0.0',mode:'단일',prof:0,deps:[{n:'gemma-4-12b-it-idle',ws:'ai-service-team',st:'유휴'}]},
  {n:'gpt-oss-120b',v:'latest',ready:'캐싱됨',cn:3,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-10 09:44:51',eng:'vLLM',base:'Custom Build',
-  arch:{p:'120B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'160',r:'아니요',g:'제한 없음'},store:'model-registry/gpt-oss-120b:latest',mode:'단일',deps:[{n:'gpt-oss-120b-symphony',ws:'ai-service-team',st:'정상'}]},
+  arch:{p:'120B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'160',r:'아니요',g:'제한 없음'},store:'model-registry/gpt-oss-120b:latest',mode:'단일',prof:0,deps:[{n:'gpt-oss-120b-symphony',ws:'ai-service-team',st:'정상'}]},
  {n:'gemma-4-31b-it-fp8-block',v:'1.0.0',ready:'캐싱됨',cn:3,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-05 17:22:03',eng:'vLLM',base:'Official Base',
-  arch:{p:'31B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'제한 없음'},store:'model-registry/gemma-4-31b-it-fp8-block:v1.0.0',mode:'단일',deps:[{n:'gemma-4-31b-fp8-failed',ws:'test-npu',st:'생성 실패'}]},
+  arch:{p:'31B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'제한 없음'},store:'model-registry/gemma-4-31b-it-fp8-block:v1.0.0',mode:'단일',prof:0,deps:[{n:'gemma-4-31b-fp8-failed',ws:'test-npu',st:'생성 실패'}]},
  {n:'qwen3-6-35b-a3b-fp8',v:'1.0.0',ready:'캐싱됨',cn:3,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-01 13:07:38',eng:'vLLM',base:'Official Base',
-  arch:{p:'35B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'제한 없음'},store:'model-registry/qwen3-6-35b-a3b-fp8:v1.0.0',mode:'단일',deps:[{n:'qwen3-6-35b-a3b-fp8-bench',ws:'ml-research',st:'유휴'}]},
+  arch:{p:'35B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'제한 없음'},store:'model-registry/qwen3-6-35b-a3b-fp8:v1.0.0',mode:'단일',prof:0,deps:[{n:'qwen3-6-35b-a3b-fp8-bench',ws:'ml-research',st:'유휴'}]},
  /* 같은 모델의 여러 버전 — 목록 행 단위를 비교하기 위한 데모 데이터 */
  {n:'qwen3-32b',v:'v3.6',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',tags:['추천'],by:'임승주(sj.lim)',at:'2026-08-01 09:12:00',eng:'vLLM',base:'Official Base',
-  arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.6',mode:'단일',deps:[]},
+  arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.6',mode:'단일',prof:0,deps:[]},
  {n:'qwen3-32b',v:'v3.2',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',tags:['추천'],by:'성유진(yj.seong)',at:'2026-06-11 15:40:22',eng:'vLLM',base:'Official Base',
-  arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.2',mode:'단일',deps:[]},
+  arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.2',mode:'단일',prof:0,deps:[]},
  {n:'qwen3-32b',v:'v3.1',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'성유진(yj.seong)',at:'2026-04-02 11:05:10',eng:'vLLM',base:'Official Base',
-  arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.1',mode:'단일',deps:[]},
+  arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.1',mode:'단일',prof:0,deps:[]},
  {n:'qwen3-32b',v:'v3.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'성유진(yj.seong)',at:'2026-02-15 10:00:00',eng:'vLLM',base:'Official Base',
-  arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.0',mode:'단일',deps:[]},
+  arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.0',mode:'단일',prof:0,deps:[]},
  {n:'llama-3.2-1b-instruct',v:'v2.0',ready:'캐싱됨',cn:3,use:'미사용',scope:'워크스페이스 전용',ws:'ai-service-team',by:'유지현(jh.yu)',at:'2026-07-20 16:33:41',eng:'vLLM',base:'Custom Build',
-  arch:{p:'1B',c:'8,192',q:'적용 안 함',d:'BF16'},infra:{v:'8',r:'아니요',g:'제한 없음'},store:'model-registry/llama-3.2-1b-instruct:v2.0',mode:'단일',deps:[]}
+  arch:{p:'1B',c:'8,192',q:'적용 안 함',d:'BF16'},infra:{v:'8',r:'아니요',g:'제한 없음'},store:'model-registry/llama-3.2-1b-instruct:v2.0',mode:'단일',prof:0,deps:[]}
 ];
 const WGT=[
  {n:'gpt-oss-20b',v:'1.0.0',ready:'빌드 중',path:'s3://concerto-models/gpt-oss-20b',size:'2.02 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-04-15 10:58:00',tok:'gpt-oss-20b/tokenizer.json',built:'gpt-oss-20b:latest',
@@ -950,7 +994,7 @@ const NODES=[
 /* 시스템 컴포넌트는 목록에서 제외 (판정 기준 확인 필요 — B-12) */
 IMG.forEach(m=>{ m.gpu=m.infra.g; m.vram=m.infra.v; m.sys=false; });
 IMG.push({n:'oci-storage-initializer',v:'v0.15.2',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-03-02 09:12:00',eng:'-',base:'Official Base',
-  arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'},store:'model-registry/oci-storage-initializer:v0.15.2',mode:'-',deps:[],gpu:'-',vram:'-',sys:true});
+  arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'},store:'model-registry/oci-storage-initializer:v0.15.2',mode:'-',prof:0,deps:[],gpu:'-',vram:'-',sys:true});
 WGT.forEach(m=>{ m.gpu=m.infra.g; m.vram=m.infra.v; });
 const RB={'캐싱됨':'ok','미캐싱':'mu','캐싱 중':'ac load','미빌드':'mu','빌드 중':'ac load','빌드됨':'ok','빌드 실패':'cr'};
 const RB2={'정상':'ok','경고':'wa','위험':'cr'};
@@ -1131,7 +1175,7 @@ const COLDEF={
 const ITEMDEF={
   quant:'모델 가중치를 더 적은 비트로 표현해 메모리 사용량을 줄이는 방식입니다.',
   rdma:'노드 간 고속 통신이 필요한지를 표시합니다. 여러 노드에 분산 배포할 때 사용됩니다.',
-  mode:'이 모델에 적합한 서빙 방식입니다. 배포 생성 시 기본값으로 사용됩니다.',
+  mode:'이 모델에 적합한 서빙 방식입니다. 배포 생성 시 기본값으로 사용됩니다.',prof:0,
   sync:'저장소의 실제 이미지와 플랫폼에 등록된 정보가 일치하는지를 표시합니다.',
   cnode:'이 이미지를 사전 다운로드한 노드 수입니다.'
 };
@@ -1389,6 +1433,7 @@ function openPanel(i){
     + '<dt>표시 범위</dt><dd>'+(m.scope==='전역'?'전역':'워크스페이스 전용')+'</dd>'
     + '<dt>워크스페이스</dt><dd>'+dv(m.ws)+'</dd>'
     + (isA?'<dt>서빙 엔진</dt><dd>'+m.eng+'</dd>':'<dt>토크나이저 경로</dt><dd>'+dv(m.tok)+'</dd>')
+    + (isA?'<dt>베이스</dt><dd>'+m.base+'</dd>':'')
     + '<dt>태그</dt><dd>'+((m.tags&&m.tags.length)?m.tags.map(function(t){return '<span class="vtag">'+t+'</span>';}).join(' '):dv(''))+'</dd>'
     + '<dt>동기화 상태'+help('sync')+'</dt><dd><span class="stbadge ok">일치</span></dd>'
     + '<dt>등록자</dt><dd>'+userRef(m.by)+'</dd>'
@@ -1406,7 +1451,8 @@ function openPanel(i){
     + '<dt>RDMA 필요'+help('rdma')+'</dt><dd>'+m.infra.r+'</dd>'
     + '<dt>요구 가속기</dt><dd>'+m.infra.g+'</dd>'
     + (isA?'<dt>권장 엔진 모드'+help('mode')+'</dt><dd>'+m.mode+'</dd>':'')
-    + (isA?'<dt>리소스 프로파일</dt><dd><span class="dash">-</span></dd>':'')
+    /* 건수로 적는다. 0이면 `-` 로 둔다(정책 2.2) — 배열 자체를 나열하면 패널 폭에 안 들어간다 */
+     + (isA?'<dt>리소스 프로파일</dt><dd>'+(m.prof? m.prof+'개' : '<span class="dash">-</span>')+'</dd>':'')
     + '</dl>', 'spec');
 
   if(isA){
@@ -1512,7 +1558,8 @@ function drawDetail(){
    + kv('모델명', m.n)
    + kv('표시 범위', m.scope + (m.scope==='전역'?'':' · '+m.ws))
    + kv('서빙 엔진', isA? m.eng : '<span class="dash">-</span>')
-   + kv('태그', (m.tags&&m.tags.length)? m.tags.map(function(t){return '<span class="chip">'+t+'</span>';}).join(' ') : '<span class="dash">-</span>')
+   + /* 사용자 태그는 값 태그다. 분류 배지(.chip)와 형태를 가른다(공통정책 1.9) — 패널과 같은 규격 */
+      kv('태그', (m.tags&&m.tags.length)? m.tags.map(function(t){return '<span class="vtag">'+t+'</span>';}).join(' ') : '<span class="dash">-</span>')
    + '</div></div>';
 
   /* ② 아키텍처 · ③ 인프라 요건 — 모델의 고유 스펙 */
@@ -1523,10 +1570,14 @@ function drawDetail(){
      + '</div></div>';
   }
   if(m.infra){
+    /* 패널과 같은 항목을 둔다. 기획서 7장이 권장 엔진 모드·리소스 프로파일을
+       모델 사양 섹션에 포함한다고 정하고 패널만 두라는 말은 없다 */
     h+='<div class="dsec"><h4>인프라 요건</h4><div class="dgrid">'
      + kv('최소 vRAM', m.infra.v==='-'?'<span class="dash">-</span>':m.infra.v+' GB')
      + kv('요구 가속기', m.infra.g)
      + kv('멀티노드 필요', m.infra.r)
+     + (isA? kv('권장 엔진 모드', m.mode) : '')
+     + (isA? kv('리소스 프로파일', m.prof? m.prof+'개' : '<span class="dash">-</span>') : '')
      + '</div></div>';
   }
 
@@ -1585,7 +1636,54 @@ function editFromRow(i, isA){
   cur = {m:(isA?IMG:WGT)[i], isA:isA};
   openEdit();
 }
-function openVerAdd(){ act('버전 추가 화면으로 이동합니다. 모델명은 고정되고 버전·소스만 입력합니다.'); }
+/* 버전 추가 — 대상 모델은 상세에서 이미 정해져 있다. 모델명을 읽기 전용으로 두어
+   어느 모델에 붙는 버전인지 밝힌다(모델정책 2.3) */
+function openVerAdd(){
+  if(!dCur) return;
+  document.getElementById('vName').value = dCur.m.n;
+  ['vPath','vVer','vTok'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['vPathErr','vVerErr'].forEach(function(id){ document.getElementById(id).style.display='none'; });
+  document.getElementById('vSrc').value='S3';
+  onVSrcChange();
+  document.getElementById('mdVer').classList.add('on');
+  verValid();
+}
+function closeVer(){ document.getElementById('mdVer').classList.remove('on'); }
+function onVSrcChange(){
+  const src=document.getElementById('vSrc').value;
+  const hint=document.getElementById('vSrcHint');
+  hint.textContent = src==='HuggingFace'
+    ? '귀속 워크스페이스의 토큰으로 내려받습니다(워크스페이스 정책 8.2).'
+    : '플랫폼 스토리지에서 가져옵니다.';
+}
+/* 중복은 모델명 + 버전 조합으로 본다(모델정책 2.2). 모델명이 고정이라 버전만 확인하면 된다 */
+function verDup(){
+  if(!dCur) return false;
+  const v=document.getElementById('vVer').value.trim();
+  const vers=(dCur.m._vers&&dCur.m._vers.length)?dCur.m._vers:[dCur.m];
+  return !!v && vers.some(function(x){ return x.v===v; });
+}
+function verValid(){
+  const p=document.getElementById('vPath').value.trim();
+  const v=document.getElementById('vVer').value.trim();
+  document.getElementById('vSubmit').disabled = !(p && v && !verDup());
+}
+function verBlur(id){
+  const el=document.getElementById(id), err=document.getElementById(id+'Err');
+  if(!err) return;
+  if(id==='vVer'){
+    const dup=verDup();
+    err.textContent = dup? '이미 등록된 버전입니다.' : '버전을 입력해 주세요.';
+    err.style.display = (!el.value.trim()||dup)? 'block':'none';
+  }else{
+    err.style.display = el.value.trim()? 'none':'block';
+  }
+}
+function submitVer(){
+  const v=document.getElementById('vVer').value.trim();
+  closeVer();
+  act(dCur.m.n+' 에 버전 '+v+' 을 추가했습니다.');
+}
 
 function closePanel(){document.getElementById('panel').classList.remove('on');
   document.querySelectorAll('table.tbl tbody tr').forEach(r=>r.classList.remove('rowsel'));}
@@ -1890,7 +1988,7 @@ function build(name){
     if(!IMG.some(x=>x.n===m.n&&x.v===m.v)){
       IMG.unshift({n:m.n,v:m.v,ready:'미캐싱',cn:0,use:'미사용',scope:m.scope,ws:m.ws,by:m.by,
         at:new Date().toISOString().slice(0,19).replace('T',' '),eng:'vLLM',base:'Custom Build',
-        arch:m.arch,infra:m.infra,store:'model-registry/'+m.n+':'+m.v,mode:'단일',deps:[],
+        arch:m.arch,infra:m.infra,store:'model-registry/'+m.n+':'+m.v,mode:'단일',prof:0,deps:[],
         gpu:m.infra.g,vram:m.infra.v,sys:false});
     }
     render(); if(cur&&cur.m===m) openPanel(WGT.indexOf(m));
