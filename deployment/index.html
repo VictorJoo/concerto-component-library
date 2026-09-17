@@ -1,9 +1,23 @@
 <!--
-  콘체르토 매니저 — 배포 화면 목업 v0.2 (2026-08-20)
+  콘체르토 매니저 — 배포 화면 목업 v0.33 (2026-09-14)
   색·컴포넌트 규격은 워크스페이스 목업 v0.33 를 그대로 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
 
   ── 변경 ────────────────────────────────────────
-  v0.21 · 목록 상단 액션에 `NaN` 이 나오던 것을 고쳤다. 주석 앞뒤에 `+` 가 둘 붙어
+  v0.21 · 표기를 다른 화면과 맞췄다.
+          · 모델 버전을 원값 그대로 둔다. `'v'+버전` 이라 `latest` 가 `vlatest` 로 나왔다.
+            패널만 `(latest)` 형태로 또 달랐다. 모델 화면과 같이 값만 둔다.
+          · 가속기 이름을 하이픈형으로 바꿨다 — `NVIDIA H200` → `NVIDIA-H200`.
+            나머지 목업과 용어집 6장이 하이픈형이다.
+          · 가속기 목록을 플랫폼 설정 인프라 자원의 클러스터 구성과 맞췄다.
+            H100·A100 은 클러스터에 없는 장비였다. MIG 를 별도 타입으로 둔다.
+        · 상세 헤더 액션을 목록 행 메뉴와 같은 집합으로 맞췄다. 종전에는 상세에
+          설정 변경·종료만 있어 일시중지·재시작·다시 시작·다시 시도를 하려면
+          목록으로 돌아가야 했다. 같은 대상에 같은 조건인데 자리마다 할 수 있는 것이
+          다르면 어느 쪽이 맞는지 알 수 없다. 상태로 막히는 것은 비활성 + 사유로 둔다.
+        · 확인 알럿의 파괴적 액션 판정에 `등록 해제` 를 넣었다. 목록은 `해제` 만 담고 있어
+          외부 배포 등록 해제 버튼이 기본 버튼으로 나왔다. 되돌릴 수 없는 작업이라
+          최종 실행 버튼은 채운 색이어야 한다.
+        · 목록 상단 액션에 `NaN` 이 나오던 것을 고쳤다. 주석 앞뒤에 `+` 가 둘 붙어
           단항 플러스로 해석되었다. 주석은 연산자 뒤가 아니라 앞에 둔다.
 
         벤치마크 실행 이력에 진행과 결과를 담았다(통합기능명세서 28·29).
@@ -135,7 +149,7 @@
           ⚠ 라이브러리에 체크박스 규격이 없다 — 개정 제안 대상.
         · 모델 버전을 드롭다운에 합쳤다. 모델마다 버전이 하나라 따로 고를 것이 없고
           별도 필드로 두면 같은 값을 두 번 보여준다. 현행 표기 형식(모델명 (버전))을 따른다.
-          캐시되지 않은 모델은 목록에 표시하고 고르면 상태 배지(.stbadge)와 안내를 띄운다.
+          캐싱되지 않은 모델은 목록에 표시하고 고르면 상태 배지(.stbadge)와 안내를 띄운다.
           현행은 `10분 이상` 으로 적고 있으나 모델 크기·네트워크에 따라 달라 수치는 옮기지 않았다.
         · 검수를 단계 순 세로 배치로 바꿨다. 마법사가 세로로 진행되는데 검수만
           좌우로 나누면 읽는 순서가 어긋난다. 오류는 해당 단계·항목 자리에서 알리고
@@ -1034,6 +1048,22 @@ table.tbl tr.need td{background:color-mix(in srgb,var(--destructive) 5%,transpar
 .rstwarn{display:flex;gap:9px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 9%,transparent);border-radius:9px;font-size:12px;line-height:1.6;color:var(--foreground);margin-top:14px}
 .rstwarn b{color:var(--warning)}
 
+/* 배포 전 검사 — 검수 단계에서 dry-run 결과를 보인다.
+   화면 검증(wErrs)이 잡는 것과 다르다 — 여기는 자원 여유·인자 충돌처럼
+   실제로 띄워 봐야 아는 것을 잡는다 */
+.drybox{margin-top:18px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.dryhd{display:flex;align-items:center;gap:9px;padding:11px 14px;background:var(--muted);
+  border-bottom:1px solid var(--border);font-size:12.5px;font-weight:600;color:var(--foreground)}
+.dryhd .drysp{margin-left:auto;font-weight:400;color:var(--muted-foreground);font-size:11.5px}
+.drybd{padding:6px 14px 12px}
+.dryr{display:flex;gap:9px;padding:7px 0;font-size:12.5px;line-height:1.6;color:var(--foreground)}
+.dryr + .dryr{border-top:1px solid var(--border)}
+.dryr i{font-style:normal;font-weight:700;flex:none;width:14px;text-align:center}
+.dryr.ok i{color:var(--success)}
+.dryr.warn i{color:var(--warning)}
+.dryr.err i{color:var(--destructive)}
+.dryr .dryd{color:var(--muted-foreground);display:block;margin-top:2px;font-size:11.5px}
+
 /* 컬럼 도움말 — 상태값 목록 */
 .thpop dl{margin:8px 0 0;display:grid;grid-template-columns:auto 1fr;gap:5px 9px;font-size:11.5px}
 .thpop dt{font-weight:600;color:var(--foreground);white-space:nowrap}
@@ -1448,7 +1478,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .rvarg em{font-style:normal;font-family:ui-monospace,Menlo,monospace;color:var(--foreground)}
   .rvmsg{color:var(--destructive)}
   /* 관측성 — 켜고 끄는 값이라 토글. 드롭다운은 셋 이상일 때 쓴다 */
-  /* 캐시 안 된 모델 안내 — 기동 시간이 크게 달라진다 */
+  /* 미캐싱 모델 안내 — 기동 시간이 크게 달라진다 */
   .mcwarn{margin-top:12px;max-width:560px;padding:11px 14px;border-radius:9px;
     font-size:12px;line-height:1.6;color:var(--foreground);
     background:color-mix(in srgb,var(--warning) 9%,transparent);
@@ -1883,8 +1913,11 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
       <div class="flywrap" id="setWrap">
         <a href="#" class="has-fly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 00-1.7-1L15 3H9l-.4 2.6a7.6 7.6 0 00-1.7 1l-2.3-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 001.7 1L9 21h6l.4-2.6a7.6 7.6 0 001.7-1l2.3 1 2-3.4z"/></svg><span class="lb">플랫폼 설정</span></a>
         <div class="flyout">
-          <a href="#">사용자 및 역할 <span class="tb">RBAC</span></a>
-          <a href="#">보안 및 감사</a><a href="#">외부 연동</a><a href="#">알림 채널</a>
+          <a href="#">사용자 및 역할</a>
+          <a href="#">보안 및 감사</a>
+          <a href="#">인프라 자원</a>
+          <a href="#">카탈로그</a>
+          <a href="#">연동 및 알림</a>
         </div>
       </div>
     </div>
@@ -1956,7 +1989,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
       <h2 id="pnName">-</h2>
       <button class="pnexp" onclick="openDetail()" title="상세 페이지로 이동"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M21 3l-8 8M10 5H5a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5"/></svg></button>
       <div class="more" id="pnMore">
-        <button class="morebtn" onclick="tgMore(event,'pnMore')">⋮</button>
+        <button class="morebtn" onclick="tgMore(event,'pnMore')">⋯</button>
         <div class="rowmenu" id="pnMenu"></div>
       </div>
       <button class="pnclose" onclick="closePanel()">✕</button>
@@ -1975,7 +2008,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     <div class="mdbody" id="bmBody"></div>
     <div class="mdfoot">
       <button class="btn ghost" onclick="closeBmRep()">닫기</button>
-      <button class="btn" onclick="act('벤치마크 결과를 내려받습니다.')">결과 내려받기</button>
+      <button class="btn" id="bmDl" onclick="act('벤치마크 결과를 내려받습니다.')">결과 내려받기</button>
     </div>
   </div>
 </div>
@@ -2036,23 +2069,27 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
    상태값은 관측(§4.1 `Ready`)과 워크스페이스 목업의 룸 상태 체계를 준용한 안이다.
    원천값 전수는 미확인이므로 확인 항목으로 남긴다 */
 const ME='yj.seong';
-const WSLIST=['공용 워크스페이스','ai-service-team','llm-research','npu-bench'];
+/* 삭제 중·삭제 실패 워크스페이스는 등록·배포 대상이 되지 않는다.
+   ⚠ 상태는 워크스페이스가 갖고 있다. 화면은 활성만 조회해 받는다(확인 항목) */
+const WSLIST=['공용 워크스페이스','ai-service-team','ml-research','test-npu'];
 /* 워크스페이스 운영룸의 가속기 배분 — 워크스페이스 정책 5장.
    배포는 운영룸 몫을 쓰므로 개발룸에 이관된 만큼은 여기서 빠져 있다.
    자원을 점유하는 값은 잔여와 함께 보여준다(정책 원칙 3) */
+/* 워크스페이스 목업의 할당량에서 개발룸 이관분을 뺀 값이다 — 운영룸 몫이 배포에 쓰인다
+   (워크스페이스 정책 5.2). 공용은 배정이 없어 남는 자원을 쓴다(정책 6.1) */
 const WSQ={
-  '공용 워크스페이스': {gpu:4, used:3},
-  'ai-service-team':  {gpu:4, used:2},
-  'llm-research':     {gpu:4, used:1},
-  'npu-bench':        {gpu:2, used:2}
+  '공용 워크스페이스': {gpu:0, used:0},  /* 배정 없음. 외부 배포만 있어 한도가 적용되지 않는다 */
+  'ai-service-team':  {gpu:2, used:2},  /* 할당 4 − 개발룸 2 */
+  'ml-research':      {gpu:0, used:0},  /* 할당 2 − 개발룸 2 */
+  'test-npu':         {gpu:1, used:1}   /* 할당 1 − 개발룸 0 */
 };
 function gpuFree(ws){ const w=WSQ[ws]; return w? Math.max(0, w.gpu-w.used) : 0; }
 /* 운영룸 상태별 생성 차단 — 배포 정책 2.4 */
 const WSPROD={
   '공용 워크스페이스': '정상',
   'ai-service-team': '정상',
-  'llm-research':    '미생성',
-  'npu-bench':       '오류'
+  'ml-research':    '미생성',
+  'test-npu':       '오류'
 };
 function prodOf(ws){ return WSPROD[ws] || '정상'; }
 function prodBlocks(ws){
@@ -2068,19 +2105,19 @@ function prodMsg(ws){
 function gpuTotal(ws){ const w=WSQ[ws]; return w? w.gpu : 0; }
 
 const MODELS=[
- {n:'llama-3.2-1b-instruct', v:'latest', cached:true},
- {n:'llama-3-1-8b-instruct-furiosa', v:'1.0.0', cached:false},
+ {n:'llama-3.2-1b-instruct', v:'latest', cached:false},
+ {n:'qwen3-32b',              v:'v3.6',   cached:true},
  {n:'k-exaone-236b-a23b-nvfp4a16', v:'1.0.0', cached:false},
- {n:'qwen3-6-35b-a3b-fp8', v:'1.0.0', cached:false},
+ {n:'qwen3-6-35b-a3b-fp8', v:'1.0.0', cached:true},
  {n:'qwen3-5-122b-a10b-gptq-int4', v:'1.0.0', cached:false},
- {n:'gemma-4-31b-it-fp8-block', v:'1.0.0', cached:false},
+ {n:'gemma-4-31b-it-fp8-block', v:'1.0.0', cached:true},
  {n:'gemma-4-12b-it', v:'1.0.0', cached:false},
- {n:'qwen3-next-80b-a3b-thinking', v:'latest', cached:true},
+ {n:'qwen-next-80b-a3b-thinking', v:'latest', cached:false},
  {n:'furiosa-qwen3-32b-fp8', v:'latest', cached:true},
  {n:'gpt-oss-20b', v:'latest', cached:true},
  {n:'gpt-oss-120b-furiosa', v:'1.0.0', cached:false},
  {n:'gpt-oss-120b', v:'latest', cached:true},
- {n:'solar-open-100b-nvfp4a16', v:'1.0.0', cached:true}
+ {n:'solar-open-100b-nvfp4a16', v:'1.0.0', cached:false}
 ];
 
 /* 가속기 목록은 ACCS 하나로 둔다. 목록용·마법사용으로 나눠 두었더니
@@ -2088,51 +2125,44 @@ const MODELS=[
 
 const DEPS=[
  {n:'llama-3-2-1b-prod', ws:'ai-service-team', model:'llama-3.2-1b-instruct', mver:'latest',
-  type:'자체 배포', st:'정상', rep:2, tgt:2, acc:'nvidia-h100', gpu:1, topo:'단일',
+  type:'자체 배포', st:'정상', rep:2, tgt:2, acc:'nvidia-h200', gpu:1, topo:'단일',
   owner:'성유진(yj.seong)', at:'2026-08-12 14:20', upd:'2026-08-12 17:20', health:'안정',
   ep:'https://gw.concerto.okestro.cloud/ai-service-team/llama-3-2-1b-prod/v1',
-  gw:true, host:'api.concerto.io', tls:true, obs:true, keys:['lang-chain-agent-prod','svc-chat-front'],
-  desc:'사내 챗봇 서비스가 호출하는 상시 배포입니다.'},
+  gw:true, host:'api.concerto.io', tls:true, auth:true, obs:true, keys:['lang-chain-agent-prod','batch-infer-key']},
 
  {n:'gpt-oss-120b-symphony', ws:'ai-service-team', model:'gpt-oss-120b', mver:'latest',
-  type:'자체 배포', st:'정상', rep:4, tgt:4, acc:'nvidia-h100', gpu:4, topo:'프리필·디코드 분리',
+  type:'자체 배포', st:'정상', rep:4, tgt:4, acc:'nvidia-h200', gpu:4, topo:'프리필·디코드 분리',
   owner:'임승주(sj.lim)', at:'2026-08-09 10:02', upd:'2026-08-09 13:02', health:'주의',
-  ep:'https://gw.concerto.okestro.cloud/llm-research/gpt-oss-120b-symphony/v1',
-  gw:true, host:'', tls:false, obs:true, keys:['research-bench'],
-  desc:'장문 프롬프트 처리량 실험용 배포입니다.'},
+  ep:'https://gw.concerto.okestro.cloud/ml-research/gpt-oss-120b-symphony/v1',
+  gw:true, host:'', tls:false, auth:true, obs:true, keys:[]},
 
- {n:'qwen3-6-35b-a3b-fp8-bench', ws:'llm-research', model:'qwen3-6-35b-a3b-fp8', mver:'1.0.0',
-  type:'자체 배포', st:'생성 중', rep:0, tgt:2, acc:'nvidia-a100', gpu:2, topo:'단일',
+ {n:'qwen3-6-35b-a3b-fp8-bench', ws:'ml-research', model:'qwen3-6-35b-a3b-fp8', mver:'1.0.0',
+  type:'자체 배포', st:'생성 중', rep:0, tgt:2, acc:'nvidia-h200-mig', gpu:2, topo:'단일',
   owner:'유지현(jh.yu)', at:'2026-08-18 09:41', upd:'2026-08-18 12:41', health:'-',
-  ep:'', gw:true, host:'', tls:false, obs:true, keys:[],
-  desc:''},
+  ep:'', gw:true, host:'', tls:false, auth:true, obs:true, keys:[]},
 
- {n:'furiosa-qwen3-32b-npu', ws:'npu-bench', model:'furiosa-qwen3-32b-fp8', mver:'latest',
+ {n:'furiosa-qwen3-32b-npu', ws:'test-npu', model:'furiosa-qwen3-32b-fp8', mver:'latest',
   type:'자체 배포', st:'오류', rep:0, tgt:2, acc:'furiosa-rngd', gpu:8, topo:'단일',
   owner:'김병건(bg.kim)', at:'2026-08-15 17:33', upd:'2026-08-15 20:33', health:'위험',
-  ep:'https://gw.concerto.okestro.cloud/npu-bench/furiosa-qwen3-32b-npu/v1',
-  gw:true, host:'', tls:false, obs:true, keys:[],
-  desc:'국산 NPU 대조 실험용 배포입니다.'},
+  ep:'https://gw.concerto.okestro.cloud/test-npu/furiosa-qwen3-32b-npu/v1',
+  gw:true, host:'', tls:false, auth:true, obs:true, keys:[]},
 
  {n:'gemma-4-12b-it-idle', ws:'ai-service-team', model:'gemma-4-12b-it', mver:'1.0.0',
-  type:'자체 배포', st:'유휴', rep:0, tgt:2, acc:'nvidia-a100', gpu:1, topo:'단일',
+  type:'자체 배포', st:'유휴', rep:0, tgt:2, acc:'nvidia-h200-mig', gpu:1, topo:'단일',
   owner:'성유진(yj.seong)', at:'2026-07-30 11:15', upd:'2026-07-30 14:15', health:'안정',
   ep:'https://gw.concerto.okestro.cloud/ai-service-team/gemma-4-12b-it-idle/v1',
-  gw:true, host:'', tls:false, obs:true, keys:['svc-chat-front'],
-  desc:'호출이 없으면 레플리카를 0으로 내립니다.'},
+  gw:true, host:'', tls:false, auth:true, obs:true, keys:['lang-chain-agent-prod']},
 
  {n:'solar-open-100b-paused', ws:'ai-service-team', model:'solar-open-100b-nvfp4a16', mver:'1.0.0',
-  type:'자체 배포', st:'중지됨', rep:0, tgt:1, acc:'nvidia-h100', gpu:2, topo:'단일',
+  type:'자체 배포', st:'중지됨', rep:0, tgt:1, acc:'nvidia-h200', gpu:2, topo:'단일',
   owner:'오경환(kh.oh)', at:'2026-07-22 16:48', upd:'2026-07-22 19:48', health:'-',
   ep:'https://gw.concerto.okestro.cloud/ai-service-team/solar-open-100b-paused/v1',
-  gw:true, host:'', tls:false, obs:false, keys:[],
-  desc:'비용 절감을 위해 일시중지한 배포입니다.'},
+  gw:true, host:'', tls:false, auth:true, obs:false, keys:[]},
 
- {n:'gemma-4-31b-fp8-failed', ws:'npu-bench', model:'gemma-4-31b-it-fp8-block', mver:'1.0.0',
-  type:'자체 배포', st:'생성 실패', rep:0, tgt:1, acc:'nvidia-h100', gpu:4, topo:'단일',
+ {n:'gemma-4-31b-fp8-failed', ws:'test-npu', model:'gemma-4-31b-it-fp8-block', mver:'1.0.0',
+  type:'자체 배포', st:'생성 실패', rep:0, tgt:1, acc:'nvidia-h200', gpu:4, topo:'단일',
   owner:'유지현(jh.yu)', at:'2026-08-17 13:07', upd:'2026-08-17 16:07', health:'-',
-  ep:'', gw:true, host:'', tls:false, obs:true, keys:[],
-  desc:''}
+  ep:'', gw:true, host:'', tls:false, auth:true, obs:true, keys:[]}
 ,
 
  /* 외부 배포 — 콘체르토 밖에서 돌던 워크로드를 목록에 등록한 것.
@@ -2142,15 +2172,13 @@ const DEPS=[
   type:'외부 배포', st:'정상', rep:1, tgt:null, acc:'furiosa-rngd', gpu:8, topo:'-',
   owner:'-', at:'2026-07-07 18:34', upd:'2026-07-07 21:34', health:'안정',
   ep:'https://biz-prod.internal/furiosa-gpt-oss-120b/v1',
-  gw:false, host:'', tls:false, obs:false, keys:[],
-  desc:'콘체르토 밖에서 운영 중인 워크로드를 등록한 것입니다.'},
+  gw:false, host:'', tls:false, auth:false, obs:false, keys:[]},
 
  {n:'gpt-oss-20b-081valid', ws:'공용 워크스페이스', model:'-', mver:'-',
-  type:'외부 배포', st:'정상', rep:2, tgt:null, acc:'nvidia-h100', gpu:2, topo:'-',
+  type:'외부 배포', st:'정상', rep:2, tgt:null, acc:'nvidia-h200', gpu:2, topo:'-',
   owner:'-', at:'2026-07-07 18:36', upd:'2026-07-07 21:36', health:'안정',
   ep:'https://081valid.internal/gpt-oss-20b/v1',
-  gw:false, host:'', tls:false, obs:false, keys:[],
-  desc:'콘체르토 밖에서 운영 중인 워크로드를 등록한 것입니다.'}
+  gw:false, host:'', tls:false, auth:false, obs:false, keys:[]}
 ];
 
 /* 상태 → 배지 등급. 생성·삭제의 진행은 로딩 표기를 함께 쓴다 */
@@ -2182,7 +2210,7 @@ const canImport=()=>isSuper();
 
 /* 조회 범위 — 최고 관리자는 전체를, 그 외에는 소속 워크스페이스와 공용만 본다.
    기술문서 3.2 — VIEWER 는 워크스페이스 내 자원의 상태만 조회한다 */
-const MYWS={ admin:['ai-service-team'], editor:['ai-service-team','llm-research'], viewer:['llm-research'] };
+const MYWS={ admin:['ai-service-team'], editor:['ai-service-team','ml-research'], viewer:['ml-research'] };
 function inScope(d){
   if(isSuper()) return true;
   if(d.ws==='공용 워크스페이스') return true;
@@ -2198,6 +2226,8 @@ function busy(d){ return d.st==='생성 중'||d.st==='삭제 중'; }
    오류는 기동은 했으나 요청을 처리하지 못하는 것이라 재시작으로 고칠 수 있고
    자원을 반환하고 멈출 수도 있다 */
 function running(d){ return d.st==='정상'||d.st==='유휴'||d.st==='오류'; }
+/* 재시작 대상 — 유휴는 레플리카가 0이라 내렸다 올릴 대상이 없다(배포정책 3.2·3.3) */
+function restartable(d){ return d.st==='정상'||d.st==='오류'; }
 
 /* ===== 검색·필터·정렬 ===== */
 let sq='', composing=false;
@@ -2381,7 +2411,7 @@ function tableView(d){
    + '<th>담당자</th>'
    /* 최근 변경일시 — 배포 정책 3.5. 공통정책 2.2 개정 제안 대상 */
    + sortTh('upd','최근 변경일시')
-   + '<th style="width:44px"></th>'
+   + '<th style="width:64px">작업</th>'
    + '</tr></thead><tbody>'
    + d.map(function(x){
        const i=DEPS.indexOf(x);
@@ -2392,7 +2422,7 @@ function tableView(d){
         + '<td>'+x.ws+'</td>'
         + '<td>'+(x.type==='외부 배포'
             ? '<span class="epcell" title="'+x.ep+'">'+x.ep+'</span>'
-            : x.model+(x.mver==='-'?'':'<span class="mver">v'+x.mver+'</span>'))+'</td>'
+            : x.model+(x.mver==='-'?'':'<span class="mver">'+x.mver+'</span>'))+'</td>'
         + '<td>'+repCell(x)+'</td>'
         + '<td>'+userRef(x.owner)+'</td>'
         /* 값은 DB 확정 후 연결한다. 지금은 데이터에 있는 값을 그대로 보인다 */
@@ -2413,7 +2443,7 @@ function rowMore(i){
   function mi(label,fn,dis,cls){
     return '<button'+(cls?' class="'+cls+'"':'')+(dis?' disabled title="'+why+'"':' onclick="event.stopPropagation();'+fn+'"')+'>'+label+'</button>';
   }
-  const head='<div class="more" id="mo'+i+'"><button class="morebtn" onclick="tgMore(event,\'mo'+i+'\')">⋮</button><div class="rowmenu">';
+  const head='<div class="more" id="mo'+i+'"><button class="morebtn" onclick="tgMore(event,\'mo'+i+'\')">⋯</button><div class="rowmenu">';
   /* 외부 배포는 콘체르토가 기동·자원을 관리하지 않아 제어 액션을 두지 않는다.
      항목이 하나뿐이라 구분선도 두지 않는다 */
   if(d.type==='외부 배포') return head + mi('등록 해제','delDep('+i+')', b, 'd') + '</div></div>';
@@ -2436,7 +2466,7 @@ function rowMore(i){
    /* 중지는 정상 기동된 적이 있어 같은 설정으로 다시 올린다. 생성 실패와 구분하려고
       `다시 시작` 으로 쓴다(정책 3.3) */
    + (d.st==='중지됨'? mi('다시 시작','startDep('+i+')',b) : mi('일시중지','pauseDep('+i+')', b||!running(d)))
-   + mi('재시작','restartDep('+i+')', b||!running(d))
+   + mi('재시작','restartDep('+i+')', b||!restartable(d))
    + mi('설정 변경','openCfg('+i+')', b)
    + '<hr>'
    + mi('종료','delDep('+i+')', b, 'd')
@@ -2466,9 +2496,10 @@ function dl(pairs){ return '<dl class="dl">'+pairs.map(function(p){ return '<dt>
 function openPanel(i){
   const d=DEPS[i]; cur={d:d,i:i};
   document.getElementById('pnName').textContent=d.n;
+  /* 설명을 두지 않는다. 마법사 4단계에서 받지 않는 값이라 화면에 자리만 남는다.
+     배포는 이름이 엔드포인트 주소에 들어가 이름 자체가 식별이다(배포정책 2.5) */
   const de=document.getElementById('pnDesc');
-  de.textContent = d.desc || '설명이 없습니다.';
-  de.className = 'pndesc'+(d.desc?'':' none');
+  if(de) de.style.display='none';
   document.getElementById('pnTags').innerHTML = stBadge(d.st, true)+'<span class="vtag">'+d.type+'</span>';
   document.getElementById('pnMenu').innerHTML = canDeploy()
     ? rowMenuItems(i)
@@ -2502,7 +2533,7 @@ function openPanel(i){
     ['모델', d.model==='-'
        ? '<span class="dash">-</span>'
        : '<a class="mname" onclick="event.stopPropagation();act(\''+d.model+' 모델 화면으로 이동합니다.\')">'+d.model+'</a>'
-         +(d.mver==='-'?'':'<span class="mver">v'+d.mver+'</span>')],
+         +(d.mver==='-'?'':'<span class="mver">'+d.mver+'</span>')],
     ['서빙 방식'+tip('단일은 같은 구성의 레플리카로 서비스합니다. 프리필·디코드 분리는 프롬프트 분석과 토큰 생성을 나누어 배치합니다.'), d.topo],
     /* 표기는 상세와 같게 둔다. 같은 값을 화면마다 다르게 쓰면 대조가 안 된다 */
     ['가속기', d.gpu
@@ -2518,8 +2549,10 @@ function openPanel(i){
 
   b.push(sec('접근 설정', dl([
     ['외부 접근', d.gw? '사용' : '사용 안 함'],
-    ['호스트명', d.host? d.host : '<span class="dash">-</span>'],
+    /* 운영룸 게이트웨이에서 정한 값이다. 배포에서 바꾸지 않는다 */
+    ['호스트명', d.host? d.host : '<span class="dash">기본 도메인</span>'],
     ['HTTPS', d.tls? '사용' : '사용 안 함'],
+    ['API Key 인증', d.auth? '사용' : '사용 안 함'],
     ['지표·추적 수집', d.obs? '사용' : '사용 안 함']
   ]), 'cfg'));
 
@@ -2581,7 +2614,7 @@ function rowMenuItems(i){
   if(d.st==='삭제 실패')
     return mi('다시 시도','delDep('+i+')', b);
   return (d.st==='중지됨'? mi('다시 시작','startDep('+i+')',b) : mi('일시중지','pauseDep('+i+')', b||!running(d)))
-   + mi('재시작','restartDep('+i+')', b||!running(d))
+   + mi('재시작','restartDep('+i+')', b||!restartable(d))
    + mi('설정 변경','openCfg('+i+')', b)
    + '<hr>' + mi('종료','delDep('+i+')', b, 'd');
 }
@@ -2601,12 +2634,30 @@ function backToList(){ view='list'; cur=null; syncView(); render(); vwBtn(0); }
 function drawDetail(){
   if(!cur) return;
   const d=cur.d, i=cur.i;
-  const dis = busy(d)? ' disabled title="지금은 '+d.st+' 상태라 실행할 수 없습니다."' : '';
+  /* 상세 헤더 액션은 목록 행 메뉴와 같은 집합을 둔다(기획서 `제어` 절).
+     같은 대상에 같은 조건인데 자리마다 할 수 있는 것이 다르면 어느 쪽이 맞는지 알 수 없다.
+     상태로 막히는 것은 미노출이 아니라 비활성 + 사유다(공통정책 7.10 과 구분) */
+  function dbtn(label, fn, disabled, cls){
+    return '<button class="btn '+(cls||'ghost')+'"'
+      + (disabled ? ' disabled title="지금은 '+d.st+' 상태라 실행할 수 없습니다."' : ' onclick="'+fn+'"')
+      + '>'+label+'</button>';
+  }
+  const b = busy(d);
   const acts = !canDeploy() ? ''
     : d.type==='외부 배포'
-      ? '<button class="btn danger-line" onclick="delDep('+i+')"'+dis+'>등록 해제</button>'
-      : '<button class="btn ghost" onclick="openCfg('+i+')"'+dis+'>설정 변경</button>'
-        + '<button class="btn danger-line" onclick="delDep('+i+')"'+dis+'>종료</button>';
+      ? dbtn('등록 해제','delDep('+i+')', b, 'danger-line')
+    : d.st==='생성 실패'
+      ? dbtn('설정 변경','openCfg('+i+')', b)
+        + dbtn('다시 시도','startDep('+i+')', b)
+        + dbtn('종료','delDep('+i+')', b, 'danger-line')
+    : d.st==='삭제 실패'
+      ? dbtn('다시 시도','delDep('+i+')', b)
+      : (d.st==='중지됨'
+          ? dbtn('다시 시작','startDep('+i+')', b)
+          : dbtn('일시중지','pauseDep('+i+')', b||!running(d)))
+        + dbtn('재시작','restartDep('+i+')', b||!restartable(d))
+        + dbtn('설정 변경','openCfg('+i+')', b)
+        + dbtn('종료','delDep('+i+')', b, 'danger-line');
 
   const tabs=['개요','모니터링','벤치마크'];
   document.getElementById('detailBody').innerHTML =
@@ -2631,7 +2682,7 @@ function drawDetail(){
         ['모델', d.model==='-'
           ? '<span class="dash">-</span>'
           : '<a class="mname" onclick="act(\''+d.model+' 모델 화면으로 이동합니다.\')">'+d.model+'</a>'
-            +(d.mver==='-'?'':'<span class="mver">('+d.mver+')</span>')],
+            +(d.mver==='-'?'':'<span class="mver">'+d.mver+'</span>')],
         ['워크스페이스', '<a class="mname" onclick="act(\''+d.ws+' 워크스페이스로 이동합니다.\')">'+d.ws+'</a>'],
         ['담당자', userRef(d.owner)],
         ['생성일시', d.at]
@@ -2702,15 +2753,17 @@ function tstSend(){
 }
 function dOverview(d){
   const curl='curl -X POST '+(d.ep||'{엔드포인트}')+'/chat/completions \\\n'
-   +'  -H "Authorization: Bearer {API_KEY}" \\\n'
+   /* 인증을 끈 배포는 키 없이 호출한다. 헤더를 그대로 두면 실제 호출과 어긋난다 */
+   + (d.auth? '  -H "Authorization: Bearer {API_KEY}" \\\n' : '')
    +'  -H "Content-Type: application/json" \\\n'
    +'  -d \'{"model":"'+d.model+'","messages":[{"role":"user","content":"안녕하세요"}]}\'';
   return '<div class="dsec"><h4>연결 정보</h4>'
    /* 엔드포인트는 요약 카드에 있어 여기서 다시 쓰지 않는다 */
    + dl([
        ['외부 접근', d.gw? '사용' : '사용 안 함'],
-       ['호스트명', d.host? d.host : '<span class="dash">-</span>'],
-       ['HTTPS', d.tls? '사용' : '사용 안 함']
+       ['호스트명', d.host? d.host : '<span class="dash">기본 도메인</span>'],
+       ['HTTPS', d.tls? '사용' : '사용 안 함'],
+       ['API Key 인증', d.auth? '사용' : '사용 안 함']
      ])
    + '</div>'
 
@@ -2848,9 +2901,12 @@ function dMonitor(d){
 const BM=[
   {st:'실행 중', engine:'AIPerf',  at:'2026-08-20 11:12', done:34, total:100},
   {st:'완료',   engine:'AIPerf',  at:'2026-08-17 14:02', upd:'2026-08-17 17:02', ttft:186, tps:'42.8',
-   rep:{req:100, ok:100, ttft:{avg:186, p95:241}, tpot:{avg:11.4, p95:16.2}, tps:'42.8', dur:'3시간 0분'}},
+   /* 부하 구간의 GPU 지표를 성능값과 한 세트로 저장한다(팀장 확인 9/14) */
+   rep:{req:100, ok:100, ttft:{avg:186, p95:241}, tpot:{avg:11.4, p95:16.2}, tps:'42.8', dur:'3시간 0분',
+        gpu:{util:{avg:78, max:94}, mem:{avg:62.4, max:71.8}, pw:{avg:248, max:301}}}},
   {st:'완료',   engine:'AIPerf',  at:'2026-08-12 09:31', upd:'2026-08-12 12:31', ttft:203, tps:'39.1',
-   rep:{req:100, ok:98,  ttft:{avg:203, p95:288}, tpot:{avg:12.9, p95:19.4}, tps:'39.1', dur:'3시간 0분'}},
+   rep:{req:100, ok:98,  ttft:{avg:203, p95:288}, tpot:{avg:12.9, p95:19.4}, tps:'39.1', dur:'3시간 0분',
+        gpu:{util:{avg:71, max:88}, mem:{avg:58.2, max:66.1}, pw:{avg:231, max:284}}}},
   {st:'실패',   engine:'LLMPerf', at:'2026-08-09 17:48', upd:'2026-08-09 20:48', ttft:0,   tps:'0',
    err:'대상 엔드포인트에 연결하지 못했습니다.'}
 ];
@@ -2881,7 +2937,7 @@ function dBench(d){
       ? '<div class="tblwrap"><table class="tbl"><thead><tr>'
         + '<th style="width:104px">상태</th><th>엔진</th><th style="width:160px">시작 일시</th>'
         + '<th class="thcell" style="width:200px">'+thHelp('bmres','요약 지표')+'</th>'
-        + '<th style="width:52px"><span class="sronly">작업</span></th>'
+        + '<th style="width:64px">작업</th>'
         + '</tr></thead><tbody>'
         + BM.map(function(b,ix){
             const done = b.st==='완료';
@@ -2890,11 +2946,13 @@ function dBench(d){
                 ? b.done+' / '+b.total+'<span class="mver">요청</span>'
               : done
                 ? 'TTFT '+b.ttft+'ms<span class="mver">TPS '+b.tps+'</span>'
-              : b.err
-                ? '<span class="tip-anchor"><span class="dash" tabindex="0">실패 사유</span><span class="tip">'+b.err+'</span></span>'
-                : '<span class="dash">-</span>';
-            /* 완료 건은 행을 눌러 요약 리포트를 연다. 이력의 두 값만으로는 판단이 서지 않는다 */
-            return '<tr'+(done?' onclick="openBmRep('+ix+')" style="cursor:pointer"':'')+'>'
+              /* 실패 사유를 툴팁에 두지 않는다. 툴팁은 항목 설명에 쓰고 그 건에 무슨 일이
+                 있었는지는 결과에서 본다(라이브러리 구분 기준 · 개발룸·워크스페이스와 같은 규격) */
+              : '<span class="dash">-</span>';
+            /* 완료 건은 행을 눌러 요약 리포트를, 실패 건은 사유를 연다.
+               이력의 두 값만으로는 판단이 서지 않는다 */
+            const openable = done || !!b.err;
+            return '<tr'+(openable?' onclick="openBmRep('+ix+')" style="cursor:pointer"':'')+'>'
              + '<td><span class="stbadge '+(done?'ok':b.st==='실행 중'?'ac load':'cr')+'">'+b.st+'</span></td>'
              + '<td>'+b.engine+'</td>'
              + '<td>'+b.at+'</td>'
@@ -2910,9 +2968,21 @@ function dBench(d){
 /* 벤치마크 결과 — 이력 행에서 연다. 요약 지표 둘만으로는 판단이 서지 않아 결과 전체를 담는다(명세 29).
    평균과 p95 를 함께 둔다 — 평균만 보면 꼬리 지연이 가려진다 */
 function openBmRep(ix){
-  const b=BM[ix]; if(!b || !b.rep) return;
-  const r=b.rep;
+  const b=BM[ix]; if(!b) return;
   document.getElementById('bmSub').textContent = b.engine + ' · ' + b.at;
+  /* 실패 건은 사유만 담는다. 측정값이 없다 */
+  if(!b.rep){
+    if(!b.err) return;
+    document.getElementById('bmBody').innerHTML =
+        '<div class="dsec" style="margin:0"><h4>실패 사유</h4>'
+      + '<p class="secnote" style="margin:0">'+b.err+'</p></div>';
+    /* 실패 건은 내려받을 결과가 없다 */
+    document.getElementById('bmDl').style.display='none';
+    document.getElementById('mdBm').classList.add('on');
+    return;
+  }
+  const r=b.rep;
+  document.getElementById('bmDl').style.display='';
   document.getElementById('bmBody').innerHTML =
       '<div class="dsec" style="margin:0 0 12px"><h4>실행 조건</h4><dl class="dl">'
     + '<dt>도구</dt><dd>'+b.engine+'</dd>'
@@ -2927,7 +2997,24 @@ function openBmRep(ix){
     + '<dt>TTFT p95</dt><dd>'+r.ttft.p95+' ms</dd>'
     + '<dt>TPOT 평균</dt><dd>'+r.tpot.avg+' ms</dd>'
     + '<dt>TPOT p95</dt><dd>'+r.tpot.p95+' ms</dd>'
-    + '</dl></div>';
+    + '</dl></div>'
+    /* 부하 구간의 GPU 지표다. 성능값과 한 세트로 재고 저장한다.
+       모니터링은 실시간 추이를 보는 화면이고 여기는 그 구간의 고정 스냅샷이라 다르다 */
+    + (r.gpu
+       ? '<div class="dsec" style="margin:12px 0 0"><h4>가속기'
+         + tip('벤치마크를 돌린 구간의 값입니다. 실시간 추이는 모니터링에서 확인합니다.')+'</h4>'
+         + '<dl class="dl">'
+         + '<dt>사용률 평균</dt><dd>'+r.gpu.util.avg+' %</dd>'
+         + '<dt>사용률 최대</dt><dd>'+r.gpu.util.max+' %</dd>'
+         + '<dt>메모리 평균</dt><dd>'+r.gpu.mem.avg+' GB</dd>'
+         + '<dt>메모리 최대</dt><dd>'+r.gpu.mem.max+' GB</dd>'
+         + '<dt>전력 평균</dt><dd>'+r.gpu.pw.avg+' W</dd>'
+         + '<dt>전력 최대</dt><dd>'+r.gpu.pw.max+' W</dd>'
+         + '</dl>'
+         + '<div class="secact" style="margin-top:12px">'
+         +   '<button class="btn ghost sm" onclick="act(\'모니터링 화면으로 이동합니다.\')">모니터링에서 추이 보기</button>'
+         + '</div></div>'
+       : '');
   document.getElementById('mdBm').classList.add('on');
 }
 function closeBmRep(){ document.getElementById('mdBm').classList.remove('on'); }
@@ -3004,7 +3091,7 @@ function newWF(){
     rdma:false,
     /* 03 게이트웨이 */
     name:'', nameChecked:false, ws:'',
-    host:'', tls:false,
+    host:'', tls:false, auth:'true',
     limit:false, limitReq:'500', limitUnit:'분', limitKey:'전체 토큰', limitHeader:'x-user-id',
     timeout:'60초', maxBody:'10',
     /* 04 검수 */
@@ -3155,11 +3242,13 @@ function argCatCount(sec){
   return n;
 }
 
+/* 플랫폼 설정 인프라 자원의 클러스터 구성과 같은 목록을 둔다.
+   화면에 없는 장비를 고르게 하면 실제로 배포할 수 없다.
+   MIG 는 부모 가속기와 별도 타입이다(워크스페이스 정책 5.4 · 용어집 6장) */
 const ACCS=[
-  {k:'nvidia-h200', n:'NVIDIA H200', vram:'141GB', kind:'gpu'},
-  {k:'nvidia-h100', n:'NVIDIA H100', vram:'80GB',  kind:'gpu'},
-  {k:'nvidia-a100', n:'NVIDIA A100', vram:'40GB',  kind:'gpu'},
-  {k:'furiosa-rngd',n:'Furiosa RNGD',vram:'48GB',  kind:'npu'}
+  {k:'nvidia-h200',    n:'NVIDIA-H200',     vram:'141GB', kind:'gpu'},
+  {k:'nvidia-h200-mig',n:'NVIDIA-H200 MIG', vram:'20GB',  kind:'gpu'},
+  {k:'furiosa-rngd',   n:'Furiosa RNGD',    vram:'48GB',  kind:'npu'}
 ];
 function accOf(k){ return ACCS.find(function(a){return a.k===k;}) || ACCS[0]; }
 
@@ -3178,17 +3267,74 @@ function openWiz(){
      필터가 특정 워크스페이스면 그 값을 기본으로 채운다 */
   WF=newWF();
   WF.ws = (wsCur && wsCur!=='전체') ? wsCur : '';
-  wStep=0; wShown={}; wAdv={};
+  wStep=0; wShown={}; wAdv={}; DRY=null; dryKey='';
   view='wiz'; cur=null; closePanel(); syncView(); drawWiz(); vwBtn(2);
 }
-function wGo(i){ wStep=i; drawWiz(); }
+/* ── 배포 전 검사(dry-run) ─────────────────────
+   실행하지 않고 검사만 수행해 결과를 받는다. 백엔드 제공 가능(팀장 확인 9/2).
+   검수 단계에 들어오면 자동으로 돌리고, 앞 단계를 고치고 돌아오면 다시 돌린다.
+   ✕ 가 하나라도 있으면 배포 버튼을 막는다.
+   ⚠ 결과 값은 데모용이다. 실제로는 백엔드가 내려준다.
+   ⚠ 인자명은 화면 라벨로 바꿔 보인다(공통정책 7.9) */
+let DRY = null;      /* null 미실행 · 'run' 검사 중 · 객체 결과 */
+let dryKey = '';     /* 어떤 입력으로 돌렸는지. 값이 바뀌면 다시 돌린다 */
+function drySnap(){
+  return [WF.model,WF.acc,WF.topo,WF.rep,WF.gpu,WF.preRep,WF.preGpu,WF.maxLen,WF.name].join('|');
+}
+function dryRun(){
+  dryKey = drySnap();
+  DRY = 'run';
+  drawWiz();
+  setTimeout(function(){
+    if(dryKey !== drySnap()) return;   /* 그새 값이 바뀌었으면 버린다 */
+    const rows = [];
+    rows.push({t:'ok', m:'설정 확인'});
+    /* 자원 초과는 화면도 잡지만 여기서는 클러스터 잔여 기준으로 다시 본다 */
+    const need = wTotalGpu(), free = WF.ws? gpuFree(WF.ws) : 0;
+    if(need > free) rows.push({t:'warn', m:'요청 가속기 '+need+'장 · 배분 가능 '+free+'장',
+      d:'배분 가능한 양을 넘습니다. 워크스페이스 할당량을 조정하거나 수를 줄여 주세요.'});
+    /* 인자 충돌 — 데모로 하나만 둔다 */
+    if(WF.maxLen==='4K' || WF.maxLen==='8K')
+      rows.push({t:'err', m:'최대 배치 토큰 수는 최대 컨텍스트 길이보다 클 수 없습니다',
+        d:'최대 컨텍스트 길이를 늘리거나 고급 설정에서 최대 배치 토큰 수를 줄여 주세요.'});
+    DRY = rows;
+    drawWiz();
+  }, 700);
+}
+function dryHasErr(){ return Array.isArray(DRY) && DRY.some(function(r){ return r.t==='err'; }); }
+function dryBox(){
+  if(DRY==='run'){
+    return '<div class="drybox"><div class="dryhd">배포 전 검사'
+     + '<span class="drysp">검사 중…</span></div></div>';
+  }
+  if(!Array.isArray(DRY)) return '';
+  const ico={ok:'✓',warn:'⚠',err:'✕'};
+  return '<div class="drybox"><div class="dryhd">배포 전 검사'
+   + '<span class="drysp">'
+   +   '<button class="btn ghost sm" onclick="dryRun()">다시 검사</button></span></div>'
+   + '<div class="drybd">'
+   + DRY.map(function(r){
+       return '<div class="dryr '+r.t+'"><i>'+ico[r.t]+'</i><span>'+r.m
+        + (r.d? '<span class="dryd">'+r.d+'</span>' : '')+'</span></div>';
+     }).join('')
+   + '</div></div>';
+}
+function wGo(i){
+  wStep=i;
+  /* 검수 단계에 들어오면 자동으로 검사한다. 앞 단계를 고치고 돌아오면 다시 돌린다 */
+  if(i===WSTEPS.length-1 && dryKey!==drySnap()) dryRun(); else drawWiz();
+}
 /* 나가는 길은 상단 뒤로가기 하나로 둔다. 상세·가져오기와 같은 자리다.
    하단에 두면 스크롤해야 보이고 화면마다 위치가 갈린다.
    입력한 것이 있으면 확인받는다(공통정책 7.2) */
 function wDirty(){
   const b=newWF();
-  for(const k of ['model','maxLen','gpuUtil','acc','topo','rdma','rep','gpu','preRep','preGpu',
-                  'name','ws','host','tls','limit','obs','timeout','maxBody']){
+  /* newWF 가 정하는 키를 모두 본다. 목록을 따로 두면 필드를 늘릴 때 빠뜨린다 */
+  for(const k of ['model','mver','topo','maxLen','gpuUtil','scorer','alloc','acc',
+                  'rep','gpu','preRep','preGpu','rdma',
+                  'name','ws','tls','auth',
+                  'limit','limitReq','limitUnit','limitKey','limitHeader',
+                  'timeout','maxBody','obs']){
     if(String(WF[k])!==String(b[k])) return true;
   }
   if(Object.keys(WF.args||{}).some(function(k){ return String(WF.args[k]).trim()!==''; })) return true;
@@ -3369,12 +3515,12 @@ function paneModel(){
    + '<div class="fgrid">'
    +   fld('모델','model',
         selBox('model', MODELS.map(function(m){
-          return {v:m.n, t:m.n+' ('+m.v+')'+(m.cached?'':' · 캐시 안 됨')};
+          return {v:m.n, t:m.n+' ('+m.v+')'+(m.cached?'':' · 미캐싱')};
         }), WF.model)
-        /* 캐시 여부는 상태값이라 배지로 둔다. 이름의 일부가 아니다.
+        /* 캐싱 여부는 상태값이라 배지로 둔다. 이름의 일부가 아니다.
            option 에는 마크업이 들어가지 않아 목록에서는 텍스트로, 고른 뒤에 배지로 알린다 */
         + (mm && !mm.cached
-           ? '<div class="mcst"><span class="stbadge wa"><span class="d"></span>캐시 안 됨</span></div>'
+           ? '<div class="mcst"><span class="stbadge wa"><span class="d"></span>미캐싱</span></div>'
            : ''),
         '', true)
    + '</div>'
@@ -3382,7 +3528,7 @@ function paneModel(){
       그대로 옮기지 않는다. 수치는 확인 후 넣는다 */
    + (mm && !mm.cached
       ? '<div class="mcwarn"><b>클러스터에 모델 파일이 없어 배포 후 내려받습니다.</b>'
-        + '캐시된 모델보다 기동이 오래 걸립니다.</div>'
+        + '캐싱된 모델보다 기동이 오래 걸립니다.</div>'
       : '')
 
    /* 가속기 메모리 사용률·최대 컨텍스트 길이는 고급으로 옮겼다.
@@ -3608,6 +3754,11 @@ function paneRes(){
 
 /* ── 03 게이트웨이 ──────────────────────────────────
    어디로 호출하나 */
+/* 운영룸 게이트웨이의 호스트. 워크스페이스마다 다르다.
+   ⚠ 데모용 값이다. 실제로는 백엔드가 내려준다 */
+const PROD_HOST={ 'ai-service-team':'gw.ai-service.concerto.io' };
+function prodHost(){ return PROD_HOST[WF.ws] || ''; }
+
 function paneGw(){
   const nm=WF.name.trim();
   return wHead('게이트웨이','외부에서 이 배포를 호출할 주소와 제한을 정합니다.')
@@ -3626,15 +3777,26 @@ function paneGw(){
 
    + '<div class="fsec"><h4>호출 주소</h4>'
    +   '<div class="fgrid">'
+   /* 게이트웨이는 룸 단위 리소스이고 호스트는 그 리스너 속성이다(팀장 확인 9/8).
+      배포마다 받으면 같은 운영룸의 배포가 서로 다른 값을 넣었을 때 무엇을 쓸지 정할 수 없다.
+      운영룸에서 정한 값을 읽기 전용으로 보인다 */
    +     fld('호스트명','host',
-          inp('host','value="'+WF.host+'" placeholder="비우면 기본 도메인을 사용합니다"'
-            +' oninput="wSetQuiet(\'host\',this.value)"'), '')
+          '<div class="ro">'+(prodHost()||'gw.concerto.okestro.io')+'</div>',
+          '운영룸에서 정합니다. 배포마다 바꿀 수 없습니다.')
    +     fld('HTTPS','tls',
           selBox('tls',[{v:'true',t:'사용'},{v:'false',t:'사용 안 함'}], String(WF.tls)), '')
+   /* API Key 인증 — 키 목록·발급은 워크스페이스 소관이고(8/19 회의 3.4)
+      요구 여부만 배포에서 정한다(팀장 확인 9/2). 기본값은 켬이다.
+      인증은 게이트웨이가 처리하므로 호출 주소와 같은 섹션에 둔다 */
+   +     fld('API Key 인증','auth',
+          selBox('auth',[{v:'true',t:'사용'},{v:'false',t:'사용 안 함'}], String(WF.auth)),
+          (WF.auth==='false'||WF.auth===false)
+            ? '키 없이 호출할 수 있습니다. 요청자를 식별하지 못해 사용량을 셀 수 없습니다.'
+            : '호출 시 API Key 를 요구합니다. 키 발급은 워크스페이스에서 합니다.')
    +   '</div>'
    +   '<div class="epprev"><span class="el">발급될 주소</span>'
    +     '<span class="ev">'+(WF.tls==='true'||WF.tls===true?'https':'http')+'://'
-   +       (WF.host || 'gw.concerto.okestro.cloud')+'/'
+   +       (prodHost() || 'gw.concerto.okestro.cloud')+'/'
    +       (WF.ws||'{워크스페이스}')+'/'+(nm||'{배포명}')+'/v1</span></div>'
    + '</div>'
 
@@ -3785,6 +3947,7 @@ function paneReview(){
          (WF.name||'배포명 없음')+' · HTTPS '+((WF.tls==='true'||WF.tls===true)?'사용':'사용 안 함'),
          row('배포명', nm[0], nm[1])
        + row('HTTPS', (WF.tls==='true'||WF.tls===true)?'사용':'사용 안 함')
+       + row('API Key 인증', (WF.auth==='true'||WF.auth===true)?'사용':'사용 안 함')
        + row('토큰 사용량 제한', (WF.limit==='true'||WF.limit===true)
           ? WF.limitReq+' / '+WF.limitUnit : '사용 안 함'))
    /* 플랫폼 값은 바꿀 수 없어 확인 표시를 두지 않는다 */
@@ -3810,6 +3973,7 @@ function paneReview(){
    +       '<span class="tk"></span></button>'
    +   '</div>'
    + '</div>'
+   + dryBox()
    + '</div>';
 }
 
@@ -3829,7 +3993,10 @@ function wFoot(errs){
    /* 첫 단계에는 돌아갈 데가 없어 이전을 두지 않는다 */
    +   (wStep>0? '<button class="btn ghost" onclick="wShown[\'_v\'+wStep]=true;wGo('+(wStep-1)+')">이전</button>' : '')
    +   (last
-     ? '<button class="btn"'+(errs.length?' disabled title="확인이 필요한 항목이 있습니다."':'')
+     ? '<button class="btn"'
+       + (errs.length? ' disabled title="확인이 필요한 항목이 있습니다."'
+          : dryHasErr()? ' disabled title="배포 전 검사에서 오류가 있습니다."'
+          : DRY==='run'? ' disabled title="배포 전 검사를 진행하고 있습니다."' : '')
        + ' onclick="submitWiz()">배포</button>'
      : '<button class="btn" onclick="wShown[\'_v\'+wStep]=true;wGo('+(wStep+1)+')">다음</button>')
    + '</span></div>';
@@ -4022,7 +4189,7 @@ function openConfirm(title,body,onOk,okLabel,cancelLabel,confirmName){
   document.getElementById('cfBody').innerHTML=body;
   const ok=document.getElementById('cfOk');
   ok.textContent=okLabel||'확인';
-  ok.className='btn'+(['삭제','종료','취소','중단','일시중지','해제'].indexOf(okLabel)>=0?' danger':'');
+  ok.className='btn'+(['삭제','종료','취소','중단','일시중지','해제','등록 해제'].indexOf(okLabel)>=0?' danger':'');
   ok.style.display=onOk?'':'none';
   ok.onclick=function(){ closeConfirm(); if(onOk) onOk(); };
   document.querySelector('#mdConfirm .btn.ghost').textContent = cancelLabel || (onOk?'취소':'닫기');
@@ -4085,7 +4252,8 @@ function cfgDef(d){
     minRep: String(d.tgt||1), maxRep: String(d.maxRep||Math.max(2,(d.tgt||1)+1)), rep: String(d.tgt||1),
     /* ⚠ CPU · 메모리는 화면에서 받은 적이 없다 — TUI · 현행 생성 화면 어디에도 없다.
        추론 기본값도 근거가 없어 뺐다. 현행 Configure 모달 내용은 관측되지 않았다 */
-    maxLen: String(d.maxLen||''), gpuUtil: String(d.gpuUtil||'0.9')
+    maxLen: String(d.maxLen||''), gpuUtil: String(d.gpuUtil||'0.9'),
+    auth: d.auth!==false
   };
 }
 function openCfg(i){
@@ -4103,7 +4271,10 @@ function cfgChg(){
   const o=cfgDef(cur.d);
   return {
     live: ['temp','topP','sysPrompt'].some(function(k){ return CFG[k]!==o[k]; }),
-    rest: ['auto','minRep','maxRep','rep','cpu','mem','maxLen','gpuUtil'].some(function(k){ return CFG[k]!==o[k]; })
+    rest: ['auto','minRep','maxRep','rep','cpu','mem','maxLen','gpuUtil'].some(function(k){ return CFG[k]!==o[k]; }),
+    /* 인증은 재기동이 따르지 않는다. 끄던 것을 켜면 기존 호출이 막히므로 그때만 알린다 */
+    auth: CFG.auth!==o.auth,
+    authOn: CFG.auth && !o.auth
   };
 }
 function chgMark(k){ return CFG[k]!==cfgDef(cur.d)[k] ? '<span class="chgd">변경됨</span>' : ''; }
@@ -4160,6 +4331,14 @@ function drawCfg(){
      현행 Configure 모달 내용이 관측되지 않았고 TUI · 차트에도 없다.
      vLLM 은 이 값들을 호출 시 파라미터로 받으므로 배포 설정에 둘 값이 아닐 수 있다 */
 
+  /* API Key 인증 — 재기동이 따르지 않아 용량·엔진 설정과 구간을 나눈다.
+     `즉시 반영` 이라 쓰지 않는다. 저장을 눌러야 반영되는 것은 같다(배포 정책 2.6) */
+  h+='<div class="cfggrp"><div class="gh"><h5>접근 설정</h5></div>'
+   + '<div class="gd">저장하면 바로 적용되며 배포는 다시 기동되지 않습니다.</div>'
+   + '<div class="cfgrow"><label>API Key 인증'+tip('끄면 키 없이 호출할 수 있습니다. 요청자를 식별하지 못해 사용량을 셀 수 없습니다.')+chgMark('auth')+'</label>'
+   +   '<span class="sw'+(CFG.auth?' on':'')+'" onclick="cSet(\'auth\',!CFG.auth)"></span></div>'
+   + '</div>';
+
   /* 바꿀 수 없는 값도 자리를 둔다 — 없으면 어디서 바꾸는지 찾아 헤맨다 */
   h+='<div class="cfggrp"><div class="gh"><h5>병렬 처리</h5><span class="gtag">변경 불가</span></div>'
    + '<div class="cfgrow"><label>레플리카당 가속기</label>'
@@ -4170,14 +4349,21 @@ function drawCfg(){
   if(chg.rest) h+='<div class="rstwarn">'
    + '<b>재기동</b><span>저장하면 배포가 다시 기동되며, 그동안 호출이 실패할 수 있습니다. 추론 기본값만 바꾸면 기동 없이 반영됩니다.</span></div>';
 
+  /* 끄는 방향은 넓어지는 변경이라 알리지 않는다. 켜는 방향만 기존 호출이 막힌다 */
+  if(chg.authOn) h+='<div class="rstwarn">'
+   + '<b>인증</b><span>지금까지 키 없이 호출하던 요청은 더 이상 처리되지 않습니다.</span></div>';
+
   document.getElementById('cfgBody').innerHTML=h;
   document.getElementById('cfgSub').textContent = d.n+'의 용량과 엔진 설정을 수정합니다.';
-  document.getElementById('cfgSave').disabled = !(chg.live || chg.rest);
+  document.getElementById('cfgSave').disabled = !(chg.live || chg.rest || chg.auth);
 }
 
 function submitCfg(){
   const d=cur.d, chg=cfgChg();
   closeCfg();
+
+  /* 인증은 재기동과 무관하게 반영한다 */
+  if(chg.auth) d.auth=CFG.auth;
 
   if(chg.rest){
     d.auto=CFG.auto; d.maxRep=parseInt(CFG.maxRep)||d.maxRep;
@@ -4215,7 +4401,7 @@ function submitCfg(){
    어느 워크스페이스에도 속하지 않은 네임스페이스는 `미지정` 으로 둔다 */
 const NS2WS={
   '081valid':'ai-service-team', '262q-valid':'ai-service-team',
-  'llmapi':'llm-research', 'llmd081':'npu-bench'
+  'llmapi':'ml-research', 'llmd081':'test-npu'
 };
 function wsOfNs(ns){ return NS2WS[ns] || ''; }
 
@@ -4287,9 +4473,9 @@ function drawImport(){
               return '<option value="'+m.n+'"'+(IMP[i].pick===m.n?' selected':'')+'>'+m.n+'</option>';
             }).join('')
         + '</select>'
-        /* ⚠ 판정 기준은 확인 전이다. 이름·이미지 경로·라벨 중 무엇으로 맞추는지 모른다.
-      어떻게 찾았는지를 화면이 단정하지 않는다 */
-   + (IMP[i].auto && IMP[i].pick? '<div class="hint">자동으로 연결했습니다. 맞는지 확인해 주세요.</div>':'')
+        /* 모델 명칭과 메타데이터로 레지스트리 모델과 비교해 맞춘다(팀장 확인 9/2).
+      후보 목록에는 가속기를 쓰는 LLM 워크로드가 오른다 */
+   + (IMP[i].auto && IMP[i].pick? '<div class="hint">모델 명칭과 메타데이터로 연결했습니다. 맞는지 확인해 주세요.</div>':'')
         + '</td></tr>';
      }).join('')
    + '</tbody></table></div></div>';
@@ -4313,8 +4499,7 @@ function submitImport(){
       acc:f.acc, gpu:f.gpu, topo:'-',
       owner:'-', at:'2026-08-18 10:40', upd:'2026-08-18 13:40', health:'안정',
       ep:'https://'+f.ns+'.internal/'+f.pod+'/v1',
-      gw:false, host:'', tls:false, obs:false, keys:[],
-      desc:'콘체르토 밖에서 운영 중인 워크로드를 등록한 것입니다.' });
+      gw:false, host:'', tls:false, auth:false, obs:false, keys:[] });
   });
   add.reverse().forEach(function(d){ DEPS.unshift(d); });
   backToList();
