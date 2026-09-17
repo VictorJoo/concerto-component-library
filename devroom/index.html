@@ -1,5 +1,5 @@
 <!--
-  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.3 (2026-08-26)
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.23 (2026-09-16)
   CDE 정책 기준.
 
   ── 화면 부제 (2026-08-26) ────────────────────
@@ -130,7 +130,7 @@
     ⚠ 워크스페이스 목업의 CDE 표기(상태 `정상`, IDE `Jupyter Lab`, 실행 방식 `비동기 위임`)가
       이 목업과 다르다. 개발룸을 덜어낼 때 함께 정리한다.
   · 신청 폼 섹션명을 워크스페이스 목업 CDE 폼과 맞췄다 — `기간·사유` → `사용 기간`.
-    섹션 다섯(환경·자원·볼륨·접근 제한·사용 기간)과 순서는 이미 같다.
+    섹션 다섯(환경·자원·볼륨·접근 제한·신청 정보)과 순서는 이미 같다.
     ⚠ CDE 이름 입력이 없다. 목록 첫 컬럼이 `CDE명` 인데 신청 폼에 항목이 없어
       시스템이 만드는 것으로 두었으나 규칙이 정해진 적이 없다 — 확인 대상(정책 9. 21번).
     ⚠ AI 에이전트는 화면에 두지 않았다. 기술문서 5.4 가 `옵션으로 제공` 이라 하나
@@ -1577,7 +1577,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 
 /* 폼 — 라벨 좌측 고정. 항목이 늘어도 값 열이 흔들리지 않는다 */
 .fsec{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px 18px 14px;margin-bottom:14px}
-.fsec > h3{margin:14px 0 6px;font-size:13px;font-weight:600}
+.fsec > h4{margin:14px 0 6px;font-size:13px;font-weight:600}
 .frow{display:flex;align-items:flex-start;gap:14px;padding:11px 0;border-bottom:1px solid var(--border)}
 .frow:last-child{border-bottom:0}
 .flb{flex:0 0 150px;min-width:0;font-size:12.5px;color:var(--muted-foreground);padding-top:7px}
@@ -1601,12 +1601,12 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .secttl > div{margin-left:auto}
 
 /* 선택지가 2~3개인 값은 드롭다운 대신 나란히 둔다. 한 번에 보이고 한 번에 고른다 */
-.seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:9px;overflow:hidden}
-.seg button{background:transparent;border:0;border-right:1px solid var(--border);color:var(--muted-foreground);
-  font-family:inherit;font-size:12.5px;padding:8px 15px;cursor:pointer}
-.seg button:last-child{border-right:0}
-.seg button:hover{background:var(--hover)}
-.seg button.on{background:var(--primary);color:var(--primary-foreground);font-weight:600}
+/* 라이브러리 규격(.segmented). 선택지 2~3개이고 양쪽 모두 유효한 결정일 때 쓴다.
+   기본값은 왼쪽에 둔다 */
+.segmented{display:inline-flex;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:3px;gap:3px}
+.segmented button{border:0;background:transparent;color:var(--muted-foreground);font-family:inherit;font-size:12.5px;font-weight:600;padding:6px 14px;border-radius:6px;cursor:pointer}
+.segmented button:hover{color:var(--foreground)}
+.segmented button.on{background:rgba(79,111,230,.14);color:var(--foreground);border:1px solid rgba(79,111,230,.30);font-weight:700}
 
 /* 안내 문구 안의 이동 링크 — 색이 아니라 밑줄로 구분한다 */
 .ablink{color:inherit;text-decoration:underline;text-decoration-color:var(--underline);text-underline-offset:3px}
@@ -1828,16 +1828,23 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
   <div class="modal" style="width:460px">
     <div class="mdhead"><h3>데이터 가져오기</h3><p id="dlTarget"></p></div>
     <div class="mdbody">
+      <!-- 백엔드 source_type 세 값과 1:1 로 맞춘다. 내부 값을 그대로 쓰지 않고
+           읽는 말로 바꿔 보인다(공통정책 7.9) -->
       <div class="fld"><label>소스<span class="req">*</span></label>
-        <select class="inp" id="dlSrc"><option>HuggingFace</option><option>S3</option></select></div>
+        <select class="inp" id="dlSrc" onchange="dlValid()">
+          <option value="HuggingFace">HuggingFace 모델</option>
+          <option value="HuggingFaceDataset">HuggingFace 데이터셋</option>
+          <option value="S3">S3</option></select>
+        </div>
       <div class="fld" style="margin-top:14px"><label>리포지토리<span class="req">*</span></label>
         <input class="inp" id="dlRepo" placeholder="meta-llama/Llama-3-8B" oninput="dlValid()"></div>
       <div class="fld" style="margin-top:14px"><label>폴더명<span class="req">*</span></label>
-        <input class="inp" id="dlDir" placeholder="my_data" oninput="dlValid()"></div>
+        <input class="inp" id="dlDir" placeholder="my_data" oninput="dlValid()">
+        <div class="errmsg" id="dlDirErr"></div></div>
       <!-- 어디에 떨어지는지 보여준다. 바꿀 수 없는 값이라 읽기 전용이다 -->
       <div class="fld" style="margin-top:14px"><label>저장 경로</label>
         <input class="inp" value="/workspace/shared/datasets/" readonly></div>
-      <p class="pnote">다운로드는 백그라운드로 처리되어 화면을 닫아도 계속됩니다.</p>
+      <div class="hint" style="margin-top:14px">화면을 닫아도 계속 내려받습니다. 진행 상태는 작업 이력에서 확인할 수 있습니다.</div>
     </div>
     <div class="mdfoot">
       <!-- 모달은 취소 시 바로 닫는다. 모달 안에서 확인 알럿을 띄우지 않는다(공통정책 4.5) -->
@@ -1996,17 +2003,17 @@ const CDE = [
     정했다. `공용이 필요하면` 은 별도 기능을 만들라는 뜻이 아니라 관리자가 CDE 를
     만들어 쓰면 된다는 운영 방법이다 */
  {n:'yj-jupyter-01', acc:'NVIDIA-H200', by:'성유진', id:'yj.seong', st:'구동 중', ide:'JupyterLab', fw:'PyTorch 2.4',
-  mode:'위임 할당', cpu:8, ram:32, gpu:1, vol:20, at:'2026-08-01 10:12:00', until:'2026-09-01', reason:'추천 모델 파인튜닝', apBy:'김병건(bg.kim)', apAt:'2026-08-01 11:04:22'},
+  mode:'위임 할당', cpu:8, ram:32, gpu:1, vol:20, at:'2026-08-01 10:12:00', until:'2026-09-01', reason:'추천 모델 파인튜닝', keys:['llama-3-2-1b-prod','qwen3-6-35b-a3b-fp8'], apBy:'김병건(bg.kim)', apAt:'2026-08-01 11:04:22'},
  {n:'sj-vscode-01', acc:'', by:'임승주', id:'sj.lim', st:'절전', ide:'VS Code Web', fw:'TensorFlow 2.16',
-  mode:'위임 할당', cpu:4, ram:16, gpu:0, vol:5, at:'2026-07-22 14:30:00', until:'2026-09-12', reason:'전처리 파이프라인 개발', apBy:'김병건(bg.kim)', apAt:'2026-07-22 11:04:22'},
+  mode:'위임 할당', cpu:4, ram:16, gpu:0, vol:5, at:'2026-07-22 14:30:00', until:'2026-09-12', reason:'전처리 파이프라인 개발', keys:[], apBy:'김병건(bg.kim)', apAt:'2026-07-22 11:04:22'},
  {n:'jh-jupyter-01', acc:'Furiosa RNGD', by:'유지현', id:'jh.yu', st:'구동 중', ide:'JupyterLab', fw:'PyTorch 2.4',
-  mode:'직접 할당', cpu:8, ram:32, gpu:1, vol:50, at:'2026-07-15 09:05:00', until:'2026-09-05', reason:'비전 모델 실험', apBy:'김병건(bg.kim)', apAt:'2026-07-15 11:04:22'},
+  mode:'직접 할당', cpu:8, ram:32, gpu:1, vol:50, at:'2026-07-15 09:05:00', until:'2026-09-05', reason:'비전 모델 실험', keys:['gpt-oss-120b-symphony'], apBy:'김병건(bg.kim)', apAt:'2026-07-15 11:04:22'},
  {n:'kh-jupyter-01', acc:'NVIDIA-H200 MIG', by:'오경환', id:'kh.oh', st:'승인 대기', ide:'JupyterLab', fw:'PyTorch 2.4',
-  mode:'위임 할당', cpu:4, ram:16, gpu:1, vol:20, at:'2026-08-11 16:44:00', until:'2026-09-11', reason:'벤치마크 재현'},
+  mode:'위임 할당', cpu:4, ram:16, gpu:1, vol:20, at:'2026-08-11 16:44:00', until:'2026-09-11', reason:'벤치마크 재현', keys:[]},
  {n:'mj-vscode-01', acc:'', by:'박민준', id:'mj.park', st:'만료', ide:'VS Code Web', fw:'PyTorch 2.4',
-  mode:'위임 할당', cpu:4, ram:16, gpu:0, vol:5, at:'2026-05-02 11:00:00', until:'2026-08-02', reason:'데이터 검증', apBy:'김병건(bg.kim)', apAt:'2026-05-02 11:04:22'},
+  mode:'위임 할당', cpu:4, ram:16, gpu:0, vol:5, at:'2026-05-02 11:00:00', until:'2026-08-02', reason:'데이터 검증', keys:[], apBy:'김병건(bg.kim)', apAt:'2026-05-02 11:04:22'},
  {n:'sh-jupyter-01', acc:'NVIDIA-H200 MIG', by:'최서현', id:'sh.choi', st:'실패', ide:'JupyterLab', fw:'PyTorch 2.4',
-  mode:'직접 할당', cpu:8, ram:32, gpu:2, vol:20, at:'2026-08-10 13:20:00', until:'2026-09-10', reason:'대형 모델 학습', apBy:'김병건(bg.kim)', apAt:'2026-08-10 11:04:22'}
+  mode:'직접 할당', cpu:8, ram:32, gpu:2, vol:20, at:'2026-08-10 13:20:00', until:'2026-09-10', reason:'대형 모델 학습', keys:['llama-3-2-1b-prod'], apBy:'김병건(bg.kim)', apAt:'2026-08-10 11:04:22'}
 ];
 
 /* 시안 확인용 — 내 CDE 상태를 바꿔 상태별 조작을 확인한다.
@@ -2396,8 +2403,12 @@ function askDelRoom(){
 /* 사용자당 하나만 둔다(정책 3.3). 다만 버튼을 없애지 않는다 —
    신청 중인 건이 목록에 보이지 않으므로 버튼까지 사라지면 왜 못 하는지 알 수 없다.
    누르면 이유와 갈 곳을 알린다 */
+/* 보유 중으로 셀 상태만 본다. 종료 중은 자원 회수가 끝나기를 기다리는 것이라
+   새 CDE 신청과 별개다 — 승인 시점에 자원이 모자라면 반려된다(정책 3.1).
+   반려·취소는 신청이 성립하지 않은 것이라 보유가 아니다 */
+const CDE_HELD = ['승인 대기','준비 중','구동 중','절전','실패','만료'];
 function myCde(){
-  return CDE.find(m=>isMine(m) && m.st!=='종료' && m.st!=='반려');
+  return CDE.find(m=>isMine(m) && CDE_HELD.indexOf(m.st) >= 0);
 }
 function drawTabs(){
   /* 탭 라벨 옆에 설명을 둔다. 섹션 제목을 없앴으므로 여기가 유일한 자리다 */
@@ -2730,7 +2741,7 @@ function drawRoomCfg(){
        '배정한 만큼 운영룸 한도가 줄어듭니다. 운영 중인 모델이 쓰고 있는 자원은 옮길 수 없습니다.','',false))
    /* 클러스터는 생성 시 정해지고 바꿀 수 없다. 값만 보인다.
       섹션 밖에 두면 어느 묶음에 속하는지 알 수 없어 기본 정보로 감싼다 */
-   + '<div class="fsec"><h3>기본 정보</h3>'
+   + '<div class="fsec"><h4>기본 정보</h4>'
    + row('대상 클러스터'
        + tip(rcNew? '개발룸을 만들 클러스터입니다. 만든 뒤에는 바꿀 수 없습니다.'
                   : '개발룸이 만들어진 클러스터입니다. 생성 후에는 바꿀 수 없습니다.'),
@@ -2741,7 +2752,7 @@ function drawRoomCfg(){
    + '</div></div>'
    + '</div>'
    /* 신청 폼과 같이 섹션으로 나눈다. 자원과 스토리지·네트워크는 성격이 다르다 */
-   + (isSysWs? '' : '<div class="fsec"><h3>자원</h3>')
+   + (isSysWs? '' : '<div class="fsec"><h4>자원</h4>')
    /* 공용 워크스페이스는 배정 상한이 없어 자원을 입력받지 않는다(8/10 회의 1.3) */
    /* 만들 때는 쓰고 있는 자원이 없어 하한이 0 이다 */
    + (isSysWs? '' :
@@ -2754,7 +2765,7 @@ function drawRoomCfg(){
        return rcRow('acc_'+g.k, g.n, '장', WSQ.acc[g.k]||0, rcNew?0:g.use, 1,
                     '한 장당 '+g.vram+'GB.'+(i===0? ' 벤더·유형별로 구분해 배정합니다.' : ''));
      }).join('') + '</div>')
-   + '<div class="fsec"><h3>스토리지·네트워크</h3>'
+   + '<div class="fsec"><h4>스토리지·네트워크</h4>'
    /* 공유 볼륨은 생성 시에만 정한다(8/12 회의 1.5 `생성 후 변경 불가. 관리자만 설정`).
       이미 데이터가 쌓인 볼륨을 줄이면 무엇이 사라지는지 화면이 알 수 없다 */
    + (rcNew
@@ -2835,6 +2846,7 @@ function submitExt(){
 function canImport(){ return CDE.some(function(m){ return m.st==='구동 중'; }); }
 function openDl(){
   document.getElementById('dlTarget').textContent = '개발룸 공유 볼륨에 내려받습니다. 같은 개발룸의 모든 CDE 가 함께 씁니다.';
+  dlValid();
   ['dlRepo','dlDir'].forEach(function(id){ document.getElementById(id).value=''; });
   dlValid();
   document.getElementById('mdDl').classList.add('on');
@@ -2854,10 +2866,26 @@ function openIde(name){
   }
   act('웹 IDE를 새 탭으로 엽니다.');
 }
+/* 공유 볼륨 하위 폴더명만 받는다. 절대경로·상위 폴더 이탈은 백엔드가 422 로 막으므로
+   화면에서 먼저 걸러 알린다(공통정책 7.8) */
+function dirErr(v){
+  if(!v) return '';
+  if(v.startsWith('/'))        return '폴더명만 입력해 주세요. 경로는 사용할 수 없습니다.';
+  if(v.split('/').indexOf('..')>=0) return '상위 폴더로 올라가는 경로는 사용할 수 없습니다.';
+  return '';
+}
 function dlValid(){
-  const r=document.getElementById('dlRepo'), d=document.getElementById('dlDir'), b=document.getElementById('dlBtn');
+  const r=document.getElementById('dlRepo'), d=document.getElementById('dlDir'),
+        b=document.getElementById('dlBtn'), err=document.getElementById('dlDirErr');
   if(!r||!d||!b) return;
-  b.disabled = !(r.value.trim() && d.value.trim());
+
+  /* 토큰 안내를 두지 않는다. 워크스페이스 설정이 없으면 공용 토큰을 쓰고
+     공개 저장소는 토큰 없이 받는다 — 사용자가 미리 할 일이 없다(팀장 확인 9/4) */
+  const de = dirErr(d.value.trim());
+  d.classList.toggle('err', !!de);
+  if(err){ err.textContent = de; err.style.display = de ? 'block' : 'none'; }
+
+  b.disabled = !(r.value.trim() && d.value.trim() && !de);
 }
 function submitDl(){
   closeDl();
@@ -2991,7 +3019,7 @@ function askCancelJob(id){
   if(!j) return;
   openConfirm('작업 중단',
     '<b>'+j.id+'</b> 을 중단합니다. 지금까지 진행한 연산은 저장되지 않습니다.',
-    function(){ toast('ok','작업 중단을 요청했습니다. 중단되면 상태가 중단됨으로 바뀝니다.'); }, '중단하기');
+    function(){ toast('ok','작업 중단을 요청했습니다. 중단되면 상태가 중단됨으로 바뀝니다.'); }, '중단');
 }
 function openLog(id){
   logCur=JOBS.find(function(x){ return x.id===id; });
@@ -3152,6 +3180,18 @@ function closeCde(){
   document.getElementById('pgList').style.display='';
   syncBc(); window.scrollTo(0,0);
 }
+/* 기존 키를 폐기하고 새로 발급한다. 접근 범위는 다시 고른다.
+   키가 CDE 에 주입되는 구조라면 새 키가 적용되려면 다시 기동해야 한다 —
+   구조가 확인되면 문구를 조정한다 */
+function askReissue(name){
+  openConfirm('에이전트 키 재발급',
+    '<b>'+name+'</b>의 에이전트 키를 폐기하고 새로 발급합니다.<br>'
+    + '기존 키로 호출하던 요청은 더 이상 처리되지 않습니다.<br>'
+    + '새 키가 적용되려면 CDE를 다시 기동해야 합니다.',
+    function(){ toast('ok','에이전트 키 재발급을 요청했습니다. 접근할 모델을 다시 선택해 주세요.'); },
+    '재발급');
+}
+
 function drawCdeDetail(){
   const m=cdCur; if(!m) return;
   const list=cdeScope();
@@ -3179,6 +3219,10 @@ function drawCdeDetail(){
     if(has('접속'))      acts += btnL('웹 IDE 접속', canAccess(m), 'openIde(\''+m.n+'\')', blockMsg(m));
     if(has('연장'))      acts += btnG('연장 신청', canExtend(m), 'openExt(\''+m.n+'\')', blockMsg(m));
     if(has('다시 시도')) acts += btnG('다시 시도', true, 'act(\'다시 시도를 요청했습니다.\')', '');
+    /* 에이전트 키 범위를 바꾸려면 폐기 후 재발급한다(CDE 정책 2.4).
+       자원을 잡고 있는 상태에서만 의미가 있다 */
+    if(m.st==='구동 중' || m.st==='절전')
+      acts += btnG('에이전트 키 재발급', true, 'askReissue(\''+m.n+'\')', '');
     if(has('삭제'))      acts += btnD('삭제', true, 'askReturn(\''+m.n+'\')', '');
     else if(has('반납')) acts += btnD('반납', canReturn(m), 'askReturn(\''+m.n+'\')', blockMsg(m));
   }
@@ -3205,11 +3249,16 @@ function drawCdeDetail(){
        : '')
     + '</dl></div>';
 
+  /* 에이전트 키의 접근 범위다. 발급 후에는 바꾸지 않고 폐기 후 재발급한다(CDE 정책 2.4).
+     고르지 않으면 키가 없어 값 자리에 발급하지 않았음을 밝힌다 */
+  const km = m.keys || [];
   h += '<div class="dsec"><h4>환경</h4><dl class="dl two">'
     + '<dt>IDE 유형</dt><dd>'+m.ide+'</dd>'
     + '<dt>이미지 태그</dt><dd>'+m.fw+'</dd>'
     + '<dt>실행 방식'+help('mode')+'</dt><dd>'+m.mode+'</dd>'
-    + '<dt></dt><dd></dd>'
+    + '<dt>접근 허용 모델</dt><dd>'
+    +   (km.length ? km.join(' · ')
+        : '<span class="dash">에이전트 키를 발급하지 않았습니다</span>')+'</dd>'
     + '</dl></div>';
 
   h += '<div class="dsec"><h4>자원</h4><dl class="dl two">'
@@ -3244,7 +3293,15 @@ function btnL(label, ok, fn, why){
 function closePanel(){ if(cdCur) closeCde(); cur=null; }
 
 /* ═══════════ 신청 폼 WKSP-CDE-F01 ═══════════ */
-const NF={ acc:'NVIDIA H200', ip:'', exp:'',ide:'JupyterLab', fw:'PyTorch 2.4', mode:'위임 할당', cpu:'4', ram:'16', gpu:'0', vol:'20', days:'30', reason:''};
+/* 워크스페이스 소속 배포 목록. 에이전트 키가 접근할 대상을 여기서 고른다.
+   배포 조회가 소속 기준으로 열려 있어(워크스페이스 정책 9장) 목록을 좁히지 않는다 */
+const WS_DEPLOYS=[
+  {n:'llama-3-2-1b-prod',      st:'정상'},
+  {n:'qwen3-6-35b-a3b-fp8',    st:'정상'},
+  {n:'gpt-oss-120b-symphony',  st:'정상'},
+  {n:'gemma-4-12b-it-serving', st:'오류'}
+];
+const NF={ acc:'NVIDIA H200', ip:'', exp:'', keyModels:[], mq:'',ide:'JupyterLab', fw:'PyTorch 2.4', mode:'위임 할당', cpu:'4', ram:'16', gpu:'0', vol:'20', days:'30', reason:''};
 /* 지난 날짜를 고를 수 없게 막는다. 신청일 이전 만료는 성립하지 않는다 */
 function today(){
   const d=new Date();
@@ -3290,7 +3347,7 @@ function accFree(){
 function drawForm(){
   const freeC=ROOM.cpu.q-ROOM.cpu.use, freeR=ROOM.ram.q-ROOM.ram.use, freeG=accFree();
   let h='';
-  h+='<div class="fsec"><h3>환경</h3>'
+  h+='<div class="fsec"><h4>환경</h4>'
    + row('IDE 유형', true, seg('ide',['JupyterLab','VS Code Web']), '')
    /* ⚠ 기술문서에는 CDE 이미지가 기본·최신 두 벌로 있고 CUDA·Python·PyTorch 버전이
       함께 묶여 있다. 프레임워크 하나를 고르는 구조가 맞는지, TensorFlow·JAX 를
@@ -3303,7 +3360,7 @@ function drawForm(){
          : '기동한 동안 가속기를 계속 점유합니다. 상시 연산이 필요할 때 선택합니다.')
    + '</div>';
 
-  h+='<div class="fsec"><h3>자원</h3>'
+  h+='<div class="fsec"><h4>자원</h4>'
    /* 공용 워크스페이스는 배정 상한이 없어 승인 시점의 잔여에 따라 갈린다 */
    + (isSysWs? '<div class="secnote" style="margin-bottom:14px">공용 워크스페이스는 다른 워크스페이스에 배분하고 남은 자원을 사용합니다. 잔여에 따라 기동이 지연될 수 있습니다.</div>' : '')
    /* 사용 중 수치를 두지 않는다. 신청자는 얼마를 쓸 수 있는지만 알면 되고
@@ -3323,7 +3380,7 @@ function drawForm(){
 
   /* 공유 볼륨은 관리자가 개발룸 설정에서 정한다. 신청 화면에서는 조정할 수 없다 */
   const volFree = VOL.total - VOL.shared - VOL.used;
-  h+='<div class="fsec"><h3>볼륨</h3>'
+  h+='<div class="fsec"><h4>볼륨</h4>'
    /* 정책 5.2 — 볼륨은 워크스페이스 전체 → 개발룸 공유 → CDE 개인 3 단계다 */
    + qrow('vol','개인 볼륨','GB',volFree,10,'이 CDE 만 쓰는 볼륨입니다. 공유 볼륨을 뺀 나머지에서 할당됩니다.')
    /* 공유 볼륨은 신청 시 조정할 수 없다. 8/10 회의 4.3 이 `개발환경 신청 시에도 조정` 으로
@@ -3335,14 +3392,19 @@ function drawForm(){
 
   /* 기술문서 5.3 — CDE 생성 시 접속을 허용할 IP 대역(CIDR)을 설정한다.
      비우면 제한하지 않는다 */
-  h+='<div class="fsec"><h3>접근 제한</h3>'
+  h+='<div class="fsec"><h4>접근 제한</h4>'
    + row('접근 허용 IP', false,
        '<input class="inp" value="'+(NF.ip||'')+'" placeholder="10.20.0.0/16" oninput="NF.ip=this.value">',
        '지정한 대역에서만 이 CDE에 접속할 수 있습니다. 비우면 제한하지 않습니다.')
+   /* 신청이 승인될 때 발급되는 에이전트 키의 접근 범위다(CDE 정책 2.4).
+      고르지 않으면 키를 발급하지 않는다 — 배포 모델을 호출하지 않는 CDE 도 있다 */
+   + row('접근 허용 모델', false, mselModels(),
+       '에이전트 키가 호출할 수 있는 배포입니다. 키는 신청이 승인될 때 발급되며, 고르지 않으면 발급하지 않습니다.')
    + '</div>';
 
-  /* 워크스페이스 목업 CDE 폼과 같은 섹션명·구성이다 */
-  h+='<div class="fsec"><h3>사용 기간</h3>'
+  /* 만료일과 사유는 신청 시 받는 값이다. CDE 상세의 `신청 정보` 섹션과 이름을 맞춘다 —
+     폼에서 받은 것이 상세에서 어디로 가는지 드러난다 */
+  h+='<div class="fsec"><h4>신청 정보</h4>'
    /* 날짜로 받는다. `30일` 은 언제 끝나는지 계산해야 하고 프로젝트 마감에 맞추기 어렵다.
       기술문서 5.2 도 `최대 사용 기간(만료 시간)` 으로 시점을 말한다.
       연장 신청도 같은 형식이라 맞춘다 */
@@ -3359,12 +3421,56 @@ function drawForm(){
   document.getElementById('formBody').innerHTML=h;
   validate();
 }
+/* 다중 선택 목록(라이브러리 .mselect). 항목이 늘어도 높이가 고정된다.
+   오류 상태 배포는 고를 수 없다 — 호출이 되지 않는다 */
+function mselModels(){
+  const q=(NF.mq||'').toLowerCase();
+  const list=WS_DEPLOYS.filter(function(d){ return !q || d.n.toLowerCase().indexOf(q)>=0; });
+  const pick=WS_DEPLOYS.filter(function(d){ return NF.keyModels.indexOf(d.n)>=0; }).length;
+  const able=WS_DEPLOYS.filter(function(d){ return d.st==='정상'; });
+  const allOn=able.length>0 && able.every(function(d){ return NF.keyModels.indexOf(d.n)>=0; });
+  return '<div class="mselect">'
+   + '<div class="mshead">'
+   +   '<span class="mssearch">'
+   +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
+   +     '<input placeholder="배포명 검색" value="'+(NF.mq||'')+'" oninput="NF.mq=this.value;drawForm()">'
+   +   '</span>'
+   +   '<button type="button" class="msall" onclick="toggleAllModels()">'+(allOn?'전체 해제':'전체 선택')+'</button>'
+   + '</div>'
+   + '<div class="mslist">'
+   + (list.length
+      ? list.map(function(d){
+          const on=NF.keyModels.indexOf(d.n)>=0, ok=d.st==='정상';
+          return '<label class="msitem'+(ok?'':' off')+'"'
+           + (ok?'':' title="정상 상태인 배포만 선택할 수 있습니다."')+'>'
+           + '<input type="checkbox"'+(on?' checked':'')+(ok?'':' disabled')
+           +   ' onchange="toggleModel(\''+d.n+'\')">'
+           + '<span class="mnm">'+d.n+'</span>'
+           + '<span class="stbadge '+(ok?'ok':'cr')+'">'+d.st+'</span></label>';
+        }).join('')
+      : '<div class="msempty">검색 결과가 없습니다.</div>')
+   + '</div>'
+   + '<div class="msfoot"><b>'+pick+'</b>건 선택 · 전체 '+WS_DEPLOYS.length+'건</div>'
+   + '</div>';
+}
+function toggleModel(n){
+  const i=NF.keyModels.indexOf(n);
+  if(i>=0) NF.keyModels.splice(i,1); else NF.keyModels.push(n);
+  drawForm();
+}
+/* 전체 선택은 고를 수 있는 것만 대상으로 한다 */
+function toggleAllModels(){
+  const able=WS_DEPLOYS.filter(function(d){ return d.st==='정상'; }).map(function(d){ return d.n; });
+  const allOn=able.length>0 && able.every(function(n){ return NF.keyModels.indexOf(n)>=0; });
+  NF.keyModels = allOn ? [] : able.slice();
+  drawForm();
+}
 function row(label, req, body, note){
   return '<div class="frow"><label class="flb">'+label+(req?'<span class="req">*</span>':'')+'</label>'
    + '<div class="fbd">'+body+(note?'<div class="fnote">'+note+'</div>':'')+'</div></div>';
 }
 function seg(k,opts){
-  return '<div class="seg">'+opts.map(function(o){
+  return '<div class="segmented">'+opts.map(function(o){
     return '<button type="button" class="'+(NF[k]===o?'on':'')+'" onclick="NF.'+k+'=\''+o+'\';drawForm()">'+o+'</button>';
   }).join('')+'</div>';
 }
@@ -3444,14 +3550,26 @@ function askReturn(name){
   openConfirm('CDE 반납',
     '<b>'+name+'</b>을 반납합니다. 연산 자원이 개발룸으로 반환되고 개인 볼륨이 삭제됩니다. 공유 볼륨의 데이터는 남습니다.',
     /* 파드를 내리는 데 시간이 걸린다. 바로 종료로 넘기면 요청과 완료가 구분되지 않는다 */
-    function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료 중'; render(); }
+    function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료 중'; render(); finishRelease(name); }
       toast('ok','CDE 반납을 요청했습니다. 자원 회수가 끝나면 알림으로 안내됩니다.'); }, '반납');
+}
+/* 파드를 내리는 데 시간이 걸린다. 요청과 완료를 갈라 보이려고 종료 중을 거친다.
+   ⚠ 대기 시간은 데모용이다. 실제로는 백엔드가 완료를 알린다 */
+function finishRelease(name){
+  setTimeout(function(){
+    const m=CDE.find(x=>x.n===name);
+    if(!m || m.st!=='종료 중') return;
+    m.st='종료';
+    if(cdCur && cdCur.n===name) closeCde();
+    render();
+    toast('ok','CDE 자원 회수가 끝났습니다.');
+  }, 2600);
 }
 function askRevoke(name){
   /* 회수는 남의 것을 지운다. 개인 볼륨이 함께 사라지므로 반납과 같이 밝힌다(회의 3.3) */
   openConfirm('CDE 회수',
     '<b>'+name+'</b>을 회수합니다. 연산 자원이 개발룸으로 반환되고 개인 볼륨이 삭제됩니다. 공유 볼륨의 데이터는 남습니다. 사용자에게 알림이 전송됩니다.',
-    function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료 중'; render(); }
+    function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료 중'; render(); finishRelease(name); }
       toast('ok','CDE 회수를 요청했습니다. 자원 회수가 끝나면 알림으로 안내됩니다.'); }, '회수');
 }
 /* 조사 — 받침 유무로 고른다. 영문·숫자로 끝나면 발음 기준으로 판정한다 */
