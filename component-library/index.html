@@ -1,11 +1,19 @@
-
 <!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>콘체르토 매니저 · 컴포넌트 라이브러리 (v0.2)</title>
+<title>콘체르토 매니저 · 컴포넌트 라이브러리 (v0.22)</title>
 <!--
+  v0.22 (2026-09-16) — 추가
+    · 폼 섹션(.fsec) 신설 — 생성·설정 화면에서 입력을 묶는 카드.
+      제목 태그를 h4 로 고정한다. 목업마다 h3·h4 가 섞여 같은 컴포넌트가
+      다르게 보이던 문제(개발룸은 h3, 나머지는 h4)
+
+  v0.21 (2026-09-08) — 보완
+    · --selected-soft 를 토큰 목록에 추가. :root · .dark 에는 정의되어 있었으나
+      TOKENS 배열에서 빠져 팔레트 문서에 노출되지 않던 문제. 값 변경 없음
+
   v0.3 (2026-07-29) — 추가·수정
     · 토큰 신설: --destructive-hover / --card-2 / --active / --flyout / --faint / --shadow
     · .btn.danger 호버 상태 정의 (없어서 공통 .btn:hover가 적용되던 문제)
@@ -358,6 +366,11 @@
 .pn-ic svg{width:14px;height:14px}
 .lib-panel .pn-body{padding:6px 18px 16px;max-height:340px;overflow-y:auto}
 
+/* 폼 섹션 — 생성·설정 화면에서 입력을 묶는 카드. 제목은 h4 로 고정한다 */
+.fsec{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:18px 20px;margin-bottom:14px}
+.fsec > h4{display:flex;align-items:center;gap:6px;margin:0 0 4px;font-size:13px;font-weight:600}
+.fsec:last-of-type{margin-bottom:0}
+
 /* 패널 섹션 접기 — 기본 펼침, 개별 접기 */
 .lsec{border-bottom:1px solid var(--border);padding:14px 0}
 .lsec:last-child{border-bottom:0}
@@ -586,7 +599,7 @@ a{color:inherit;text-decoration:none}
 <div class="top">
   <div class="topin">
     <div class="titlerow">
-      <h1>컴포넌트 라이브러리 <span>콘체르토 매니저 · v0.1</span></h1>
+      <h1>컴포넌트 라이브러리 <span>콘체르토 매니저</span></h1>
       <button class="modebtn" onclick="toggleMode()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 14.5A8 8 0 019.5 4a7 7 0 100 10.5 7 7 0 0010.5 0z" stroke-linejoin="round"/></svg><span id="modeLb">다크로 보기</span></button>
     </div>
     <div class="tabs">
@@ -1331,6 +1344,24 @@ a{color:inherit;text-decoration:none}
       <div class="note">채널 필터와 노이즈 숨김만 제공한다. 검색·시간 범위·레벨 구분은 분석 영역이므로 별도 화면에서 다룬다.</div>
     </div>
   </section>
+
+  <section class="gs">
+    <div class="gs-head"><span class="chip">공통정책 4.5</span><h3>폼 섹션</h3></div>
+    <div class="gs-quote">생성·설정 화면에서 입력을 성격별로 묶는 카드다. 한 화면에 여러 섹션을 쌓아 무엇을 정하는 자리인지 나눈다. 제목은 <code>h4</code> 로 고정한다 — 목업마다 태그가 갈리면 같은 컴포넌트가 다르게 보인다.</div>
+    <div class="demo">
+      <div class="fsec">
+        <h4>환경</h4>
+        <div class="field" style="max-width:none"><label>IDE 유형</label>
+          <div class="segmented"><button class="on">JupyterLab</button><button>VS Code Web</button></div></div>
+      </div>
+      <div class="fsec">
+        <h4>접근 제한</h4>
+        <div class="field" style="max-width:none"><label>접근 허용 IP</label>
+          <input class="inp" placeholder="10.20.0.0/16"></div>
+      </div>
+      <div class="note">값을 받지 않고 보여주기만 하는 섹션도 같은 카드를 쓴다. 입력이 없다고 형태를 바꾸면 한 화면 안에서 카드가 갈린다.</div>
+    </div>
+  </section>
 </div>
 
 <!-- ================= 탭3: 상태 매트릭스 ================= -->
@@ -1477,6 +1508,7 @@ var TOKENS=[
   ['hover','호버 배경 — 주 표면·화면 배경·띄우는 면 위','#fafbfe','#1b1e26'],
   ['hover-strong','호버 배경 — 비강조 면·테이블 헤더 위. 기본 호버로는 보이지 않는 자리','#dce2f1','#262a33'],
   ['selected','선택·현재 — 패널이 열려 있는 행, 선택된 값','#dde6f8','#252b38'],
+  ['selected-soft','선택 — 카드처럼 흰 면 위. 회색 면 위와 달리 --selected 는 진하게 보인다','#f2f6fd','#1e2430'],
   ['muted-foreground','보조 텍스트 — 설명·플레이스홀더·힌트','#565f7e','#969ba6'],
   ['faint','가장 흐린 텍스트 — 경로·보조 태그·단위','#8b93ad','#6f7686'],
   ['border','면 구분 — 표 구분선·카드 외곽','#dce2f1','#262a33'],
