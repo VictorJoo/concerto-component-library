@@ -1,5 +1,5 @@
 <!--
-  콘체르토 매니저 — 모니터링 목업 v0.1 (2026-08-27)
+  콘체르토 매니저 — 모니터링 목업 v0.21 (2026-09-17)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다 —
   필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
 
@@ -26,7 +26,7 @@
     `알림 규칙 탐색기` → `알림 규칙`. 화면 이름이 이미 모니터링이라 탭마다 되풀이하지
     않는다(공통정책 1.1). `오버뷰 대시보드` 는 무엇을 보는지 말하지 않는다.
   · 슬롯 상태를 한글로 뒀다 — `IDLE`·`ACTIVE`·`SHARED`·`UNKNOWN` 은 내부 값이다(7.9).
-  · `Zombie Slot` 을 `확인 불가` 로 묶었다. 발생 조건이 확인되지 않았다(정책 7. 2번).
+  · `Zombie Slot` 을 `확인 불가` 로 묶었다. 상태를 읽지 못하는 것이라 UNKNOWN 과 같은 값이다(정책 4.2).
   · 알림 규칙에 수정·삭제를 뒀다. 현행은 작업 열이 있으나 액션이 없다.
   · 건전성에 원인·조치를 함께 뒀다. 점수만으로는 무엇을 해야 할지 알 수 없다(기술문서 10.5).
 
@@ -394,6 +394,16 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .tip-anchor:hover .tip,.tip-anchor:focus-within .tip{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
 .tip-ic{width:16px;height:16px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);font-size:11px;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex:0 0 auto}
 .tip-anchor:hover .tip-ic,.tip-anchor:focus-within .tip-ic{border-color:var(--foreground);color:var(--foreground)}
+/* 값 옆에 붙는 설명 — 왜 그 값인지 툴팁으로 알린다. 문제가 아니라 모른다는 것이라
+   경고색을 쓰지 않는다. 컬럼 헤더 도움말과 같은 무게로 둔다 */
+.warnic{margin-left:4px}
+.warnic .tip-ic{width:14px;height:14px;font-size:10px}
+/* 마지막 컬럼이라 오른쪽 끝을 맞추고, 아래로 열면 표 밖으로 나가 위로 연다 */
+.warnic .tip{left:auto;right:0;top:auto;bottom:calc(100% + 8px);
+  transform:translateX(0) translateY(4px);width:230px;max-width:230px;white-space:normal}
+.warnic:hover .tip,.warnic:focus-within .tip{transform:translateX(0) translateY(0)}
+.warnic .tip::after{top:100%;bottom:auto;left:auto;right:10px;
+  border-top-color:var(--flyout);border-bottom-color:transparent}
 .phead h1{display:inline-flex;align-items:center;gap:8px}
 
 /* 페이지 타이틀 툴팁 — 화면 상단이라 아래로 펼침(잘림 방지) */
@@ -2297,16 +2307,15 @@ const NODES=[
    slots:[
      {no:1, dev:'NVIDIA-H200', id:'GPU-0', st:'사용 중', core:74, vram:{use:129.4,cap:140}, temp:71, pw:412, by:['llama-3-2-1b-prod']},
      {no:2, dev:'NVIDIA-H200', id:'GPU-1', st:'사용 중', core:68, vram:{use:118.2,cap:140}, temp:69, pw:398, by:['gpt-oss-120b-symphony']},
-     {no:3, dev:'NVIDIA-H200', id:'GPU-2', st:'공유',   core:41, vram:{use:62.0,cap:140},  temp:58, pw:245,
-      /* 공유 — 둘 이상이 나눠 쓴다. 나누는 방식은 확인 대상이다(정책 7. 24번) */
-      by:['gemma-4-12b-it-idle','llama-3-2-1b-prod']},
+     {no:3, dev:'NVIDIA-H200', id:'GPU-2', st:'사용 중', core:41, vram:{use:62.0,cap:140},  temp:58, pw:245,
+      by:['gemma-4-12b-it-idle']},
      {no:4, dev:'NVIDIA-H200', id:'GPU-3', st:'사용 중', core:52, vram:{use:96.7,cap:140}, temp:64, pw:331, by:['solar-open-100b-paused']},
      {no:5, dev:'NVIDIA-H200', id:'GPU-4', st:'유휴', core:0, vram:{use:0.4,cap:140}, temp:34, pw:62, by:[]},
      {no:6, dev:'NVIDIA-H200', id:'GPU-5', st:'유휴', core:0, vram:{use:0.4,cap:140}, temp:33, pw:61, by:[]},
      {no:7, dev:'NVIDIA-H200', id:'GPU-6', st:'유휴', core:0, vram:{use:0.4,cap:140}, temp:35, pw:63, by:[]},
      /* 상태를 읽지 못하는 슬롯이다. 현행은 `Zombie Slot (UNKNOWN)` 으로 표기한다.
         발생 조건이 확인되지 않아 `확인 불가` 로 묶었다(정책 4.2 · 7. 2번) */
-     {no:8, dev:'NVIDIA-H200', id:'GPU-7', st:'확인 불가', core:null, vram:null, temp:null, pw:null, by:[]}
+     {no:8, dev:'NVIDIA-H200', id:'GPU-7', st:'확인 불가', core:null, vram:null, temp:null, pw:null, by:null}
    ]},
   /* 모델이 여럿일 때 화면이 어떻게 버티는지 보이려고 섞어 둔다.
      한 노드에 두 모델이 꽂히는지는 확인 대상이다(정책 7. 15번) */
@@ -2326,7 +2335,14 @@ const NODES=[
      {no:1, dev:'Furiosa RNGD-S', id:'NPU-0', st:'사용 중', core:62, vram:{use:31.4,cap:48}, temp:54, pw:118, by:['furiosa-qwen3-32b-npu']},
      {no:2, dev:'Furiosa RNGD-S', id:'NPU-1', st:'유휴', core:0, vram:{use:0.2,cap:48}, temp:31, pw:22, by:[]},
      {no:3, dev:'Furiosa RNGD-S', id:'NPU-2', st:'유휴', core:0, vram:{use:0.2,cap:48}, temp:30, pw:21, by:[]},
-     {no:4, dev:'Furiosa RNGD-S', id:'NPU-3', st:'확인 불가', core:null, vram:{use:null,cap:48}, temp:null, pw:null, by:[]}
+     {no:4, dev:'Furiosa RNGD-S', id:'NPU-3', st:'확인 불가', core:null, vram:{use:null,cap:48}, temp:null, pw:null, by:null},
+     /* 사용 중이지만 점유 배포를 모르는 슬롯이다 — 현행은 `Unknown` 으로 표기한다.
+        콘체르토 밖에서 쓰고 있을 수 있어 안의 배포와 같은 것인지 구분할 수 없다(팀장 확인 9/16).
+        by 를 null 로 두어 `없음` 과 가른다 — 빈 배열은 점유한 배포가 없다는 뜻이다 */
+     {no:5, dev:'Furiosa RNGD-S', id:'NPU-4', st:'사용 중', core:0, vram:{use:0,cap:48}, temp:0, pw:0, by:null,
+      pod:'vllm-qwen3-32b-7f4c9d'},
+     {no:6, dev:'Furiosa RNGD-S', id:'NPU-5', st:'사용 중', core:0, vram:{use:0,cap:48}, temp:0, pw:0, by:null,
+      pod:'vllm-qwen3-32b-7f4c9d'}
    ]},
   {n:'npu-svr-01', ip:'10.10.20.21', kind:'npu', st:'정상',
    cpu:{use:12,cap:64}, mem:{use:88,cap:512},
@@ -2550,7 +2566,7 @@ const metricUnit=(k)=>{ const p=PRESETS.find(x=>x.k===k); return p? p.u : ''; };
 const CHANNELS=['slack-ai-alert','slack-infra','ops-webhook'];
 
 /* 상태 배지 색 — 시스템 용어집 5.3 */
-const SLOTB={'사용 중':'ok','공유':'ac','유휴':'mu','확인 불가':'wa'};
+const SLOTB={'사용 중':'ok','유휴':'mu','확인 불가':'wa'};
 const HB={'안정':'ok','주의':'wa','위험':'cr'};
 /* 배포 상태 색 — 배포정책 3.1 상태값과 같은 축 */
 const DST={'정상':'ok','유휴':'mu','오류':'cr','중지됨':'mu'};
@@ -2700,7 +2716,7 @@ function visibleNodes(){
     return list.map(function(nd){
       return Object.assign({}, nd, {
         slots: nd.slots.filter(function(x){
-        return x.by.some(function(d){ return wsOfDep(d)===wsCur; });
+        return byList(x).some(function(d){ return wsOfDep(d)===wsCur; });
       })
       });
     }).filter(function(nd){ return nd.slots.length; });
@@ -2922,7 +2938,7 @@ function thFilterSt(){
    + '</button></span>'
    + '<div class="thpop">'+COLDEF.sst+'</div>'
    + '<span class="fdd" onclick="event.stopPropagation()">'
-   +   ['사용 중','공유','유휴','확인 불가'].map(function(o){
+   +   ['사용 중','유휴','확인 불가'].map(function(o){
          return '<label><input type="checkbox"'+(slotSel.indexOf(o)>=0?' checked':'')
               + ' onchange="tgSlotSt(\''+o+'\')"><span>'+o+'</span></label>'; }).join('')
    + '</span>';
@@ -3043,7 +3059,7 @@ function drawAcc(el){
       +   '<th class="thcell">'+thHelp('vram','VRAM')+'</th>'
       +   '<th>온도</th><th>전력</th>'
       +   '<th class="thcell">'+thFilterSt()+'</th>'
-      +   '<th>점유 배포</th></tr></thead><tbody>'
+      +   '<th class="thcell">'+thHelp('dep','점유 배포')+'</th></tr></thead><tbody>'
       +   view.map(function(x){
             const dead = x.st==='확인 불가';
             return '<tr onclick="openSlot(\'' + nd.n + '\',' + x.no + ')" style="cursor:pointer">'
@@ -3063,12 +3079,13 @@ function drawAcc(el){
              + '<td class="mono">'+(dead? dash() : x.temp+'°C')+'</td>'
              + '<td class="mono">'+(dead? dash() : x.pw+'W')+'</td>'
              + '<td><span class="stbadge '+(SLOTB[x.st]||'mu')+'">'+x.st+'</span></td>'
-             /* 공유 슬롯은 배포가 여럿이다. 첫 배포만 보이고 나머지는 건수로 줄인다 —
-        전부 늘어놓으면 행 높이가 들쭉날쭉해진다. 자세한 것은 패널에서 본다 */
-     + '<td>'+(x.by.length
-         ? '<span class="rname">'+x.by[0]+'</span>'
-           + (x.by.length>1? '<span class="mver">외 '+(x.by.length-1)+'건</span>' : '')
-         : dash())+'</td></tr>';
+     /* 장치별 할당이라 슬롯 하나에 배포 하나다(팀장 확인 9/2) */
+     /* 모름은 `확인 불가` 로 둔다 — `-` 로 두면 점유한 배포가 없는 것으로 읽힌다 */
+     + '<td>'+(byUnknown(x)
+         ? '<span class="dash">확인 불가</span>'
+           + warnIc('등록되지 않은 워크로드가 점유하고 있습니다. 배포 화면에서 외부 배포로 가져오면 이름이 표시됩니다.'
+               + (x.pod? '<br>워크로드 '+x.pod : ''))
+         : byList(x).length? '<span class="rname">'+x.by[0]+'</span>' : dash())+'</td></tr>';
           }).join('')
       +   '</tbody></table></div>'
       + '</div>'
@@ -3080,10 +3097,11 @@ function drawAcc(el){
 /* ── 가속기 탭 공용 ──────────────────────────────
    전체와 노드가 같은 함수를 쓴다. 형태가 같아야 층위가 눈으로 읽힌다 */
 
-const USEHELP = '사용 중과 공유를 합쳐 전체로 나눈 값입니다. 확인 불가도 분모에 넣습니다 — '
+const USEHELP = '사용 중을 전체로 나눈 값입니다. 확인 불가도 분모에 넣습니다 — '
   + '쓸 수 없는 상태이지 자리가 없어진 것은 아닙니다.';
 
-function usedOf(list){ return list.filter(function(x){ return x.st==='사용 중'||x.st==='공유'; }).length; }
+/* 가속기는 장치별로 할당한다. 하나를 나눠 쓰지 않는다(팀장 확인 9/2) */
+function usedOf(list){ return list.filter(function(x){ return x.st==='사용 중'; }).length; }
 function pcOf(list){ return list.length? Math.round(usedOf(list)/list.length*100) : 0; }
 
 /* 가속기 모델별 집계 — 노드 부제에 쓴다 */
@@ -3130,13 +3148,12 @@ function devList(byDev){
 /* 점유 막대 — 상태별 길이를 이어 붙인다. 칸을 하나씩 그리던 격자를 대신한다.
    격자는 `몇 개 찼나` 만 답하면서 표와 같은 정보를 덜 정확하게 보여 주고 있었다.
    개별 슬롯은 표에서 본다 */
-const SGRID={'사용 중':'used','공유':'shared','유휴':'idle','확인 불가':'dead'};
-const SORDER=['사용 중','공유','확인 불가','유휴'];
+const SGRID={'사용 중':'used','유휴':'idle','확인 불가':'dead'};
+const SORDER=['사용 중','확인 불가','유휴'];
 /* 구간마다 말풍선을 둔다. `title` 은 1초 지연되고 여러 줄이 안 되며 꾸밀 수 없다.
    호버한 구간만 원색이 되고 나머지는 흐린 채로 남아, 지금 보는 것이 어느 상태인지 드러난다 */
 const SDESC={
   '사용 중':'배포 하나가 점유한 상태입니다.',
-  '공유':'둘 이상이 나눠 쓰고 있습니다.',
   '유휴':'점유한 배포가 없어 바로 쓸 수 있습니다.',
   '확인 불가':'상태를 읽지 못합니다. 노드나 수집 에이전트를 확인해 주세요.'
 };
@@ -3148,7 +3165,7 @@ function barOf(list, scope){
        if(!g.length) return '';
        const pc = g.length/tot*100;
        /* 배포가 여럿이면 셋까지만 보이고 나머지는 건수로 줄인다 */
-       const deps=[...new Set(g.reduce(function(a,x){ return a.concat(x.by); }, []))];
+       const deps=[...new Set(g.reduce(function(a,x){ return a.concat(byList(x)); }, []))];
        const dl = deps.length
          ? '<span class="ubt-d">'+deps.slice(0,3).map(function(d){ return '<span>'+d+'</span>'; }).join('')
            + (deps.length>3? '<span class="ubt-m">외 '+(deps.length-3)+'건</span>' : '')+'</span>'
@@ -3169,7 +3186,7 @@ function barOf(list, scope){
    건수를 함께 둔다 — 막대에 호버하지 않아도 몇 장인지 알 수 있어야 한다 */
 function legend(list){
   return '<div class="sglg">'
-   + [['used','사용 중'],['shared','공유'],['idle','유휴'],['dead','확인 불가']]
+   + [['used','사용 중'],['idle','유휴'],['dead','확인 불가']]
        .map(function(p){
          const c = list ? list.filter(function(x){ return SGRID[x.st]===p[0]; }).length : null;
          return '<span><i class="lg '+p[0]+'"></i>'+p[1]
@@ -3874,22 +3891,45 @@ let RF={};
 function openRule(i){
   ruleIdx=i;
   const r = i<0 ? {n:'',metric:'gpu_temp',op:'초과',th:'',dur:'60',scope:'전체',ch:[]} : RULES[i];
-  RF={n:r.n, metric:r.metric, op:r.op, th:String(r.th), dur:String(r.dur), scope:r.scope, ch:r.ch.slice()};
+  /* 스위처가 `전체` 면 폼에서 고른다. 개별이면 그 워크스페이스로 고정된다 */
+  const opts=ruleWsOpts();
+  RF={n:r.n, metric:r.metric, op:r.op, th:String(r.th), dur:String(r.dur), scope:r.scope, ch:r.ch.slice(),
+      ws: r.ws || (wsCur==='전체'? (opts[0]||'') : wsCur)};
   document.getElementById('ruleTitle').textContent = i<0? '알림 규칙 추가' : '알림 규칙 수정';
   drawRuleForm();
   document.getElementById('mdRule').classList.add('on');
 }
 function closeRule(){ document.getElementById('mdRule').classList.remove('on'); }
 
-function rfSet(k,v){ RF[k]=v; drawRuleForm(); }
+function rfSet(k,v){
+  RF[k]=v;
+  /* 워크스페이스를 바꾸면 고른 배포가 그 워크스페이스에 없다 — 전체로 되돌린다 */
+  if(k==='ws') RF.scope='전체';
+  drawRuleForm();
+}
 function rfToggleCh(c){
   const i=RF.ch.indexOf(c);
   if(i>=0) RF.ch.splice(i,1); else RF.ch.push(c);
   drawRuleForm();
 }
 function ruleValid(){
+  if(wsCur==='전체' && !RF.ws) return false;
   return RF.n.trim() && String(RF.th).trim()!=='' && String(RF.dur).trim()!=='';
 }
+/* 규칙을 만들 수 있는 워크스페이스. 최고 관리자는 전체, 그 외에는 자기 소속만.
+   공용 워크스페이스는 자원을 배정받지 않아 감시할 대상이 없다 */
+/* 대상 범위 배포는 규칙이 속할 워크스페이스 것만이다 — 스위처가 아니라
+   폼에서 고른 값을 따른다. 스위처 기준으로 두면 다른 워크스페이스 배포를 고를 수 있다 */
+function ruleDeps(){
+  const w = wsCur==='전체' ? RF.ws : wsCur;
+  return DEPS.filter(function(d){ return d.ws===w; });
+}
+
+function ruleWsOpts(){
+  const all=WSLIST.filter(function(w){ return w!=='공용 워크스페이스'; });
+  return role==='super'? all : (MYWS[role]||[]);
+}
+
 function drawRuleForm(){
   const u=metricUnit(RF.metric);
   document.getElementById('ruleBody').innerHTML =
@@ -3916,16 +3956,32 @@ function drawRuleForm(){
     +       ' oninput="RF.dur=this.value;document.getElementById(\'ruleSave\').disabled=!ruleValid()">'
     +       '<span class="unit">초</span></div>'
     +       '<div class="hint">조건이 이 시간만큼 이어질 때만 알립니다. 순간값으로 알리지 않습니다.</div></div>'
-    /* 규칙은 지금 고른 워크스페이스에 만들어진다. 대상 범위는 그 안에서
-       전체인지 특정 배포인지다 — `워크스페이스 전체` 로 적으면 같은 말이 두 번 나온다 */
+    +   '</div></div>'
+
+    /* 무엇을 재는지와 어디에 거는지는 다른 질문이다. 한 섹션에 섞으면
+       메트릭 옆에 워크스페이스가 놓여 무엇을 정하는 자리인지 흐려진다 */
+    + '<div class="fsec"><h4>적용 범위</h4>'
+    +   '<div class="fgrid">'
+    /* 규칙은 워크스페이스에 속한다. 스위처가 `전체` 면 어디에 만들지 정해지지 않아
+       폼에서 고르게 한다. 고를 수 있는 범위는 역할을 따른다 —
+       최고 관리자는 전체, 그 외에는 자기 소속만이다(팀장 확인 9/17) */
+    +     (wsCur!=='전체' ? ''
+        : ruleIdx>=0
+          /* 수정에서는 바꾸지 않는다 — 규칙을 만든 뒤 다른 워크스페이스로 옮기는 것은
+             대상 범위와 채널을 다시 정해야 하는 일이라 수정 범위를 넘는다 */
+          ? '<div class="fld"><label>워크스페이스</label>'
+            + '<div class="ro">'+RF.ws+'</div>'
+            + '<div class="hint">만든 뒤에는 바꿀 수 없습니다.</div></div>'
+          : '<div class="fld"><label>워크스페이스<span class="req">*</span></label>'
+            + selBox('ws', ruleWsOpts().map(function(w){ return {v:w, t:w}; }), RF.ws)
+            + '<div class="hint">규칙은 고른 워크스페이스에 속합니다. 다른 워크스페이스에는 걸리지 않습니다.</div></div>')
+    /* 대상 범위는 그 워크스페이스 안에서 전체인지 특정 배포인지다 —
+       `워크스페이스 전체` 로 적으면 같은 말이 두 번 나온다 */
+    /* 힌트를 두지 않는다 — 선택지가 `워크스페이스 전체` 라 무엇의 전체인지
+       이미 드러나고, 어느 워크스페이스인지는 위 필드에 보인다 */
     +     '<div class="fld"><label>대상 범위</label>'
     +       selBox('scope', [{v:'전체',t:'워크스페이스 전체'}].concat(
-                depList().map(function(d){ return {v:d.n, t:d.n}; })), RF.scope)
-    +       '<div class="hint">'
-    +         (wsCur==='전체'
-                ? '워크스페이스를 먼저 고르면 그 워크스페이스에 규칙이 만들어집니다.'
-                : wsCur+'에 만들어집니다.')
-    +       '</div>'
+                ruleDeps().map(function(d){ return {v:d.n, t:d.n}; })), RF.scope)
     +     '</div>'
     +   '</div></div>'
 
@@ -3944,9 +4000,10 @@ function drawRuleForm(){
   document.getElementById('ruleSave').disabled = !ruleValid();
 }
 function saveRule(){
-  /* 지금 고른 워크스페이스에 만든다. 수정이면 원래 소속을 지킨다 */
+  /* 스위처가 `전체` 면 폼에서 고른 값을, 아니면 지금 보고 있는 워크스페이스를 쓴다.
+     수정이면 원래 소속을 지킨다 — 만든 뒤에는 옮기지 않는다 */
   const r={n:RF.n.trim(), metric:RF.metric, op:RF.op, th:+RF.th, dur:+RF.dur,
-           ws:(ruleIdx<0 ? (wsCur==='전체'? '' : wsCur) : RULES[ruleIdx].ws),
+           ws:(ruleIdx<0 ? (wsCur==='전체'? RF.ws : wsCur) : RULES[ruleIdx].ws),
            scope:RF.scope, ch:RF.ch.slice(), fires:[],
            by:'성유진(yj.seong)', at:'2026-08-27 09:20:11'};
   if(ruleIdx<0) RULES.unshift(r); else RULES[ruleIdx]=Object.assign(RULES[ruleIdx], r);
@@ -4293,10 +4350,11 @@ function openSlot(nodeName, no){
     '슬롯 #'+x.no+'<span class="mver">'+nd.n+'</span>';
   /* 같은 배포가 쓰는 다른 슬롯 — 배포 하나가 여러 장을 쓰면 한 장만 봐서는 판단이 안 선다 */
   /* 배포가 여럿이면 그중 하나라도 겹치는 슬롯을 모은다 */
-  const sib = x.by.length
+  /* 점유 배포를 모르면 묶지 않는다 — 모름끼리 같은 값이라 해서 같은 배포가 아니다 */
+  const sib = byList(x).length
     ? visibleNodes().reduce(function(a,n2){
         n2.slots.forEach(function(s2){
-          const same = s2.by.some(function(d){ return x.by.indexOf(d)>=0; });
+          const same = byList(s2).some(function(d){ return x.by.indexOf(d)>=0; });
           if(same && !(n2.n===nd.n && s2.no===x.no)) a.push({n:n2.n, no:s2.no});
         });
         return a;
@@ -4321,16 +4379,24 @@ function openSlot(nodeName, no){
          + '<div class="lchart sm">'+lineChart('slot'+x.no+'temp')+'</div></div>'
        + '<div class="dsec"><h4>전력<span class="pnv">'+x.pw+'W</span></h4>'
          + '<div class="lchart sm">'+lineChart('slot'+x.no+'pw')+'</div></div>')
-    /* 점유 배포는 링크로만 둔다. 조치는 그 배포 화면에서 한다(공통정책 2.1 · 정책 1장 원칙 2) */
+    /* 점유 배포는 링크로만 둔다(공통정책 2.1). 배포 하나를 눌렀으니 그 배포 화면으로 가되,
+       궁금한 것은 지금 어떻게 돌고 있는지라 상세의 모니터링 탭으로 연다(팀장 확인 9/16) */
     + '<div class="dsec"><h4>점유 배포</h4>'
-    /* 공유 슬롯은 배포가 여럿이다. 하나씩 줄을 나눠 각각 링크로 둔다 */
-    +   (x.by.length
+    +   (byList(x).length
         ? '<dl class="dl">'
           + x.by.map(function(d){
-              return '<dt>배포</dt><dd><button class="lnk" onclick="act(\'배포 상세로 이동합니다.\')">'+d+'</button></dd>';
+              return '<dt>배포</dt><dd><button class="lnk" onclick="act(\''+d+' 배포 상세의 모니터링 탭으로 이동합니다.\')">'+d+'</button></dd>';
             }).join('')
           + '</dl>'
-        : '<div class="emptyline">이 슬롯을 쓰는 배포가 없습니다.</div>')
+        : byUnknown(x)
+          /* 모델 이름은 모르지만 워크로드 정보는 온다. 무엇이 점유 중인지 알아야
+             외부 배포로 가져올 대상을 지목할 수 있다(팀장 확인 9/17).
+             원시 표기 대신 워크로드로 쓴다(공통정책 7.9 · 배포 기획서와 같은 기준) */
+          ? '<dl class="dl"><dt>배포</dt><dd><span class="dash">확인 불가</span></dd>'
+            + (x.pod? '<dt>워크로드</dt><dd>'+x.pod+'</dd>' : '')
+            + '</dl>'
+            + '<div class="secnote">등록되지 않은 워크로드가 점유하고 있습니다. 배포 화면에서 외부 배포로 가져오면 이름이 표시됩니다.</div>'
+          : '<div class="emptyline">이 슬롯을 쓰는 배포가 없습니다.</div>')
     + '</div>'
     /* 배포가 여러 장을 쓰면 나머지도 함께 봐야 한다 — 한 장만 보고는 판단이 안 선다 */
     + (sib.length
@@ -4362,6 +4428,11 @@ document.addEventListener('keydown', function(e){
 
 /* ── 공용 ─────────────────────────────────────── */
 function dash(){ return '<span class="dash">-</span>'; }
+/* 점유 배포는 셋으로 갈린다 — 배포가 있음 · 없음(빈 배열) · 모름(null).
+   모름은 콘체르토 밖에서 쓰고 있을 수 있어 안의 배포와 같은지 구분할 수 없는 상태다.
+   없음과 섞으면 비어 있는 것처럼 읽히고, 모름끼리 묶으면 남의 배포가 같은 배포로 잡힌다 */
+function byList(x){ return Array.isArray(x.by)? x.by : []; }
+function byUnknown(x){ return x.by===null || x.by===undefined; }
 function mcard(t,v,u,help){
   return '<div class="mcard"><div class="mt">'+t+(help? tip(help) : '')+'</div>'
     + '<div class="mv">'+v+'<small>'+u+'</small></div></div>';
@@ -4375,12 +4446,18 @@ const COLDEF={
   vram:'모델과 KV 캐시가 사용하는 메모리입니다. 사용량 / 전체 용량으로 표시합니다.',
   sst:'슬롯의 점유 상태입니다.'
       +'<dl><dt>사용 중</dt><dd>배포 하나가 점유하고 있습니다.</dd>'
-      +'<dt>공유</dt><dd>둘 이상이 나눠 쓰고 있습니다.</dd>'
       +'<dt>유휴</dt><dd>점유한 배포가 없습니다.</dd>'
       +'<dt>확인 불가</dt><dd>상태를 읽지 못했습니다.</dd></dl>',
+  dep:'이 슬롯을 쓰고 있는 배포입니다. 누르면 그 배포의 모니터링으로 이동합니다.',
   cond:'임계값을 넘은 상태가 지속 시간만큼 이어지면 알림이 발생합니다.',
   fire:'이 규칙이 실제로 알림을 울린 가장 최근 시각입니다. 눌러서 펴면 최근 5건을 봅니다.'
 };
+/* 값 옆 도움말 아이콘. 왜 그 값인지 짧게 알린다 */
+function warnIc(txt){
+  return ' <span class="tip-anchor warnic"><span class="tip-ic" tabindex="0">?</span>'
+   + '<span class="tip">'+txt+'</span></span>';
+}
+
 function thHelp(k,label){
   return label+'<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span>'
     + '<span class="tip">'+COLDEF[k]+'</span></span>';
