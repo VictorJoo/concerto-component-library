@@ -187,6 +187,8 @@
     height:40px;padding:0 20px;border:0;border-radius:var(--radius);
     background:var(--primary);color:#fff;font-size:14px;font-weight:600;cursor:pointer;
   }
+  /* 입력이 유효하기 전에는 누를 수 없다(공통정책 7.1) */
+  .modal .modal-ok:disabled{opacity:.45;cursor:not-allowed;}
   .modal .modal-ok:hover{opacity:.9;}
 
   /* 토스트 (공통정책 7.6·7.7) — 동기 작업 결과 즉시 피드백. 위치는 컴포넌트 라이브러리 확정 전 가안(우측 상단) */
@@ -329,6 +331,7 @@
     <button data-case="rejected">반려</button>
     <button data-case="locked">계정 잠금</button>
     <button data-case="expired">세션 만료</button>
+    <button data-case="temppw">임시 비밀번호</button>
     <span class="demo-label" style="margin-left:12px;">피드백(가입 신청 완료 시):</span>
     <button data-case="toast">가입 접수 토스트</button>
     <span class="demo-label" style="margin-left:12px;">테마:</span>
@@ -362,6 +365,42 @@
       <h2 id="expiredTitle">세션 만료</h2>
       <p>세션이 만료되어 로그아웃되었습니다.<br>다시 로그인해 주세요.</p>
       <div class="modal-actions"><button type="button" class="modal-ok" id="expiredOk">확인</button></div>
+    </div>
+  </div>
+
+  <!-- 임시 비밀번호 강제 변경 모달 (계정정책 2.2 — 임시 비밀번호로 로그인한 경우에만 강제)
+       로그인 직후 자동으로 열린다. 닫기·취소를 두지 않는다 — 변경 전까지 인증이 필요한
+       모든 API 가 403 이라 다른 화면으로 가도 할 수 있는 것이 없다.
+       비밀번호 변경 모달(SYS-PWCHG-M01)과 같은 규격이고, 진입 경로와 닫기 유무만 다르다.
+       배경을 마이페이지로 두지 않는 이유도 같다 — 마이페이지 조회도 403 이다 -->
+  <div class="modal-overlay" id="pwForceModal" role="dialog" aria-modal="true" aria-labelledby="pwForceTitle">
+    <div class="modal" style="max-width:420px;text-align:left">
+      <h2 id="pwForceTitle" style="text-align:left">비밀번호 변경</h2>
+      <p style="text-align:left">임시 비밀번호로 로그인했습니다. 비밀번호를 변경해야 다른 기능을 사용할 수 있습니다.</p>
+      <div class="field" style="margin-top:16px">
+        <label for="fp_cur">현재 비밀번호 <span style="color:var(--danger)">*</span></label>
+        <div class="input-shell"><input class="input" type="password" id="fp_cur" placeholder="발급받은 임시 비밀번호를 입력해 주세요." autocomplete="new-password"><button type="button" class="toggle-pw" data-target="fp_cur" aria-label="비밀번호 표시"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      
+        <p class="err" id="fp_curErr">현재 비밀번호를 입력해 주세요.</p>
+      </div>
+      <div class="field">
+        <label for="fp_new">새 비밀번호 <span style="color:var(--danger)">*</span></label>
+        <div class="input-shell"><input class="input" type="password" id="fp_new" placeholder="새 비밀번호를 입력해 주세요." autocomplete="new-password"><button type="button" class="toggle-pw" data-target="fp_new" aria-label="비밀번호 표시"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+        <!-- 강도 표시는 회원가입·비밀번호 변경 모달과 같은 규격이다(계정정책 2.2 — 안전 이상부터 사용) -->
+        <div class="pw-meter" id="fpMeter" hidden>
+          <div class="pw-bars"><span></span><span></span><span></span><span></span></div>
+          <span class="pw-label" id="fpLabel"></span>
+        </div>
+        <p class="err" id="fp_newErr">비밀번호를 입력해주세요.</p>
+        <p class="hint" style="font-size:12px;color:var(--muted);margin:7px 0 0">8~64자, 영문 대·소문자·숫자·특수문자 중 3종 이상. 아이디·현재 비밀번호와 동일하거나 연속·반복 문자는 사용할 수 없습니다.</p>
+      </div>
+      <div class="field">
+        <label for="fp_new2">새 비밀번호 확인 <span style="color:var(--danger)">*</span></label>
+        <div class="input-shell"><input class="input" type="password" id="fp_new2" placeholder="새 비밀번호를 다시 입력해 주세요." autocomplete="new-password"><button type="button" class="toggle-pw" data-target="fp_new2" aria-label="비밀번호 표시"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      
+        <p class="err" id="fp_new2Err">비밀번호가 일치하지 않습니다.</p>
+      </div>
+      <div class="modal-actions"><button type="button" class="modal-ok" id="fpOk" disabled>변경</button></div>
     </div>
   </div>
 
@@ -492,20 +531,7 @@
   }
   function vSuId(){ const msg=idError(su_id.value.trim()); const e=$('su_idErr'); if(msg){ e.textContent=msg; su_id.classList.add('has-error'); e.classList.add('show'); return false; } su_id.classList.remove('has-error'); e.classList.remove('show'); return true; }
   function vName(){ const v=su_name.value.trim(); showErr(su_name,'su_nameErr',!v); return !!v; }
-  /* 이메일은 확인 버튼을 두지 않는다. 형식이 맞으면 필드를 벗어날 때 중복을 조회한다(계정정책 2.3).
-   아이디와 달리 사용자가 고르는 값이 아니라 이미 정해진 것이라 눌러 확인할 이유가 없다.
-   ⚠ 데모라 `admin@okestro.com` 하나만 사용 중으로 둔다 */
-const MAIL_TAKEN=['admin@okestro.com'];
-function vEmail(){
-  const v=su_email.value.trim();
-  const e=$('su_emailErr');
-  if(!v){ e.textContent='이메일을 입력해주세요.'; showErr(su_email,'su_emailErr',true); return false; }
-  if(!emailRe.test(v)){ e.textContent='올바른 이메일 형식이 아닙니다.'; showErr(su_email,'su_emailErr',true); return false; }
-  if(MAIL_TAKEN.indexOf(v.toLowerCase())>=0){
-    e.textContent='이미 사용 중인 이메일입니다.'; showErr(su_email,'su_emailErr',true); return false;
-  }
-  showErr(su_email,'su_emailErr',false); return true;
-}
+  function vEmail(){ const ok=emailRe.test(su_email.value.trim()); showErr(su_email,'su_emailErr',!ok); return ok; }
   // 비밀번호 강도 (계정 정책 2.2) — 0 약함 · 1 보통 · 2 안전 · 3 매우 안전. 안전(2) 이상부터 사용 가능.
   const PW_LABELS=['약함','보통','안전','매우 안전'];
   const pwMeter=$('pwMeter'), pwLabel=$('pwLabel');
@@ -551,11 +577,9 @@ function vEmail(){
     su_pw.classList.remove('has-error'); e.classList.remove('show'); return true;
   }
   function vPw2(){ const ok=su_pw2.value!=='' && su_pw2.value===su_pw.value; showErr(su_pw2,'su_pw2Err',!ok); return ok; }
-  /* 중복이면 등록 버튼을 활성화하지 않는다(계정정책 2.1·2.3) */
-  function mailOk(){ const v=su_email.value.trim(); return emailRe.test(v) && MAIL_TAKEN.indexOf(v.toLowerCase())<0; }
   function refreshBtn(){
     signupBtn.disabled = !(su_id.value.trim() && idChecked && su_name.value.trim()
-      && mailOk() && pwLevel(su_pw.value)>=2 && su_pw2.value!=='' && su_pw2.value===su_pw.value);
+      && emailRe.test(su_email.value.trim()) && pwLevel(su_pw.value)>=2 && su_pw2.value!=='' && su_pw2.value===su_pw.value);
   }
   // 뷰 전환·제출 후 회원가입 폼 초기화 (입력 잔존·비밀번호 잔류 방지)
   function resetSignup(){
@@ -571,8 +595,7 @@ function vEmail(){
     else { idChecked=true; su_id.classList.add('is-ok'); su_id.classList.remove('has-error'); $('su_idErr').classList.remove('show'); su_idOk.classList.add('show'); }
     refreshBtn();
   });
-  su_name.addEventListener('blur', vName); su_email.addEventListener('blur', function(){ vEmail(); refreshBtn(); });
-  su_email.addEventListener('input', function(){ showErr(su_email,'su_emailErr',false); refreshBtn(); }); su_pw.addEventListener('blur', vPw); su_pw2.addEventListener('blur', vPw2);
+  su_name.addEventListener('blur', vName); su_email.addEventListener('blur', vEmail); su_pw.addEventListener('blur', vPw); su_pw2.addEventListener('blur', vPw2);
   su_id.addEventListener('blur', ()=>{ if(su_id.value.trim()) vSuId(); });   // 형식 유효성(길이·시작끝·연속 특수문자) 안내
   [su_name,su_email,su_pw,su_pw2].forEach(el=>el.addEventListener('input', ()=>{ showErr(el, el.id+'Err', false); if(el===su_pw){ updateMeter(); if(su_pw2.value) vPw2(); } refreshBtn(); }));
   $('signupView').addEventListener('submit', e=>{
@@ -630,6 +653,13 @@ function vEmail(){
         expiredModal.classList.add('show');
         return;   // 입력값은 비운 상태 유지
       }
+      /* 임시 비밀번호 = 로그인은 성공했고 변경을 마쳐야 넘어간다.
+         로그인 화면 위에 모달을 얹는다 — 화면을 옮기면 그 화면 조회도 403 이다 */
+      if(key==='temppw'){
+        li_id.value='yujin'; li_pw.value='Tp9!x2mQ7za4';
+        $('pwForceModal').classList.add('show');
+        return;
+      }
       li_id.value='yujin'; li_pw.value='pass1234';   // 케이스는 입력된 상태로 전환
       if(key==='inactive' || key==='rejected'){
         stateModal.classList.add('show');            // 비활성·반려(종료 상태)만 일반 모달. 잠금은 잠금 안내 배너
@@ -641,6 +671,57 @@ function vEmail(){
       }
     });
   });
+  /* 변경을 마치면 모달이 닫히고 원래 목적지로 간다. 닫기·취소는 두지 않는다 */
+  /* 세 필드가 모두 유효할 때만 변경을 활성화한다(공통정책 7.1).
+     새 비밀번호는 강도 `안전` 이상이어야 하고 확인값과 같아야 한다(계정정책 2.2) */
+  /* 규칙 문구는 계정정책 2.2 를 그대로 쓴다. 아이디 비교 대상만 로그인 아이디로 바꾼다 */
+  function fpPwError(v){
+    if(!v) return '비밀번호를 입력해주세요.';
+    if(/[^\x21-\x7E]/.test(v)) return '비밀번호에 사용할 수 없는 문자가 있습니다. (한글·공백·이모지 불가)';
+    if(v.length<8) return '8자 이상 입력해주세요.';
+    if(v.length>64) return '64자까지 입력할 수 있습니다.';
+    if(pwKinds(v)<3) return '영문 대문자·소문자·숫자·특수문자 중 3종 이상을 포함해야 합니다.';
+    const id=$('li_id').value.trim();
+    if(id && v.toLowerCase()===id.toLowerCase()) return '아이디와 동일한 비밀번호는 사용할 수 없습니다.';
+    if(pwHasRun(v)) return '동일하거나 연속된 문자·숫자는 사용할 수 없습니다.';
+    if(pwLevel(v)<2) return '안전 이상의 비밀번호를 사용해 주세요.';
+    return '';
+  }
+  function fpShowErr(fid, msg){
+    const el=$(fid), e=$(fid+'Err');
+    if(msg){ e.textContent=msg; el.classList.add('has-error'); e.classList.add('show'); }
+    else { el.classList.remove('has-error'); e.classList.remove('show'); }
+  }
+  /* 입력 중에는 채운 필드만 본다. 아직 손대지 않은 필드에 에러를 띄우지 않는다(공통정책 7.8) */
+  function fpCheck(){
+    const cur=$('fp_cur').value, nw=$('fp_new').value, nw2=$('fp_new2').value;
+    let msg = nw? fpPwError(nw) : '';
+    if(!msg && nw && cur && nw===cur) msg='현재 비밀번호와 다른 비밀번호를 입력해 주세요.';
+    fpShowErr('fp_new', msg);
+    fpShowErr('fp_new2', (nw2 && nw!==nw2)? '비밀번호가 일치하지 않습니다.' : '');
+    const ok = cur!=='' && nw!=='' && !msg && nw===nw2;
+    $('fpOk').disabled = !ok;
+  }
+  ['fp_cur','fp_new','fp_new2'].forEach(k=>{
+    $(k).addEventListener('input', ()=>{
+      if(k==='fp_new'){
+        const v=$('fp_new').value, m=$('fpMeter');
+        if(!v){ m.hidden=true; }
+        else { const lv=pwLevel(v); m.hidden=false; m.dataset.level=lv; $('fpLabel').textContent=PW_LABELS[lv]; }
+      }
+      fpCheck();
+    });
+  });
+  /* 변경을 마치면 모달이 닫히고 원래 목적지로 이동한다.
+     이 목업에는 홈이 없어 로그인 화면에 남는다 — 이동은 실제 화면에서 일어난다 */
+  $('fpOk').addEventListener('click', ()=>{
+    $('pwForceModal').classList.remove('show');
+    ['fp_cur','fp_new','fp_new2'].forEach(k=>{ $(k).value=''; });
+    $('fpMeter').hidden=true; $('fpOk').disabled=true;
+    ['fp_cur','fp_new','fp_new2'].forEach(k=>fpShowErr(k,''));
+    showToast('비밀번호를 변경했습니다.');
+  });
+
   $('stateOk').addEventListener('click', ()=> stateModal.classList.remove('show'));
   stateModal.addEventListener('click', e=>{ if(e.target===stateModal) stateModal.classList.remove('show'); });
   $('expiredOk').addEventListener('click', ()=> expiredModal.classList.remove('show'));
