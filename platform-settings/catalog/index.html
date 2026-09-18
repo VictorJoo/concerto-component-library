@@ -2578,7 +2578,7 @@ function drawUsers(){
    + '<th>이메일</th>'
    + sortTh('usr','at','등록일시')
    + sortTh('usr','last','최근 로그인')
-   + '<th style="width:44px"><span class="sronly">작업</span></th>'
+   + '<th style="width:64px">작업</th>'
    + '</tr></thead><tbody>'
    + sorted.map(function(u){
        const i=USERS.indexOf(u);
@@ -2620,7 +2620,7 @@ function userMore(i){
   const lastAdmin = u.role==='최고 관리자'
     && USERS.filter(function(x){return x.role==='최고 관리자' && x.active;}).length<=1;
   const why = lastAdmin? '마지막 최고 관리자는 변경할 수 없습니다.' : '';
-  return '<div class="more" id="um'+i+'"><button class="morebtn" onclick="event.stopPropagation();tgMore(event,\'um'+i+'\')">⋮</button><div class="rowmenu">'
+  return '<div class="more" id="um'+i+'"><button class="morebtn" onclick="event.stopPropagation();tgMore(event,\'um'+i+'\')">⋯</button><div class="rowmenu">'
    /* 가입 승인·반려는 내 작업함 소관이라 여기 두지 않는다. 목록에 승인된 계정만 있다 */
    + ('<button onclick="event.stopPropagation();openUserAt('+i+')">수정</button>'
         + (lastAdmin
@@ -3014,7 +3014,7 @@ function drawAudit(){
       폭을 잡지 않으면 값이 길어질 때 셀이 늘어나 다른 컬럼을 밀어낸다(공통정책 1.2) */
    + '<th class="wcell">내용</th>'
    /* 행 클릭으로도 열리나 무엇을 할 수 있는지 드러나야 한다(개발룸 작업 이력과 같은 규격) */
-   + '<th style="width:96px"><span class="sronly">작업</span></th>'
+   + '<th style="width:96px">작업</th>'
    + '</tr></thead><tbody>'
    + applySort('aud', list).map(function(r){
        const ri=AUDIT.indexOf(r);
@@ -3560,7 +3560,7 @@ function drawChans(){
         + '<th>범위</th><th>주소</th>'
         + sortTh('ch','sent','마지막 발송')
         + sortTh('ch','at','등록일시')
-        + '<th style="width:44px"><span class="sronly">작업</span></th>'
+        + '<th style="width:64px">작업</th>'
         + '</tr></thead><tbody>'
         + applySort('ch', list).map(function(c){
             const i=CHANS.indexOf(c);
@@ -3577,7 +3577,7 @@ function drawChans(){
              + '<td class="wcell"><span class="epcell">'+esc(c.url)+'</span></td>'
              + '<td>'+(c.sent? c.sent : '<span class="dash">-</span>')+'</td>'
              + '<td>'+c.at+'</td>'
-             + '<td><div class="more" id="cm'+i+'"><button class="morebtn" onclick="tgMore(event,\'cm'+i+'\')">⋮</button>'
+             + '<td><div class="more" id="cm'+i+'"><button class="morebtn" onclick="tgMore(event,\'cm'+i+'\')">⋯</button>'
              /* 등록된 주소로 고정 문구를 보내므로 입력할 것이 없다. 작성 화면을 두지 않는다.
                 결과는 상태·마지막 발송 컬럼에 남는다 */
              +   '<div class="rowmenu"><button onclick="event.stopPropagation();testCh('+i+')">테스트 발송</button>'
