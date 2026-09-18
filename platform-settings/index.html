@@ -614,7 +614,11 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .inp:focus{outline:none;border-color:var(--ring);box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
 .inp.err{border-color:var(--destructive)}
 .hint{font-size:11.5px;color:var(--muted-foreground);margin-top:5px;line-height:1.55}
-.errmsg{font-size:11.5px;color:var(--destructive);margin-top:5px}
+.errmsg{font-size:11.5px;color:var(--destructive);margin-top:5px;display:none}
+    .errmsg.show{display:block}
+    /* 중복 확인 통과 문구 — 오류와 같은 자리에 두되 색으로 가른다 */
+    .okmsg{font-size:11.5px;color:var(--success);margin-top:5px;display:none}
+    .okmsg.show{display:block}
 .row2{display:grid;grid-template-columns:150px 1fr;gap:8px}
 .noderow{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer}
 .noderow:has(input:checked){border-color:var(--primary);background:var(--selected)}
@@ -2194,6 +2198,11 @@ let view='usr', role='super';
    로그인은 승인 + 활성일 때만 된다(계정정책 3장). 한 컬럼으로 합치면
    `비활성` 이 승인 전인지 승인 후 잠긴 것인지 구분되지 않는다 */
 const USERS=[
+  /* 설치 시 만들어지는 계정이다. 다른 화면에서 워크스페이스 관리자·모델 등록자로 참조한다 */
+  {id:'admin',    name:'관리자',  mail:'admin@okestro.com',   role:'최고 관리자',
+   apv:'승인', active:true, at:'2026-01-02 09:00:00', ws:[], upd:'', last:'2026-08-25 09:10:22'},
+  {id:'kh.oh',    name:'오경환',  mail:'kh.oh@okestro.com',   role:'일반 사용자',
+   apv:'승인', active:true, at:'2026-07-10 09:12:04', ws:[{n:'ai-service-team',r:'관리자'}], upd:'', last:'2026-08-25 14:02:11'},
   /* 승인 대기는 로그인한 적이 없어 최근 로그인·소속이 비어 있다.
      반려는 승인되지 않은 계정이라 접근이 꺼져 있다 */
   {id:'sh.choi',  name:'최서현', mail:'sh.choi@okestro.com',  role:'일반 사용자',
@@ -2214,8 +2223,8 @@ const USERS=[
    apv:'승인', active:true, at:'2026-07-10 09:10:51', ws:[{n:'ai-service-team',role:'관리자'},{n:'platform-ops',role:'관리자'}], upd:'2026-07-10 09:10:22', last:'2026-08-20 09:55:12'},
   {id:'tg.kim',   name:'김태건', mail:'tg.kim@okestro.com',   role:'일반 사용자',
    apv:'승인', active:false, at:'2026-08-18 16:02:33', upd:'2026-08-05 11:20:33', last:null},
-  {id:'jh.park',  name:'박지훈', mail:'jh.park@okestro.com',  role:'일반 사용자',
-   apv:'승인', why:'관리자 차단', active:false, at:'2026-08-15 10:20:44', upd:'2026-08-12 16:44:07', last:null}
+  {id:'jh.park',  name:'박지훈', mail:'jh.park@gmail.com',  role:'일반 사용자',
+   apv:'반려', active:false, at:'2026-08-19 16:22:41', ws:[], upd:'2026-08-19 16:50:07', last:''}
 ];
 
 /* 감사 로그 — 현행은 액션을 UPPER_SNAKE_CASE 원시값으로 노출한다.
@@ -2631,7 +2640,7 @@ function drawUsers(){
    + '<th>이메일</th>'
    + sortTh('usr','at','등록일시')
    + sortTh('usr','last','최근 로그인')
-   + '<th style="width:44px"><span class="sronly">작업</span></th>'
+   + '<th style="width:64px">작업</th>'
    + '</tr></thead><tbody>'
    + sorted.map(function(u){
        const i=USERS.indexOf(u);
@@ -2673,17 +2682,22 @@ function userMore(i){
   const lastAdmin = u.role==='최고 관리자'
     && USERS.filter(function(x){return x.role==='최고 관리자' && x.active;}).length<=1;
   const why = lastAdmin? '마지막 최고 관리자는 변경할 수 없습니다.' : '';
-  return '<div class="more" id="um'+i+'"><button class="morebtn" onclick="event.stopPropagation();tgMore(event,\'um'+i+'\')">⋮</button><div class="rowmenu">'
-   /* 가입 승인·반려는 내 작업함 소관이라 여기 두지 않는다. 목록에 승인된 계정만 있다 */
-   + ('<button onclick="event.stopPropagation();openUserAt('+i+')">수정</button>'
-        + (lastAdmin
-           ? '<button disabled title="'+why+'">비활성</button><hr><button class="d" disabled title="'+why+'">삭제</button>'
-           : (u.apv==='승인'
-              ? '<button onclick="event.stopPropagation();tgActive('+i+')">'
-                + (u.active? '비활성' : (u.why==='로그인 실패 누적'? '잠금 해제' : '활성'))+'</button><hr>'
-              : '<button disabled title="'
-                + (u.apv==='승인 대기'? '승인 후에 바꿀 수 있습니다.' : '반려된 계정입니다.')+'">활성</button><hr>')
-             + '<hr><button class="d" onclick="event.stopPropagation();delUser('+i+')">삭제</button>'))
+  return '<div class="more" id="um'+i+'"><button class="morebtn" onclick="event.stopPropagation();tgMore(event,\'um'+i+'\')">⋯</button><div class="rowmenu">'
+   /* 가입 승인·반려 처리는 내 작업함 소관이라 여기 두지 않는다.
+       목록에는 승인 대기·반려도 나온다 — 계정 레코드로 남기 때문이다(계정정책 3장) */
+   /* 승인 전이거나 반려된 계정은 고치지 않는다. 아직·이미 계정이 아니다(계정정책 3장).
+      활성 토글·임시 비밀번호와 같은 기준이다 */
+   + ((u.apv!=='승인')
+       ? '<button disabled title="'+(u.apv==='승인 대기'? '승인 후에 수정할 수 있습니다.' : '반려된 계정입니다.')+'">수정</button>'
+       : '<button onclick="event.stopPropagation();openUserAt('+i+')">수정</button>')
+   + (lastAdmin
+      ? '<button disabled title="'+why+'">비활성</button><hr><button class="d" disabled title="'+why+'">삭제</button>'
+      : (u.apv==='승인'
+         ? '<button onclick="event.stopPropagation();tgActive('+i+')">'
+           + (u.active? '비활성' : (u.why==='로그인 실패 누적'? '잠금 해제' : '활성'))+'</button>'
+         : '<button disabled title="'
+           + (u.apv==='승인 대기'? '승인 후에 바꿀 수 있습니다.' : '반려된 계정입니다.')+'">활성</button>')
+        + '<hr><button class="d" onclick="event.stopPropagation();delUser('+i+')">삭제</button>')
    + '</div></div>';
 }
 
@@ -2735,7 +2749,7 @@ function drawPw(){
        (pwNew? '<p class="segnote" style="margin:0 0 14px">'+u.name+'('+u.id+') 계정을 추가하고 임시 비밀번호를 발급했습니다.</p>' : '')
      + '<div class="pwbox"><span class="pwv">'+pwValue+'</span>'+copyBtn('임시 비밀번호')+'</div>'
      + '<p class="pwwarn">이 화면에서만 확인할 수 있습니다. 닫으면 다시 볼 수 없습니다.</p>'
-     + '<p class="pwact">'+u.name+'('+u.id+')님에게 전달해 주세요. 첫 로그인에서 본인이 바꿉니다.</p>';
+     + '<p class="pwact">'+u.name+'('+u.id+')님에게 전달해 주세요. 최초 로그인 시 변경해야 합니다.</p>';
     $('pwFoot').innerHTML =
        '<button class="btn" onclick="closePw();act('+(pwNew? "'사용자를 추가했습니다.'" : "'임시 비밀번호를 발급했습니다.'")+')">확인</button>';
   }
@@ -2852,7 +2866,10 @@ function drawUsrDetail(){
    +     (udEdit
         ? '<button class="btn ghost sm" onclick="tgUdEdit()">취소</button>'
           + '<button class="btn sm" onclick="saveUsr()">저장</button>'
-        : '<button class="btn ghost sm" onclick="tgUdEdit()">수정</button>')
+        /* 승인 전이거나 반려된 계정은 고치지 않는다(계정정책 3장) */
+        : (u.apv!=='승인'
+           ? '<button class="btn ghost sm" disabled title="'+(u.apv==='승인 대기'? '승인 후에 수정할 수 있습니다.' : '반려된 계정입니다.')+'">수정</button>'
+           : '<button class="btn ghost sm" onclick="tgUdEdit()">수정</button>'))
    +   '</div></div>'
    + (udEdit
       /* 아이디는 로그인 식별자라 만든 뒤 바꾸지 않는다(계정정책 1장 · 공통정책 7.11).
@@ -2960,13 +2977,19 @@ function drawUserModal(){
      '<div class="fsec"><h4>기본 정보</h4>'
    + '<div class="fgrid">'
    /* 아이디는 로그인 식별자라 만든 뒤 바꾸지 않는다(계정정책 1장 · 공통정책 7.11) */
+   /* 아이디는 확인 버튼으로, 이메일은 필드를 벗어날 때 자동으로 중복을 본다(계정정책 2.1·2.3).
+      회원가입 화면과 같은 규격이다 */
    + '<div class="fld"><label>아이디<span class="req">*</span></label>'
-   +   '<input class="inp" placeholder="영문 소문자·숫자·마침표">'
+   +   '<div class="inline"><input class="inp" id="ufId" placeholder="영문 소문자·숫자·마침표" oninput="ufIdChange()">'
+   +   '<button class="btn ghost sm" onclick="ufCheckId()">중복 확인</button></div>'
+   +   '<div class="errmsg" id="ufIdErr"></div>'
+   +   '<div class="okmsg" id="ufIdOk">사용 가능한 아이디입니다.</div>'
    +   '<div class="hint">로그인에 쓰는 값이라 만든 뒤 바꿀 수 없습니다.</div></div>'
    + '<div class="fld"><label>이름<span class="req">*</span></label>'
-   +   '<input class="inp"></div>'
+   +   '<input class="inp" id="ufName"></div>'
    + '<div class="fld"><label>이메일<span class="req">*</span></label>'
-   +   '<input class="inp" placeholder="name@okestro.com"></div>'
+   +   '<input class="inp" id="ufMail" placeholder="name@okestro.com" onblur="ufCheckMail()" oninput="ufMailChange()">'
+   +   '<div class="errmsg" id="ufMailErr"></div></div>'
    + '<div class="fld"><label>플랫폼 역할<span class="req">*</span></label>'
    +   '<select class="inp"><option>일반 사용자</option><option>최고 관리자</option></select>'
    +   '<div class="hint">최고 관리자는 플랫폼 설정과 전체 워크스페이스에 접근합니다.</div></div>'
@@ -2974,8 +2997,35 @@ function drawUserModal(){
    /* 비밀번호를 받지 않는다. 만든 뒤 임시 비밀번호를 발급한다(계정정책 2.2) —
       관리자가 남의 비밀번호를 아는 상태를 만들지 않는다.
       관리자가 만든 계정은 바로 승인 상태다. 승인 절차는 회원가입 건에만 둔다 */
-   + '<p class="segnote" style="margin:14px 0 0">계정을 추가하면 임시 비밀번호를 발급합니다. '
-   + '본인이 첫 로그인에서 바꿉니다.</p>';
+   + '<p class="segnote" style="margin:14px 0 0">계정을 추가하면 임시 비밀번호가 발급됩니다. '
+   + '최초 로그인 시 변경해야 합니다.</p>';
+}
+
+/* 아이디는 확인 버튼을 눌러야 통과한다. 이메일은 형식이 맞으면 필드를 벗어날 때 자동 조회한다
+   (계정정책 2.1·2.3 · 회원가입 화면과 같은 규격) */
+const ID_TAKEN=['admin','yj.seong','sj.lim','jh.yu','kh.oh','bg.kim','tg.kim','sh.choi','dh.jung','jh.park'];
+const MAIL_TAKEN=['admin@okestro.com','yj.seong@okestro.com'];
+let ufIdChecked=false;
+
+function ufShow(id, msg, cls){
+  const el=$(id); if(!el) return;
+  if(msg!==null) el.textContent=msg;
+  el.classList.toggle('show', msg!==null);
+}
+function ufIdChange(){ ufIdChecked=false; ufShow('ufIdErr',null); ufShow('ufIdOk',null); }
+function ufCheckId(){
+  const v=($('ufId').value||'').trim().toLowerCase();
+  if(!v){ ufShow('ufIdErr','아이디를 입력해 주세요.'); return; }
+  if(ID_TAKEN.indexOf(v)>=0){ ufIdChecked=false; ufShow('ufIdOk',null); ufShow('ufIdErr','이미 사용 중인 아이디입니다.'); return; }
+  ufIdChecked=true; ufShow('ufIdErr',null); ufShow('ufIdOk','사용 가능한 아이디입니다.');
+}
+function ufMailChange(){ ufShow('ufMailErr',null); }
+function ufCheckMail(){
+  const v=($('ufMail').value||'').trim();
+  if(!v){ ufShow('ufMailErr','이메일을 입력해 주세요.'); return; }
+  if(!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(v)){ ufShow('ufMailErr','올바른 이메일 형식이 아닙니다.'); return; }
+  if(MAIL_TAKEN.indexOf(v.toLowerCase())>=0){ ufShow('ufMailErr','이미 사용 중인 이메일입니다.'); return; }
+  ufShow('ufMailErr',null);
 }
 
 function dl(rows){
@@ -3067,7 +3117,7 @@ function drawAudit(){
       폭을 잡지 않으면 값이 길어질 때 셀이 늘어나 다른 컬럼을 밀어낸다(공통정책 1.2) */
    + '<th class="wcell">내용</th>'
    /* 행 클릭으로도 열리나 무엇을 할 수 있는지 드러나야 한다(개발룸 작업 이력과 같은 규격) */
-   + '<th style="width:96px"><span class="sronly">작업</span></th>'
+   + '<th style="width:96px">작업</th>'
    + '</tr></thead><tbody>'
    + applySort('aud', list).map(function(r){
        const ri=AUDIT.indexOf(r);
@@ -3613,7 +3663,7 @@ function drawChans(){
         + '<th>범위</th><th>주소</th>'
         + sortTh('ch','sent','마지막 발송')
         + sortTh('ch','at','등록일시')
-        + '<th style="width:44px"><span class="sronly">작업</span></th>'
+        + '<th style="width:64px">작업</th>'
         + '</tr></thead><tbody>'
         + applySort('ch', list).map(function(c){
             const i=CHANS.indexOf(c);
@@ -3630,7 +3680,7 @@ function drawChans(){
              + '<td class="wcell"><span class="epcell">'+esc(c.url)+'</span></td>'
              + '<td>'+(c.sent? c.sent : '<span class="dash">-</span>')+'</td>'
              + '<td>'+c.at+'</td>'
-             + '<td><div class="more" id="cm'+i+'"><button class="morebtn" onclick="tgMore(event,\'cm'+i+'\')">⋮</button>'
+             + '<td><div class="more" id="cm'+i+'"><button class="morebtn" onclick="tgMore(event,\'cm'+i+'\')">⋯</button>'
              /* 등록된 주소로 고정 문구를 보내므로 입력할 것이 없다. 작성 화면을 두지 않는다.
                 결과는 상태·마지막 발송 컬럼에 남는다 */
              +   '<div class="rowmenu"><button onclick="event.stopPropagation();testCh('+i+')">테스트 발송</button>'
