@@ -1,6 +1,12 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 인프라 자원 목업 v0.1 (2026-08-25)
+  콘체르토 매니저 — 플랫폼 설정 | 인프라 자원 목업 v0.11 (2026-09-18)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.11 변경 ─────────────────────────────────
+  화면 분리 때 딸려 온 사용자 및 역할(목록·상세·추가·임시 비밀번호) 코드를 지웠다.
+  이 파일에는 해당 화면의 DOM 이 없어 동작하지 않는 코드였고, 데모 바가 없는 요소를
+  참조해 오류로 멈추던 것도 함께 해소했다. 사용자 및 역할은
+  platform-settings/index.html 이 정본이다.
 
   ── 메뉴 구성 ───────────────────────────────────
   GNB `플랫폼 설정` 하위에 다섯 화면을 둔다. 현행은 한 페이지 안 탭 6 개이나
@@ -2015,13 +2021,6 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <!-- 2단계다. ① 관리자 재인증 → ② 값 1회 노출(계정정책 2.2).
        세션이 열려 있어도 본인 확인을 다시 받는다 — 자리를 비운 사이
        남이 남의 비밀번호를 발급하는 것을 막는다 -->
-  <div class="mdbg" id="mdPw">
-    <div class="modal">
-      <div class="mdhead"><h3 id="pwTitle">임시 비밀번호 발급</h3></div>
-      <div class="mdbody" id="pwBody"></div>
-      <div class="mdfoot" id="pwFoot"></div>
-    </div>
-  </div>
 
   <!-- ══════════ 감사 로그 원본 SET-AUDIT-L01.M01 ══════════ -->
   <!-- 패널 폭이 440px 이라 들여쓴 JSON 이 가로로 넘친다. 전문은 모달에서 본다.
@@ -2133,7 +2132,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 /* ══════════ 데이터 ══════════
    현행 화면 명세 6장 관측값을 옮긴다. 값은 데모용이고 구조가 근거다 */
 
-let view='usr', role='super';
+let view='sys', role='super';
 
 /* 사용자 — 현행 컬럼: 사용자명·이메일·역할·패스워드·상태·가입일·상세
    패스워드 컬럼은 두지 않는다. 마스킹된 값이라 보여줄 것이 없고,
@@ -2302,12 +2301,8 @@ let dstate='default';
 function goDemo(v,btn){
   document.querySelectorAll('#demoBar .vw').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
-  $('pgUsrF').style.display='none';
-  $('pgUsrD').style.display='none'; udCur=null;
   /* 권한이 없으면 하위 화면으로도 들어갈 수 없다(공통정책 9.4·4.1) */
-  if(role!=='super'){ go(v==='usrD'||v==='usrF'? 'usr' : v); return; }
-  if(v==='usrD'){ go('sys'); openUsrDetail(0); return; }
-  if(v==='usrF'){ go('sys'); openUser(); return; }
+  if(role!=='super'){ go(v); return; }
   go(v);
 }
 /* 연결 전·후를 다 확인할 수 있게 둔다. 값이 하나로 고정되면 한쪽 화면을 볼 수 없다 */
@@ -2364,7 +2359,7 @@ function go(v){
 
 /* 로딩·오류는 데이터 영역만 대체한다. 헤더·GNB·툴바·탭은 유지한다(공통정책 4.1).
    먼저 정상 렌더를 돌려 툴바·탭을 그리고 데이터 영역만 덮는다 */
-const AREA={usr:'usrArea', aud:'audArea', sys:'sysBody', run:'runBody', ext:'extBody'};
+const AREA={aud:'audArea', sys:'sysBody', run:'runBody', ext:'extBody'};
 function skelBox(){
   let r='';
   for(let i=0;i<6;i++){
@@ -2383,7 +2378,6 @@ function errBox(){
 
 function render(){
   if(role!=='super') return;
-  if(view==='usr') drawUsrList();
   if(view==='aud') drawAudit();
   if(view==='sys') drawSys();
   if(view==='run') drawRun();
@@ -2395,7 +2389,6 @@ function render(){
 }
 
 /* ══════════ 사용자 및 역할 ══════════ */
-let uq='';
 /* 공통정책 3.3 — 엔터로 검색한다. 지우기는 검색어만 지우고 필터는 그대로 둔다 */
 function onUqKey(e){
   if(e.key!=='Enter') return;
@@ -2414,7 +2407,6 @@ function clearUq(){ $('uq').value=''; uq=''; $('uqclr').hidden=true; drawUsers()
    ⚠ 잠금은 별도 상태가 아니라 접근을 끄는 사유다(계정정책 3장).
      로그인 실패 5회 초과 시 비활성이 되며, 관리자가 끈 것과 화면에서 갈리지 않는다
      — 확인 요청 항목 9번 */
-const ACC={'활성':'ok','비활성':'mu','승인 대기':'wa','반려':'cr','삭제됨':'mu'};
 /* 참조 자리에서는 이름을 보이지 않고 `삭제됨` 으로 둔다(공통정책 1.6).
    보관 기간이 지나면 물리 삭제되므로 이름을 남겨 둘 근거가 없다 */
 function userRef(id){
@@ -2426,12 +2418,7 @@ function userRef(id){
 }
 /* 가입 승인이 먼저다. 승인되지 않았으면 활성 여부를 말할 자리가 없다.
    `반려 + 활성` 같은 조합은 생기지 않는다 — 반려는 종료 상태다 */
-function userSt(u){
-  if(u.apv==='삭제됨') return '삭제됨';
-  if(u.apv==='승인 대기') return '승인 대기';
-  if(u.apv==='반려') return '반려';
-  return u.active? '활성' : '비활성';
-}
+
 
 /* 정렬 — 워크스페이스 목업과 같은 규격. 목록마다 키를 따로 둔다.
    일시는 최신이 먼저다(공통정책 3.1) */
@@ -2453,8 +2440,7 @@ function tgSort(t,k){
   const s=SORT[t];
   if(s.k===k){ s.d = s.d==='asc'?'desc':'asc'; }
   else { s.k=k; s.d=(k==='at'||k==='upd'||k==='last')?'desc':'asc'; }
-  if(t==='usr') drawUsers();
-  else if(t==='aud') drawAudit();
+  if(t==='aud') drawAudit();
   else if(t==='ch') drawChans();
   else drawRun();
 }
@@ -2510,201 +2496,29 @@ const COLDEF={
 };
 /* 값이 2종인 열에만 필터를 둔다 — 역할·상태. 이름·이메일처럼 값이 다 다른 열은 검색으로 찾는다.
    감사 로그와 같은 규격(.thfilter + .fdd)이다 */
-let uRole=[], uAct=[];
-function tgURole(v){ const i=uRole.indexOf(v); if(i<0) uRole.push(v); else uRole.splice(i,1); drawUsers(); }
-function tgUAct(v){ const i=uAct.indexOf(v); if(i<0) uAct.push(v); else uAct.splice(i,1); drawUsers(); }
-function resetU(){ uq=''; uRole=[]; uAct=[]; $('uq').value=''; drawUsers(); }
 /* 필터가 없는 상태 컬럼에도 값별 설명을 붙인다 */
 function thHelp(k, label){
   const def=COLDEF[k];
   return '<span class="thwrap">'+label+(def?'<span class="thic" tabindex="0">?</span>':'')+'</span>'
    + (def? '<div class="thpop">'+def+'</div>' : '');
 }
-function uFilter(key, label, opts, sel, fn){
-  const def=COLDEF[key==='act'? 'st' : key];
-  return '<span class="thwrap">'+label
-   + (def? '<span class="thic" tabindex="0">?</span>' : '')
-   + '<button class="thfilter'+(sel.length?' on':'')+'" onclick="tgFdd(event,\''+key+'\')" title="필터">'
-   + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button></span>'
-   + (def? '<div class="thpop">'+def+'</div>' : '')
-   + '<div class="fdd" onclick="event.stopPropagation()">'
-   + '<label><input type="checkbox" '+(sel.length===0?'checked':'')+' onchange="'+(key==='role'?'uRole':'uAct')+'=[];drawUsers()">전체</label><hr>'
-   + opts.map(function(o){
-       return '<label><input type="checkbox" '+(sel.indexOf(o)>=0?'checked':'')
-        + ' onchange="'+fn+'(\''+o+'\')">'+o
-        + '<span class="fc">'+USERS.filter(function(u){ return key==='role'? u.role===o : userSt(u)===o; }).length+'</span></label>';
-     }).join('')
-   + '</div>';
-}
-function drawUsers(){
-  const q=uq.trim().toLowerCase();
-  const list=(dstate==='empty'? [] : USERS).filter(function(u){
-    /* 삭제된 계정은 목록에서 뺀다. 관리 대상이 아니다 */
-    if(u.apv==='삭제됨') return false;
-    if(uRole.length && uRole.indexOf(u.role)<0) return false;
-    if(uAct.length && uAct.indexOf(userSt(u))<0) return false;
-    return true;
-  }).filter(function(u){
-    return !q || [u.id,u.name,u.mail,u.role].some(function(x){
-      return String(x).toLowerCase().indexOf(q)>=0; });
-  });
-  $('uPgtxt').textContent='총 '+list.length+'건';
-  const sorted=applySort('usr', list);
 
-  if(!list.length){
-    $('usrArea').innerHTML = q
-      /* 워크스페이스 목업과 같은 규격(.state) — 아이콘 · 제목 · 설명 · 조건 초기화 */
-      ? '<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><h3>검색 결과가 없습니다.</h3>'
-        + '<p>다른 조건으로 검색해 주세요.</p>'
-        + '<button class="btn ghost" onclick="resetU()">조건 초기화</button></div>'
-      : '<div class="state"><h3>사용자가 없습니다.</h3>'
-        + '<p>사용자를 추가하면 목록에 표시됩니다.</p>'
-        + '<button class="btn" onclick="openUser()">사용자 추가</button></div>';
-    return;
-  }
 
-  $('usrArea').innerHTML =
-     '<div class="tblwrap"><table class="tbl"><thead><tr>'
-   /* 이름과 아이디를 나눈다. 아이디는 로그인 식별자이고 이름은 표시용이라
-      각각 별도 속성이다(계정정책 1장). 한 셀에 붙이면 정렬 대상이 흐려진다 */
-   + /* 공통정책 2.2 — 이름 → 상태 → 유형 순이다. 역할이 유형 자리에 온다.
-      `접근` 은 정책의 축 이름이고 화면 라벨은 다른 목록과 같이 `상태` 로 둔다 */
-     /* 아이디는 이름 옆에 둔다. 같은 사람을 가리키는 값이라 떨어뜨리면 눈이 오간다 —
-        워크스페이스 멤버 목록도 `이름 · 아이디 · 역할` 로 붙여 둔다.
-        정렬은 이름 기준이다 */
-     sortTh('usr','name','이름')
-   + sortTh('usr','id','아이디')
-   + '<th class="thcell">'+uFilter('act','상태',['승인 대기','활성','비활성','반려'],uAct,'tgUAct')+'</th>'
-   + '<th class="thcell">'+uFilter('role','역할',['최고 관리자','일반 사용자'],uRole,'tgURole')+'</th>'
-   + '<th>이메일</th>'
-   + sortTh('usr','at','등록일시')
-   + sortTh('usr','last','최근 로그인')
-   + '<th style="width:64px">작업</th>'
-   + '</tr></thead><tbody>'
-   + sorted.map(function(u){
-       const i=USERS.indexOf(u);
-       /* 이름을 눌러 사용자 화면으로 간다 — 이동 대상이라 .mname 이다.
-          .rname 은 강조만 하는 식별자에 쓴다(알림 채널명처럼 갈 곳이 없는 값).
-          표시는 이름이고 식별은 아이디다(계정정책 1장) */
-       const hasWhy = !u.active && !!u.why;
-       return '<tr onclick="openUsrDetail('+i+')" title="'+u.id+' 열기">'
-        + '<td><span class="mname">'+u.name+'</span></td>'
-        + '<td>'+u.id+'</td>'
-        /* 사유는 상세에서 밝히나 목록에서 여러 건을 훑을 때 어느 것이 잠긴 것인지
-           바로 보여야 한다 — 배지에 호버하면 사유를 보인다 */
-        /* 사유가 있는 행만 앵커로 감싸면 세로 기준선이 갈린다 —
-           `.tip-anchor` 는 `vertical-align:middle` 이고 맨 배지는 베이스라인에 앉는다.
-           사유가 없어도 앵커를 두고 툴팁만 뺀다. 구조를 한 가지로 맞춘다 */
-        + '<td><span class="tip-anchor stwrap2">'
-        +   '<span class="stbadge '+ACC[userSt(u)]+'"'+(hasWhy? ' tabindex="0"':'')+'>'
-        +     '<span class="d"></span>'+userSt(u)+'</span>'
-        +   (hasWhy? '<span class="tip">'+u.why+'</span>' : '')
-        + '</span></td>'
-        /* ⚠ 공통정책 1.9 는 역할을 강조색 소프트 필로 정하나 예시가 워크스페이스 역할
-           (관리자·편집자·뷰어)이다. 플랫폼 역할은 값이 둘뿐이고 같은 행에 상태 배지가
-           이미 있어 필을 붙이면 배지가 둘이 되어 무엇을 볼지 흐려진다.
-           워크스페이스 목업도 멤버 역할을 맨 텍스트로 둔다 — 그쪽에 맞춘다 */
-        + '<td>'+u.role+'</td>'
-        + '<td>'+u.mail+'</td>'
-        + '<td>'+u.at+'</td>'
-        /* 로그인한 적이 없으면 빈 값이 아니라 없다고 쓴다 */
-        + '<td>'+(u.last? u.last : '<span class="dash">-</span>')+'</td>'
-        + '<td>'+userMore(i)+'</td>'
-        + '</tr>';
-     }).join('')
-   + '</tbody></table></div>';
-}
 
-function userMore(i){
-  const u=USERS[i];
-  /* 마지막 최고 관리자는 역할을 내리거나 지울 수 없다 */
-  const lastAdmin = u.role==='최고 관리자'
-    && USERS.filter(function(x){return x.role==='최고 관리자' && x.active;}).length<=1;
-  const why = lastAdmin? '마지막 최고 관리자는 변경할 수 없습니다.' : '';
-  return '<div class="more" id="um'+i+'"><button class="morebtn" onclick="event.stopPropagation();tgMore(event,\'um'+i+'\')">⋯</button><div class="rowmenu">'
-   /* 가입 승인·반려는 내 작업함 소관이라 여기 두지 않는다. 목록에 승인된 계정만 있다 */
-   + ('<button onclick="event.stopPropagation();openUserAt('+i+')">수정</button>'
-        + (lastAdmin
-           ? '<button disabled title="'+why+'">비활성</button><hr><button class="d" disabled title="'+why+'">삭제</button>'
-           : (u.apv==='승인'
-              ? '<button onclick="event.stopPropagation();tgActive('+i+')">'
-                + (u.active? '비활성' : (u.why==='로그인 실패 누적'? '잠금 해제' : '활성'))+'</button><hr>'
-              : '<button disabled title="'
-                + (u.apv==='승인 대기'? '승인 후에 바꿀 수 있습니다.' : '반려된 계정입니다.')+'">활성</button><hr>')
-             + '<hr><button class="d" onclick="event.stopPropagation();delUser('+i+')">삭제</button>'))
-   + '</div></div>';
-}
+
 
 /* 되돌릴 수 없는 작업은 이름을 다시 받는다(공통정책 7.5) */
 /* 복사 — 부가 동작이라 아이콘으로 둔다. 텍스트 버튼을 두면 값 옆에서 자리를 차지하고
    주 액션과 무게가 같아 보인다(배포 목업 규격) */
-function copyBtn(what){
-  return '<button class="cbtn sm" title="복사" onclick="event.stopPropagation();act(\''+what+jo(what,'을')+' 복사했습니다.\')">'
-   + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">'
-   + '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 011-1h10"/></svg></button>';
-}
+
 
 /* 발급한 값은 저장하지 않는다. 다시 필요하면 새로 발급한다(계정정책 2.2) */
-let pwStep=1, pwFor=null, pwValue='', pwNew=false;
-function openPw(i){
-  pwFor=i; pwStep=1; pwValue=''; pwNew=false; drawPw(); $('mdPw').classList.add('on');
-}
-function closePw(){ $('mdPw').classList.remove('on'); pwFor=null; pwValue=''; }
-function pwNext(){
-  const inp=$('pwCur');
-  if(!inp || !inp.value){ if(inp) inp.focus(); return; }
-  /* 목업은 검증을 재현하지 않는다. 실제로는 관리자 본인 비밀번호를 확인한다 */
-  pwValue = 'Tq7#mA2vRx9L';
-  pwStep=2; drawPw();
-}
-function drawPw(){
-  const u=USERS[pwFor];
-  if(!u) return;
-  if(pwStep===1){
-    $('pwTitle').textContent='관리자 본인 확인';
-    $('pwBody').innerHTML =
-       '<p class="segnote" style="margin:0 0 14px">'+u.name+'('+u.id+')님의 임시 비밀번호를 발급합니다.</p>'
-     + '<div class="fld"><label>현재 비밀번호<span class="req">*</span></label>'
-     +   '<input class="inp" type="password" id="pwCur" placeholder="비밀번호를 입력해 주세요.">'
-     +   '<div class="hint">관리자 본인 확인이 필요합니다.</div></div>';
-    $('pwFoot').innerHTML =
-       '<button class="btn ghost" onclick="closePw()">취소</button>'
-     + '<button class="btn" onclick="pwNext()">확인</button>';
-    setTimeout(function(){ const e=$('pwCur'); if(e) e.focus(); },40);
-  } else {
-    /* 발급은 즉시 끝나므로 완료형으로 쓴다(용어집 7 · 공통정책 7.7) */
-    $('pwTitle').textContent = pwNew? '사용자 추가 완료' : '임시 비밀번호 발급 완료';
-    /* 무엇을 해야 하는지를 먼저 말한다(문구 스킬 2 — 대상 + 동작 + 조치).
-       라벨은 명사로 두고 대상은 안내문에서 밝힌다(문구 스킬 7) */
-    /* 값이 가장 중요하다. 값 → 경고 → 조치 순으로 둔다.
-       경고를 값 바로 아래 두면 `지금 복사해야 한다` 가 이어진다.
-       alertBox 는 영역 레벨 알림용이라(공통정책 7.6) 모달 안에서는 과하다 */
-    $('pwBody').innerHTML =
-       (pwNew? '<p class="segnote" style="margin:0 0 14px">'+u.name+'('+u.id+') 계정을 추가하고 임시 비밀번호를 발급했습니다.</p>' : '')
-     + '<div class="pwbox"><span class="pwv">'+pwValue+'</span>'+copyBtn('임시 비밀번호')+'</div>'
-     + '<p class="pwwarn">이 화면에서만 확인할 수 있습니다. 닫으면 다시 볼 수 없습니다.</p>'
-     + '<p class="pwact">'+u.name+'('+u.id+')님에게 전달해 주세요. 첫 로그인에서 본인이 바꿉니다.</p>';
-    $('pwFoot').innerHTML =
-       '<button class="btn" onclick="closePw();act('+(pwNew? "'사용자를 추가했습니다.'" : "'임시 비밀번호를 발급했습니다.'")+')">확인</button>';
-  }
-}
 
-function delUser(i){
-  const u=USERS[i];
-  /* 사용자 목록에서는 뺀다. 관리 대상이 아니다(공통정책 1.6).
-     데이터는 소프트 삭제로 남아 참조하는 자리에서 `삭제됨` 으로 보인다 */
-  openConfirm('사용자 삭제',
-    '<b>'+u.name+'('+u.id+')</b> 계정을 삭제하면 로그인할 수 없고 복구할 수 없습니다.',
-    function(){
-      /* 목록에서 바로 뺀다. 소프트 삭제라 데이터는 남지만 관리 대상이 아니다 —
-         참조하는 자리에서만 `삭제됨` 으로 보인다(공통정책 1.6) */
-      u.apv='삭제됨'; u.active=false; u.why=''; u.upd=nowStr();
-      if($('pgUsrF').style.display!=='none') closeUsrForm();
-      if(udCur!==null) closeUsrDetail();
-      drawUsers();
-      act('계정을 삭제했습니다.');
-    }, '삭제', null, u.id);
-}
+
+
+
+
+
 
 /* ── 사용자 모달 ── */
 /* 활성·비활성은 값을 바꾸고 다시 그린다. 토스트만 띄우면 화면이 그대로다 */
@@ -2713,31 +2527,11 @@ function nowStr(){
   return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())
     +' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
 }
-function tgActive(i){
-  const u=USERS[i];
-  /* 승인되지 않은 계정은 접근 활성을 바꿀 수 없다. 승인·반려는 내 작업함 소관이다 */
-  if(u.apv!=='승인') return;
-  const was=u.why;
-  u.active=!u.active;
-  u.upd=nowStr();
-  if(!u.active && !u.why) u.why='관리자 차단';
-  if(u.active) u.why='';
-  drawUsers();
-  if(udCur!==null) drawUsrDetail();
-  if($('pgUsrF').style.display!=='none') drawUserModal();
-  act(u.name+'('+u.id+') 계정을 '+(u.active? (was==='로그인 실패 누적'? '잠금 해제' : '활성화') : '비활성화')+'했습니다.');
-}
+
 
 /* 목록 → 상세 → [수정] → 폼. 마이페이지·워크스페이스와 같은 동선이다 */
-let udCur=null;
-function openUsrDetail(i){
-  if(role!=='super') return;
-  udCur=i; $('pgUsr').style.display='none'; $('pgUsrF').style.display='none';
-  $('pgUsrD').style.display=''; drawUsrDetail(); window.scrollTo(0,0);
-}
-function closeUsrDetail(){
-  udCur=null; udEdit=false; $('pgUsrD').style.display='none'; $('pgUsr').style.display='';
-}
+
+
 /* 기본 정보는 카드 안에서 고친다 — 연동 및 알림 스토리지·모델 저장소와 같은 규격이다.
    고치는 값이 그 카드의 값(이름·이메일·역할)이라 카드를 벗어날 이유가 없다.
    ⚠ 스크린ID 규칙서가 `SET-USER-L01.F01` 을 수정 폼으로 두고 있어 개정 대상이다.
@@ -2746,185 +2540,24 @@ function closeUsrDetail(){
    ⚠ 공통정책 4.5 는 `모달 vs 페이지` 둘만 가른다. 카드 안 인라인은 조항에 없다.
    ⚠ 7.2 취소 확인 알럿·7.1 변경 감지 저장 활성은 미적용이다 —
      연동 및 알림 취소도 같은 상태다. 조항 적용 범위가 정해져야 한다 */
-let udEdit=false;
-function tgUdEdit(){ udEdit=!udEdit; drawUsrDetail(); }
-function saveUsr(){
-  const u=USERS[udCur];
-  const nm=$('udName'), ml=$('udMail'), rl=$('udRole');
-  if(nm) u.name=nm.value.trim() || u.name;
-  if(ml) u.mail=ml.value.trim() || u.mail;
-  if(rl) u.role=rl.value;
-  u.upd=nowStr();
-  udEdit=false; drawUsrDetail(); drawUsers();
-  act('사용자 수정이 완료되었습니다.');
-}
-function drawUsrDetail(){
-  const u=USERS[udCur];
-  $('udHead').innerHTML = '<h1>'+u.name+'('+u.id+')'
-    + '<span class="stbadge '+ACC[userSt(u)]+' stwrap"><span class="d"></span>'+userSt(u)+'</span></h1>'
-    + '<div class="dmeta"><span class="vtag">'+u.role+'</span></div>';
-  /* 마지막 최고 관리자는 내리거나 지울 수 없다.
-     ⚠ 최고 관리자 수 제한은 문서에 없다 — 확인 요청 항목 13번 */
-  const lastAdmin = u.role==='최고 관리자'
-    && USERS.filter(function(x){ return x.role==='최고 관리자' && x.active; }).length<=1;
-  const why = lastAdmin? '마지막 최고 관리자는 변경할 수 없습니다.' : '';
-  /* 승인 대기·반려는 접근 활성을 말할 자리가 아니다. 승인·반려는 내 작업함 소관이다
-     (계정정책 3장) — 활성 버튼을 두지 않는다 */
-  const approved = u.apv==='승인';
-  /* 임시 비밀번호 발급은 계정 전체에 걸리는 조치다 — 잠금 해제·삭제와 같은 줄에 둔다.
-     `수정` 은 기본 정보 카드에 걸리므로 그 카드 제목 옆으로 내렸다 */
-  /* 승인 전 계정에는 발급하지 않는다. 로그인할 수 없는 계정에 비밀번호를 주는 것이라
-     ⚠ 계정정책 2.2 가 대상 계정의 상태 조건을 정하지 않았다 — 확인 대상 */
-  $('udAct').innerHTML =
-    '<button class="btn ghost"'
-    + (approved? ' onclick="openPw('+udCur+')"'
-       : ' disabled title="'+(u.apv==='승인 대기'? '승인 후에 발급할 수 있습니다.' : '반려된 계정입니다.')+'"')
-    + '>임시 비밀번호 발급</button>'
-    + (lastAdmin
-       ? '<button class="btn ghost" disabled title="'+why+'">비활성</button>'
-         + '<button class="btn danger-line" disabled title="'+why+'">삭제</button>'
-       /* 잠긴 계정과 관리자가 끈 계정은 조치가 다르다. 잠김은 본인 실수라 풀어 주면 되고
-          관리자 차단은 의도적이라 함부로 풀면 안 된다 — 버튼 이름으로 가른다 */
-       /* 승인 전에는 비활성으로 두고 사유를 알린다. 권한이 아니라 상태 때문에 못 하는 것이라
-          미노출(7.10)이 아니라 비활성이다 — 개발룸·배포도 같은 방식이다 */
-       : (approved
-          ? '<button class="btn ghost" onclick="tgActive('+udCur+')">'
-            + (u.active? '비활성' : (u.why==='로그인 실패 누적'? '잠금 해제' : '활성'))+'</button>'
-          : '<button class="btn ghost" disabled title="'
-            + (u.apv==='승인 대기'? '승인 후에 바꿀 수 있습니다.' : '반려된 계정입니다.')+'">활성</button>')
-         + '<button class="btn danger-line" onclick="delUser('+udCur+')">삭제</button>');
-  $('udBody').innerHTML =
-     '<div class="ssec"><div class="ssechd"><div><h4>기본 정보</h4></div>'
-   /* 수정·취소·저장을 같은 자리에 둔다. 어디를 눌러야 할지 옮겨 다니지 않는다 */
-   +   '<div class="secbtns">'
-   +     (udEdit
-        ? '<button class="btn ghost sm" onclick="tgUdEdit()">취소</button>'
-          + '<button class="btn sm" onclick="saveUsr()">저장</button>'
-        : '<button class="btn ghost sm" onclick="tgUdEdit()">수정</button>')
-   +   '</div></div>'
-   + (udEdit
-      /* 아이디는 로그인 식별자라 만든 뒤 바꾸지 않는다(계정정책 1장 · 공통정책 7.11).
-         상태는 헤더 액션이 바꾸고, 일시 셋은 시스템 값이라 읽기 전용으로 둔다(7.11) */
-      ? '<div class="fgrid">'
-        + '<div class="fld"><label>아이디</label><div class="ro">'+u.id+'</div></div>'
-        + '<div class="fld"><label>이름<span class="req">*</span></label>'
-        +   '<input class="inp" id="udName" value="'+esc(u.name)+'"></div>'
-        + '<div class="fld"><label>이메일<span class="req">*</span></label>'
-        +   '<input class="inp" id="udMail" value="'+esc(u.mail)+'"></div>'
-        + '<div class="fld"><label>플랫폼 역할<span class="req">*</span></label>'
-        +   '<select class="inp" id="udRole">'
-        +     '<option'+(u.role==='일반 사용자'?' selected':'')+'>일반 사용자</option>'
-        +     '<option'+(u.role==='최고 관리자'?' selected':'')+'>최고 관리자</option></select>'
-        +   '<div class="hint">최고 관리자는 플랫폼 설정과 전체 워크스페이스에 접근합니다.</div></div>'
-        + '</div>'
-        /* 바꿀 수 없는 값도 자리를 지킨다. 사라지면 무엇이 빠졌는지 알 수 없다(7.11) */
-        + '<dl class="dl two" style="margin-top:16px">'
-        +   '<dt>상태</dt><dd>'+userSt(u)
-        +     (!u.active && u.why? '<span class="sub">('+u.why+')</span>' : '')+'</dd>'
-        +   '<dt>등록일시</dt><dd>'+u.at+'</dd>'
-        + '</dl>'
-      /* 카드 안에서 편집하는 값은 조회에도 있어야 한다. 이름은 헤더에도 있으나
-         편집 대상이라 카드에 함께 둔다(공통정책 4.5.1) */
-      : '<dl class="dl two">'
-        +   '<dt>이름</dt><dd>'+u.name+'</dd>'
-        +   '<dt>아이디</dt><dd>'+u.id+'</dd>'
-        +   '<dt>이메일</dt><dd>'+u.mail+'</dd>'
-        +   '<dt>플랫폼 역할</dt><dd>'+u.role+'</dd>'
-        /* 사유는 상태를 설명하는 부가 정보라 괄호로 잇는다. 가운뎃점으로 두면
-           별개 값 둘로 읽힌다(공통정책 1.5 — 괄호는 한 값의 일부) */
-        +   '<dt>상태</dt><dd>'+userSt(u)
-        +     (!u.active && u.why? '<span class="sub">('+u.why+')</span>' : '')+'</dd>'
-        +   '<dt>등록일시</dt><dd>'+u.at+'</dd>'
-        +   '<dt>최근 변경일시</dt><dd>'+(u.upd? u.upd : '<span class="dash">-</span>')+'</dd>'
-        +   '<dt>최근 로그인</dt><dd>'+(u.last? u.last : '<span class="dash">-</span>')+'</dd>'
-        + '</dl>')
-   /* 승인 대기는 어디서 처리하는지가 새 정보라 남긴다. 버튼 툴팁만으로는 눌러 봐야 안다.
-      반려는 두지 않는다 — `가입이 반려된 계정입니다.` 는 제목 옆 배지와 위 `상태` 항목이
-      이미 말하는 것이라 조치도 정보도 더하지 않는다 */
-   + (u.apv==='승인 대기'
-      ? '<div class="hint" style="margin-top:10px">'
-        + '승인 대기 중입니다. 승인·반려는 내 작업함에서 처리합니다.</div>'
-      : '')
-   + '</div>'
-   /* 소속과 역할은 워크스페이스마다 들어가야 확인할 수 있어 여기서 한 번에 보여준다.
-      변경은 워크스페이스 상세의 멤버 탭 소관이라 조작을 두지 않는다(공통정책 2.1) */
-   + '<div class="ssec"><h4>소속 워크스페이스'
-   +   tabTip('역할 변경과 멤버 추가·제외는 워크스페이스 상세의 멤버 탭에서 합니다.')
-   +   (u.ws && u.ws.length? '<span class="wscnt">'+u.ws.length+'</span>' : '')+'</h4>'
-   + (u.ws && u.ws.length
-      ? '<div class="wslist">'
-        + u.ws.map(function(w){
-            return '<div class="wsrow" onclick="act(\''+w.n+' 워크스페이스로 이동합니다.\')">'
-             + '<span class="wsic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="10" height="18" rx="1"/><path d="M14 8h5a1 1 0 011 1v11a1 1 0 01-1 1H4"/></svg></span>'
-             + '<span class="wsn">'+w.n+'</span><span class="wsrole">'+w.role+'</span></div>';
-          }).join('')
-        + '</div>'
-      : '<div class="hint">소속된 워크스페이스가 없습니다.</div>')
-   + '</div>';
-}
+
+
+
 
 /* 만든 뒤 임시 비밀번호를 발급한다. 두 단계 모달의 ② 화면을 바로 띄운다 —
    방금 만든 계정이라 관리자 재인증은 거치지 않는다 */
-function createUser(){
-  const u={id:'new.user', name:'새 사용자', mail:'new.user@okestro.com', role:'일반 사용자',
-    apv:'승인', active:true, at:nowStr(), upd:'', last:'', ws:[]};
-  USERS.unshift(u);
-  closeUsrForm(); drawUsers();
-  pwFor=USERS.indexOf(u); pwStep=2; pwValue='Tq7#mA2vRx9L'; pwNew=true;
-  drawPw(); $('mdPw').classList.add('on');
-}
-function openUser(){ openUsrForm(); }
+
+
 /* 목록 행 메뉴의 `수정` 도 상세로 들어가 그 카드를 편집 모드로 연다.
    폼 페이지는 `추가` 만 쓴다 */
-function openUserAt(i){ openUsrDetail(i); udEdit=true; drawUsrDetail(); }
+
 /* 목록에서 열면 목록으로, 상세에서 열면 상세로 돌아간다 */
-function openUsrForm(){
-  $('pgUsr').style.display='none'; $('pgUsrD').style.display='none';
-  $('pgUsrF').style.display=''; drawUserModal(); window.scrollTo(0,0);
-}
-function closeUsrForm(){
-  $('pgUsrF').style.display='none';
-  if(udCur!==null){ $('pgUsrD').style.display=''; drawUsrDetail(); }
-  else $('pgUsr').style.display='';
-}
+
+
 
 /* 이 화면은 `추가` 만 쓴다. 수정은 상세의 기본 정보 카드 안에서 한다(2026-08-25).
    ⚠ 스크린ID `SET-USER-L01.F01` 이 `추가·수정` 폼으로 등록되어 있어 개정 대상이다 */
-function drawUserModal(){
-  /* 제목은 동작이다(워크스페이스 `워크스페이스 생성` 규격) */
-  $('ufHead').innerHTML = '<h1>사용자 추가</h1>';
-  /* 비활성·삭제는 상세가 갖는다. 입력 화면에 파괴적 액션을 두지 않는다 */
-  $('ufAct').innerHTML = '';
-  /* 생성은 곧바로 임시 비밀번호 발급으로 이어진다. 관리자가 값을 전달해야 하므로
-     만든 직후에 준다 */
-  $('ufFoot').innerHTML =
-     '<button class="btn ghost" onclick="closeUsrForm()">취소</button>'
-   /* 계정은 회원가입과 관리자 등록 두 경로가 있어 `생성` 이 한쪽만 가리킨다.
-      진입 버튼이 `사용자 추가` 이므로 실행 버튼도 같은 말로 둔다(용어집 7) */
-   + '<button class="btn" onclick="createUser()">추가</button>';
-  /* 받을 값이 넷이라 카드 하나에 담는다. 항목마다 섹션을 나누면 카드가 쪼개지고
-     구분선이 늘어난다 */
-  $('ufBody').innerHTML =
-     '<div class="fsec"><h4>기본 정보</h4>'
-   + '<div class="fgrid">'
-   /* 아이디는 로그인 식별자라 만든 뒤 바꾸지 않는다(계정정책 1장 · 공통정책 7.11) */
-   + '<div class="fld"><label>아이디<span class="req">*</span></label>'
-   +   '<input class="inp" placeholder="영문 소문자·숫자·마침표">'
-   +   '<div class="hint">로그인에 쓰는 값이라 만든 뒤 바꿀 수 없습니다.</div></div>'
-   + '<div class="fld"><label>이름<span class="req">*</span></label>'
-   +   '<input class="inp"></div>'
-   + '<div class="fld"><label>이메일<span class="req">*</span></label>'
-   +   '<input class="inp" placeholder="name@okestro.com"></div>'
-   + '<div class="fld"><label>플랫폼 역할<span class="req">*</span></label>'
-   +   '<select class="inp"><option>일반 사용자</option><option>최고 관리자</option></select>'
-   +   '<div class="hint">최고 관리자는 플랫폼 설정과 전체 워크스페이스에 접근합니다.</div></div>'
-   + '</div></div>'
-   /* 비밀번호를 받지 않는다. 만든 뒤 임시 비밀번호를 발급한다(계정정책 2.2) —
-      관리자가 남의 비밀번호를 아는 상태를 만들지 않는다.
-      관리자가 만든 계정은 바로 승인 상태다. 승인 절차는 회원가입 건에만 둔다 */
-   + '<p class="segnote" style="margin:14px 0 0">계정을 추가하면 임시 비밀번호를 발급합니다. '
-   + '본인이 첫 로그인에서 바꿉니다.</p>';
-}
+
 
 function dl(rows){
   return '<div class="dlist">'
@@ -2936,13 +2569,7 @@ function dl(rows){
 /* SSO 는 `연동 및 알림` 소관이다. 현행도 외부 연동 탭에 `단일 로그인(SSO 연결)` 로 있고
    계정정책 4.3·스크린 ID 규칙서(SET-INTEG-SSO-F01)도 그쪽으로 정한다.
    앞서 `계정을 어떻게 받을지 정하는 일` 로 보고 옮겼으나 문서 셋과 어긋나 되돌린다 */
-function drawUsrList(){
-  /* ⚠ 일괄 등록을 두지 않는다. 근거가 없고 전체 30~40명 규모라(8/10 회의 7장)
-     실익이 확인되지 않았다 — 확인 요청 항목 8번 */
-  $('usrAct').innerHTML =
-    '<button class="btn" onclick="openUser()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>사용자 추가</button>';
-  drawUsers();
-}
+
 function drawSso(){
   if(!$('ssoBody')) return;
   $('ssoBody').innerHTML = SSO.on
