@@ -2,20 +2,8 @@
   콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.24 (2026-09-21)
   CDE 정책 기준.
 
-  ── v0.24 변경 (CON-531·542) ─────────────────────
-  · 만료 CDE 도 자동 회수 전까지 연장할 수 있게 했다. 만료 즉시 접속만 막히고
-    유예(기본 3일) 뒤 연산이 정지되며, 다시 유예(기본 3일) 뒤 연산 자원이 자동 회수된다.
-    회수 전까지는 연장이 승인되면 그대로 복귀한다(CDE 정책 5.2·5.3).
-    v0.2x 에서 `만료되면 되살릴 수 없다(기술문서 5.2)` 로 연장을 뺐던 것을 되돌린다.
-  · 정지·자동 회수는 상태값을 늘리지 않는다. 백엔드도 `EXPIRED` 하나로 두고
-    정지·회수 여부를 따로 싣는다. 만료 배지 옆에 보조 텍스트로만 보인다(공통정책 1.9).
-  · 자동 회수된 CDE 는 연장을 비활성으로 두고 사유에 `개인 저장소는 보존됩니다` 를 남긴다.
-    이 문구가 없으면 데이터까지 사라진 줄 안다(CON-542).
-  · 보유로 보는 상태에서 실패·만료를 뺐다(CDE 정책 6장). 만료된 CDE 만 있으면 새로 신청할 수 있다.
-  · 연장 만료일 하한을 오늘로 맞췄다. 만료된 CDE 는 현재 만료일이 지나 있어
-    `현재 만료일 다음 날` 만 기준으로 두면 지난 날짜를 고를 수 있었다.
-  · 정지된 CDE 의 연장 모달에 승인되면 다시 기동한다는 안내를 둔다.
-  · 데모 바 `내 CDE` 에 만료 · 정지 · 자원 회수 세 경우를 두었다.
+  ── v0.24 (CON-531·542) ──
+  · 만료 CDE 자동 회수 전 연장 허용, 보유 기준에서 실패·만료 제외, 만료 관련 안내 문구 정리. 상세는 기획서 v0.24 변경이력.
 
   ── 화면 부제 (2026-08-26) ────────────────────
   개발룸 설정·CDE 신청 화면 부제에서 `· 개발룸` 을 뺐다. 제목이 `개발룸 설정` 인데
@@ -1692,7 +1680,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
              워크스페이스 목업이 진입 경로를 기억한다(roomFrom) — 여기서는 특정하지 않는다 -->
         <button class="back" title="이전으로" onclick="act('이전 화면으로 돌아갑니다.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>
         <div class="dinfo">
-          <h1>개발룸 <span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span><span class="tip">멤버가 개발·실험에 사용하는 환경입니다. 자원은 관리자 승인 후 할당되며 사용 기한이 지나면 회수됩니다.</span></span></h1>
+          <h1>개발룸 <span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span><span class="tip">멤버가 개발·실험에 사용하는 환경입니다. 자원은 관리자 승인 후 할당되며 사용 기간이 지나면 접속할 수 없습니다.</span></span></h1>
           <div class="dmeta"><span style="font-size:12.5px;color:var(--muted-foreground)">ai-service-team</span></div>
         </div>
         <div class="dact" id="roomAct"></div>
@@ -1809,7 +1797,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
     <div class="page" id="pgForm" style="display:none">
       <div class="dhead">
         <button class="back" onclick="cancelForm()" title="목록으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M15 6l-6 6 6 6"/></svg></button>
-        <div class="dinfo"><h1 id="fTitle">CDE 신청<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span><span class="tip">개발룸 안에 개인 작업 환경을 만듭니다. 관리자 승인 후 사용할 수 있으며 사용 기한이 지나면 회수됩니다.</span></span></h1>
+        <div class="dinfo"><h1 id="fTitle">CDE 신청<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span><span class="tip">개발룸 안에 개인 작업 환경을 만듭니다. 관리자 승인 후 사용할 수 있으며 사용 기간이 지나면 접속할 수 없습니다.</span></span></h1>
           <div class="dmeta"><span style="font-size:12.5px;color:var(--muted-foreground)">ai-service-team</span></div>
         </div>
       </div>
@@ -2089,13 +2077,7 @@ function canExtend(m){
   return isMine(m) && canApply()
     && (m.st==='구동 중' || m.st==='절전' || (m.st==='만료' && m.ph!=='reclaimed'));
 }
-/* 만료 뒤 단계를 배지 옆에 보조 텍스트로 붙인다. 배지를 하나 더 두지 않는다(공통정책 1.9) */
-function phaseNote(m){
-  if(m.st!=='만료') return '';
-  if(m.ph==='stopped')   return '<span class="mver">정지됨</span>';
-  if(m.ph==='reclaimed') return '<span class="mver">자원 회수됨</span>';
-  return '';
-}
+
 function canReturn(m){ return isMine(m) && (m.st==='구동 중'||m.st==='절전'); }
 function blockMsg(m){
   if(m.st==='종료 중') return '반납 처리 중입니다.';
@@ -2110,8 +2092,8 @@ function blockMsg(m){
   if(m.st==='만료' && m.ph==='reclaimed')
     return '연산 자원이 회수되어 연장할 수 없습니다. 개인 저장소는 보존됩니다. 새로 신청해 주세요.';
   if(m.st==='만료' && m.ph==='stopped')
-    return '사용 기간이 끝나 정지되었습니다. 연장이 승인되면 다시 기동합니다.';
-  if(m.st==='만료')     return '사용 기간이 끝나 접속할 수 없습니다. 연장을 신청하면 다시 쓸 수 있습니다.';
+    return '사용 기간이 끝나 정지되었습니다. 연장이 승인되면 다시 시작됩니다.';
+  if(m.st==='만료')     return '사용 기간이 끝나 접속할 수 없습니다. 연장을 신청하면 다시 사용할 수 있습니다.';
   if(m.st==='종료')     return '반납·회수된 CDE입니다.';
   return '';
 }
@@ -2223,7 +2205,7 @@ function render(){
        + '<td><div class="wsname"><span class="mname">'+m.n+'</span></div></td>'
        /* 배지에 툴팁을 두지 않는다. blockMsg 는 조작이 왜 막혔는지 알리는 문구라
           상태 설명이 아니고, 값별 의미는 컬럼 헤더 도움말에 이미 있다 */
-       + '<td><span class="stbadge '+(SB[m.st]||'mu')+'">'+m.st+'</span>'+phaseNote(m)+'</td>'
+       + '<td><span class="stbadge '+(SB[m.st]||'mu')+'">'+m.st+'</span></td>'
        + '<td>'+userRef(m.by+'('+m.id+')')+'</td>'
        + '<td>'+m.ide+'</td>'
        + '<td>'+m.mode+'</td>'
@@ -2450,7 +2432,7 @@ function myCde(){
 }
 function drawTabs(){
   /* 탭 라벨 옆에 설명을 둔다. 섹션 제목을 없앴으므로 여기가 유일한 자리다 */
-  const t=[['CDE','개발룸 안에서 개인이 사용하는 작업 공간입니다. 신청 후 관리자 승인을 거쳐 만들어지며, 사용 기간이 지나면 접속이 막히고 유예 기간 뒤 회수됩니다.'],
+  const t=[['CDE','개발룸 안에서 개인이 사용하는 작업 공간입니다. 신청 후 관리자 승인을 거쳐 만들어지며, 사용 기간이 지나면 접속할 수 없습니다.'],
            ['작업 이력','CDE 터미널에서 제출한 학습·전처리 작업입니다. 편집기와 별도로 백그라운드에서 실행됩니다.']];
   /* 탭 배지 — 그 건수가 탭을 열기 전 판단에 쓰인다. CDE 는 자원을 얼마나 쓰고 있는지,
      작업 이력은 돌고 있는 것이 있는지가 재료다 */
@@ -2868,7 +2850,7 @@ function drawExt(){
    +   '<div class="hint">'+(extCur.st==='만료'? '오늘 이후여야 합니다.' : '현재 만료일보다 뒤여야 합니다.')+'</div></div>'
    /* 정지된 CDE 는 파드를 다시 띄워야 한다. 승인 직후 바로 접속되지 않을 수 있어 미리 알린다 */
    + (extCur.st==='만료' && extCur.ph==='stopped'
-       ? '<div class="hint" style="margin-top:10px">정지된 CDE는 연장이 승인되면 다시 기동합니다. 기동이 끝나면 접속할 수 있습니다.</div>' : '')
+       ? '<div class="hint" style="margin-top:10px">정지된 CDE는 연장이 승인되면 다시 시작됩니다. 준비가 끝나면 접속할 수 있습니다.</div>' : '')
    + '<div class="fld" style="margin-top:14px"><label>사유<span class="req">*</span></label>'
    +   '<textarea class="inp" rows="3" placeholder="연장이 필요한 이유를 입력해 주세요." oninput="extWhy=this.value;extValid()">'+extWhy+'</textarea></div>';
   extValid();
@@ -3248,7 +3230,7 @@ function drawCdeDetail(){
   /* 상태 배지는 제목 옆에 붙인다. 배포 상세와 같은 규격이다 —
      .dhead h1 이 flex 라 이름 뒤에 이어 붙는다 */
   document.getElementById('cdTitle').innerHTML =
-      m.n + '<span class="stbadge '+(SB[m.st]||'mu')+'">'+m.st+'</span>'+phaseNote(m);
+      m.n + '<span class="stbadge '+(SB[m.st]||'mu')+'">'+m.st+'</span>';
   /* 지금 어느 워크스페이스 안에 있는지 알린다. 개발룸은 브레드크럼에 있어 되풀이하지 않는다.
      사용자는 기본 정보 섹션에 있어 여기 두지 않는다 */
   document.getElementById('cdMeta').innerHTML =
@@ -3458,7 +3440,7 @@ function drawForm(){
       연장 신청도 같은 형식이라 맞춘다 */
    + row('사용 만료일', true,
        '<input class="inp" type="date" min="'+today()+'" value="'+(NF.exp||'')+'" onchange="NF.exp=this.value;validate()">',
-       '이 날짜가 지나면 연산 자원이 회수됩니다. 저장된 데이터는 유지됩니다.')
+       '이 날짜가 지나면 접속할 수 없으며 저장된 데이터는 유지됩니다.')
    + row('요청 사유', true,
        '<textarea class="inp" rows="3" placeholder="승인 판단에 필요한 내용을 입력해 주세요." oninput="NF.reason=this.value;validate()">'+NF.reason+'</textarea>', '')
    + '</div>';
@@ -3592,9 +3574,10 @@ function askReturn(name){
   if(t && (t.st==='실패' || t.st==='만료')){
     const held = t.st==='만료' && t.ph!=='reclaimed';
     openConfirm('CDE 삭제',
-      '<b>'+name+'</b>을 삭제합니다. '
-      + (held? '연산 자원이 개발룸으로 반환되고' : '연산 자원은 이미 회수되었고')
-      + ' 개인 볼륨이 함께 사라집니다. 공유 볼륨의 데이터는 남습니다.',
+      /* 문장을 조각으로 잇지 않는다 — 다국어에서 깨진다(UI 문구 규칙 8) */
+      held
+        ? '<b>'+name+'</b>을 삭제합니다. 연산 자원이 개발룸으로 반환되고 개인 볼륨이 함께 사라집니다. 공유 볼륨의 데이터는 남습니다.'
+        : '<b>'+name+'</b>을 삭제합니다. 연산 자원은 이미 회수되었고 개인 볼륨이 함께 사라집니다. 공유 볼륨의 데이터는 남습니다.',
       function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료'; render(); }
         toast('ok','CDE를 삭제했습니다.'); }, '삭제');
     return;
@@ -3675,7 +3658,7 @@ function act(msg){ closeAllMore(); toast('ok',msg); }
 /* ═══════════ 공통 ═══════════ */
 const COLDEF={
   /* ⚠ 만료 처리 시각이 확정되지 않았다. 만료일 자정으로 두고 확인 대상으로 남긴다(정책 9. 16번) */
-  exp:'사용 기간이 끝나는 날입니다. 이 날짜가 지나면 접속이 막히고, 유예 기간 뒤 연산이 정지되며 이어서 연산 자원이 회수됩니다. 회수 전까지는 연장할 수 있고 저장된 데이터는 유지됩니다.',
+  exp:'사용 기간이 끝나는 날입니다. 이 날짜가 지나면 접속할 수 없으며 저장된 데이터는 유지됩니다.',
   /* 배치 작업 상태 — 기술문서 6.2 Pending / Running / Succeeded / Failed */
   jst:'CDE 터미널에서 제출한 작업의 진행 단계입니다.<dl>'
      +'<dt>대기</dt><dd>자원을 기다리고 있습니다.</dd>'
