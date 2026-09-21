@@ -1,6 +1,21 @@
 <!--
-  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.23 (2026-09-16)
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.24 (2026-09-21)
   CDE 정책 기준.
+
+  ── v0.24 변경 (CON-531·542) ─────────────────────
+  · 만료 CDE 도 자동 회수 전까지 연장할 수 있게 했다. 만료 즉시 접속만 막히고
+    유예(기본 3일) 뒤 연산이 정지되며, 다시 유예(기본 3일) 뒤 연산 자원이 자동 회수된다.
+    회수 전까지는 연장이 승인되면 그대로 복귀한다(CDE 정책 5.2·5.3).
+    v0.2x 에서 `만료되면 되살릴 수 없다(기술문서 5.2)` 로 연장을 뺐던 것을 되돌린다.
+  · 정지·자동 회수는 상태값을 늘리지 않는다. 백엔드도 `EXPIRED` 하나로 두고
+    정지·회수 여부를 따로 싣는다. 만료 배지 옆에 보조 텍스트로만 보인다(공통정책 1.9).
+  · 자동 회수된 CDE 는 연장을 비활성으로 두고 사유에 `개인 저장소는 보존됩니다` 를 남긴다.
+    이 문구가 없으면 데이터까지 사라진 줄 안다(CON-542).
+  · 보유로 보는 상태에서 실패·만료를 뺐다(CDE 정책 6장). 만료된 CDE 만 있으면 새로 신청할 수 있다.
+  · 연장 만료일 하한을 오늘로 맞췄다. 만료된 CDE 는 현재 만료일이 지나 있어
+    `현재 만료일 다음 날` 만 기준으로 두면 지난 날짜를 고를 수 있었다.
+  · 정지된 CDE 의 연장 모달에 승인되면 다시 기동한다는 안내를 둔다.
+  · 데모 바 `내 CDE` 에 만료 · 정지 · 자원 회수 세 경우를 두었다.
 
   ── 화면 부제 (2026-08-26) ────────────────────
   개발룸 설정·CDE 신청 화면 부제에서 `· 개발룸` 을 뺐다. 제목이 `개발룸 설정` 인데
@@ -1916,7 +1931,9 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
     <button class="ms on" onclick="setMyState('구동 중',this)">구동 중</button>
     <button class="ms" onclick="setMyState('절전',this)">절전</button>
     <button class="ms" onclick="setMyState('실패',this)">실패</button>
-    <button class="ms" onclick="setMyState('만료',this)">만료</button></span>
+    <button class="ms" onclick="setMyState('만료',this)">만료</button>
+    <button class="ms" onclick="setMyState('만료',this,'stopped')">만료 · 정지</button>
+    <button class="ms" onclick="setMyState('만료',this,'reclaimed')">만료 · 자원 회수</button></span>
   <span class="dgrp"><span class="demo-label">권한:</span>
     <button class="rl on" onclick="setRole('super',this)">최고 관리자</button>
     <button class="rl" onclick="setRole('admin',this)">WS 관리자</button>
@@ -2011,7 +2028,7 @@ const CDE = [
  {n:'kh-jupyter-01', acc:'NVIDIA-H200 MIG', by:'오경환', id:'kh.oh', st:'승인 대기', ide:'JupyterLab', fw:'PyTorch 2.4',
   mode:'위임 할당', cpu:4, ram:16, gpu:1, vol:20, at:'2026-08-11 16:44:00', until:'2026-09-11', reason:'벤치마크 재현', keys:[]},
  {n:'mj-vscode-01', acc:'', by:'박민준', id:'mj.park', st:'만료', ide:'VS Code Web', fw:'PyTorch 2.4',
-  mode:'위임 할당', cpu:4, ram:16, gpu:0, vol:5, at:'2026-05-02 11:00:00', until:'2026-08-02', reason:'데이터 검증', keys:[], apBy:'김병건(bg.kim)', apAt:'2026-05-02 11:04:22'},
+  mode:'위임 할당', cpu:4, ram:16, gpu:0, vol:5, at:'2026-05-02 11:00:00', until:'2026-08-02', reason:'데이터 검증', keys:[], apBy:'김병건(bg.kim)', apAt:'2026-05-02 11:04:22', ph:'stopped'},
  {n:'sh-jupyter-01', acc:'NVIDIA-H200 MIG', by:'최서현', id:'sh.choi', st:'실패', ide:'JupyterLab', fw:'PyTorch 2.4',
   mode:'직접 할당', cpu:8, ram:32, gpu:2, vol:20, at:'2026-08-10 13:20:00', until:'2026-09-10', reason:'대형 모델 학습', keys:['llama-3-2-1b-prod'], apBy:'김병건(bg.kim)', apAt:'2026-08-10 11:04:22'}
 ];
@@ -2023,12 +2040,15 @@ function setSysWs(v,btn){
   if(btn) btn.classList.add('on');
   isSysWs=v; closePanel(); render();
 }
-function setMyState(v,btn){
+/* ph — 만료 뒤 단계. '' 만료 직후 · 'stopped' 정지 · 'reclaimed' 자동 회수(CDE 정책 5.2).
+   상태값이 아니라 만료 안의 표시다 — 백엔드도 EXPIRED 하나로 두고 따로 싣는다 */
+function setMyState(v,btn,ph){
   document.querySelectorAll('#demoBar .ms').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
   const m=CDE.find(function(x){ return x.id===ME; });
   if(!m) return;
   m.st=v;
+  m.ph = (v==='만료')? (ph||'') : '';
   /* 실패는 뜬 적이 없어 자원을 잡지 않는다 */
   m.until = (v==='만료')? '2026-08-02' : '2026-09-01';
   closePanel();
@@ -2061,10 +2081,21 @@ const isMine=(m)=>m.id===ME;
    (정책 원칙 4 — 조회는 워크스페이스 전체, 조작은 본인 것만) */
 function usable(m){ return isMine(m); }
 function canAccess(m){ return usable(m) && (m.st==='구동 중'||m.st==='절전'); }
-/* 만료되면 자원이 회수되어 되살릴 수 없다(기술문서 5.2). 연장은 만료 전에만 한다.
+/* 만료된 CDE 도 자동 회수 전까지는 연장할 수 있다(정책 5.3). 승인되면 그대로 복귀한다.
+   자동 회수 뒤에는 되살릴 연산 자원이 없어 새로 신청한다.
    절전은 자원만 내린 것이고 만료일은 그대로 흘러가므로 연장 대상이다 */
 /* 연장은 새로 자원을 잡는 행위라 신청과 같다. 뷰어로 강등되면 막힌다(정책 7.1) */
-function canExtend(m){ return isMine(m) && canApply() && (m.st==='구동 중'||m.st==='절전'); }
+function canExtend(m){
+  return isMine(m) && canApply()
+    && (m.st==='구동 중' || m.st==='절전' || (m.st==='만료' && m.ph!=='reclaimed'));
+}
+/* 만료 뒤 단계를 배지 옆에 보조 텍스트로 붙인다. 배지를 하나 더 두지 않는다(공통정책 1.9) */
+function phaseNote(m){
+  if(m.st!=='만료') return '';
+  if(m.ph==='stopped')   return '<span class="mver">정지됨</span>';
+  if(m.ph==='reclaimed') return '<span class="mver">자원 회수됨</span>';
+  return '';
+}
 function canReturn(m){ return isMine(m) && (m.st==='구동 중'||m.st==='절전'); }
 function blockMsg(m){
   if(m.st==='종료 중') return '반납 처리 중입니다.';
@@ -2075,7 +2106,12 @@ function blockMsg(m){
   if(m.st==='반려')     return '반려된 신청입니다. 다시 신청해 주세요.';
   if(m.st==='준비 중')  return '환경을 만들고 있습니다. 준비가 끝나면 알림으로 안내됩니다.';
   if(m.st==='실패')     return '기동에 실패했습니다. 다시 시도하거나 삭제할 수 있습니다.';
-  if(m.st==='만료')     return '사용 기간이 끝나 자원이 회수되었습니다. 다시 쓰려면 새로 신청해 주세요.';
+  /* 만료는 단계마다 할 수 있는 일이 달라 사유를 나눈다(정책 5.2·5.3) */
+  if(m.st==='만료' && m.ph==='reclaimed')
+    return '연산 자원이 회수되어 연장할 수 없습니다. 개인 저장소는 보존됩니다. 새로 신청해 주세요.';
+  if(m.st==='만료' && m.ph==='stopped')
+    return '사용 기간이 끝나 정지되었습니다. 연장이 승인되면 다시 기동합니다.';
+  if(m.st==='만료')     return '사용 기간이 끝나 접속할 수 없습니다. 연장을 신청하면 다시 쓸 수 있습니다.';
   if(m.st==='종료')     return '반납·회수된 CDE입니다.';
   return '';
 }
@@ -2187,7 +2223,7 @@ function render(){
        + '<td><div class="wsname"><span class="mname">'+m.n+'</span></div></td>'
        /* 배지에 툴팁을 두지 않는다. blockMsg 는 조작이 왜 막혔는지 알리는 문구라
           상태 설명이 아니고, 값별 의미는 컬럼 헤더 도움말에 이미 있다 */
-       + '<td><span class="stbadge '+(SB[m.st]||'mu')+'">'+m.st+'</span></td>'
+       + '<td><span class="stbadge '+(SB[m.st]||'mu')+'">'+m.st+'</span>'+phaseNote(m)+'</td>'
        + '<td>'+userRef(m.by+'('+m.id+')')+'</td>'
        + '<td>'+m.ide+'</td>'
        + '<td>'+m.mode+'</td>'
@@ -2216,7 +2252,7 @@ const CDE_ACT = {
   '구동 중':   { on:['접속','연장','반납'], off:[] },
   '절전':      { on:['접속','연장','반납'], off:[] },
   '실패':      { on:['다시 시도','삭제'], off:['접속'] },
-  '만료':      { on:['삭제'],            off:['접속','연장'] },
+  '만료':      { on:['연장','삭제'],     off:['접속'] },
   '종료 중':   { on:[],                  off:['접속','연장','반납'] },
   '종료':      { on:[],                  off:[] }
 };
@@ -2240,7 +2276,8 @@ function rowMenu(m,i){
   if(has('취소'))
     items.push(btn('신청 취소', isMine(m), 'act(\'신청을 취소했습니다.\')', blockMsg(m)));
 
-  /* 실패는 뜬 적이 없고 만료는 이미 회수되어 반납할 자원이 없다. 삭제로 치운다(정책 6장) */
+  /* 실패는 뜬 적이 없고 만료는 접속이 막혀 반납 대상이 아니다. 삭제로 치운다(정책 6장).
+     자동 회수 뒤에는 연장이 비활성으로 남아 사유를 알린다 */
   if(has('삭제'))
     items.push((items.length?'<hr>':'')+btn('삭제', isMine(m), 'askReturn(\''+m.n+'\')', blockMsg(m), true));
   else if(has('반납'))
@@ -2403,16 +2440,17 @@ function askDelRoom(){
 /* 사용자당 하나만 둔다(정책 3.3). 다만 버튼을 없애지 않는다 —
    신청 중인 건이 목록에 보이지 않으므로 버튼까지 사라지면 왜 못 하는지 알 수 없다.
    누르면 이유와 갈 곳을 알린다 */
-/* 보유 중으로 셀 상태만 본다. 종료 중은 자원 회수가 끝나기를 기다리는 것이라
+/* 보유 중으로 셀 상태만 본다(정책 6장). 종료 중은 자원 회수가 끝나기를 기다리는 것이라
    새 CDE 신청과 별개다 — 승인 시점에 자원이 모자라면 반려된다(정책 3.1).
-   반려·취소는 신청이 성립하지 않은 것이라 보유가 아니다 */
-const CDE_HELD = ['승인 대기','준비 중','구동 중','절전','실패','만료'];
+   반려·취소는 신청이 성립하지 않은 것이라 보유가 아니다.
+   실패·만료도 보유가 아니다 — 쓸 수 없는 CDE 때문에 새 신청을 막지 않는다(정책 3.3) */
+const CDE_HELD = ['승인 대기','준비 중','구동 중','절전'];
 function myCde(){
   return CDE.find(m=>isMine(m) && CDE_HELD.indexOf(m.st) >= 0);
 }
 function drawTabs(){
   /* 탭 라벨 옆에 설명을 둔다. 섹션 제목을 없앴으므로 여기가 유일한 자리다 */
-  const t=[['CDE','개발룸 안에서 개인이 사용하는 작업 공간입니다. 신청 후 관리자 승인을 거쳐 만들어지며, 사용 기간이 지나면 회수됩니다.'],
+  const t=[['CDE','개발룸 안에서 개인이 사용하는 작업 공간입니다. 신청 후 관리자 승인을 거쳐 만들어지며, 사용 기간이 지나면 접속이 막히고 유예 기간 뒤 회수됩니다.'],
            ['작업 이력','CDE 터미널에서 제출한 학습·전처리 작업입니다. 편집기와 별도로 백그라운드에서 실행됩니다.']];
   /* 탭 배지 — 그 건수가 탭을 열기 전 판단에 쓰인다. CDE 는 자원을 얼마나 쓰고 있는지,
      작업 이력은 돌고 있는 것이 있는지가 재료다 */
@@ -2809,6 +2847,12 @@ function openExt(name){
   document.getElementById('mdExt').classList.add('on');
 }
 function closeExt(){ document.getElementById('mdExt').classList.remove('on'); }
+function extMin(){
+  const t=today();
+  if(extCur.until==='—') return t;
+  const n=nextDay(extCur.until);
+  return n>t? n : t;
+}
 
 function drawExt(){
   document.getElementById('extForm').innerHTML =
@@ -2818,9 +2862,13 @@ function drawExt(){
    /* 신청 폼과 같은 형식으로 날짜를 받는다. `30일` 은 언제 끝나는지 계산해야 하고
       프로젝트 마감에 맞추기 어렵다. 기술문서 5.2 도 `만료 시간` 으로 시점을 말한다 */
    + '<div class="fld" style="margin-top:16px"><label>연장 만료일<span class="req">*</span></label>'
-   /* 현재 만료일 다음 날부터 고를 수 있다. 그 이전은 연장이 아니다 */
-   +   '<input class="inp" type="date" min="'+(extCur.until!=='—'? nextDay(extCur.until) : today())+'" value="'+extDays+'" onchange="extDays=this.value;extValid()">'
-   +   '<div class="hint">현재 만료일보다 뒤여야 합니다.</div></div>'
+   /* 현재 만료일 다음 날부터 고를 수 있다. 그 이전은 연장이 아니다.
+      만료된 CDE 는 현재 만료일이 지나 있어 오늘이 하한이 된다 */
+   +   '<input class="inp" type="date" min="'+extMin()+'" value="'+extDays+'" onchange="extDays=this.value;extValid()">'
+   +   '<div class="hint">'+(extCur.st==='만료'? '오늘 이후여야 합니다.' : '현재 만료일보다 뒤여야 합니다.')+'</div></div>'
+   /* 정지된 CDE 는 파드를 다시 띄워야 한다. 승인 직후 바로 접속되지 않을 수 있어 미리 알린다 */
+   + (extCur.st==='만료' && extCur.ph==='stopped'
+       ? '<div class="hint" style="margin-top:10px">정지된 CDE는 연장이 승인되면 다시 기동합니다. 기동이 끝나면 접속할 수 있습니다.</div>' : '')
    + '<div class="fld" style="margin-top:14px"><label>사유<span class="req">*</span></label>'
    +   '<textarea class="inp" rows="3" placeholder="연장이 필요한 이유를 입력해 주세요." oninput="extWhy=this.value;extValid()">'+extWhy+'</textarea></div>';
   extValid();
@@ -2828,8 +2876,8 @@ function drawExt(){
 function extValid(){
   const b=document.getElementById('extBtn');
   if(!b) return;
-  /* 현재 만료일보다 뒤여야 연장이다 */
-  const okDate = extDays && (extCur.until==='—' || extDays>extCur.until);
+  /* 하한 이상이어야 연장이다 — 현재 만료일 다음 날과 오늘 중 늦은 날 */
+  const okDate = extDays && extDays>=extMin();
   b.disabled = !(okDate && extWhy.trim());
 }
 function submitExt(){
@@ -3200,7 +3248,7 @@ function drawCdeDetail(){
   /* 상태 배지는 제목 옆에 붙인다. 배포 상세와 같은 규격이다 —
      .dhead h1 이 flex 라 이름 뒤에 이어 붙는다 */
   document.getElementById('cdTitle').innerHTML =
-      m.n + '<span class="stbadge '+(SB[m.st]||'mu')+'">'+m.st+'</span>';
+      m.n + '<span class="stbadge '+(SB[m.st]||'mu')+'">'+m.st+'</span>'+phaseNote(m);
   /* 지금 어느 워크스페이스 안에 있는지 알린다. 개발룸은 브레드크럼에 있어 되풀이하지 않는다.
      사용자는 기본 정보 섹션에 있어 여기 두지 않는다 */
   document.getElementById('cdMeta').innerHTML =
@@ -3539,10 +3587,14 @@ function submitForm(){
 /* ═══════════ 액션 ═══════════ */
 function askReturn(name){
   const t=CDE.find(x=>x.n===name);
-  /* 실패·만료는 이미 자원이 없다. 반납이 아니라 목록에서 치우는 것이라 문구를 나눈다 */
+  /* 실패·만료는 반납이 아니라 목록에서 치우는 것이라 문구를 나눈다.
+     만료는 자동 회수 전이면 연산 자원이 아직 남아 있어 반환된다고 알린다(정책 5.2) */
   if(t && (t.st==='실패' || t.st==='만료')){
+    const held = t.st==='만료' && t.ph!=='reclaimed';
     openConfirm('CDE 삭제',
-      '<b>'+name+'</b>을 삭제합니다. 자원은 이미 회수되었고 개인 볼륨이 함께 사라집니다. 공유 볼륨의 데이터는 남습니다.',
+      '<b>'+name+'</b>을 삭제합니다. '
+      + (held? '연산 자원이 개발룸으로 반환되고' : '연산 자원은 이미 회수되었고')
+      + ' 개인 볼륨이 함께 사라집니다. 공유 볼륨의 데이터는 남습니다.',
       function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료'; render(); }
         toast('ok','CDE를 삭제했습니다.'); }, '삭제');
     return;
@@ -3623,7 +3675,7 @@ function act(msg){ closeAllMore(); toast('ok',msg); }
 /* ═══════════ 공통 ═══════════ */
 const COLDEF={
   /* ⚠ 만료 처리 시각이 확정되지 않았다. 만료일 자정으로 두고 확인 대상으로 남긴다(정책 9. 16번) */
-  exp:'사용 기간이 끝나는 날입니다. 이 날짜가 지나면 연산 자원이 회수되며 저장된 데이터는 유지됩니다.',
+  exp:'사용 기간이 끝나는 날입니다. 이 날짜가 지나면 접속이 막히고, 유예 기간 뒤 연산이 정지되며 이어서 연산 자원이 회수됩니다. 회수 전까지는 연장할 수 있고 저장된 데이터는 유지됩니다.',
   /* 배치 작업 상태 — 기술문서 6.2 Pending / Running / Succeeded / Failed */
   jst:'CDE 터미널에서 제출한 작업의 진행 단계입니다.<dl>'
      +'<dt>대기</dt><dd>자원을 기다리고 있습니다.</dd>'
@@ -3639,7 +3691,7 @@ const COLDEF={
     +'<dt>구동 중</dt><dd>접속해 사용할 수 있습니다.</dd>'
     +'<dt>절전</dt><dd>유휴로 자원을 반납했습니다. 재접속하면 복원됩니다.</dd>'
     +'<dt>실패</dt><dd>기동에 실패했습니다.</dd>'
-    +'<dt>만료</dt><dd>사용 기간이 끝났습니다. 볼륨은 보존됩니다.</dd>'
+    +'<dt>만료</dt><dd>사용 기간이 끝났습니다. 연산 자원이 회수되기 전까지 연장할 수 있습니다. 볼륨은 보존됩니다.</dd>'
     +'<dt>종료 중</dt><dd>자원을 해제하고 있습니다.</dd></dl>',
   mode:'가속기를 언제 점유하는지가 다릅니다.'
     +'<dl><dt>위임 할당</dt><dd>작업을 실행할 때만 사용합니다. 쉬는 동안 다른 사용자가 쓸 수 있습니다.</dd>'
