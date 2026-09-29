@@ -1,6 +1,14 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.11 (2026-09-18)
+  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.12 (2026-09-22)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.12 (CON-562) ──
+  · 알림 채널 설명 `씁니다` → `사용합니다`(UI 문구 규칙 8).
+  · 제목 `전역 저장소 (S3)` → `전역 저장소(S3)`(공통정책 1.4). 미사용 안내 둘째 문장 가안 표기(CON-562 확인 대기).
+  · 전역 저장소는 설치 시 둘지 정한다. 두지 않은 설치는 안내만 두고 `연결` 버튼을 두지 않는다. 데모 바 `연동: 설정 안 됨`으로 확인한다.
+  · 비밀값을 `등록됨` 배지 + `변경` 으로 통일했다. 워크스페이스 연동 탭과 같은 규격이다(기획서 3장).
+  · `데이터 스토리지` → `전역 저장소`. 셸(플라이아웃·본문) 배경을 공통 레이아웃 값으로 맞췄다.
+  · 비활성 버튼의 사유가 마우스를 올려도 뜨지 않던 것을 고쳤다 — 사유를 감싼 요소로 옮기고 라이브러리 툴팁과 같은 모양으로 띄우는 공통 처리를 넣었다.
 
   ── v0.11 변경 ─────────────────────────────────
   화면 분리 때 딸려 온 사용자 및 역할(목록·상세·추가·임시 비밀번호) 코드를 지웠다.
@@ -358,7 +366,7 @@ a{color:inherit}
 .nav a.active{background:var(--selected);color:var(--foreground);font-weight:600}
 .nav a.has-fly::after{content:"›";margin-left:auto;color:var(--faint);font-size:16px}
 .flywrap{position:relative}
-.flyout{position:absolute;left:calc(100% + 6px);top:0;width:210px;background:var(--flyout);border:1px solid var(--border);border-radius:11px;padding:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateX(-6px);transition:.13s;z-index:70}
+.flyout{position:absolute;left:calc(100% + 6px);top:0;width:210px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateX(-6px);transition:.13s;z-index:70}
 .flywrap:hover .flyout{opacity:1;visibility:visible;transform:translateX(0)}
 .flyout a{display:flex;align-items:center;padding:9px 11px;border-radius:8px;color:var(--muted-foreground);text-decoration:none;font-size:13.5px;margin-bottom:2px}
 .flyout a:hover{background:var(--hover);color:var(--foreground)}
@@ -385,7 +393,7 @@ a{color:inherit}
 .persona .who span{font-size:11px;color:var(--faint)}
 .persona .up{margin-left:auto;display:grid;place-items:center;color:var(--faint)}
 .persona .up svg{width:14px;height:14px}
-.main{grid-area:main;overflow:auto;position:relative}
+.main{grid-area:main;background:var(--background);overflow-y:auto;overflow-x:hidden;padding:24px 28px;min-height:0}
 /* ===== 페이지 ===== */
 /* 페이지는 화면 폭을 다 쓴다. 우측 여백을 두지 않는다.
    패널이 열리면 목록 영역이 패널 폭만큼 줄어 전체 폭 = 목록 + 패널이 된다 */
@@ -1919,6 +1927,14 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .cnnprev .el{flex:0 0 auto;color:var(--muted-foreground)}
   .cnnprev .ev{font-family:ui-monospace,Menlo,monospace;color:var(--foreground);
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 비활성 버튼의 사유를 감싼 요소가 받는다(목업 공통 처리) */
+.disw{display:inline-block;cursor:not-allowed}
+.disw > :disabled{pointer-events:none}
+.rowmenu .disw{display:block}
+/* 비활성 사유 툴팁 — 라이브러리 .tip 과 같은 값(목업 공통 처리) */
+.distip{position:fixed;z-index:200;display:none;background:var(--flyout);color:var(--foreground);border:1px solid var(--border-strong);font-size:12px;font-weight:400;line-height:1.5;padding:8px 11px;border-radius:7px;box-shadow:0 6px 18px var(--shadow);max-width:340px;white-space:normal;text-align:left;pointer-events:none}
+
 </style><body class="dark">
 <div class="app">
 
@@ -2065,7 +2081,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <div class="fsec"><h4>범위</h4>
           <label class="chk"><input type="checkbox"><span class="cbx"></span>
             <span class="cbt">전역 채널로 설정</span></label>
-          <p class="segnote">전역으로 두면 모든 워크스페이스가 이 채널을 씁니다. 끄면 등록한 워크스페이스에서만 씁니다.</p>
+          <p class="segnote">전역으로 두면 모든 워크스페이스가 이 채널을 사용합니다. 끄면 등록한 워크스페이스에서만 사용합니다.</p>
         </div>
       </div>
       <div class="mdfoot">
@@ -3047,7 +3063,7 @@ function runCluster(){
 /* 라이선스는 설치 시 정해지고 화면에서는 조회만 한다. 클러스터와 같다.
    ⚠ 산정 항목이 확정되지 않았다. 8/10 회의 2.2 가 말하는 것은 가속기뿐이다 —
      `라이선스가 vRAM 1GB 단가로 산정되므로 총 용량 정보가 필요하다`.
-     팀장이 단가 기준을 vRAM → 가속기 장수로 바꾸는 것을 검토 중이라 둘을 함께 둔다.
+     단가 기준을 vRAM → 가속기 장수로 바꾸는 것을 검토 중이라 둘을 함께 둔다.
      CPU·Memory·워크스페이스 수가 대상인지는 문서에 없어 넣지 않았다 */
 /* ⚠ 에디션·만료일은 근거 없이 넣은 값이다. 기술문서에 라이선스 서술이 없고
    회의록 셋뿐이다(8/10 2.2 vRAM 단가 · 2.3 최종 제한 · 8/12 1.6 최고 관리자 전용).
@@ -3263,11 +3279,23 @@ function drawExt(){
 
 /* 저장한 비밀값은 다시 보여주지 않는다. 바꿀 때만 새로 받는다 */
 function secretField(label, set, hint){
+  /* 등록돼 있으면 `등록됨` 배지와 `변경` 만 둔다. 빈 입력란을 두면 비운 채 저장했을 때
+     지워지는지 유지되는지 알 수 없다 — 워크스페이스 연동 탭과 같은 규격이다 */
+  if(set) return '<div class="fld"><label>'+label+'</label>'
+    + '<div class="credbox"><span class="stbadge ok">등록됨</span>'
+    +   '<span class="credact"><button class="btn ghost sm" onclick="secChg(this)">변경</button></span></div>'
+    + '<input class="inp" type="password" placeholder="새 '+label+jo(label,'을')+' 입력해 주세요." style="display:none">'
+    + (hint? '<div class="hint">'+hint+'</div>' : '')
+    + '</div>';
   return '<div class="fld"><label>'+label+'</label>'
-   + '<input class="inp" type="password" placeholder="'+(set? '변경하지 않으려면 비워 두세요' : '입력해 주세요')+'">'
-   + (set? '<div class="hint">이미 설정되어 있습니다. '+(hint||'')+'</div>'
-         : (hint? '<div class="hint">'+hint+'</div>' : ''))
-   + '</div>';
+    + '<input class="inp" type="password" placeholder="'+label+jo(label,'을')+' 입력해 주세요.">'
+    + (hint? '<div class="hint">'+hint+'</div>' : '')
+    + '</div>';
+}
+function secChg(btn){
+  const f=btn.closest('.fld');
+  f.querySelector('.credbox').style.display='none';
+  const i=f.querySelector('input'); i.style.display=''; i.focus();
 }
 
 /* 여는 목적이 확인이다. 설정은 한 번 하고 안 고치므로 읽기 상태를 기본으로 두고
@@ -3308,8 +3336,9 @@ function connBox(key){
   return alertBox(r.ok?'info':'crit', r.ok?'연결됨':'연결 실패', r.msg, '', true);
 }
 
-/* 저장된 비밀값은 되돌려 주지 않는다. 설정 여부만 알린다 */
-function secretRead(v){ return v? '설정되어 있습니다' : '<span class="dash">-</span>'; }
+/* 저장된 비밀값은 되돌려 주지 않는다. 등록 여부만 알린다 —
+   워크스페이스 연동 탭과 같은 `등록됨` 배지 규격이다 */
+function secretRead(v){ return v? '<span class="stbadge ok">등록됨</span>' : '<span class="dash">-</span>'; }
 
 function extStorage(){
   const on = editSec==='s3';
@@ -3319,8 +3348,8 @@ function extStorage(){
   /* 액션을 카드 제목 옆에 둔다. 값과 그 값을 고치는 버튼이 한 덩이로 읽힌다 —
      감사 로그 상세 `원본` 섹션과 같은 규격(.ssechd + .secbtns) */
   return connBox('s3')
-   + '<div class="ssec"><div class="ssechd"><div><h4>데이터 스토리지 (S3)</h4></div>'
-   +   (EXT.s3.url || on? '<div class="secbtns">'+secActs('s3','데이터 스토리지', !!EXT.s3.url)+'</div>' : '')
+   + '<div class="ssec"><div class="ssechd"><div><h4>전역 저장소(S3)</h4></div>'
+   +   (EXT.s3.url || on? '<div class="secbtns">'+secActs('s3','전역 저장소', !!EXT.s3.url)+'</div>' : '')
    + '</div>'
    + (on
       ? '<div class="fgrid">'
@@ -3342,9 +3371,11 @@ function extStorage(){
          : '<div class="state">'
            + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'
            +   '<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>'
-           + '<h3>연결된 스토리지가 없습니다.</h3>'
-           + '<p>모델 가중치와 실험 산출물을 저장할 스토리지를 연결해 주세요.</p>'
-           + '<button class="btn" onclick="tgEdit(\'s3\')">스토리지 연결</button></div>'))
+           /* 전역 저장소는 설치 시 둘지 정한다(워크스페이스 정책 8.2). 설정되어 있지 않다는 것은
+              두지 않기로 설치했다는 뜻이라 화면에서 연결하는 버튼을 두지 않는다 — 같은 탭의 빈 상태에서 버튼만 뺐다 
+              가안 — 둘째 문장의 "Hugging Face 등록은 그대로"는 확인 대기(코드는 HF 등록도 막음 · CON-562). 확인되면 확정 */
+           + '<h3>이 설치에서는 전역 저장소를 사용하지 않습니다.</h3>'
+           + '<p>S3 소스로 모델을 등록할 수 없습니다. Hugging Face 등록과 빌드된 모델 서빙은 그대로 사용할 수 있습니다.</p></div>'))
    + '</div>';
 }
 
@@ -3464,6 +3495,46 @@ document.addEventListener('click',function(){
 });
 
 go('ext');
+</script>
+
+<script>
+/* 비활성 버튼·선택은 마우스 이벤트를 받지 않아 사유가 뜨지 않는다. 브라우저 기본 툴팁(title)은
+   환경에 따라 뜨지 않기도 해 기대지 않는다 — 사유를 감싼 요소로 옮기고, 라이브러리 툴팁(.tip)과
+   같은 모양으로 띄운다. 목업 공통 처리 */
+(function(){
+  function fix(){
+    document.querySelectorAll('button[disabled][title],select[disabled][title]').forEach(function(b){
+      var p=b.parentElement, why=b.title; b.removeAttribute('title');
+      if(p && p.classList.contains('disw')){ p.dataset.why=why; return; }
+      var w=document.createElement('span'); w.className='disw'; w.dataset.why=why;
+      b.parentNode.insertBefore(w,b); w.appendChild(b);
+    });
+    document.querySelectorAll('.disw[title]').forEach(function(w){ w.dataset.why=w.title; w.removeAttribute('title'); });
+    /* 다시 켜진 버튼은 사유를 지운다 */
+    document.querySelectorAll('.disw').forEach(function(w){
+      var b=w.firstElementChild; if(b && !b.disabled) delete w.dataset.why;
+    });
+  }
+  var tip=null;
+  function hide(){ if(tip) tip.style.display='none'; }
+  function show(w){
+    if(!w.dataset.why){ hide(); return; }
+    if(!tip){ tip=document.createElement('div'); tip.className='distip'; document.body.appendChild(tip); }
+    tip.textContent=w.dataset.why; tip.style.display='block';
+    var r=w.getBoundingClientRect(), tw=tip.offsetWidth, th=tip.offsetHeight;
+    var x=Math.min(Math.max(8, r.left+r.width/2-tw/2), innerWidth-tw-8);
+    var y=r.top-th-8; if(y<8) y=r.bottom+8;
+    tip.style.left=x+'px'; tip.style.top=y+'px';
+  }
+  document.addEventListener('mouseover',function(e){
+    var w=e.target.closest && e.target.closest('.disw'); if(w) show(w); else hide();
+  });
+  document.addEventListener('scroll',hide,true);
+  var t=null;
+  new MutationObserver(function(){ if(t) return; t=setTimeout(function(){ t=null; fix(); },0); })
+    .observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['disabled','title']});
+  fix();
+})();
 </script>
 </body>
 </html>
