@@ -1,7 +1,11 @@
 <!doctype html>
 <!--
-  콘체르토 매니저 — 홈 목업 v0.12 (2026-09-15)
+  콘체르토 매니저 — 홈 목업 v0.13 (2026-09-22)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다.
+
+  ── v0.13 (CON-531·542) ──
+  · 알림 CDE 만료 임박 본문을 `만료됩니다` 로 정정. 만료 즉시 회수되지 않는다(CDE 정책 5.2).
+  · 비활성 버튼의 사유가 마우스를 올려도 뜨지 않던 것을 고쳤다 — 사유를 감싼 요소로 옮기고 라이브러리 툴팁과 같은 모양으로 띄우는 공통 처리를 넣었다.
   셸(헤더·GNB·플라이아웃)은 공통 레이아웃 목업 규격을 그대로 쓴다.
 
   ── 화면 구성 ───────────────────────────────────
@@ -54,7 +58,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>콘체르토 매니저 · 공통 레이아웃 (v0.3)</title>
 <!--
-  콘체르토 매니저 — 공통 레이아웃 (프론트 핸드오프용)
+  콘체르토 매니저 — 공통 레이아웃
   · 컴포넌트 라이브러리 v0.2 색상 토큰에 맞춤. (: 라이브러리에 없던 레이아웃 전용 색 sidebar·flyout·border-soft·faint·active를 기존 라이브러리 토큰으로 치환 — 모든 색이 라이브러리 역할 토큰만 참조)
   · 치환 매핑: sidebar·header(크롬)→card(흰 크롬), flyout→card, border-soft→border, faint→muted-foreground, active(선택)→border, 메뉴 hover·칩→card-2(muted). 본문 캔버스만 background. 라이브러리 밖 색 제거.
   · 언어·테마 위치: 1안(프로필 팝오버) 확정 반영.
@@ -563,6 +567,14 @@
   .demo-bar button{background:#1c2136;border:1px solid #2f3654;color:#c9cfe0;border-radius:6px;padding:5px 10px;font-size:12px;font-family:inherit;cursor:pointer;}
   .demo-bar button:hover{border-color:var(--accent);color:#fff;}
   .demo-bar button.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600;}
+
+/* 비활성 버튼의 사유를 감싼 요소가 받는다(목업 공통 처리) */
+.disw{display:inline-block;cursor:not-allowed}
+.disw > :disabled{pointer-events:none}
+.rowmenu .disw{display:block}
+/* 비활성 사유 툴팁 — 라이브러리 .tip 과 같은 값(목업 공통 처리) */
+.distip{position:fixed;z-index:200;display:none;background:var(--flyout);color:var(--foreground);border:1px solid var(--border-strong);font-size:12px;font-weight:400;line-height:1.5;padding:8px 11px;border-radius:7px;box-shadow:0 6px 18px var(--shadow);max-width:340px;white-space:normal;text-align:left;pointer-events:none}
+
 </style>
 </head>
 <body class="dark">
@@ -689,7 +701,7 @@ var NOTI = [
    at:'12분 전', to:'배포', read:false},
   {sev:'정보', t:'CDE 준비가 완료되었습니다',    b:'yj-jupyter-01 · 접속할 수 있습니다.',
    at:'38분 전', to:'개발룸', read:false},
-  {sev:'주의', t:'CDE 만료가 임박했습니다',    b:'yj-jupyter-01 · 2026-09-01 에 회수됩니다.',
+  {sev:'주의', t:'CDE 만료가 임박했습니다',    b:'yj-jupyter-01 · 2026-09-01 에 만료됩니다.',
    at:'2시간 전', to:'개발룸', read:false},
   {sev:'정보', t:'노드 캐싱이 완료되었습니다',    b:'qwen3-32b v3.6 · 3개 노드에 내려받았습니다.',
    at:'2026-08-26 17:40', to:'모델', read:true},
@@ -1376,5 +1388,45 @@ function toggleGnb(btn){
     <button onclick="document.body.classList.remove('gnb-fold-on')">펼침</button>
     <button onclick="document.body.classList.add('gnb-fold-on')">접힘</button></span>
 </div>
+
+<script>
+/* 비활성 버튼·선택은 마우스 이벤트를 받지 않아 사유가 뜨지 않는다. 브라우저 기본 툴팁(title)은
+   환경에 따라 뜨지 않기도 해 기대지 않는다 — 사유를 감싼 요소로 옮기고, 라이브러리 툴팁(.tip)과
+   같은 모양으로 띄운다. 목업 공통 처리 */
+(function(){
+  function fix(){
+    document.querySelectorAll('button[disabled][title],select[disabled][title]').forEach(function(b){
+      var p=b.parentElement, why=b.title; b.removeAttribute('title');
+      if(p && p.classList.contains('disw')){ p.dataset.why=why; return; }
+      var w=document.createElement('span'); w.className='disw'; w.dataset.why=why;
+      b.parentNode.insertBefore(w,b); w.appendChild(b);
+    });
+    document.querySelectorAll('.disw[title]').forEach(function(w){ w.dataset.why=w.title; w.removeAttribute('title'); });
+    /* 다시 켜진 버튼은 사유를 지운다 */
+    document.querySelectorAll('.disw').forEach(function(w){
+      var b=w.firstElementChild; if(b && !b.disabled) delete w.dataset.why;
+    });
+  }
+  var tip=null;
+  function hide(){ if(tip) tip.style.display='none'; }
+  function show(w){
+    if(!w.dataset.why){ hide(); return; }
+    if(!tip){ tip=document.createElement('div'); tip.className='distip'; document.body.appendChild(tip); }
+    tip.textContent=w.dataset.why; tip.style.display='block';
+    var r=w.getBoundingClientRect(), tw=tip.offsetWidth, th=tip.offsetHeight;
+    var x=Math.min(Math.max(8, r.left+r.width/2-tw/2), innerWidth-tw-8);
+    var y=r.top-th-8; if(y<8) y=r.bottom+8;
+    tip.style.left=x+'px'; tip.style.top=y+'px';
+  }
+  document.addEventListener('mouseover',function(e){
+    var w=e.target.closest && e.target.closest('.disw'); if(w) show(w); else hide();
+  });
+  document.addEventListener('scroll',hide,true);
+  var t=null;
+  new MutationObserver(function(){ if(t) return; t=setTimeout(function(){ t=null; fix(); },0); })
+    .observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['disabled','title']});
+  fix();
+})();
+</script>
 </body>
 </html>
