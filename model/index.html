@@ -1,6 +1,23 @@
 <!--
-  콘체르토 매니저 — 모델 화면 목업 v0.31 (2026-08-26)
+  콘체르토 매니저 — 모델 화면 목업 v0.32 (2026-09-22)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다.
+
+  ── v0.32 (CON-562 · CON-446) ──
+  · 사용 여부 도움말에서 값 목록(`배포 이름`·`-`)을 뺐다 — 상태 배지 열이 아니고, 빈 값 표기는 전 화면 공통이다(공통정책 1.7).
+  · 본문 최대 폭 제한(1400px)을 없앴다 — 다른 화면은 제한이 없어 모델만 넓은 화면에서 오른쪽이 비었다.
+  · 사용 여부 도움말의 값 설명을 배포 이름 기준으로 바꿨다. 패널 섹션 제목의 건수 표기를 뺐다 — 섹션 안에 목록이 바로 나온다.
+  · 패널 폭을 라이브러리 토큰(--panel-w)으로 쓰고, 패널이 열리면 본문 최대 폭 제한을 푼다 — 넓은 화면에서 목록과 패널 사이가 크게 벌어졌다. 간격은 다른 목업과 같은 56px다.
+  · 사용 여부를 건수 대신 배포 이름으로 보인다. 여러 건이면 `{첫 배포} 외 N건`(라이브러리 4.5). 셀 호버 툴팁은 없앴다.
+  · 패널이 열리면 목록 폭이 줄어들게 했다 — 워크스페이스와 같은 처리(패널이 목록을 덮지 않는다). 좁아진 폭에서 열이 잘리지 않게 덜 중요한 열을 접는다(등록자·최소 vRAM·요구 가속기·엔진 순).
+  · 표에 가로 스크롤을 두고, 헤더 도움말·행 메뉴는 화면 기준으로 띄우는 공통 처리를 넣었다 — 좁은 화면에서 `작업` 열이 찌그러지던 것을 고쳤다(공통정책 3.4).
+  · 캐싱·빌드 완료 알림 문구를 `…완료되었습니다. — {모델명}` → `{모델명}의 …완료되었습니다.`로 — 대상을 문장 안에 둔다(UI 문구 규칙 8).
+  · 토큰 안내의 `귀속` → `소속`(문서 용어를 화면에 쓰지 않음). HF 등록 안내는 가안 표기(CON-562 확인 대기).
+  · 전역 저장소를 두지 않은 설치에서는 소스 선택지에 S3를 두지 않는다(모델 정책 2.3). 데모 바 `전역 저장소`로 확인한다.
+  · 소스에 따라 경로 예시·안내를 바꾼다 — S3는 저장소 경로, Hugging Face는 모델 ID. 등록·버전 추가 모두. 안내 문구의 문서 조항 표기를 뺐다.
+  · Hugging Face 소스를 고르면 토크나이저 경로 칸을 숨긴다. 백엔드가 HF 등록 시 토크나이저 경로를 저장하지 않는다(asset/service.py).
+  · 워크스페이스 전용 모델의 수정 모달에서 워크스페이스 칸을 잠갔다 — 소속 워크스페이스는 바꾸지 않는다(모델 정책 2.4 · CON-446).
+  · 셸(헤더·GNB·브랜드·플라이아웃·본문)을 공통 레이아웃 값으로 맞췄다. 본문 배경이 정의되지 않은 토큰(--bg)을 쓰고 있었다.
+  · 비활성 버튼의 사유가 마우스를 올려도 뜨지 않던 것을 고쳤다 — 사유를 감싼 요소로 옮기고 라이브러리 툴팁과 같은 모양으로 띄우는 공통 처리를 넣었다.
 -->
 <style>
 /* ===== 컴포넌트 라이브러리 역할 토큰 (정본) ===== */
@@ -20,7 +37,7 @@
   /* 레이아웃 전용 (라이브러리 미정의 · 개정 대상) */
   --sidebar:#f7f9fe; --flyout:#ffffff; --card-2:#f0f3fb; --active:#e6ebfa; --faint:#8b93ab;
   --shadow:rgba(23,29,51,.10);
-  --header-h:58px; --gnb-w:236px;
+  --header-h:58px; --panel-w:440px; --gnb-w:236px;
 }
 .dark{
   --background:#0d0f14; --foreground:#e6e8ee;
@@ -44,11 +61,11 @@ a{color:inherit}
 .app{display:grid;grid-template-columns:var(--gnb-w) 1fr;grid-template-rows:var(--header-h) 1fr;height:calc(100vh - 46px);overflow:hidden;grid-template-areas:"brand header" "gnb main"}
 
 /* ===== 공통 레이아웃 ===== */
-.brand{grid-area:brand;display:flex;align-items:center;gap:10px;padding:0 18px;background:var(--sidebar);border-bottom:1px solid var(--border)}
+.brand{grid-area:brand;display:flex;align-items:center;gap:10px;padding:0 18px;background:var(--card);border-bottom:1px solid var(--border)}
 .logo-mark svg{width:24px;height:24px}
 .brand b{font-size:15.5px;font-weight:700}
 .brand b .ai{color:var(--accent)}
-.header{grid-area:header;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--sidebar);border-bottom:1px solid var(--border)}
+.header{grid-area:header;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--card);border-bottom:1px solid var(--border)}
 /* ⭐ 상세 페이지 헤더 */
 .pnexp{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--border-strong);
   background:transparent;border-radius:7px;color:var(--muted-foreground);cursor:pointer;flex:0 0 auto}
@@ -105,7 +122,7 @@ a{color:inherit}
 .wsdd hr{border:0;border-top:1px solid var(--border);margin:5px 0}
 .wsdd .wsempty{padding:16px 12px;text-align:center;font-size:12px;color:var(--faint)}
 .ws .chev{color:var(--muted-foreground)}
-.gnb{grid-area:gnb;display:flex;flex-direction:column;background:var(--sidebar);border-right:1px solid var(--border);overflow:visible}
+.gnb{grid-area:gnb;display:flex;flex-direction:column;background:var(--card);border-right:1px solid var(--border);overflow:visible}
 .banner{margin:14px 12px 8px;height:120px;border-radius:12px;background:linear-gradient(135deg,#7386b2 0%,#8698c4 100%);position:relative;overflow:hidden;display:flex;align-items:center;padding:0 18px}
 .banner .bt{font-size:21px;font-weight:800;color:#fff;line-height:1.05;z-index:1;letter-spacing:.5px}
 .banner .kv{position:absolute;right:-26px;bottom:-34px;width:170px;height:170px;z-index:0}
@@ -117,7 +134,7 @@ a{color:inherit}
 .nav a.active{background:var(--selected);color:var(--foreground);font-weight:600}
 .nav a.has-fly::after{content:"›";margin-left:auto;color:var(--faint);font-size:16px}
 .flywrap{position:relative}
-.flyout{position:absolute;left:calc(100% + 6px);top:0;width:210px;background:var(--flyout);border:1px solid var(--border);border-radius:11px;padding:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateX(-6px);transition:.13s;z-index:70}
+.flyout{position:absolute;left:calc(100% + 6px);top:0;width:210px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px;box-shadow:0 12px 30px var(--shadow);opacity:0;visibility:hidden;transform:translateX(-6px);transition:.13s;z-index:70}
 .flywrap:hover .flyout{opacity:1;visibility:visible;transform:translateX(0)}
 .flyout a{display:flex;align-items:center;padding:9px 11px;border-radius:8px;color:var(--muted-foreground);text-decoration:none;font-size:13.5px;margin-bottom:2px}
 .flyout a:hover{background:var(--card);color:var(--foreground)}
@@ -139,9 +156,11 @@ a{color:inherit}
 .persona .who b{font-size:13px;display:block}
 .persona .who span{font-size:11px;color:var(--faint)}
 .persona .up{margin-left:auto;color:var(--faint)}
-.main{grid-area:main;overflow:auto;position:relative}
+.main{grid-area:main;background:var(--background);overflow-y:auto;overflow-x:hidden;padding:24px 28px;min-height:0}
 /* ===== 페이지 ===== */
-.page{padding:26px 28px 40px;max-width:1400px}
+.page{padding:26px 28px 40px;max-width:none;transition:padding-right .22s ease}
+    /* 패널이 열리면 목록 폭을 줄인다 — 패널이 목록을 덮으면 비교하며 볼 수 없다(워크스페이스와 같은 처리) */
+    body.panel-on .page{padding-right:calc(var(--panel-w) + 28px)}
 .phead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
 .phead h1{font-size:21px;margin:0 0 5px;letter-spacing:-.3px}
 .phead p{margin:0;font-size:13px;color:var(--muted-foreground)}
@@ -175,7 +194,13 @@ a{color:inherit}
 .cbtn svg{width:15px;height:15px}
 
 /* 테이블 */
-.tblwrap{background:var(--card);border:1px solid var(--border);border-radius:11px;overflow:visible}
+.tblwrap{background:var(--card);border:1px solid var(--border);border-radius:11px;overflow-x:auto;overflow-y:visible}
+    /* 열이 많아 좁은 화면에서는 가로 스크롤을 둔다(공통정책 3.4). 스크롤을 두지 않으면
+       폭이 모자랄 때 브라우저가 열을 눌러 `작업` 같은 좁은 열이 먼저 찌그러진다.
+       가로 스크롤을 두면 헤더 팝오버·행 메뉴가 잘리므로 열릴 때 화면 기준으로 띄운다(아래 공통 처리) */
+    /* 작업 열은 아이콘 하나뿐이라 폭이 모자랄 때 가장 먼저 찌그러진다. 최소 폭을 지켜 준다 */
+    .tblwrap table th:last-child,.tblwrap table td:last-child{min-width:64px}
+    .usecell{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
 table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 /* 헤더 배경은 --muted, 행 호버는 --hover 로 분리한다.
    같은 토큰을 쓰면 마우스를 올린 행이 헤더처럼 보인다 */
@@ -245,7 +270,7 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
 /* 사이드 패널 */
 
-.panel{position:fixed;top:var(--header-h);right:0;bottom:0;width:440px;max-width:92vw;background:var(--card);border-left:1px solid var(--border);z-index:90;transform:translateX(102%);transition:transform .2s ease;display:flex;flex-direction:column;box-shadow:-14px 0 40px var(--shadow)}
+.panel{position:fixed;top:var(--header-h);right:0;bottom:0;width:var(--panel-w);max-width:92vw;background:var(--card);border-left:1px solid var(--border);z-index:90;transform:translateX(102%);transition:transform .2s ease;display:flex;flex-direction:column;box-shadow:-14px 0 40px var(--shadow)}
 .panel.on{transform:translateX(0)}
 .pnhead{padding:18px 20px 14px;border-bottom:1px solid var(--border);flex:0 0 auto}
 .pnhead .r1{display:flex;align-items:flex-start;gap:10px}
@@ -529,6 +554,14 @@ th.thcell.fdd-on .fdd{display:block}
 .thpop dt{font-weight:600;color:var(--foreground);white-space:nowrap}
 .thpop dd{margin:0;color:var(--muted-foreground);line-height:1.5}
 .thpop{width:290px}
+
+/* 비활성 버튼의 사유를 감싼 요소가 받는다(목업 공통 처리) */
+.disw{display:inline-block;cursor:not-allowed}
+.disw > :disabled{pointer-events:none}
+.rowmenu .disw{display:block}
+/* 비활성 사유 툴팁 — 라이브러리 .tip 과 같은 값(목업 공통 처리) */
+.distip{position:fixed;z-index:200;display:none;background:var(--flyout);color:var(--foreground);border:1px solid var(--border-strong);font-size:12px;font-weight:400;line-height:1.5;padding:8px 11px;border-radius:7px;box-shadow:0 6px 18px var(--shadow);max-width:340px;white-space:normal;text-align:left;pointer-events:none}
+
 </style><body class="dark">
 <div class="app">
 
@@ -709,7 +742,7 @@ th.thcell.fdd-on .fdd{display:block}
         <label>소스 경로<span class="req">*</span></label>
         <input class="inp" id="rPath" placeholder="s3://concerto-models/llama-3.2-1b" oninput="regValid()" onblur="regBlur('rPath')">
         <div class="errmsg" id="rPathErr" style="display:none">가중치 경로를 입력해 주세요.</div>
-        <div class="hint">S3 폴더명이 모델명으로 사용됩니다. 소문자·하이픈 구분 형태를 권장합니다.</div>
+        <div class="hint" id="rPathHint">S3 폴더명이 모델명으로 사용됩니다. 소문자·하이픈 구분 형태를 권장합니다.</div>
       </div>
       <!-- 모델명이 먼저다. 바로 위 소스 경로 힌트가 `S3 폴더명이 모델명으로 사용됩니다` 로
            이어지고, 중복 확인도 모델명 + 버전 조합이라 이름이 앞이다(모델정책 2장) -->
@@ -726,7 +759,7 @@ th.thcell.fdd-on .fdd{display:block}
           <div class="errmsg" id="rVerErr" style="display:none">버전을 입력해 주세요.</div>
         </div>
       </div>
-      <div class="f">
+      <div class="f" id="rTokRow">
         <label>토크나이저 경로</label>
         <input class="inp" id="rTok" placeholder="llama-3.2-1b/tokenizer.json">
         <div class="hint">입력하지 않으면 벤치마크 실행이 제한됩니다.</div>
@@ -767,11 +800,12 @@ th.thcell.fdd-on .fdd{display:block}
       <div class="f">
         <label>소스<span class="req">*</span></label>
         <select class="inp" id="vSrc" onchange="onVSrcChange()"><option>S3</option><option>HuggingFace</option></select>
-        <div class="hint" id="vSrcHint">플랫폼 스토리지에서 가져옵니다.</div>
+        <div class="hint" id="vSrcHint">전역 저장소에서 가져옵니다.</div>
       </div>
       <div class="f">
         <label>소스 경로<span class="req">*</span></label>
         <input class="inp" id="vPath" placeholder="s3://concerto-models/llama-3.2-1b-v2" oninput="verValid()" onblur="verBlur('vPath')">
+          <div class="hint" id="vPathHint">전역 저장소의 가중치 경로를 입력합니다.</div>
         <div class="errmsg" id="vPathErr" style="display:none">가중치 경로를 입력해 주세요.</div>
       </div>
       <div class="f">
@@ -780,7 +814,7 @@ th.thcell.fdd-on .fdd{display:block}
         <div class="errmsg" id="vVerErr" style="display:none">이미 등록된 버전입니다.</div>
         <div class="hint">모델명과 조합해 중복을 확인합니다.</div>
       </div>
-      <div class="f" style="margin-bottom:0">
+      <div class="f" id="vTokRow" style="margin-bottom:0">
         <label>토크나이저 경로</label>
         <input class="inp" id="vTok" placeholder="llama-3.2-1b/tokenizer.json">
         <div class="hint">입력하지 않으면 벤치마크 실행이 제한됩니다.</div>
@@ -866,6 +900,9 @@ th.thcell.fdd-on .fdd{display:block}
 <div class="toast-wrap" id="toasts"></div>
 
 <div class="demo-bar" id="demoBar">
+  <span class="dgrp"><span class="demo-label">전역 저장소:</span>
+    <button class="gs on" onclick="setGs(true,this)">사용</button>
+    <button class="gs" onclick="setGs(false,this)">미사용</button></span>
   <span class="dgrp"><span class="demo-label">목록 행 단위:</span>
     <button class="un on" onclick="setUnit('model',this)">모델 단위</button>
     <button class="un" onclick="setUnit('version',this)">버전 단위</button></span>
@@ -1100,13 +1137,14 @@ function cnCell(m){
   const tot=NODES.length, gap=m.cn<tot;
   return '<span'+(gap?' class="dash"':'')+'>'+m.cn+' / '+tot+'</span>';
 }
-/* 사용 여부 — 건수만 두고 어느 배포인지는 호버로 보인다.
-   0 건이면 `-` 다. `미사용` 이라 쓰면 값이 있는 것처럼 읽힌다(공통정책 1.7) */
+/* 사용 여부. 한 건이면 배포 이름을, 여러 건이면 `{첫 배포} 외 N건` 으로 줄인다(라이브러리 4.5).
+   0 건이면 `-` 다. `미사용` 이라 쓰면 값이 있는 것처럼 읽힌다(공통정책 1.7).
+   이름을 셀에 두므로 셀 호버 툴팁은 두지 않는다. 전체 목록은 상세의 배포 탭에서 본다 */
 function useCell(m){
   const ds=depsOf(m);
   if(!ds.length) return '<span class="dash">-</span>';
-  return '<span class="tip-anchor"><span class="ubtn" tabindex="0">'+ds.length+'건</span>'
-   + '<span class="tip">'+ds.map(function(d){ return d.n; }).join('<br>')+'</span></span>';
+  const label = ds.length===1 ? ds[0].n : ds[0].n+' 외 '+(ds.length-1)+'건';
+  return '<span class="usecell" title="'+label+'">'+label+'</span>';
 }
 
 /* 캐싱된 노드 이름 — 패널·상세에서 쓴다 */
@@ -1164,9 +1202,8 @@ const COLDEF={
     +'<dt>빌드 중</dt><dd>이미지를 만들고 있습니다.</dd>'
     +'<dt>미빌드</dt><dd>아직 이미지로 만들지 않았습니다.</dd>'
     +'<dt>빌드 실패</dt><dd>이미지 생성에 실패했습니다. 다시 시도할 수 있습니다.</dd></dl>',
-  use:'이 모델을 쓰는 배포 건수입니다. 건수에 손을 올리면 배포 이름을 보입니다.'
-    +'<dl><dt>건수</dt><dd>이 모델을 쓰는 배포가 있습니다. 배포를 먼저 종료해야 모델을 지울 수 있습니다.</dd>'
-    +'<dt>-</dt><dd>쓰는 배포가 없습니다.</dd></dl>',
+  /* `-` 와 배포 이름은 값 목록으로 설명하지 않는다. 상태 배지가 아니라 이름이 들어가는 열이다 */
+  use:'이 모델을 쓰는 배포입니다. 여러 건이면 첫 배포와 나머지 건수를 보입니다. 전체는 상세의 배포 탭에서 확인합니다.',
   eng:'모델 이미지에 결합된 서빙 엔진을 표시합니다.',
   gpu:'이 모델을 배포하는 데 필요한 가속기를 벤더·유형으로 표시합니다.',
   vram:'노드당 필요한 최소 가속기 메모리를 표시합니다.'
@@ -1411,6 +1448,7 @@ function busyMsg(m){
 }
 
 function openPanel(i){
+  document.body.classList.add('panel-on');
   const isA=tab==='A'; const m=(isA?IMG:WGT)[i]; cur={m,isA};
   const busy = m.ready==='캐싱 중'||m.ready==='빌드 중';
   /* 모델 단위에서는 헤더에 최신 버전과 버전 수를 함께 둔다 */
@@ -1475,7 +1513,7 @@ function openPanel(i){
 
     /* ④ 이 모델을 쓰는 배포 — 연관 리소스 */
     const dps=depsOf(m);
-    h+=sec('이 모델을 쓰는 배포 <span style="font-weight:400">'+dps.length+'건</span>',
+    h+=sec('이 모델을 쓰는 배포',
         (dps.length
           ? '<div class="linklist">'+dps.map(d=>'<a href="#" onclick="return false"><span class="nm">'+d.n+'<span class="chip" style="margin-left:6px">'+d.ws+'</span></span><span class="stbadge '+RB2[d.st]+'"><span class="d"></span>'+d.st+'</span></a>').join('')+'</div>'
           : '<div class="emptyline">이 모델을 사용하는 배포가 없습니다.</div>'), 'deps');
@@ -1643,7 +1681,8 @@ function openVerAdd(){
   document.getElementById('vName').value = dCur.m.n;
   ['vPath','vVer','vTok'].forEach(function(id){ document.getElementById(id).value=''; });
   ['vPathErr','vVerErr'].forEach(function(id){ document.getElementById(id).style.display='none'; });
-  document.getElementById('vSrc').value='S3';
+  srcOpts('vSrc');
+  document.getElementById('vSrc').value = GS_ON? 'S3' : 'HuggingFace';
   onVSrcChange();
   document.getElementById('mdVer').classList.add('on');
   verValid();
@@ -1652,9 +1691,52 @@ function closeVer(){ document.getElementById('mdVer').classList.remove('on'); }
 function onVSrcChange(){
   const src=document.getElementById('vSrc').value;
   const hint=document.getElementById('vSrcHint');
-  hint.textContent = src==='HuggingFace'
-    ? '귀속 워크스페이스의 토큰으로 내려받습니다(워크스페이스 정책 8.2).'
-    : '플랫폼 스토리지에서 가져옵니다.';
+  setPathEx('vPath', src, true);
+  /* 가안 — 전역 저장소가 없을 때 HF 등록도 막히는지 확인 대기(코드는 막음 · CON-562). 확인되면 문구 확정 */
+  /* 문장을 조각으로 잇지 않는다 — 다국어에서 깨진다(UI 문구 규칙 8) */
+  hint.textContent = src!=='HuggingFace' ? '전역 저장소에서 가져옵니다.'
+    : GS_ON ? '소속 워크스페이스의 토큰으로 내려받습니다.'
+    : '이 설치에서는 전역 저장소를 사용하지 않아 Hugging Face로만 등록할 수 있습니다. 소속 워크스페이스의 토큰으로 내려받습니다.';
+}
+/* 전역 저장소는 설치 시 정한다(워크스페이스 정책 8.2). 두지 않은 설치에서는 S3를 선택지에 두지 않는다 —
+   운영 중 풀리지 않는 조건이라 비활성이 아니라 미노출로 둔다(모델 정책 2.3).
+   남는 소스가 하나면 작업 산출물 진입 때와 같이 잠가서 보인다 */
+let GS_ON = true;
+function srcOpts(id){
+  const el=document.getElementById(id); if(!el) return;
+  const cur=el.value;
+  el.innerHTML = (GS_ON? '<option>S3</option>' : '') + '<option>HuggingFace</option>';
+  el.value = (GS_ON && cur==='S3')? 'S3' : (GS_ON? cur||'S3' : 'HuggingFace');
+  el.disabled = !GS_ON;
+}
+/* 경로 입력 예시는 소스에 따라 다르다 — S3는 저장소 경로, Hugging Face는 모델 ID */
+function setPathEx(id, src, isVer){
+  const el=document.getElementById(id); if(!el) return;
+  /* Hugging Face 는 토크나이저를 따로 받지 않는다 — 등록 시 tokenizer_path 를 저장하지 않아
+     입력해도 버려진다(백엔드 asset/service.py register_huggingface_model). 칸을 숨기고 값을 비운다 */
+  const tokRow=document.getElementById(isVer? 'vTokRow' : 'rTokRow');
+  if(tokRow){
+    const hf = src==='HuggingFace';
+    tokRow.style.display = hf? 'none' : '';
+    if(hf){ const t=tokRow.querySelector('input'); if(t) t.value=''; }
+  }
+  const h=document.getElementById(id+'Hint');
+  /* 버전 추가는 모델명이 정해져 있어 폴더명 안내를 두지 않는다 */
+  if(h) h.textContent = src==='HuggingFace'
+    ? 'Hugging Face 모델 ID를 입력합니다. 조직명/모델명 형식입니다.'
+    : isVer ? '전역 저장소의 가중치 경로를 입력합니다.'
+    : 'S3 폴더명이 모델명으로 사용됩니다. 소문자·하이픈 구분 형태를 권장합니다.';
+  el.placeholder = src==='HuggingFace'
+    ? 'meta-llama/Llama-3.2-1B'
+    : (isVer? 's3://concerto-models/llama-3.2-1b-v2' : 's3://concerto-models/llama-3.2-1b');
+}
+function setGs(on,btn){
+  GS_ON=on;
+  document.querySelectorAll('#demoBar .gs').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  srcOpts('rSrc'); srcOpts('vSrc');
+  if(document.getElementById('mdReg').classList.contains('on') && !regFrom){ onSrcChange(); regValid(); }
+  if(document.getElementById('mdVer').classList.contains('on')){ onVSrcChange(); verValid(); }
 }
 /* 중복은 모델명 + 버전 조합으로 본다(모델정책 2.2). 모델명이 고정이라 버전만 확인하면 된다 */
 function verDup(){
@@ -1685,7 +1767,7 @@ function submitVer(){
   act(dCur.m.n+' 에 버전 '+v+' 을 추가했습니다.');
 }
 
-function closePanel(){document.getElementById('panel').classList.remove('on');
+function closePanel(){document.getElementById('panel').classList.remove('on'); document.body.classList.remove('panel-on');
   document.querySelectorAll('table.tbl tbody tr').forEach(r=>r.classList.remove('rowsel'));}
 /* 패널은 닫기 버튼과 ESC 로 닫는다. 배경 클릭을 가로채는 레이어를 두지 않는다(공통정책 4.2.4·4.2.5) */
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') closePanel(); });
@@ -1713,12 +1795,15 @@ function openEdit(){
   });
   /* 전역 상태 `cur`(패널에 열린 대상)과 이름이 겹치면 함수 전체에서 전역이 가려진다 */
   const curWs = (m.ws && m.ws!=='-')? m.ws : '';
+  /* 이미 워크스페이스 전용인 모델은 소속 워크스페이스를 바꾸지 않는다(모델 정책 2.4 · CON-446).
+     전역 → 전용으로 바꿀 때 고르는 것은 확인 대상이라 그대로 둔다 */
+  eLockWs = (m.scope!=='전역' && !!curWs);
   const opts = (curWs? '' : '<option value="">선택해 주세요.</option>')
    + mine.map(function(w){ return '<option'+(w===curWs?' selected':'')+'>'+w+'</option>'; }).join('');
   if(role==='super'){
     p.innerHTML='<label><input type="radio" name="escope" '+(m.scope==='전역'?'checked':'')+' onchange="editScope(\'global\')"><span>전역</span><small>모든 워크스페이스</small></label>'
               + '<label><input type="radio" name="escope" '+(m.scope!=='전역'?'checked':'')+' onchange="editScope(\'ws\')"><span>워크스페이스 전용</span>'
-              +   '<select class="inp wsin" id="eWs"'+(m.scope==='전역'?' disabled':'')+' onclick="event.stopPropagation()" onchange="editValid()">'+opts+'</select></label>';
+              +   '<select class="inp wsin" id="eWs"'+((m.scope==='전역'||eLockWs)?' disabled title="소속 워크스페이스는 등록 시 정하며 바꿀 수 없습니다."':'')+' onclick="event.stopPropagation()" onchange="editValid()">'+opts+'</select></label>';
     hint.textContent = useOf(m)==='배포 중' ? '배포에 사용 중인 모델입니다. 범위를 변경하면 해당 배포의 접근 범위가 함께 바뀝니다.' : '';
   }else{
     p.innerHTML='<label style="grid-column:1/-1"><input type="radio" name="escope" checked><span>'+(m.scope==='전역'?'전역':'워크스페이스 전용')+'</span></label>';
@@ -1728,9 +1813,10 @@ function openEdit(){
   document.getElementById('mdEdit').classList.add('on');
   editValid();
 }
+let eLockWs=false;
 function editScope(v){
   const sel=document.getElementById('eWs');
-  if(sel) sel.disabled=(v==='global');
+  if(sel) sel.disabled=(v==='global') || eLockWs;
   editValid();
 }
 function closeEdit(){
@@ -1786,8 +1872,9 @@ function openReg(){
      (def? '' : '<option value="">선택해 주세요.</option>')
    + mine.map(function(w){
        return '<option'+(w===def?' selected':'')+'>'+w+'</option>'; }).join('');
-  onSrcChange();
+  srcOpts('rSrc');
   drawRegFrom();
+  onSrcChange();
   document.getElementById('mdReg').classList.add('on');
   regValid();
 }
@@ -1798,11 +1885,12 @@ function drawRegFrom(){
   const note=document.getElementById('rFromNote');
   if(regFrom){
     if(path){ path.value=regFrom.path; path.readOnly=true; }
-    if(src){ src.disabled=true; }
+    /* 산출물은 전역 저장소를 거쳐 S3 소스로 등록한다(모델 기획서 5.2) */
+    if(src){ src.innerHTML='<option>S3</option>'; src.value='S3'; src.disabled=true; }
     if(note){ note.hidden=false; }
   } else {
     if(path){ path.value=''; path.readOnly=false; }
-    if(src){ src.disabled=false; }
+    if(src){ srcOpts('rSrc'); }
     if(note){ note.hidden=true; }
   }
 }
@@ -1842,12 +1930,18 @@ function onWsPick(){ onSrcChange(); regValid(); }
 function onSrcChange(){
   const src=document.getElementById('rSrc').value;
   const hint=document.getElementById('rSrcHint');
-  if(src!=='HuggingFace'){ hint.textContent='플랫폼 스토리지에서 가져옵니다.'; return; }
-  if(regScope==='global'){ hint.textContent='플랫폼 전역 토큰으로 내려받습니다.'; return; }
+  setPathEx('rPath', src, false);
+  if(src!=='HuggingFace'){ hint.textContent='전역 저장소에서 가져옵니다.'; return; }
+  /* 문장을 조각으로 잇지 않는다 — 전역 저장소 사용 여부별로 완결 문장을 둔다(UI 문구 규칙 8) */
   const ws=document.getElementById('rWs').value;
-  hint.textContent = ws
-    ? ws+'에 등록된 토큰으로 내려받습니다. 없으면 플랫폼 전역 토큰을 씁니다.'
-    : '워크스페이스를 고르면 어느 토큰을 쓰는지 안내합니다.';
+  const M = GS_ON ? {
+      g:'플랫폼 전역 토큰으로 내려받습니다.',
+      w:ws+'에 등록된 토큰으로 내려받습니다. 없으면 플랫폼 전역 토큰을 사용합니다.',
+      n:'워크스페이스를 고르면 어느 토큰을 사용하는지 안내합니다.' } : {
+      g:'이 설치에서는 전역 저장소를 사용하지 않아 Hugging Face로만 등록할 수 있습니다. 플랫폼 전역 토큰으로 내려받습니다.',
+      w:'이 설치에서는 전역 저장소를 사용하지 않아 Hugging Face로만 등록할 수 있습니다. '+ws+'에 등록된 토큰으로 내려받습니다.',
+      n:'이 설치에서는 전역 저장소를 사용하지 않아 Hugging Face로만 등록할 수 있습니다. 워크스페이스를 고르면 어느 토큰을 사용하는지 안내합니다.' };
+  hint.textContent = regScope==='global' ? M.g : ws ? M.w : M.n;
 }
 function closeReg(){ regFrom=null; document.getElementById('mdReg').classList.remove('on'); }
 /* 필수 항목 유효성 — 입력 중에는 오류를 걸지 않고 필드를 벗어날 때 표시한다(공통정책 7.8).
@@ -1969,7 +2063,7 @@ function submitCache(){
   setTimeout(function(){
     m.cn=Math.min(NODES.length, (m.cn||0)+picked);
     m.ready='캐싱됨'; render(); if(cur&&cur.m===m) openPanel(IMG.indexOf(m));
-    notify('노드 캐싱이 완료되었습니다. — '+m.n);
+    notify(m.n+'의 노드 캐싱이 완료되었습니다.');
   }, 3000);
 }
 
@@ -1992,7 +2086,7 @@ function build(name){
         gpu:m.infra.g,vram:m.infra.v,sys:false});
     }
     render(); if(cur&&cur.m===m) openPanel(WGT.indexOf(m));
-    notify('이미지 빌드가 완료되었습니다. — '+m.n);
+    notify(m.n+'의 이미지 빌드가 완료되었습니다.');
   }, 4000);
 }
 /* 완료·실패 알림 (7.6) — 토스트와 별도 채널 */
@@ -2064,5 +2158,106 @@ function toast(t,msg){
 }
 
 setRole('super'); setTab('A'); drawChips();
+</script>
+
+<script>
+/* 비활성 버튼·선택은 마우스 이벤트를 받지 않아 사유가 뜨지 않는다. 브라우저 기본 툴팁(title)은
+   환경에 따라 뜨지 않기도 해 기대지 않는다 — 사유를 감싼 요소로 옮기고, 라이브러리 툴팁(.tip)과
+   같은 모양으로 띄운다. 목업 공통 처리 */
+(function(){
+  function fix(){
+    document.querySelectorAll('button[disabled][title],select[disabled][title]').forEach(function(b){
+      var p=b.parentElement, why=b.title; b.removeAttribute('title');
+      if(p && p.classList.contains('disw')){ p.dataset.why=why; return; }
+      var w=document.createElement('span'); w.className='disw'; w.dataset.why=why;
+      b.parentNode.insertBefore(w,b); w.appendChild(b);
+    });
+    document.querySelectorAll('.disw[title]').forEach(function(w){ w.dataset.why=w.title; w.removeAttribute('title'); });
+    /* 다시 켜진 버튼은 사유를 지운다 */
+    document.querySelectorAll('.disw').forEach(function(w){
+      var b=w.firstElementChild; if(b && !b.disabled) delete w.dataset.why;
+    });
+  }
+  var tip=null;
+  function hide(){ if(tip) tip.style.display='none'; }
+  function show(w){
+    if(!w.dataset.why){ hide(); return; }
+    if(!tip){ tip=document.createElement('div'); tip.className='distip'; document.body.appendChild(tip); }
+    tip.textContent=w.dataset.why; tip.style.display='block';
+    var r=w.getBoundingClientRect(), tw=tip.offsetWidth, th=tip.offsetHeight;
+    var x=Math.min(Math.max(8, r.left+r.width/2-tw/2), innerWidth-tw-8);
+    var y=r.top-th-8; if(y<8) y=r.bottom+8;
+    tip.style.left=x+'px'; tip.style.top=y+'px';
+  }
+  document.addEventListener('mouseover',function(e){
+    var w=e.target.closest && e.target.closest('.disw'); if(w) show(w); else hide();
+  });
+  document.addEventListener('scroll',hide,true);
+  var t=null;
+  new MutationObserver(function(){ if(t) return; t=setTimeout(function(){ t=null; fix(); },0); })
+    .observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['disabled','title']});
+  fix();
+})();
+
+/* 표 안에서 열리는 팝오버(헤더 도움말·필터, 행 더보기 메뉴)를 화면 기준으로 띄운다.
+   표에 가로 스크롤이 생기면 absolute 로 둔 팝오버가 스크롤 영역에 잘린다.
+   열릴 때 좌표를 계산해 fixed 로 바꾸고, 닫히면 되돌린다 */
+(function(){
+  function place(pop, anchor, align){
+    const r=anchor.getBoundingClientRect();
+    pop.style.position='fixed';
+    pop.style.top=(r.bottom+6)+'px';
+    if(align==='right'){ pop.style.left='auto'; pop.style.right=Math.max(8, window.innerWidth-r.right)+'px'; }
+    else { pop.style.left=Math.min(r.left, window.innerWidth-260)+'px'; pop.style.right='auto'; }
+    pop.style.bottom='auto';
+  }
+  function clear(pop){ pop.style.position=''; pop.style.top=''; pop.style.left=''; pop.style.right=''; pop.style.bottom=''; }
+  function sync(){
+    document.querySelectorAll('.tblwrap th.thcell').forEach(function(th){
+      const pop=th.querySelector('.thpop'); if(!pop) return;
+      th.classList.contains('pop-on') ? place(pop, th, 'left') : clear(pop);
+    });
+    document.querySelectorAll('.tblwrap .more').forEach(function(m){
+      const pop=m.querySelector('.rowmenu'); if(!pop) return;
+      m.classList.contains('open') ? place(pop, m, 'right') : clear(pop);
+    });
+  }
+  new MutationObserver(sync).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class'],childList:true});
+  window.addEventListener('scroll', sync, true);
+  window.addEventListener('resize', sync);
+})();
+
+/* 패널이 열리면 목록 폭이 줄어든다. 열을 그대로 두면 오른쪽 열이 잘려 보이므로
+   덜 중요한 열부터 접는다(값은 패널에 다 있다). 폭이 다시 넓어지면 되돌린다.
+   접는 순서는 목록에서 판단에 덜 쓰이는 것부터다 — 자세한 값은 패널·상세에서 본다 */
+(function(){
+  const ORDER=['등록자','최소 vRAM','요구 가속기','엔진','캐싱 노드','용량','표시 범위'];
+  function cols(t){
+    const ths=[...t.querySelectorAll('thead th')];
+    return ths.map((th,i)=>({i, name:th.innerText.replace(/[?▼▲\s]/g,'')}));
+  }
+  function setCol(t, idx, show){
+    t.querySelectorAll('thead th').forEach((th,i)=>{ if(i===idx) th.style.display = show?'':'none'; });
+    t.querySelectorAll('tbody tr').forEach(tr=>{ const td=tr.children[idx]; if(td) td.style.display = show?'':'none'; });
+  }
+  function fit(){
+    const wrap=document.querySelector('.tblwrap'); if(!wrap) return;
+    const t=wrap.querySelector('table'); if(!t) return;
+    const list=cols(t);
+    list.forEach(c=>setCol(t,c.i,true));
+    if(!document.body.classList.contains('panel-on')) return;
+    for(const nm of ORDER){
+      if(t.scrollWidth<=wrap.clientWidth) break;
+      const c=list.find(x=>x.name===nm.replace(/\s/g,''));
+      if(c) setCol(t,c.i,false);
+    }
+  }
+  window.fitPanelCols=fit;
+  new MutationObserver(function(muts){
+    if(muts.some(m=>m.target===document.body && m.attributeName==='class')) fit();
+    else if(muts.some(m=>m.type==='childList')) fit();
+  }).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class'],childList:true});
+  window.addEventListener('resize', fit);
+})();
 </script>
 </body></html>
