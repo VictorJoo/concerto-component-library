@@ -1,6 +1,30 @@
 <!--
-  콘체르토 매니저 — 모델 화면 목업 v0.32 (2026-09-22)
+  콘체르토 매니저 — 모델 화면 목업 v0.33 (2026-09-30)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다.
+
+  ── v0.33 (CON-446) ──
+  · 상세 `삭제` 가 강조색 채움 버튼으로 렌더되던 것을 고쳤다. `.btn.danger-line` 규칙이 이
+    파일에만 빠져 있어 파괴적 액션이 주 액션과 같은 모양이었다. 라이브러리 정본 2줄을
+    가져왔다 — 워크스페이스·개발룸·배포·모니터링 목업에는 이미 있다.
+  · 상세 `＋ 버전 추가` 를 탭 줄 우측으로 옮겼다(`.tabrow` — 개발룸·플랫폼 설정 목업과 같은
+    규격). 종전에는 탭 아래에 액션만 담긴 줄을 두어 탭과 표 사이에 41px 빈 층이 생겼고,
+    탭 줄 우측은 비어 있었다.
+    ⚠ 공통정책에 액션 배치 조항이 없다 — 3.6 은 행 단위 더보기 메뉴 규칙이다. 조항은
+      신설하지 않고 각 화면 주석으로 관리한다(9/30 판단). 이 파일에서 3.6 을 배치 근거로
+      인용한 자리는 지웠다.
+  · 수정 모달의 표시 범위를 읽기 전용으로 바꿨다. 표시 범위는 등록 시 정하며 바꾸지 않는다
+    (모델 정책 2.4·6장 · 워크스페이스 정책 2.1). 범위를 바꾸려면 대상 범위로 다시 등록한다.
+    ⚠ v0.32 는 전용 모델의 워크스페이스 칸만 잠그고 전역 ⇄ 전용 전환은 최고 관리자에게 열어
+      두었다. 9/23 팀장 확정(3안)으로 전환도 소속 변경에 해당해 차단한다 — 빌드 이미지·노드
+      캐시·배포가 워크스페이스에 묶여 있어 범위를 바꾸면 실물이 따라가지 못한다.
+      백엔드는 9/28 dev 배포부터 전환 요청을 400 으로 거부한다.
+  · 라디오·워크스페이스 셀렉트를 없애고 현재 값만 텍스트로 둔다. 모델명·버전과 같은 층위다
+    (공통정책 7.11 — 수정 불가 항목은 읽기 전용으로 노출).
+  · 안내 문구는 상태 안내에 그친다 — `다시 등록해 주세요` 가 아니라 `새로 등록합니다`.
+    이 화면에서 할 수 있는 조치가 없고, 재등록은 이 모델을 고치는 일이 아니라 다른 모델을
+    만드는 일이라 조치가 아니다(UI 문구 규칙 1·2).
+  · 데모 바 권한 버튼이 처음 열었을 때 아무것도 켜져 있지 않던 것을 고쳤다 — 초기화가 버튼 없이
+    호출되어 표시만 지워졌다. 워크스페이스 목업과 같은 처리다. 검토용 장치라 화면 규격과 무관하다.
 
   ── v0.32 (CON-562 · CON-446) ──
   · 사용 여부 도움말에서 값 목록(`배포 이름`·`-`)을 뺐다 — 상태 배지 열이 아니고, 빈 값 표기는 전 화면 공통이다(공통정책 1.7).
@@ -83,7 +107,7 @@ a{color:inherit}
 .dact{margin-left:auto;display:flex;gap:8px;flex:0 0 auto}
 /* 속성 섹션 — 탭에 숨기지 않는다. 상세로 들어온 주된 이유다 */
 .dsec{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px}
-/* 섹션 액션 — 제목 줄 우측에 붙인다(공통정책 3.6) */
+/* 섹션 액션 — 제목 줄 우측에 붙인다 */
 .secbtns{margin-left:auto;display:flex;gap:6px}
 .dsec > h4{margin:0 0 12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
 .dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 22px}
@@ -172,6 +196,10 @@ a{color:inherit}
 .btn.ghost:hover:not(:disabled){background:var(--hover);border-color:var(--foreground)}
 .btn.danger{background:var(--destructive);color:#fff}
 .btn.danger:hover:not(:disabled){background:var(--destructive-hover)}
+/* 파괴적 액션 진입 버튼은 외곽선, 확인 알럿의 최종 실행만 채운다(라이브러리 v0.2).
+   이 파일에 규칙이 빠져 있어 상세 `삭제` 가 기본 `.btn`(강조색 채움)으로 렌더되고 있었다 */
+.btn.danger-line{background:transparent;border:1px solid color-mix(in srgb,var(--destructive) 45%,var(--border));color:var(--destructive)}
+.btn.danger-line:hover:not(:disabled){background:color-mix(in srgb,var(--destructive) 8%,transparent);border-color:var(--destructive)}
 .btn svg{width:14px;height:14px}
 .btn.sm{padding:6px 11px;font-size:12px}
 
@@ -181,6 +209,12 @@ a{color:inherit}
 .tabs button.on{color:var(--foreground);border-bottom-color:var(--primary)}
 .tabs .cnt{font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:20px;background:var(--muted);color:var(--muted-foreground)}
 .tabs button.on .cnt{background:var(--primary);color:var(--primary-foreground)}
+/* 탭 줄 — 탭과 그 탭의 액션을 한 줄에 둔다. 개발룸·플랫폼 설정 목업과 같은 규격이다.
+   테두리를 이 줄이 갖고 탭 자체의 테두리는 지운다 */
+.tabrow{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+  border-bottom:1px solid var(--border);margin-bottom:16px}
+.tabrow .tabs{border-bottom:0;margin-bottom:0}
+.tabrow > div:last-child{padding-bottom:8px}
 
 /* 툴바 */
 .toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
@@ -868,7 +902,7 @@ th.thcell.fdd-on .fdd{display:block}
       </div>
       <div class="f">
         <label>표시 범위</label>
-        <div class="pick" id="eScope"></div>
+        <div id="eScope"></div>
         <div class="hint" id="eScopeHint"></div>
       </div>
       <div class="f" id="eEngWrap">
@@ -1402,8 +1436,12 @@ function setState(s,btn){state=s;
   render();}
 function setRole(r,btn){
   role=r;
-  document.querySelectorAll('#demoBar .rl').forEach(b=>b.classList.remove('on'));
-  if(btn)btn.classList.add('on');
+  /* 버튼 없이 호출되는 초기화(setRole('super'))에서도 표시가 맞아야 한다 —
+     종전에는 on 을 지우기만 하고 다시 붙이지 않아 기본 권한이 어느 것인지 보이지 않았다 */
+  const IDX={super:0,admin:1,editor:2,viewer:3};
+  const rls=document.querySelectorAll('#demoBar .rl');
+  rls.forEach(b=>b.classList.remove('on'));
+  (btn || rls[IDX[r]]).classList.add('on');
   /* 퍼스널 영역은 워크스페이스를 벗어난 자리라 플랫폼 역할만 표시한다(공통정책 1.5).
      워크스페이스 역할은 대상마다 달라 한 값으로 적을 수 없다 —
      역할 확인은 워크스페이스 상세 멤버 탭·마이페이지 소속 섹션에서 한다 */
@@ -1582,8 +1620,9 @@ function drawDetail(){
    + (m.scope==='전역'? ' <span class="chip">전역</span>' : ' <span class="chip">전용</span>');
   document.getElementById('dMeta').innerHTML =
     (isA?'모델 이미지':'원천 가중치') + ' · 등록자 ' + userRef(m.by) + ' · ' + m.at;
-  /* 액션은 그 액션이 걸리는 대상 옆에 둔다(공통정책 3.6).
-     `삭제` 는 모델 전체에 걸리므로 화면 헤더, `수정` 은 기본 정보 카드에 걸리므로 그 제목 옆이다 */
+  /* 액션은 그 액션이 걸리는 대상 옆에 둔다 — 공통정책에 조항이 없어 화면 주석으로 관리한다.
+     `삭제` 는 모델 전체에 걸리므로 화면 헤더, `수정` 은 기본 정보 카드에 걸리므로 그 제목 옆,
+     `＋ 버전 추가` 는 버전 목록에 걸리므로 그 탭 줄 우측이다 */
   document.getElementById('dAct').innerHTML = canWrite()
     ? '<button class="btn danger-line" onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+','+(m._vcnt||1)+')">삭제</button>'
     : '';
@@ -1619,16 +1658,22 @@ function drawDetail(){
      + '</div></div>';
   }
 
-  /* ④ 탭 — 하위 목록 */
-  h+='<div class="tabs">'
+  /* ④ 탭 — 하위 목록.
+     그 탭의 액션은 탭 줄 우측에 둔다(`.tabrow`). `＋ 버전 추가` 는 버전 목록에 항목을 더하는
+     액션이라 원칙상 목록 위 툴바 자리인데(개발룸 `CDE 신청` 과 같은 성격), 버전 목록에는
+     검색·필터가 없어 툴바를 새로 만들면 버튼만 담긴 줄이 된다. 탭 줄 우측이 비어 있어
+     층을 늘리지 않는 자리다.
+     ⚠ 버전 목록에 검색·정렬·페이지네이션이 생기면 툴바로 옮긴다 */
+  h+='<div class="tabrow"><div class="tabs">'
    + '<button class="'+(dTab===0?'on':'')+'" onclick="setDTab(0)">버전 <span class="cnt">'+vers.length+'</span></button>'
    + '<button class="'+(dTab===1?'on':'')+'" onclick="setDTab(1)">배포 <span class="cnt">'+dps.length+'</span></button>'
+   + '</div>'
+   /* 배포 탭에는 항목을 더하는 액션이 없어 우측을 비운다 — 배포는 배포 화면에서 만든다 */
+   + '<div>' + ((dTab===0 && canWrite())
+       ? '<button class="btn ghost sm" onclick="openVerAdd()">＋ 버전 추가</button>' : '') + '</div>'
    + '</div>';
 
   if(dTab===0){
-    h+= canWrite()
-      ? '<div style="display:flex;justify-content:flex-end;margin-bottom:10px">'
-        + '<button class="btn ghost sm" onclick="openVerAdd()">＋ 버전 추가</button></div>' : '';
     h+='<div class="tblwrap"><table class="tbl"><thead><tr>'
      + '<th>버전</th><th>'+(isA?'캐싱 상태':'빌드 상태')+'</th>'
    + (isA?'<th>캐싱 노드</th><th>사용 여부</th>':'')
@@ -1788,35 +1833,20 @@ function openEdit(){
   document.getElementById('eEngWrap').style.display = isA?'':'none';
   document.getElementById('eTag').value='';
   const p=document.getElementById('eScope'), hint=document.getElementById('eScopeHint');
-  /* 등록 폼과 같은 구조다 — 어느 워크스페이스인지를 라디오 안에서 고른다.
-     전역 → 전용으로 바꾸면 붙을 워크스페이스를 정해야 한다(모델정책 9. 7번) */
-  const mine = WSLIST.filter(function(w){
-    return w!=='공용 워크스페이스' && (isSuper() || (MYWS[role]||[]).indexOf(w)>=0);
-  });
-  /* 전역 상태 `cur`(패널에 열린 대상)과 이름이 겹치면 함수 전체에서 전역이 가려진다 */
+  /* 표시 범위는 등록 시 정하며 바꾸지 않는다(모델 정책 2.4·6장 · CON-446).
+     전역 ⇄ 전용 전환도 소속 변경에 해당한다 — 빌드 이미지는 워크스페이스별 레지스트리에,
+     노드 캐시와 배포는 그 네임스페이스에 묶여 있어 범위만 바꾸면 실물이 따라가지 못한다.
+     역할을 가리지 않고 값만 보인다. 최고 관리자도 바꾸지 않는다 */
   const curWs = (m.ws && m.ws!=='-')? m.ws : '';
-  /* 이미 워크스페이스 전용인 모델은 소속 워크스페이스를 바꾸지 않는다(모델 정책 2.4 · CON-446).
-     전역 → 전용으로 바꿀 때 고르는 것은 확인 대상이라 그대로 둔다 */
-  eLockWs = (m.scope!=='전역' && !!curWs);
-  const opts = (curWs? '' : '<option value="">선택해 주세요.</option>')
-   + mine.map(function(w){ return '<option'+(w===curWs?' selected':'')+'>'+w+'</option>'; }).join('');
-  if(role==='super'){
-    p.innerHTML='<label><input type="radio" name="escope" '+(m.scope==='전역'?'checked':'')+' onchange="editScope(\'global\')"><span>전역</span><small>모든 워크스페이스</small></label>'
-              + '<label><input type="radio" name="escope" '+(m.scope!=='전역'?'checked':'')+' onchange="editScope(\'ws\')"><span>워크스페이스 전용</span>'
-              +   '<select class="inp wsin" id="eWs"'+((m.scope==='전역'||eLockWs)?' disabled title="소속 워크스페이스는 등록 시 정하며 바꿀 수 없습니다."':'')+' onclick="event.stopPropagation()" onchange="editValid()">'+opts+'</select></label>';
-    hint.textContent = useOf(m)==='배포 중' ? '배포에 사용 중인 모델입니다. 범위를 변경하면 해당 배포의 접근 범위가 함께 바뀝니다.' : '';
-  }else{
-    p.innerHTML='<label style="grid-column:1/-1"><input type="radio" name="escope" checked><span>'+(m.scope==='전역'?'전역':'워크스페이스 전용')+'</span></label>';
-    hint.textContent='표시 범위 변경은 최고 관리자만 가능합니다.';
-  }
+  /* 모델명·버전과 같은 표현으로 둔다 — 수정 불가 항목은 읽기 전용 입력으로 노출한다
+     (공통정책 7.11). 라이브러리에 없는 표시용 클래스를 새로 만들지 않는다 */
+  p.innerHTML='<input class="inp" disabled value="'+(m.scope==='전역'? '전역' : '워크스페이스 전용 · '+curWs)+'">';
+  /* 이 화면에서 할 수 있는 조치가 없으므로 상태 안내에 그친다(UI 문구 규칙 2).
+     `다시 등록`은 이 모델의 범위를 바꾸는 것이 아니라 다른 모델을 새로 만드는 일이라
+     조치가 아니다. 행동을 요청하는 자리가 아니므로 평서체로 둔다(규칙 1) */
+  hint.textContent='표시 범위는 등록 시 정하며 변경할 수 없습니다. 다른 범위가 필요하면 새로 등록합니다.';
   eInit={desc:document.getElementById('eDesc').value, tag:'', scope:m.scope};
   document.getElementById('mdEdit').classList.add('on');
-  editValid();
-}
-let eLockWs=false;
-function editScope(v){
-  const sel=document.getElementById('eWs');
-  if(sel) sel.disabled=(v==='global') || eLockWs;
   editValid();
 }
 function closeEdit(){
