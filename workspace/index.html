@@ -1,5 +1,26 @@
 <!--
-  콘체르토 매니저 — 워크스페이스 화면 목업 v0.54 (2026-09-22)
+  콘체르토 매니저 — 워크스페이스 화면 목업 v0.55 (2026-09-30)
+
+  ── v0.55 (CON-605·562) ──
+  · 공용 워크스페이스 멤버 초대·제외·나가기 진입점을 감췄다(공통정책 7.10 · 정책 6.2).
+    전원이 기동 때마다 자동 등록되어 제거·탈퇴가 성립하지 않고 초대할 대상도 없다.
+  · 공용 워크스페이스 관리자는 최고 관리자가 겸한다(정책 6.1 · CON-562). 종전에는 최고
+    관리자가 공용 관리자를 지정하고 그 관리자가 속성 운영을 맡는 구조였으나, 구현이
+    최고 관리자 외에는 공용 관리자를 허용하지 않아 지정할 대상이 없다. 연동·외부 배포·룸
+    진입점을 최고 관리자 기준으로 바꿨다.
+  · 공용 워크스페이스 역할 셀렉트 — `관리자` 선택지를 최고 관리자 계정에만 두고, 최고
+    관리자 계정의 역할은 관리자로 고정해 셀렉트를 비활성으로 둔다.
+  · 전원 자동 등록이라는 사실은 멤버 섹션 도움말에 둔다(공통정책 4.7). 조치가 없는
+    정보라 알럿을 쓰지 않는다 — 알럿은 `관리자가 1명입니다` 처럼 조치가 딸릴 때만 쓴다.
+    ※ 7.10 에 조항이 없어 공통정책 개정 제안 대상이다.
+  · 공용 워크스페이스 자원 카드를 2열로 둔다. 카드가 둘(자원 배정·공유 볼륨)인데 열이
+    4개로 고정되어 오른쪽 두 칸이 비어 있었다. `자원 배정` 카드의 사유 줄은 뺐다 —
+    바로 아래 환경별 배분 안내가 같은 말을 담아 한 화면에 두 번 나왔다.
+    ※ 열 수는 카드 수를 따른다는 규칙은 컴포넌트 라이브러리 `.qcards` 소관이다.
+  · 공용 워크스페이스 데모 멤버를 최고 관리자·일반 계정이 섞인 구성으로 바꿨다. 종전
+    1명(admin)이라 위 두 규칙이 화면에 드러나지 않았다. 자동 등록 대상은 승인·활성 계정이라
+    (CON-562) 승인 대기·반려 계정은 두지 않는다 — 로그인할 수 없는 계정은 워크스페이스
+    멤버가 되지 않는다(계정 정책 3장).
 
   ── v0.54 (CON-531·562·492) ──
   · 표에 가로 스크롤을 두고, 헤더 도움말·행 메뉴는 화면 기준으로 띄우는 공통 처리를 넣었다 — 좁은 화면에서 `작업` 열이 찌그러지던 것을 고쳤다(공통정책 3.4).
@@ -15,24 +36,32 @@
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 여기서 새 값을 만들지 않는다 —
   필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
 
-  ── 공용 워크스페이스 권한 (2026-08-25) ──────────
-  속성 운영은 지정된 Workspace Admin 이 한다(정책 v0.42 6.1·8장). 최고 관리자 전용이
-  아니다 — 최고 관리자는 존재를 정하는 일(생성·삭제·관리자 지정)만 갖는다(정책 1.1).
-  관리자를 지정하는 이유는 그 관리자가 관리하기 때문이다. 지정만 하고 권한을 주지
-  않으면 지정이 뜻을 갖지 않는다.
+  ── 공용 워크스페이스 권한 (2026-09-30 개정) ──────
+  공용 워크스페이스는 플랫폼 층위에 둔다(정책 1.1). 관리자는 최고 관리자가 겸하며 따로
+  지정하지 않는다(정책 6.1 · CON-562). 최고 관리자가 아닌 계정은 공용 관리자가 될 수 없고,
+  최고 관리자의 공용 역할은 관리자로 고정된다. 멤버가 곧 플랫폼 전 계정이고 라이선스
+  용량도 이 워크스페이스에 저장된다.
 
-  예외는 셋뿐이다.
-    삭제        진입점 미노출(정책 2.5) — 지우면 공용 서빙이 중단된다
-    자원 할당량  진입점 미노출(정책 6.2) — 배정값이 없고 남은 자원을 쓴다
-    이름        읽기 전용(정책 6.1) — 플랫폼에 하나뿐이라 정체성이 이름에 있다
+  따라서 공용에서 관리자 작업의 기준은 `isWsAdmin()` 이 아니라 `isSuper()` 다.
+    연동·전용 저장소  최고 관리자만(정책 6.1·6.2)
+    외부 배포        최고 관리자만 등록·해제(정책 3.6·9장)
+    룸              최고 관리자만 생성·설정·삭제(정책 6.2)
+    멤버 역할 변경    최고 관리자만. `관리자` 선택지는 최고 관리자 계정에만(정책 6.2)
 
-  🔴 8/25 — 설명도 잠갔다. 자산 등록·수정·삭제·자원 할당량이 이미 막혀 있어
-  기본 정보만 열어 두면 기준이 갈린다. 전 사용자가 참조하는 문구라 설치 시 고정한다.
-  이름을 잠근 것은 아이콘과 짝을 맞춘 것이다. 공용 전용 아이콘은 이미 선택지에서
-  빠져 있는데(`WSICO.globe` 의 `sys:true`) 이름만 열려 있어 규격이 갈렸다.
+  진입점을 아예 두지 않는 것은 다섯이다.
+    삭제              정책 2.5 — 지우면 공용 서빙이 중단된다
+    자원 할당량        정책 6.2 — 배정값이 없고 남은 자원을 쓴다
+    기본 정보(이름·설명·아이콘)  정책 6.1 — 플랫폼에 하나뿐이라 설치 시 고정한다
+    멤버 초대          정책 6.2 — 전원 자동 등록이라 초대할 대상이 없다
+    멤버 제외·나가기    정책 6.2 — 제거·탈퇴가 성립하지 않는다. 백엔드도 거부한다(CON-605)
 
-  ⚠ 종전 주석 둘이 `수정·삭제 진입점 미노출` · `수정·삭제는 최고 관리자 전용` 로
-    적혀 있었으나 구현은 Workspace Admin 이었다. A/B 비교안 시절 잔재였고 정리했다.
+  기본 정보를 셋 다 잠근 이유 — 자산 등록·수정·삭제·자원 할당량이 이미 막혀 있어 기본
+  정보만 열어 두면 기준이 갈린다. 설명은 전 사용자가 참조하는 문구다. 공용 전용 아이콘은
+  이미 선택지에서 빠져 있다(`WSICO.globe` 의 `sys:true`).
+
+  ⚠ 종전 주석이 `속성 운영은 지정된 Workspace Admin 이 한다(정책 v0.42 6.1·8장)` 로
+    적혀 있었다. 9/22 배포로 최고 관리자 외에는 공용 ADMIN 이 될 수 없어 지정할 대상이
+    없어졌고, 팀장 확인(2026-09-29 · CON-562)으로 최고 관리자 겸임으로 확정됐다.
   ⚠ 일반 워크스페이스의 이름 변경 가능 여부는 확인 대상이다(정책 10. 7번).
     확정 전까지 입력을 유지하고 `불가` 로 확정되면 `canEditName()` 를 고쳐 잠근다.
 
@@ -107,7 +136,7 @@
    대상을 인자로 받게 고쳤다 — 카드·테이블 모두 행마다 판정한다.
    공용은 기본 정보 수정과 삭제를 노출하지 않는다(정책 6.1·6.2).
    ⚠ 연동·외부 배포·API Key 는 공용도 일반과 동일하다(6.2). 기본 정보 수정과 권한 축이
-     달라 `canManageExt()` 로 갈랐다.
+     달라 `canManageExt(m)` 로 갈랐다.
 
 ── 탭 배지 (2026-08-26) ──────────────────────
    상세 탭(멤버·연동·API Key)에 건수를 넣었다. 탭을 열기 전에 몇 건인지가 판단 재료다 —
@@ -1043,10 +1072,13 @@ table.tbl tr.need td{background:color-mix(in srgb,var(--destructive) 5%,transpar
 .dark .wtabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
 
 /* 자원 점유 현황 카드 */
-/* 상세 자원 카드 — 항목이 4개로 고정이라 열 수도 고정한다 */
+/* 상세 자원 카드 — 열 수는 카드 수를 따른다.
+   일반 워크스페이스는 4개(CPU·Memory·가속기·공유 볼륨)라 4열,
+   공용은 2개(자원 배정·공유 볼륨)라 2열이다. 4열 고정이면 오른쪽 두 칸이 빈다 */
 .qcards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:20px}
-@media (max-width:1080px){ .qcards{grid-template-columns:repeat(2,minmax(0,1fr))} }
-@media (max-width:640px){  .qcards{grid-template-columns:1fr} }
+.qcards.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:1080px){ .qcards,.qcards.two{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:640px){  .qcards,.qcards.two{grid-template-columns:1fr} }
 .qcard{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px}
 .qcard .qnote{font-size:11px;color:var(--faint);margin-top:6px}
 .qcard .qt{font-size:11.5px;color:var(--muted-foreground);margin-bottom:8px;display:flex;align-items:center;gap:5px}
@@ -1918,7 +1950,13 @@ const WS=[
   quota:{cpu:0,ram:0,gpu:0,vol:50},
   devq:{cpu:0,ram:0,gpu:0},
   use:{cpu:0,ram:0,gpu:0},
-  members:[{n:'관리자',id:'admin',role:'관리자'}],
+  /* 공용은 승인·활성 계정 전원이 자동 등록된다(정책 6.1 · CON-562).
+     최고 관리자 계정(admin·yj.seong)은 역할이 관리자로 고정되고,
+     그 외 계정은 `관리자` 선택지가 노출되지 않는다(정책 6.2 · CON-605).
+     종전 데모가 admin 1명이라 두 규칙이 화면에 드러나지 않았다 */
+  members:[{n:'관리자',id:'admin',role:'관리자'},{n:'성유진',id:'yj.seong',role:'관리자'},
+           {n:'임승주',id:'sj.lim',role:'편집자'},{n:'유지현',id:'jh.yu',role:'뷰어'},
+           {n:'오경환',id:'kh.oh',role:'편집자'}],
   models:[{n:'qwen3-32b',st:'캐싱됨',use:'미사용'},{n:'gpt-oss-120b',st:'캐싱됨',use:'배포 중'}],
   deps:[{n:'furiosa-gpt-oss-120b-biz-prod',st:'정상',rep:'1',by:'-'},{n:'gpt-oss-20b-081valid',st:'정상',rep:'2',by:'-'}],
   ext:[], cdes:[], keys:[], jobs:[]},
@@ -2051,24 +2089,35 @@ let state='default', role='super', view='list', listView='card', cur=null, formK
 /* 권한 (RBAC + 자원 배분은 플랫폼 운영자 소관) */
 const isSuper =()=>role==='super';
 const isWsAdmin=()=>role==='super'||role==='admin';
-/* 공용 워크스페이스도 일반 워크스페이스와 같은 구성을 제공한다(정책 6.2).
-   최고 관리자가 관리자를 지정하고(6.1) 그 뒤 속성 운영은 Workspace Admin 이 한다 —
-   정책 1.1 이 존재를 정하는 일(생성·삭제·관리자 지정)과 속성 운영을 층위로 가른다.
-   예외는 셋이다 — 자원 배정 정책이 없어 할당량 진입점을 두지 않고(6.2),
-   지우면 공용 서빙이 중단되므로 삭제도 두지 않고(2.5),
-   플랫폼에 하나뿐인 공간이라 정체성이 이름에 있어 이름을 바꾸지 않는다(6.1) */
+/* 공용 워크스페이스는 구성은 일반과 같으나(정책 6.2) 관리 주체가 다르다.
+   관리자는 최고 관리자가 겸하며 따로 지정하지 않는다(6.1 · CON-562) —
+   최고 관리자가 아닌 계정은 공용 관리자가 될 수 없어 지정할 대상이 없다.
+   그래서 공용에서 관리자 작업의 기준은 `isWsAdmin()` 이 아니라 `isSuper()` 다.
+   진입점을 아예 두지 않는 것은 다섯이다 — 할당량(6.2 · 배정값이 없다) ·
+   삭제(2.5 · 지우면 공용 서빙이 중단된다) · 기본 정보(6.1 · 설치 시 고정) ·
+   멤버 초대(6.2 · 전원 자동 등록이라 대상이 없다) ·
+   멤버 제외·나가기(6.2 · 제거·탈퇴가 성립하지 않고 백엔드도 거부한다 · CON-605) */
 const isSysWs =(m)=>{ const t = m || (cur && cur.m); return !!(t && t.sys); };
+/* 공용에서 관리자 작업을 할 수 있는지 — 일반은 Workspace Admin, 공용은 최고 관리자 */
+const canAdminWs=(m)=>isSysWs(m)? isSuper() : isWsAdmin();
+/* 최고 관리자 계정 — 공용 워크스페이스에서 `관리자` 역할을 가질 수 있는 계정이다.
+   사용자 및 역할 목업의 최고 관리자 계정과 같은 값을 쓴다.
+   실제로는 계정의 플랫폼 역할을 읽는다 */
+const SUPER_IDS=['admin','yj.seong'];
+const isSuperAcct=(id)=>SUPER_IDS.indexOf(id)>=0;
 /* 공용은 기본 정보(이름·설명·아이콘)를 아무도 바꾸지 않는다(정책 6.1·8장).
    자산 등록·수정·삭제·자원 할당량이 이미 막혀 있어 기본 정보만 열어 두면 기준이 갈린다.
    설명은 설치 시 고정 문구로 둔다 — 전 사용자가 참조하는 문구다.
    진입점을 두지 않는다(공통정책 7.10) */
 const canEditInfo =(m)=>!isSysWs(m) && isWsAdmin();
-/* 연동·외부 배포·API Key 는 공용도 일반과 동일하다(정책 6.2).
-   기본 정보 수정(6.1 미노출)과 권한 축이 다르므로 함수를 가른다 */
-const canManageExt=()=>isWsAdmin();   /* 이름·설명·아이콘 */
-/* 공용 워크스페이스의 전용 저장소는 최고 관리자만 설정한다(정책 6.1 · CON-562).
-   Hugging Face 연동·외부 배포·API Key 는 공용도 일반과 같아 canManageExt 를 그대로 쓴다 */
-const canManageStorage=(m)=>isWsAdmin() && (!isSysWs(m) || isSuper());
+/* 연동·외부 배포·룸은 일반은 Workspace Admin, 공용은 최고 관리자가 한다(정책 6.1·3.6).
+   기본 정보 수정(6.1 미노출)과 권한 축이 다르므로 함수를 가른다.
+   ⚠ v0.54 까지 `공용도 일반과 동일` 이었으나 정책 6.1 개정으로 바뀌었다 */
+const canManageExt=(m)=>canAdminWs(m);
+/* 전용 저장소는 공용에서 최고 관리자 전용이다(정책 6.1 · CON-562).
+   연동 전체가 같은 기준이 되어 canManageExt 와 결과가 같으나,
+   근거 조항이 달라(6.1 저장소 · 6.1 관리자 겸임) 함수를 남겨 둔다 */
+const canManageStorage=(m)=>canAdminWs(m);
 /* 공용은 이름을 바꾸지 않는다(정책 6.1).
    ⚠ 일반 워크스페이스의 이름 변경 가능 여부는 확인 대상이다(정책 10. 7번) —
      `불가` 로 확정되면 여기도 읽기 전용으로 바꾼다 */
@@ -2083,7 +2132,18 @@ const canSetQuota=(m)=>isSuper() && !isSysWs(m);
 const canAskQuota=(m)=>isWsAdmin() && !isSuper() && !isSysWs(m);
 /* 삭제 진행 중에는 같은 작업을 다시 실행할 수 없다(공통정책 7.4) */
 const isBusy=(m)=>m && m.st && m.st!=='활성';
-const canManageMember=()=>isWsAdmin();
+/* 멤버 — 두 갈래로 가른다(정책 6.2 · CON-605).
+   역할 변경은 공용에서도 한다. 다만 주체는 최고 관리자다(관리자를 겸하므로).
+   초대·제외·나가기는 공용에 두지 않는다 — 전원이 기동 때마다 자동 등록되어
+   제거·탈퇴가 성립하지 않고(백엔드도 거부한다) 초대할 대상도 남지 않는다.
+   진입점을 감춘다(공통정책 7.10) */
+const canManageMember=(m)=>canAdminWs(m);          /* 역할 변경 */
+const canChangeMembership=(m)=>canAdminWs(m) && !isSysWs(m);   /* 초대·제외·나가기 */
+/* 공용에서 `관리자` 역할을 고를 수 있는 계정인지 — 최고 관리자 계정만이다.
+   최고 관리자 계정의 공용 역할은 관리자로 고정되어 셀렉트를 비활성으로 둔다 */
+const roleOpts=(m,u)=>(isSysWs(m) && !isSuperAcct(u.id))
+  ? ['편집자','뷰어'] : ['관리자','편집자','뷰어'];
+const isFixedRole=(m,u)=>isSysWs(m) && isSuperAcct(u.id);
 /* 키는 계정 단위로 발급한다(정책 7장 · 8/19 회의 3.4).
    인증·인가 도메인에서 관리하며 워크스페이스가 참조해 쓴다.
    계정이 인증 주체이므로 역할과 무관하게 본인 키는 본인이 만들고 지운다 */
@@ -2901,9 +2961,12 @@ function drawDetail(){
 
   /* 자원 — 사용량 카드와 환경별 배분을 한자리에 둔다 */
   /* 공용 워크스페이스는 자원 할당 정책이 없다. 배정값 대신 사용 방식을 안내한다 */
+  /* 공용은 카드가 둘이라 2열로 둔다. 4열이면 오른쪽 두 칸이 빈다.
+     `자원 배정` 카드에 사유를 적지 않는다 — 바로 아래 환경별 배분 안내가
+     같은 말을 담고 있어 한 화면에 두 번 나왔다 */
   h+= m.sys
-   ? '<div class="qcards">'
-     + qcardNum('자원 배정', '<small>없음</small>', '다른 워크스페이스에 배분하고 남은 자원을 사용합니다')
+   ? '<div class="qcards two">'
+     + qcardNum('자원 배정', '<small>없음</small>', '')
      + qcardNum('공유 볼륨'+help('vol'), m.quota.vol+' <small>GB</small>', '개발룸 공유 볼륨')
      + '</div>'
    : '<div class="qcards">'
@@ -2982,28 +3045,48 @@ function drawDetail(){
 
   if(CUR==='멤버'){
     h+='<div class="dsec"><h4>멤버 <span style="font-weight:400;color:var(--muted-foreground)">'+m.members.length+'명</span>'
-     + (canManageMember()?'<span class="secbtns"><button class="btn sm" onclick="openInvite()">멤버 초대</button></span>':'')
+     /* 공용은 초대·제외 진입점이 없어 그 이유를 밝힌다. 조치가 없는 정보이므로
+        알럿이 아니라 섹션 도움말에 둔다(공통정책 4.7 · 개정 제안 7.10).
+        알럿은 조치가 딸릴 때만 쓴다 — 아래 `관리자가 1명입니다` 가 그 경우다 */
+     + (isSysWs(m)? tip('승인·활성 계정이 자동으로 등록됩니다. 역할만 변경할 수 있습니다.') : '')
+     + (canChangeMembership(m)?'<span class="secbtns"><button class="btn sm" onclick="openInvite()">멤버 초대</button></span>':'')
      + '</h4>'
-     + '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>이름</th><th>아이디</th><th>역할</th><th style="width:72px">작업</th></tr></thead><tbody>'
+     /* 공용은 제외·나가기를 두지 않아 `작업` 열 자체를 빼고 3열로 둔다(정책 6.2).
+        열을 남겨 빈 칸으로 두면 무엇이 들어올 자리인지 읽히지 않는다 */
+     + '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>이름</th><th>아이디</th><th>역할</th>'
+     + (canChangeMembership(m)?'<th style="width:72px">작업</th>':'')+'</tr></thead><tbody>'
      + m.members.map(function(u,i){
+         /* 공용에서 최고 관리자 계정의 역할은 관리자로 고정된다(정책 6.2 · CON-562).
+            사유는 hint 가 아니라 툴팁 자리가 없어 셀렉트를 감싸 안내한다 */
+         const fixed=isFixedRole(m,u);
+         const why = fixed
+           ? '최고 관리자의 공용 워크스페이스 역할은 관리자로 고정됩니다.'
+           : '이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 변경할 수 있습니다.';
          return '<tr><td><div class="memcell"><span class="avatar">'+u.n.charAt(0)+'</span>'+memberName(u)+'</div></td>'
           + '<td>'+u.id+'</td>'
-          + '<td>'+(canManageMember()
-              ? '<select class="rolesel"'+(isLastAdmin(m,i)?' disabled title="이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 변경할 수 있습니다."':'')
-                +' onchange="chgRole('+i+',this.value)">'+['관리자','편집자','뷰어'].map(r=>'<option'+(u.role===r?' selected':'')+'>'+r+'</option>').join('')+'</select>'
+          + '<td>'+(canManageMember(m)
+              ? ((fixed||isLastAdmin(m,i))
+                 ? '<span class="tip-anchor"><span tabindex="0"><select class="rolesel" disabled>'
+                   + roleOpts(m,u).map(r=>'<option'+(u.role===r?' selected':'')+'>'+r+'</option>').join('')
+                   + '</select></span><span class="tip">'+why+'</span></span>'
+                 : '<select class="rolesel" onchange="chgRole('+i+',this.value)">'
+                   + roleOpts(m,u).map(r=>'<option'+(u.role===r?' selected':'')+'>'+r+'</option>').join('')
+                   + '</select>')
               : u.role)+'</td>'
           /* 마지막 관리자만 제외할 수 없다. 본인이라는 이유로 막지 않는다 —
              관리자가 여럿이면 본인도 워크스페이스를 나갈 수 있어야 한다.
              누른 뒤 막지 않고 미리 사유를 보여준다 */
-          + '<td>'+(canManageMember()
-              ? (isLastAdmin(m,i)
+          + (canChangeMembership(m)
+              ? '<td>'+(isLastAdmin(m,i)
                  ? '<button class="btn danger-line sm" disabled title="이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 제외할 수 있습니다.">제외</button>'
-                 : '<button class="btn danger-line sm" onclick="rmMember('+i+')">'+(u.id==='yj.seong'?'나가기':'제외')+'</button>')
-              : '')+'</td></tr>';
+                 : '<button class="btn danger-line sm" onclick="rmMember('+i+')">'+(u.id==='yj.seong'?'나가기':'제외')+'</button>')+'</td>'
+              : '')+'</tr>';
        }).join('')
      + '</tbody></table></div>'
      + '</div>'
-     + (canManageMember()&&adminCount(m)<=1
+     /* 공용은 관리자를 지정하지 않으므로(최고 관리자가 겸한다) 관리자 수 안내를 두지 않는다.
+        전원 자동 등록이라는 사실은 섹션 도움말에 두었다 — 조치가 없어 알럿을 쓰지 않는다 */
+     + (canChangeMembership(m)&&adminCount(m)<=1
         ? alertBox('info','관리자가 1명입니다.',
             '관리자는 최소 1명이 있어야 하므로 지금은 역할 변경과 제외를 할 수 없습니다. 부재 시 CDE 승인이 지연될 수 있어 관리자를 추가로 지정하는 것을 권장합니다.',
             '<button class="btn ghost sm" onclick="openInvite()">멤버 초대</button>', false)
@@ -3012,7 +3095,7 @@ function drawDetail(){
 
   if(CUR==='연동'){
     h+='<div class="dsec"><h4>Hugging Face Hub'+tip('이 워크스페이스에 토큰을 등록하면 플랫폼 전역 토큰보다 먼저 사용됩니다.')
-     + (canManageExt()?'<span class="secbtns"><button class="btn ghost sm" onclick="openConn()">연동 설정</button></span>':'')
+     + (canManageExt(m)?'<span class="secbtns"><button class="btn ghost sm" onclick="openConn()">연동 설정</button></span>':'')
      + '</h4><dl class="dl">'
      + '<dt>기본 URL</dt><dd>'+(m.hfUrl||'https://huggingface.co')+'</dd>'
      /* 켜 두었으면 어디로 나가는지 보인다. `사용` 만으로는 확인이 안 된다 */
@@ -3097,7 +3180,7 @@ function pnRoomBlock(m){
 /* 가속기 등 개수 단위 자원 — 비율 막대를 두지 않는다 */
 function qcardNum(t,v,note){
   return '<div class="qcard"><div class="qt">'+t+'</div><div class="qn">'+v+'</div>'
-   + '<div class="qnote">'+note+'</div></div>';
+   + (note?'<div class="qnote">'+note+'</div>':'')+'</div>';
 }
 function qcard(t,v,p,note){
   return '<div class="qcard"><div class="qt">'+t+'</div><div class="qn">'+v+'</div>'
@@ -3215,16 +3298,16 @@ function roomTab(m){
   h+='<div class="dsec"><h4>외부 배포'
    +   tip('외부 상용 AI API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다. API Key도 동일하게 적용됩니다.')
    +   ' <span style="font-weight:400;color:var(--muted-foreground)">'+ext.length+'건</span>'
-   + (canManageExt()?'<button class="btn sm" style="margin-left:auto" onclick="openExt()">외부 배포 등록</button>':'')+'</h4>'
+   + (canManageExt(m)?'<button class="btn sm" style="margin-left:auto" onclick="openExt()">외부 배포 등록</button>':'')+'</h4>'
    + (ext.length
      ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>모델명</th><th>제공자</th><th>상태</th><th style="width:72px">작업</th></tr></thead><tbody>'
        + ext.map(function(x){ return '<tr style="cursor:default"><td><span class="rname">'+x.n+'</span></td>'
          +'<td>'+x.prov+'</td><td><span class="stbadge '+RB[x.st]+'">'+x.st+'</span></td>'
          /* 파괴적 액션 진입은 외곽선 버튼으로 둔다(라이브러리 — 확인 알럿의 최종 실행만 채운다).
               아이콘만 두면 무엇을 지우는 것인지 눌러 봐야 안다 */
-           +'<td>'+(canManageExt()?'<button class="btn danger-line sm" onclick="rmExt(\''+x.n+'\')">해제</button>':'')+'</td></tr>'; }).join('')
+           +'<td>'+(canManageExt(m)?'<button class="btn danger-line sm" onclick="rmExt(\''+x.n+'\')">해제</button>':'')+'</td></tr>'; }).join('')
        + '</tbody></table></div>'
-     : '<div class="emptyline">등록된 외부 배포가 없습니다.'+(canManageExt()?' OpenAI·Anthropic 같은 상용 API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.':'')+'</div>')
+     : '<div class="emptyline">등록된 외부 배포가 없습니다.'+(canManageExt(m)?' OpenAI·Anthropic 같은 상용 API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.':'')+'</div>')
    + '</div>';
   return h;
 }
@@ -4044,6 +4127,14 @@ function submitInvite(){
 function adminCount(m){ return m.members.filter(function(u){return u.role==='관리자';}).length; }
 function isLastAdmin(m,i){ return m.members[i].role==='관리자' && adminCount(m)<=1; }
 function chgRole(i,v){
+  /* 공용에서 관리자 역할은 최고 관리자 계정에만 붙는다(정책 6.2 · CON-562).
+     선택지에서 이미 빠져 있어 화면으로는 닿지 않으나, 백엔드도 같은 규칙으로
+     막으므로(400 WS_PUBLIC_WORKSPACE_ADMIN_SUPERADMIN_ONLY) 문구를 함께 둔다 */
+  if(isSysWs(cur.m) && v==='관리자' && !isSuperAcct(cur.m.members[i].id)){
+    drawDetail();
+    openConfirm('역할 변경 불가','공용 워크스페이스의 관리자는 최고 관리자에게만 부여할 수 있습니다.', null,'','확인');
+    return;
+  }
   if(isLastAdmin(cur.m,i) && v!=='관리자'){
     drawDetail();
     openConfirm('역할 변경 불가','이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 변경할 수 있습니다.', null,'','확인');
