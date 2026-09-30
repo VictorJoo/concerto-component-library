@@ -1,6 +1,13 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 보안 및 감사 목업 v0.13 (2026-09-22)
+  콘체르토 매니저 — 플랫폼 설정 | 보안 및 감사 목업 v0.14 (2026-09-29)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.14 변경 ──────────────────────────────────
+  · 갈래에 `모니터링` 을 신설했다. 감사 로그 정책 3.1 이 갈래를 GNB 기준으로 두는데
+    모니터링만 빠져 있었다 — 알림 규칙 조작이 기록 대상이 되어 자리가 필요해졌다.
+  · 작업값에 알림 규칙 생성·수정·삭제를 더했다. 규칙을 지우면 워크스페이스 관리자와
+    연결 채널까지 알림이 끊겨 다른 사용자에게 영향을 준다(정책 2.1 기준 3).
+  · 내용에는 심각도·조건을 남긴다. 바뀐 항목은 변경 전후로 적는다(정책 4.2).
 
   ── v0.13 (CON-531·542) ──
   · 표에 가로 스크롤을 두고 `작업` 열 최소 폭을 지켰다. 패널이 열려도 열이 더 눌리지 않는다(공통정책 3.4). 헤더 도움말·행 메뉴는 화면 기준으로 띄운다.
@@ -2288,6 +2295,12 @@ const ACTKO={
   USER_LOCKED:'계정 잠금', USER_UNLOCKED:'잠금 해제',
   USER_LIST_VIEWED:'사용자 목록 조회', USER_VIEWED:'사용자 상세 조회',
   USER_LIST_EXPORTED:'사용자 목록 다운로드',
+  /* 모니터링 — 알림 규칙을 지우면 워크스페이스 관리자와 연결 채널까지 알림이 끊긴다.
+     다른 사용자에게 영향을 주는 삭제라 기록한다(감사 로그 정책 2.1 기준 3).
+     ⚠ 키 이름은 가안 — 백엔드 확인 대상 */
+  ALERT_RULE_CREATED:'알림 규칙 생성',
+  ALERT_RULE_UPDATED:'알림 규칙 수정',
+  ALERT_RULE_DELETED:'알림 규칙 삭제',
   /* 워크스페이스 */
   WORKSPACE_UPDATED:'워크스페이스 수정', WORKSPACE_DELETED:'워크스페이스 삭제',
   WORKSPACE_QUOTA_UPDATED:'자원 할당량 변경',
@@ -2318,6 +2331,10 @@ const AUDIT=[
   {at:'2026-08-13 00:00:03', cat:'WORKSPACE', ip:'', act:'CDE_EXPIRED', who:'시스템', name:'', tgt:'yj-vscode-01', d:'워크스페이스: ai-service-team\n사유: 사용 기간 종료. 접속이 차단되고 연산 파드가 정지되었습니다.'},
   {at:'2026-08-20 17:23:04', cat:'ACCOUNT', ip:'192.168.1.42', act:'USER_LOGIN_SUCCESS', who:'yj.seong', name:'성유진', tgt:'yj.seong', tuser:'yj.seong', d:'-'},
   {at:'2026-08-20 17:20:41', cat:'DEPLOYMENT', ip:'192.168.1.57', act:'DEPLOYMENT_CREATED', who:'sj.lim', name:'임승주', tgt:'llama-3-2-1b-prod', d:'워크스페이스: ai-service-team'},
+  /* 모니터링 — 알림 규칙. 내용에 심각도·조건을 남긴다(감사 로그 정책 4.2 가리키는 항목) */
+  {at:'2026-08-20 16:48:12', cat:'MONITORING', ip:'192.168.1.42', act:'ALERT_RULE_DELETED', who:'yj.seong', name:'성유진', tgt:'응답 지연 급증', d:'워크스페이스: ai-service-team\n심각도: 주의\n조건: P99 응답 지연 2000ms 초과가 60초 지속'},
+  {at:'2026-08-20 11:06:41', cat:'MONITORING', ip:'192.168.1.42', act:'ALERT_RULE_CREATED', who:'yj.seong', name:'성유진', tgt:'KV 캐시 포화', d:'워크스페이스: ai-service-team\n심각도: 주의\n조건: KV 캐시 사용률 95% 초과가 60초 지속'},
+  {at:'2026-08-20 11:04:22', cat:'MONITORING', ip:'192.168.1.42', act:'ALERT_RULE_UPDATED', who:'yj.seong', name:'성유진', tgt:'가속기 온도 이상', d:'워크스페이스: ai-service-team\n심각도: 주의 → 오류\n조건: 가속기 온도 85°C 초과가 60초 지속'},
   /* 삭제된 계정이 남긴 기록 — 행위자가 삭제됨(아이디)로 보인다 */
   {at:'2026-08-14 17:48:30', cat:'DEPLOYMENT', ip:'192.168.1.61', act:'DEPLOYMENT_CREATED', who:'hj.kang', name:'강현정', tgt:'mistral-7b-eval', d:'워크스페이스: ai-service-team'},
   /* 계정 삭제 기록 — 대상이 계정이다 */
@@ -2771,7 +2788,9 @@ function drawSso(){
 /* ══════════ 보안 및 감사 ══════════ */
 /* 운영 워크플로우 3단계 — 로그는 ACCOUNT(계정 가입/승인) · WORKSPACE(멤버 초대/제거) ·
    DEPLOYMENT(모델 기동 및 변경) · SYSTEM(인프라 전역 설정) 네 카테고리로 나뉜다 */
-const CATKO={ACCOUNT:'계정', WORKSPACE:'워크스페이스', MODEL:'모델', DEPLOYMENT:'배포', SYSTEM:'시스템'};
+/* 갈래는 필터 축이라 화면 구조와 같아야 사용자가 찾는다(감사 로그 정책 3.1).
+   GNB 를 기준으로 두는데 모니터링만 빠져 있었다 — 알림 규칙 조작이 기록 대상이 되어 신설한다 */
+const CATKO={ACCOUNT:'계정', WORKSPACE:'워크스페이스', MODEL:'모델', DEPLOYMENT:'배포', MONITORING:'모니터링', SYSTEM:'시스템'};
 /* 기간은 범위 입력이라 헤더 필터(체크박스 목록)에 맞지 않는다. 툴바에 둔다 */
 const APERIOD=[['7','최근 7일'],['30','최근 30일'],['90','최근 90일'],['all','전체 기간']];
 let aq='', aSel=[], aCat=[], aPer='30';
