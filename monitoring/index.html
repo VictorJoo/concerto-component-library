@@ -1,7 +1,36 @@
 <!--
-  콘체르토 매니저 — 모니터링 목업 v0.21 (2026-09-17)
+  콘체르토 매니저 — 모니터링 목업 v0.22 (2026-09-29)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다 —
   필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
+
+  ── v0.22 변경 ──────────────────────────────────
+  · 알림 규칙에 심각도를 넣었다. 알림 정책 7.2 가 `규칙 생성 시 지정` 으로 두었으나
+    기획서·목업에 항목이 없어 화면에서 만든 규칙이 전부 한 등급으로 들어갔다.
+    생성·수정 폼에 선택을 두고 목록에는 규칙명 다음에 컬럼으로 둔다.
+    공통정책 2.2 가 이름 뒤를 상태에 주고 알림 정책 5.2 가 알림 목록에서도
+    심각도를 걸러 내는 첫 축으로 둔다 — 같은 값을 두 화면에서 다르게 다루지 않는다.
+    배지 규격은 공통정책 1.9 의 상태 배지(배경 없음 + 상태색 테두리)를 쓴다.
+  · 선택지는 `주의` · `오류` 둘이다. 정책 4.1 은 `정보` 를 포함한 셋이나
+    백엔드가 WARNING · CRITICAL 두 값만 받는다. 지원되면 선택지에 더한다.
+  · 기본값은 `주의` 다. 고르지 않은 규칙이 곧바로 `오류` 등급을 갖지 않게 한다.
+  · 규칙 삭제에 이름 재입력을 두었다. 지우면 등록자만이 아니라 워크스페이스 관리자와
+    연결된 채널까지 알림이 끊기고 복구할 수 없다(공통정책 7.5 · 알림 정책 5.7).
+    연결된 채널이 있으면 건수를 함께 알린다.
+  · 규칙 이름에 2~30자 제한과 실시간 카운터를 두었다(공통정책 1.1 · 7.1). 없었다.
+  · 심각도 컬럼에 헤더 도움말을 두고 값별 의미를 목록으로 적었다(공통정책 2.3).
+    슬롯 상태 도움말과 같은 형식이다.
+  · 알림 채널 섹션 툴팁에 수신자를 밝혔다. 채널만 두면 누가 받는지 알 수 없다(알림 정책 7.2).
+  · 문구를 UI 문구 규칙에 맞췄다 — `최근 발생` 도움말의 `울린`·`눌러서 펴면`·`봅니다` 를
+    `발생시킨`·`누르면`·`표시합니다` 로. 같은 COLDEF 의 `dep`·`vram` 이 쓰는 형식이다.
+  · 규칙 생성 폼의 워크스페이스 선택지를 배포 조회 범위와 같은 조건으로 맞췄다.
+    종전에 공용 워크스페이스를 빼 두었으나 근거가 없었고, 스위처로 공용을 고르면
+    저장 로직이 그 값을 그대로 써 막히지도 않았다 — 한 화면에 기준이 둘이었다.
+    알림 규칙이 범위를 따로 정하지 않고 배포 목업 `inScope` · 상단 스위처를 따른다.
+    ⚠ 공용에 자체 배포를 둘 수 있는지는 미정의다(워크스페이스 정책 9장이 배포 정책에
+      넘겼으나 조항이 없다). 확인 대상이며 정해지면 이 조건이 따라간다.
+    ⚠ 데모 데이터에 공용 소속 배포를 넣지 않았다. 배포 목업의 공용 배포 2건이
+      외부 배포라 인프라 활용 정보가 없고(배포 정책 2.2) 프리셋 5종 중
+      `latency_p99_ms` 만 걸린다. DEPS 에 배포 유형 필드가 없어 별건으로 둔다.
 
   ── 화면 구성 ───────────────────────────────────
   MON-L01              모니터링 (탭 3)
@@ -347,6 +376,9 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .selall button{border:0;background:transparent;color:var(--muted-foreground);font-size:12px;font-weight:600}
 
 /* 토스트 */
+.cfname{margin:0 22px 4px;padding-top:15px;border-top:1px solid var(--border)}
+.cfname label{display:block;font-size:12px;color:var(--muted-foreground);margin-bottom:8px;line-height:1.55}
+.cfname label b{color:var(--foreground);font-weight:600}
 .toast-wrap{position:fixed;top:74px;right:22px;z-index:300;display:flex;flex-direction:column;gap:10px;width:340px;max-width:calc(100vw - 44px)}
 /* ⚠ 라이브러리 규격은 진행 바(.prog)가 붙는 구조라 flex-start·overflow:hidden 이다.
    여기는 진행 바가 없어 center 로 둔다. 등장 동작(tin)은 공통 규격을 따른다 */
@@ -2233,6 +2265,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 <div class="mdbg" id="mdConfirm">
   <div class="modal" style="width:400px">
     <div class="mdhead"><h3 id="cfTitle"></h3><p id="cfBody"></p></div>
+    <div class="cfname" id="cfNameWrap" style="display:none">
+      <label id="cfNameLb"></label>
+      <input class="inp" id="cfName" autocomplete="off" oninput="cfCheck()">
+    </div>
     <div class="mdfoot">
       <button class="btn ghost" onclick="closeConfirm()">취소</button>
       <button class="btn danger" id="cfOk">확인</button>
@@ -2537,17 +2573,17 @@ const HEALTH={
 /* 발생 이력 — 규칙이 실제로 알림을 울린 시각. 최신순, 최대 5건만 담는다(확정 문서 4장 #2).
    ⚠ 데모 값이다. 실제로는 알림 발생 로그에서 규칙 ID로 조회해야 한다(알림정책 9장 #2) */
 let RULES=[
-  {n:'가속기 온도 이상', metric:'gpu_temp',        op:'초과', th:85,  dur:60,
+  {n:'가속기 온도 이상', metric:'gpu_temp',        op:'초과', th:85,  dur:60, sev:'오류',
    ws:'ai-service-team', scope:'전체', ch:['slack-ai-alert'], by:'성유진(yj.seong)', at:'2026-08-20 11:04:22',
    fires:['2026-08-27 03:14:02','2026-08-25 22:40:11']},
-  {n:'KV 캐시 포화',    metric:'kv_cache_usage',  op:'초과', th:95,  dur:60,
+  {n:'KV 캐시 포화',    metric:'kv_cache_usage',  op:'초과', th:95,  dur:60, sev:'주의',
    ws:'ai-service-team', scope:'전체', ch:['slack-ai-alert'], by:'성유진(yj.seong)', at:'2026-08-20 11:06:41',
    fires:[]},
-  {n:'응답 지연 급증',   metric:'latency_p99_ms',  op:'초과', th:2000, dur:60,
+  {n:'응답 지연 급증',   metric:'latency_p99_ms',  op:'초과', th:2000, dur:60, sev:'주의',
    ws:'ai-service-team', scope:'llama-3-2-1b-prod', ch:[], by:'임승주(sj.lim)', at:'2026-08-22 15:31:08',
    fires:['2026-08-27 14:02:11','2026-08-27 09:18:47','2026-08-26 20:03:29','2026-08-26 11:55:00','2026-08-25 07:41:18']},
   /* 다른 워크스페이스 규칙 — 스위처가 `전체` 일 때 섞이는 것을 보인다 */
-  {n:'VRAM 포화', metric:'vram_usage', op:'초과', th:92, dur:120,
+  {n:'VRAM 포화', metric:'vram_usage', op:'초과', th:92, dur:120, sev:'주의',
    ws:'ml-research', scope:'전체', ch:['slack-infra'], by:'유지현(jh.yu)',
    at:'2026-08-24 09:12:33', fires:[]}
 ];
@@ -3716,6 +3752,12 @@ let rq='', rSort='at', rDir='desc', rScope=[], rPage=1, rPer=20;
 /* 최근 발생 행 확장 — 트레이스 탭과 같은 방식(한 번에 한 건만, 다시 누르면 접힘) */
 let ruleOpen=null;
 function toggleRuleFire(i){ ruleOpen = ruleOpen===i? null : i; render(); }
+/* 심각도 배지 — 알림 정책 4.2 는 심각도를 배지로 표기하고 본문에 다시 쓰지 않는다.
+   공통정책 1.9 의 상태 배지 규격(배경 없음 + 상태색 테두리)을 쓴다 */
+function sevBadge(s){
+  const v = s || '주의';
+  return '<span class="stbadge '+(v==='오류'?'cr':'wa')+'">'+v+'</span>';
+}
 
 /* 대상 범위 — 그 워크스페이스 안에서의 범위다. `워크스페이스 전체` 로 적으면
    워크스페이스 컬럼과 같은 말이 두 번 나온다 */
@@ -3788,6 +3830,10 @@ function drawRules(el){
     + (view.length
     ? '<div class="tblwrap"><table class="tbl"><thead><tr>'
     + rSortTh('n','규칙명')
+    /* 심각도는 이름 다음 자리다 — 공통정책 2.2 가 이름 뒤를 상태에 주고,
+       알림 정책 5.2 가 알림 목록에서 심각도를 걸러 내는 첫 축으로 둔다.
+       같은 값을 두 화면에서 다르게 다루지 않는다 */
+    + '<th class="thcell" style="width:88px">'+thHelp('sev','심각도')+'</th>'
     + '<th>감시 대상</th>'
     + '<th class="thcell">'+thHelp('cond','조건')+'</th>'
     /* 스위처가 워크스페이스를 고르면 이 열이 한 값으로 고정된다. 같은 값이 열 줄
@@ -3808,6 +3854,7 @@ function drawRules(el){
         const open = ruleOpen===i;
         return '<tr'+(hasFire?' style="cursor:pointer" onclick="toggleRuleFire('+i+')"':'')+'>'
           + '<td><span class="rname">'+r.n+'</span></td>'
+          + '<td>'+sevBadge(r.sev)+'</td>'
           + '<td>'+metricName(r.metric)+'</td>'
           /* 조건을 한 문장으로 읽히게 둔다. 컬럼을 셋으로 나누면 눈이 오간다 */
           + '<td>'+r.th+metricUnit(r.metric)+' '+r.op+'가 '+r.dur+'초 지속</td>'
@@ -3890,10 +3937,11 @@ function rulePager(tot,pages){
 let RF={};
 function openRule(i){
   ruleIdx=i;
-  const r = i<0 ? {n:'',metric:'gpu_temp',op:'초과',th:'',dur:'60',scope:'전체',ch:[]} : RULES[i];
+  const r = i<0 ? {n:'',metric:'gpu_temp',op:'초과',th:'',dur:'60',scope:'전체',ch:[],sev:'주의'} : RULES[i];
   /* 스위처가 `전체` 면 폼에서 고른다. 개별이면 그 워크스페이스로 고정된다 */
   const opts=ruleWsOpts();
   RF={n:r.n, metric:r.metric, op:r.op, th:String(r.th), dur:String(r.dur), scope:r.scope, ch:r.ch.slice(),
+      sev: r.sev || '주의',
       ws: r.ws || (wsCur==='전체'? (opts[0]||'') : wsCur)};
   document.getElementById('ruleTitle').textContent = i<0? '알림 규칙 추가' : '알림 규칙 수정';
   drawRuleForm();
@@ -3914,10 +3962,8 @@ function rfToggleCh(c){
 }
 function ruleValid(){
   if(wsCur==='전체' && !RF.ws) return false;
-  return RF.n.trim() && String(RF.th).trim()!=='' && String(RF.dur).trim()!=='';
+  return RF.n.trim().length>=2 && String(RF.th).trim()!=='' && String(RF.dur).trim()!=='';
 }
-/* 규칙을 만들 수 있는 워크스페이스. 최고 관리자는 전체, 그 외에는 자기 소속만.
-   공용 워크스페이스는 자원을 배정받지 않아 감시할 대상이 없다 */
 /* 대상 범위 배포는 규칙이 속할 워크스페이스 것만이다 — 스위처가 아니라
    폼에서 고른 값을 따른다. 스위처 기준으로 두면 다른 워크스페이스 배포를 고를 수 있다 */
 function ruleDeps(){
@@ -3925,17 +3971,37 @@ function ruleDeps(){
   return DEPS.filter(function(d){ return d.ws===w; });
 }
 
+/* 규칙을 만들 수 있는 워크스페이스 — 배포 조회 범위와 같은 조건을 쓴다.
+   알림 규칙이 범위를 따로 정하지 않는다. 감시 대상이 배포라 배포가 보이는 곳에
+   규칙을 만들 수 있으면 된다. 배포 목업 `inScope` · 상단 스위처와 같은 식이다.
+   ⚠ 종전에 공용 워크스페이스를 `자원을 배정받지 않아 감시할 대상이 없다` 는 사유로
+     뺐으나 근거가 아니었다 — 공용은 배정이 없을 뿐 남은 자원을 쓰고(워크스페이스
+     정책 6.1), 룸은 일반과 동일해(6.2·9장) 배포가 뜬다. 배포 생성 폼도 공용을
+     선택지에 둔다. 게다가 스위처로 공용을 고르면 저장 로직이 그 값을 그대로 써
+     막으려던 것이 막히지 않았다 — 한 화면에 기준이 둘이었다. */
 function ruleWsOpts(){
-  const all=WSLIST.filter(function(w){ return w!=='공용 워크스페이스'; });
-  return role==='super'? all : (MYWS[role]||[]);
+  return WSLIST.filter(function(w){
+    return isSuper() || w==='공용 워크스페이스' || (MYWS[role]||[]).indexOf(w)>=0;
+  });
 }
 
 function drawRuleForm(){
   const u=metricUnit(RF.metric);
   document.getElementById('ruleBody').innerHTML =
+      /* 이름은 2~30자다(공통정책 1.1). 초과 입력을 막고 실시간 카운터를 둔다(7.1) */
       '<div class="fld"><label>규칙 이름<span class="req">*</span></label>'
-    +   '<input class="inp" value="'+RF.n+'" placeholder="무엇을 감시하는지 적어 주세요."'
-    +   ' oninput="RF.n=this.value;document.getElementById(\'ruleSave\').disabled=!ruleValid()"></div>'
+    +   '<input class="inp" maxlength="30" value="'+RF.n+'" placeholder="무엇을 감시하는지 적어 주세요."'
+    +   ' oninput="RF.n=this.value;document.getElementById(\'rnCnt\').textContent=this.value.length+\'/30\';'
+    +   'document.getElementById(\'ruleSave\').disabled=!ruleValid()">'
+    +   '<div class="hint" id="rnCnt">'+RF.n.length+'/30</div></div>'
+
+    /* 심각도 — 알림 정책 4.1 의 값을 쓴다. 규칙이 울렸을 때 그 알림이 어느 등급인지다.
+       정책 4.1 은 `오류`·`주의`·`정보` 셋이나 백엔드가 WARNING·CRITICAL 두 값만 받는다
+       — `정보` 는 지원되면 선택지에 더한다(CON-588).
+       기본값을 `주의` 로 둔다. 고르지 않은 규칙이 곧바로 `오류` 등급을 갖지 않게 한다 */
+    + '<div class="fld"><label>심각도<span class="req">*</span></label>'
+    +   selBox('sev', [{v:'주의',t:'주의'},{v:'오류',t:'오류'}], RF.sev)
+    +   '<div class="hint">오류는 조치가 필요한 것, 주의는 두면 문제가 되는 것입니다.</div></div>'
 
     /* 프리셋과 카탈로그 검색 둘을 둔다(정책 6.3).
        ⚠ 카탈로그 조회 API 제공 여부 확인 대상(7. 6번) */
@@ -3986,7 +4052,8 @@ function drawRuleForm(){
     +   '</div></div>'
 
     + '<div class="fsec"><h4>알림 채널'
-    +   tip('규칙이 발생하면 선택한 채널로 전송됩니다. 선택하지 않아도 인앱 알림은 발생합니다.')+'</h4>'
+    /* 수신자를 밝힌다 — 채널만 두면 누가 받는지 알 수 없다(알림 정책 7.2) */
+    +   tip('조건에 해당하면 워크스페이스 관리자와 대상 배포 담당자에게 인앱 알림이 발생합니다. 채널을 고르면 그 채널로도 함께 전송됩니다.')+'</h4>'
     /* 등록된 채널만 고를 수 있다. 없으면 그 자리에서 등록 화면을 가리킨다 —
        목록 아래 안내문으로 두면 정작 고르는 자리에서는 보이지 않는다 */
     +   (CHANNELS.length ? '' : '<div class="emptyline">등록된 채널이 없습니다. 플랫폼 설정 &gt; 연동 및 알림에서 먼저 등록해 주세요.</div>')
@@ -4002,7 +4069,7 @@ function drawRuleForm(){
 function saveRule(){
   /* 스위처가 `전체` 면 폼에서 고른 값을, 아니면 지금 보고 있는 워크스페이스를 쓴다.
      수정이면 원래 소속을 지킨다 — 만든 뒤에는 옮기지 않는다 */
-  const r={n:RF.n.trim(), metric:RF.metric, op:RF.op, th:+RF.th, dur:+RF.dur,
+  const r={n:RF.n.trim(), metric:RF.metric, op:RF.op, th:+RF.th, dur:+RF.dur, sev:RF.sev,
            ws:(ruleIdx<0 ? (wsCur==='전체'? RF.ws : wsCur) : RULES[ruleIdx].ws),
            scope:RF.scope, ch:RF.ch.slice(), fires:[],
            by:'성유진(yj.seong)', at:'2026-08-27 09:20:11'};
@@ -4013,9 +4080,14 @@ function saveRule(){
 /* 규칙을 지우면 그 상황을 더 이상 알리지 않는다. 확인 알럿을 거친다(공통정책 7.5) */
 function delRule(i){
   const r=RULES[i];
+  /* 규칙을 지우면 등록자만이 아니라 워크스페이스 관리자와 연결된 채널까지
+     알림이 끊긴다. 복구할 수 없어 이름을 다시 입력받는다(공통정책 7.5).
+     이미 발생한 알림은 규칙의 수명을 따르지 않는다 — 통지 기록이라
+     보관 기간까지 남는다(알림 정책 5.5·5.6) */
+  const chTxt = r.ch.length? ' 연결된 알림 채널 '+r.ch.length+'개로도 발송되지 않습니다.' : '';
   openConfirm('알림 규칙 삭제',
-    '<b>'+r.n+'</b>을(를) 삭제하면 이 조건을 더 이상 감시하지 않습니다.',
-    function(){ RULES.splice(i,1); render(); toast('ok','알림 규칙을 삭제했습니다.'); }, '삭제');
+    '<b>'+r.n+'</b>'+jo(r.n,'을')+' 삭제하면 이 조건을 더 이상 감시하지 않으며 복구할 수 없습니다.'+chTxt+' 이미 발생한 알림은 남습니다.',
+    function(){ RULES.splice(i,1); render(); toast('ok','알림 규칙을 삭제했습니다.'); }, '삭제', null, r.n);
 }
 
 /* ── 탭 4 · 트레이스 ──────────────────────────────
@@ -4449,8 +4521,14 @@ const COLDEF={
       +'<dt>유휴</dt><dd>점유한 배포가 없습니다.</dd>'
       +'<dt>확인 불가</dt><dd>상태를 읽지 못했습니다.</dd></dl>',
   dep:'이 슬롯을 쓰고 있는 배포입니다. 누르면 그 배포의 모니터링으로 이동합니다.',
+  /* 값 설명은 알림 정책 4.1 의 조치 필요 여부만 쓴다.
+     4.1 의 `실패했거나 동작하지 않는다` 는 완료·실패 사건 기준이라
+     임계값 초과를 감지하는 규칙 알림에는 맞지 않는다 */
+  sev:'규칙이 발생시키는 알림의 등급입니다.'
+      +'<dl><dt>오류</dt><dd>조치가 필요합니다.</dd>'
+      +'<dt>주의</dt><dd>지금은 동작하나 두면 문제가 됩니다.</dd></dl>',
   cond:'임계값을 넘은 상태가 지속 시간만큼 이어지면 알림이 발생합니다.',
-  fire:'이 규칙이 실제로 알림을 울린 가장 최근 시각입니다. 눌러서 펴면 최근 5건을 봅니다.'
+  fire:'이 규칙이 알림을 발생시킨 가장 최근 시각입니다. 누르면 최근 5건을 표시합니다.'
 };
 /* 값 옆 도움말 아이콘. 왜 그 값인지 짧게 알린다 */
 function warnIc(txt){
@@ -4513,15 +4591,41 @@ function errBox(){
 }
 
 /* 확인 알럿 · 토스트 — 배포 목업과 같은 규격 */
-function openConfirm(title,body,onOk,okLabel){
+/* 이름 재입력 — 복구할 수 없고 다른 사용자의 작업에 영향을 주는 삭제에 둔다(공통정책 7.5).
+   알림 규칙은 워크스페이스 관리자가 함께 받고 외부 채널로도 나가므로
+   지우면 등록자 말고도 알림이 끊긴다(알림 정책 5.7 · 7.2) */
+let cfExpect='';
+function hasJong(w){
+  if(!w) return false;
+  const c=w[w.length-1], code=c.charCodeAt(0);
+  if(code>=0xAC00 && code<=0xD7A3) return (code-0xAC00)%28!==0;
+  if(/[a-z]/i.test(c)){ const t=w.slice(-2).toLowerCase(); if(t==='ch'||t==='sh') return false;
+    return 'aeiouy'.indexOf(c.toLowerCase())<0; }
+  if(/[0-9]/.test(c)) return '0136780'.indexOf(c)>=0;
+  return false;
+}
+function jo(w,type){
+  const P={'을':['을','를'],'이':['이','가'],'은':['은','는'],'과':['과','와'],'으로':['으로','로']};
+  return P[type][hasJong(w)?0:1];
+}
+function openConfirm(title,body,onOk,okLabel,cancelLabel,confirmName){
   document.getElementById('cfTitle').textContent=title;
   document.getElementById('cfBody').innerHTML=body;
   const ok=document.getElementById('cfOk');
   ok.textContent=okLabel||'확인';
-  ok.className='btn'+(okLabel==='삭제'?' danger':'');
+  ok.className='btn'+(['삭제','종료','해제'].indexOf(okLabel)>=0?' danger':'');
   ok.onclick=function(){ closeConfirm(); if(onOk) onOk(); };
+  document.querySelector('#mdConfirm .btn.ghost').textContent = cancelLabel || '취소';
+  cfExpect=confirmName||'';
+  const wrap=document.getElementById('cfNameWrap'), inp=document.getElementById('cfName');
+  wrap.style.display=cfExpect?'':'none'; inp.value='';
+  if(cfExpect){
+    document.getElementById('cfNameLb').innerHTML='확인을 위해 <b>'+cfExpect+'</b>'+jo(cfExpect,'을')+' 입력해 주세요.';
+    ok.disabled=true; setTimeout(function(){ inp.focus(); },60);
+  } else { ok.disabled=false; }
   document.getElementById('mdConfirm').classList.add('on');
 }
+function cfCheck(){ document.getElementById('cfOk').disabled = document.getElementById('cfName').value.trim()!==cfExpect; }
 function closeConfirm(){ document.getElementById('mdConfirm').classList.remove('on'); }
 
 function toast(t,msg){
