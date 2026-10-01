@@ -1,6 +1,26 @@
 <!--
-  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.25 (2026-09-22 · 2026-09-28 추가)
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.26 (2026-10-01)
   CDE 정책 기준.
+
+  ── v0.26 (CON-596 G-1) ──
+  · 외부 통신 기본 차단을 설치 값으로 반영했다. 비어 있을 때 허용인지 차단인지가 설치
+    구성으로 정해지고 화면에서는 바꾸지 않는다(워크스페이스 정책 1.1·3.3).
+    클러스터 목록·전역 저장소와 같은 층위다 — 켜는 순간 허용 목록이 빈 모든 룸의 외부
+    통신이 끊겨 돌고 있는 작업이 깨지므로 운영 중 토글할 값이 아니다.
+    · 설정 폼 도움말·힌트와 기본 정보 값을 설치 값에 따라 가른다.
+      빈 값은 기본 허용이면 `제한 없음`, 기본 차단이면 `전체 차단` 이다.
+      `차단` 만 두면 무엇이 차단인지 드러나지 않아 `제한 없음` 과 짝이 되게 적었다.
+    · 적용 대상을 `개발룸의 CDE` 로 밝혔다. 룸 전체가 아니라 CDE 파드에 걸리는 정책이다
+      (요구사항 판정 No 36 현재 제공 내용). `파드` 는 내부 용어라 화면에 쓰지 않는다(공통정책 7.9).
+    · 데모 바에 `외부 통신` 토글을 두었다. 두 설치를 확인하려는 검토용 장치라 화면 규격과 무관하다.
+    · 기본 차단 설치에서 값이 있던 개발룸을 비우고 저장할 때 확인 알럿을 거친다. 그 순간
+      CDE 의 외부 통신이 끊겨 외부에서 데이터를 받는 작업이 깨진다. 설정 변경의 영향을
+      사전 안내하는 REQ-CDE-057 과 같은 처리다. 생성은 CDE 가 없어 묻지 않는다.
+    ⚠ Egress 허용 도메인에 형식 검증이 없다 — 정책·기획서·목업 전부에 없다. FQDN 허용 문자,
+      와일드카드·포트 허용 여부가 정해지지 않아 넣지 않았다. 확인 대상이다. 기본 차단
+      설치에서는 오타 하나로 그 도메인만 열리고 나머지가 전부 막혀 체감이 커진다.
+    ⚠ 플랫폼 설정에는 이 값을 둘 자리가 없다 — 인프라 자원 `구성 요소` 는 Observability 스택
+      헬스 체크이고 `라이선스` 는 계약 값이다. 조회 자리가 필요해지면 별도로 검토한다.
 
   ── v0.25 (CON-531) ──
   · 목록 `자원` 열을 개발룸 몫에서 차감 중인 양으로 정의하고, 회수는 `-` 로 두었다(CDE 정책 5.2 · 공통정책 1.7). 회수돼 자원이 반환된 뒤에도 신청 스펙이 그대로 보이고 있었다. 열 도움말에 왜 비는지 적고 배정값은 상세 자원 섹션에 남긴다.
@@ -1952,6 +1972,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
   <span class="dgrp"><span class="demo-label">워크스페이스:</span>
     <button class="sw on" onclick="setSysWs(false,this)">일반</button>
     <button class="sw" onclick="setSysWs(true,this)">공용</button></span>
+  <!-- 설치 값이라 실제 화면에는 이 토글이 없다. 두 설치를 확인하려고 둔다 -->
+  <span class="dgrp"><span class="demo-label">외부 통신:</span>
+    <button class="eg on" onclick="setEgressDeny(false,this)">기본 허용</button>
+    <button class="eg" onclick="setEgressDeny(true,this)">기본 차단</button></span>
   <span class="dgrp"><span class="demo-label">내 CDE:</span>
     <button class="ms on" onclick="setMyState('구동 중',this)">구동 중</button>
     <button class="ms" onclick="setMyState('절전',this)">절전 (2차 범위)</button>
@@ -1989,6 +2013,44 @@ const ROOM = { cpu:{q:32, use:20}, ram:{q:128, use:80},
                get gpu(){ return {q:accSum('q'), use:accSum('use')}; } };
 /* 개발룸 기본 정보 — 생성 시 정한 값이다. 화면에서 바꾸려면 개발룸 설정으로 간다 */
 const ROOM_INFO = { cls:'remote-cluster-main', egress:'', at:'2026-07-01 09:00:00', by:'성유진(yj.seong)' };
+
+/* 외부 통신 기본 차단 — 설치 시 설정 파일로 정하고 화면에서 바꾸지 않는다
+   (워크스페이스 정책 1.1·3.3 · CON-596 G-1). 기본값은 현행인 기본 허용이다.
+   적용 대상은 룸 전체가 아니라 개발룸의 CDE 다 */
+let EGRESS_DENY = false;
+/* 문장을 조각으로 잇지 않는다 — 다국어에서 깨진다(UI 문구 규칙 8). 설치 값마다 완결된 문장으로 둔다 */
+function egressTip(){
+  return EGRESS_DENY
+    ? '개발룸의 CDE 가 접근할 수 있는 외부 주소입니다. 입력한 도메인만 허용됩니다. 비우면 외부 접근이 모두 차단됩니다.'
+    : '개발룸의 CDE 가 접근할 수 있는 외부 주소입니다. 비우면 모든 외부 접근이 허용되고, 도메인을 입력하면 해당 도메인만 허용됩니다.';
+}
+function egressHint(){
+  return EGRESS_DENY ? '비우면 외부 접근이 모두 차단됩니다.' : '비우면 모든 외부 접근이 허용됩니다.';
+}
+/* 빈 값 표기 — `제한 없음` 과 짝이 되어야 무엇이 차단인지 드러난다 */
+function egressEmpty(){ return EGRESS_DENY ? '전체 차단' : '제한 없음'; }
+/* 데모 바 토글. 설치 값이라 실제 화면에는 없는 검토용 장치다.
+   누르면 개발룸 설정 폼을 연다 — 도움말·힌트가 다 있어 차이가 한눈에 잡힌다.
+   목록에 두면 기본 정보 `Egress 허용` 한 줄만 바뀌어 무엇이 달라졌는지 보이지 않는다.
+   설정 폼을 닫으면 그 한 줄도 바뀐 값으로 보인다 */
+function setEgressDeny(v, btn){
+  EGRESS_DENY = v;
+  document.querySelectorAll('#demoBar .eg').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  /* 개발룸이 없으면 설정 폼이 생성 폼으로 열려 비교할 값이 없다. 목록만 다시 그린다 */
+  if(!roomExists){ render(); return; }
+  /* 허용 목록에 값을 넣지 않는다. 기본 목록을 제공한다는 결정이 없어(엑셀 G-1 — 허용 목록이
+     비면 전체 허용, 스위치만 제공) 어떤 값을 채워도 근거가 없다.
+     비우고 저장할 때의 확인 알럿은 도메인을 직접 입력한 뒤에 확인한다 */
+  const vw = document.querySelectorAll('#demoBar .vw');
+  demoView('roomcfg', vw[2]);
+  /* 입력이 세 번째 섹션이라 화면을 열어도 데모 바 뒤에 가린다. 그 자리로 옮겨 준다 */
+  setTimeout(function(){
+    const lb=[].slice.call(document.querySelectorAll('.flb')).filter(function(x){
+      return x.textContent.indexOf('Egress')>=0; })[0];
+    if(lb) lb.scrollIntoView({block:'center'});
+  }, 0);
+}
 
 /* 공용 워크스페이스는 자원을 배정받지 않는다(8/10 회의 1.3).
    다른 워크스페이스에 배분하고 남은 자원을 쓰므로 상한 대비 점유를 그릴 수 없다.
@@ -2384,8 +2446,9 @@ function drawInfo(){
     + '<dt>대상 클러스터'+tip('개발룸이 만들어진 클러스터입니다. 생성 후에는 바꿀 수 없습니다.')+'</dt>'
     +   '<dd>'+ROOM_INFO.cls+'</dd>'
     /* `Egress 허용 도메인` 은 라벨 폭(112px)을 넘어 줄이 바뀐다. 뜻이 같으면서 짧은 말로 둔다 */
-    + '<dt>Egress 허용'+tip('개발룸에서 접근할 수 있는 외부 주소입니다. 비우면 모든 외부 접근이 허용되고, 도메인을 입력하면 해당 도메인만 허용됩니다.')+'</dt>'
-    +   '<dd>'+(ROOM_INFO.egress || '<span class="dash">제한 없음</span>')+'</dd>'
+    /* 빈 값 표기가 설치 값에 따라 갈린다 — 기본 허용은 `제한 없음`, 기본 차단은 `전체 차단` */
+    + '<dt>Egress 허용'+tip(egressTip())+'</dt>'
+    +   '<dd>'+(ROOM_INFO.egress || '<span class="dash">'+egressEmpty()+'</span>')+'</dd>'
     /* 배포 상세도 담당자·생성일시를 함께 둔다 */
     + '<dt>생성자</dt><dd>'+ROOM_INFO.by+'</dd>'
     + '<dt>생성일시</dt><dd>'+ROOM_INFO.at+'</dd>'
@@ -2712,7 +2775,11 @@ function openRoomCfg(isNew){
   RC.cpu=rcNew?'0':String(ROOM.cpu.q); RC.ram=rcNew?'0':String(ROOM.ram.q);
   RC.vol=rcNew?'0':String(VOL.shared);
   ACC.forEach(function(g){ RC['acc_'+g.k]= rcNew?'0':String(g.q); });
-  RC.egress='';
+  /* 설정은 현재 값을 채운다 — 자원·공유 볼륨과 같은 규격이다(기획서 1장 · 워크스페이스 정책 3.4
+     수정 항목에 Egress 허용 도메인 포함). 종전에는 무조건 빈칸으로 열려 값이 있던 룸도 비어
+     보였고 그대로 저장하면 설정이 지워졌다. 기본 차단 설치에서는 그 저장이 CDE 의 외부 통신을
+     끊으므로 영향이 더 크다 */
+  RC.egress = rcNew ? '' : (ROOM_INFO.egress||'');
   /* textContent 로 쓰면 툴팁이 지워진다. 라벨만 바꾸고 툴팁은 유지한다 */
   document.querySelector('#pgRoom .dinfo h1').innerHTML =
     (rcNew? '개발룸 생성' : '개발룸 설정')
@@ -2831,15 +2898,29 @@ function drawRoomCfg(){
          여백과 밑줄이 남는다. 라벨+본문만 필요한 것은 신청 폼과 같은 .frow 를 쓴다 */
       : row('공유 볼륨'+tip('개발룸 멤버가 함께 쓰는 볼륨입니다. 생성 시에 정하며 이후에는 바꿀 수 없습니다.'),
             false, '<span class="rov">'+VOL.shared+' GB</span>'))
-   /* 비면 화이트리스트를 적용하지 않는다 — K8s NetworkPolicy 와 같은 계약이다(워크스페이스 정책 3.3) */
-   + row('Egress 허용 도메인'+tip('개발룸에서 접근할 수 있는 외부 주소입니다. 비우면 모든 외부 접근이 허용되고, 도메인을 입력하면 해당 도메인만 허용됩니다.'),
+   /* 비었을 때의 처리가 설치 값으로 갈린다 — 기본 허용은 정책을 만들지 않고(K8s NetworkPolicy 미생성),
+      기본 차단은 비어 있는 동안 전부 막는다(워크스페이스 정책 1.1·3.3) */
+   + row('Egress 허용 도메인'+tip(egressTip()),
          false,
          '<textarea class="inp" rows="2" placeholder="한 줄에 하나씩 입력합니다." oninput="RC.egress=this.value">'+RC.egress+'</textarea>',
-         '비우면 모든 외부 접근이 허용됩니다.')
+         egressHint())
    + '</div>';
   document.getElementById('rcSave').disabled = bad;
 }
 function submitRoomCfg(){
+  /* 기본 차단 설치에서 값이 있던 개발룸을 비우고 저장하면 그 순간 CDE 의 외부 통신이 끊긴다.
+     돌고 있는 작업이 외부에서 데이터를 받고 있으면 깨지므로 저장 전에 영향을 알린다
+     (REQ-CDE-057 과 같은 처리 — 설정 변경의 영향을 사전 안내한다).
+     생성(rcNew)은 CDE 가 아직 없어 끊길 것이 없으므로 묻지 않는다 */
+  if(EGRESS_DENY && !rcNew && !(RC.egress||'').trim() && (ROOM_INFO.egress||'').trim()){
+    openConfirm('외부 통신 차단',
+      '허용 도메인을 비우면 이 개발룸의 CDE 가 외부에 접근할 수 없습니다. 외부에서 데이터를 받는 작업은 중단됩니다.',
+      doSubmitRoomCfg, '저장');
+    return;
+  }
+  doSubmitRoomCfg();
+}
+function doSubmitRoomCfg(){
   if(rcNew){ roomExists=true; }
   ROOM.cpu.q=parseFloat(RC.cpu)||ROOM.cpu.q;
   ROOM.ram.q=parseFloat(RC.ram)||ROOM.ram.q;
