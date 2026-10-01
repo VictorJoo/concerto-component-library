@@ -1,5 +1,13 @@
 <!--
-  콘체르토 매니저 — 워크스페이스 화면 목업 v0.55 (2026-09-30)
+  콘체르토 매니저 — 워크스페이스 화면 목업 v0.56 (2026-10-01)
+
+  ── v0.56 (CON-596 G-1) ──
+  · 생성 폼 개발룸 옵션의 `Egress 허용 도메인` 도움말을 설치 값에 따라 가른다.
+    비어 있을 때 허용인지 차단인지가 설치 구성으로 정해지고 화면에서는 바꾸지 않는다
+    (워크스페이스 정책 1.1·3.3). 적용 대상은 룸 전체가 아니라 개발룸의 CDE 다.
+    문구 정본은 개발룸 목업이다 — 생성·설정이 개발룸 화면 소관이고 여기는 생성 폼의
+    개발룸 옵션에만 같은 입력이 있다. 두 파일이 같은 문장을 쓴다(공통정책 1.1).
+  · 데모 바에 `외부 통신` 토글을 두었다. 설치 값이라 실제 화면에는 없는 검토용 장치다.
 
   ── v0.55 (CON-605·562) ──
   · 공용 워크스페이스 멤버 초대·제외·나가기 진입점을 감췄다(공통정책 7.10 · 정책 6.2).
@@ -1920,6 +1928,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <button class="rl" onclick="setRole('admin',this)">WS 관리자</button>
   <button class="rl" onclick="setRole('editor',this)">편집자</button>
   <button class="rl" onclick="setRole('viewer',this)">뷰어</button></span>
+  <!-- 설치 값이라 실제 화면에는 이 토글이 없다. 생성 폼 개발룸 옵션에서 확인한다 -->
+  <span class="dgrp"><span class="demo-label">외부 통신:</span>
+  <button class="eg on" onclick="setEgressDeny(false,this)">기본 허용</button>
+  <button class="eg" onclick="setEgressDeny(true,this)">기본 차단</button></span>
   <span class="dgrp"><span class="demo-label">테마:</span>
   <button onclick="document.body.classList.remove('dark')">라이트</button>
   <button onclick="document.body.classList.add('dark')">다크</button></span>
@@ -3317,6 +3329,38 @@ function roomTab(m){
    신청은 사유만 받으므로 짧은 폼이나, 생성과 같은 흐름이라 페이지로 통일한다. */
 /* 가속기 유형은 클러스터 구성에 따라 늘어날 수 있어 목록에서 키를 만든다(용어사전 *4) */
 const NF={name:'',desc:'',ico:'cube',owners:[],ownerQ:'',mkProd:true,mkDev:false,devVol:'50',egress:'',cpu:'16',ram:'64',vol:'100',devCpu:'8',devRam:'32',devGpu:'0',cls:[{n:'Small',s:'5Gi'},{n:'Medium',s:'20Gi'},{n:'Large',s:'50Gi'}],byob:false,rsn:''};
+
+/* 외부 통신 기본 차단 — 설치 시 설정 파일로 정하고 화면에서 바꾸지 않는다
+   (워크스페이스 정책 1.1·3.3 · CON-596 G-1). 기본값은 현행인 기본 허용이다.
+   적용 대상은 룸 전체가 아니라 개발룸의 CDE 다.
+   문구는 개발룸 목업과 같은 문장을 쓴다(공통정책 1.1) */
+let EGRESS_DENY = false;
+/* 문장을 조각으로 잇지 않는다 — 다국어에서 깨진다(UI 문구 규칙 8) */
+function egressTip(){
+  return EGRESS_DENY
+    ? '개발룸의 CDE 가 접근할 수 있는 외부 주소입니다. 입력한 도메인만 허용됩니다. 비우면 외부 접근이 모두 차단됩니다.'
+    : '개발룸의 CDE 가 접근할 수 있는 외부 주소입니다. 비우면 모든 외부 접근이 허용되고, 도메인을 입력하면 해당 도메인만 허용됩니다.';
+}
+function egressHint(){
+  return EGRESS_DENY ? '비우면 외부 접근이 모두 차단됩니다.' : '비우면 모든 외부 접근이 허용됩니다.';
+}
+/* 데모 바 토글. 설치 값이라 실제 화면에는 없는 검토용 장치다.
+   누르면 생성 폼을 열고 개발룸 옵션을 켠다 — Egress 입력이 그 안에 있어 켜 두지 않으면
+   차이를 볼 자리가 없다. 목록·상세에는 이 값이 나오지 않는다(개발룸 화면 소관) */
+function setEgressDeny(v, btn){
+  EGRESS_DENY = v;
+  document.querySelectorAll('#demoBar .eg').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  NF.mkDev = true;
+  const vw = document.querySelectorAll('#demoBar .vw');
+  goDemo('new', vw[3]);
+  /* 입력이 폼 아래쪽이라 화면을 열어도 스크롤해야 보인다. 그 자리로 옮겨 준다 */
+  setTimeout(function(){
+    const lb=[].slice.call(document.querySelectorAll('label')).filter(function(x){
+      return x.textContent.indexOf('Egress')>=0; })[0];
+    if(lb) lb.scrollIntoView({block:'center'});
+  }, 0);
+}
 /* 증액 신청 — 받는 값이 할당량 수정과 같아 같은 폼을 쓴다.
    저장 대신 신청으로 가고 최고 관리자가 내 작업함에서 처리한다(승인 정책 2.2) */
 function askQuota(){
@@ -3525,8 +3569,11 @@ function devRoomFields(){
    + qRow('devRam','Memory',ramCap,ramCap,0,0,'Gi','')
    + qRow('devGpu','가속기',gpuCap,gpuCap,0,0,'장','')
    + qRow('devVol','공유 볼륨',volCap,volCap,0,0,'GB','개발룸 멤버가 함께 쓰는 볼륨입니다. 관리자가 개발룸 설정에서 변경합니다.')
-   + '<div class="f" style="margin-bottom:0"><label>Egress 허용 도메인'+tip('개발룸에서 접근할 수 있는 외부 주소입니다. 비우면 모든 외부 접근이 허용되고, 도메인을 입력하면 해당 도메인만 허용됩니다.')+'</label>'
-   +   '<textarea class="inp" rows="2" placeholder="한 줄에 하나씩 입력합니다." oninput="NF.egress=this.value">'+(NF.egress||'')+'</textarea></div>'
+   /* 비었을 때의 처리가 설치 값으로 갈린다(워크스페이스 정책 1.1·3.3 · CON-596 G-1).
+      문구는 개발룸 목업과 같은 문장을 쓴다(공통정책 1.1) */
+   + '<div class="f" style="margin-bottom:0"><label>Egress 허용 도메인'+tip(egressTip())+'</label>'
+   +   '<textarea class="inp" rows="2" placeholder="한 줄에 하나씩 입력합니다." oninput="NF.egress=this.value">'+(NF.egress||'')+'</textarea>'
+   +   '<div class="hint">'+egressHint()+'</div></div>'
    + '</div>';
 }
 function drawFormValidOnly(){ const b=document.getElementById('fSubmit'); if(b) b.disabled=!formValid(); }
