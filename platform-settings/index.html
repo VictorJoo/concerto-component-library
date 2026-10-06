@@ -1,6 +1,51 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 사용자 및 역할 목업 v0.14 (2026-09-30)
+  콘체르토 매니저 — 플랫폼 설정 | 사용자 및 역할 목업 v0.15 (2026-10-06)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.15 (CON-614) ──
+  · `로그인 수단` 을 더했다 — `비밀번호` · `SSO` · `비밀번호·SSO`. 목록과 상세 양쪽이다.
+    관리자가 임시 비밀번호 발급 여부를 판단하려면 그 계정이 비밀번호를 갖고 있는지 보여야 한다
+    (기획서 7.2).
+  · 목록에도 두고 필터를 붙였다. 처음에는 상세에만 두려 했는데, 연결 해제 차단 안내가
+    `사용자 및 역할 화면에서 임시 비밀번호를 발급한 뒤 해제할 수 있습니다` 로 이 화면을 가리킨다.
+    목록에 없으면 대상을 찾으려고 계정을 한 명씩 열어 봐야 한다 — 안내가 가리키는 화면에서
+    그 작업을 할 수 없게 된다. 열 위치는 역할 다음이다(공통정책 2.2 유형 자리).
+  · 값을 나열로 바꿨다. `둘 다` 는 무엇과 무엇인지 드러나지 않는다.
+    `아이디·비밀번호` 는 목록 열에 길어 `비밀번호` 로 줄였다.
+    `일반 로그인` 은 쓰지 않는다 — 무엇이 일반인지가 설치마다 달라진다.
+  · 헤더 도움말에 값별 의미를 뒀다(공통정책 2.3). 세 값의 차이가 라벨만으로 드러나지 않는다.
+    `비밀번호·SSO` 에는 그 값이 되는 경로까지 적었다. 인증 기관을 등록하고 기존 사용자가
+    한 번씩 SSO 로 로그인하면 최고 관리자를 뺀 전원이 이 값이 된다 — 예외가 아니라
+    도입 후 기본 상태라 관리자가 이유를 목록에서 알아야 한다. 임시 비밀번호 발급 경로는
+    발급 모달에만 안내가 있어 목록에서 값을 본 사람은 알 수 없었다.
+  · 최고 관리자는 인증 서버 자동 연결 대상이 아니다(CON-614 2026-10-02 팀장 결정).
+    인증 서버에서 같은 이메일을 쓰는 사용자가 최고 관리자 권한을 넘겨받는 것을 막는다.
+    데모 데이터의 최고 관리자 셋은 모두 `비밀번호` 다.
+  · 판정은 비밀번호 설정 여부와 인증 서버 연결 여부로 한다. 계정 종류가 아니다 —
+    종류로 두면 임시 비밀번호를 발급한 계정이 `둘 다` 로 넘어가는 것이 설명되지 않는다
+    (계정정책 2.2·4.3).
+  · 수정 대상이 아니라 편집 중에도 읽기 전용 자리에 남긴다(기획서 7.2 — 수정 N).
+  · 인증 기관을 쓰지 않는 설치에서는 전원 같은 값이 된다. 조건부 노출은 두지 않았다 —
+    기획서 7.2 가 조건을 두지 않았고 값이 틀리지도 않는다.
+  · 임시 비밀번호 발급 버튼의 활성 조건은 손대지 않았다. 상태 조건만 보고 있어 이미
+    기획서 REQ-053 과 맞다 — 비밀번호 설정 여부는 조건이 아니다.
+  · 발급 모달에 결과 안내를 더했다. 비밀번호가 없는 계정은 재설정이 아니라 수단이 하나
+    늘어나는 것이라 관리자가 그 결과를 알아야 한다(공통정책 7.9).
+    ⚠ 이 문구는 기획서 5.2 에 없다. 함께 반영할 항목이다.
+  · 인증 서버에 연결된 계정은 이메일을 읽기 전용으로 둔다(팀장 2026-10-06 코멘트).
+    인증 서버의 값을 따른다 — 계정 복구 경로이자 기존 계정을 연결하는 기준이라
+    검증되지 않은 주소로 바뀌면 안 된다. 인증 기관에서 바꾼 뒤 다시 로그인하면 반영된다.
+    ⚠ 작업 중 이메일을 그대로 수정할 수 있게 두었다가 고쳤다.
+  · 관리자 경로도 같이 막았다. 본인만 막고 관리자를 열어 두면 검증되지 않은 주소가
+    그 경로로 들어온다. 팀장 근거가 `누가 바꾸든` 같게 적용된다.
+  · 비밀번호 계정은 그대로 수정할 수 있다. 인증 서버와 무관한 계정이다.
+  · 자리를 없애지 않고 읽기 전용으로 남겼다(공통정책 7.11). 필수 표시를 떼고 안내를 붙였다.
+  · 데모 데이터로 세 경우를 다 보인다 — 최서현(SSO·승인 대기) · 임승주(SSO·승인·활성) ·
+    김태건(둘 다). 실제 화면에서는 백엔드 응답으로 받는다.
+  · 이 파일에 남아 있는 연동 및 알림·SSO 코드는 손대지 않았다. `extTabs` DOM 이 없고
+    메뉴가 별도 파일을 가리켜 호출되지 않는 잔존 코드다. 정본은
+    platform-settings/integrations/index.html 이다 — 그 파일 v0.11 이 반대 방향으로
+    같은 정리를 했다. ⚠ 잔존 코드 제거는 별건이다.
 
   ── v0.14 변경 ─────────────────────────────────
   마지막 최고 관리자의 역할 변경을 막았다. 기획서 5.1 이 `마지막 한 명은 내리거나
@@ -2242,14 +2287,19 @@ const USERS=[
    apv:'승인', active:true, at:'2026-07-10 09:12:04', ws:[{n:'ai-service-team',r:'관리자'}], upd:'', last:'2026-08-25 14:02:11'},
   /* 승인 대기는 로그인한 적이 없어 최근 로그인·소속이 비어 있다.
      반려는 승인되지 않은 계정이라 접근이 꺼져 있다 */
+  /* pw·sso 는 로그인 수단을 가리는 값이다(기획서 7.2). 값이 없으면 비밀번호가 있는 계정으로 본다.
+     실제 화면에서는 백엔드 응답으로 받는다 — 세 경우를 다 보려고 데모라 값을 고정해 뒀다.
+     최서현은 SSO 첫 로그인으로 만들어진 계정이다. 비밀번호가 없고 승인 대기다(계정정책 1장·4.3) */
   {id:'sh.choi',  name:'최서현', mail:'sh.choi@okestro.com',  role:'일반 사용자',
-   apv:'승인 대기', active:false, at:'2026-08-23 16:20:11', ws:[], upd:'', last:''},
+   apv:'승인 대기', active:false, pw:false, sso:true, at:'2026-08-23 16:20:11', ws:[], upd:'', last:''},
   {id:'dh.jung',  name:'정도현', mail:'dh.jung@okestro.com',  role:'일반 사용자',
    apv:'반려', active:false, at:'2026-08-18 09:05:44', ws:[], upd:'2026-08-18 11:20:03', last:''},
   {id:'yj.seong', name:'성유진', mail:'yj.seong@okestro.com', role:'최고 관리자',
    apv:'승인', active:true, at:'2026-07-10 09:12:04', ws:[{n:'ai-service-team',role:'관리자'},{n:'research-lab',role:'편집자'}], upd:'2026-08-20 14:02:11', last:'2026-08-20 14:02:11'},
+  /* 비밀번호가 없고 승인·활성인 계정이다. 임시 비밀번호 발급이 되는지 여기서 확인한다 —
+     상태 조건(REQ-051)만 적용되고 비밀번호 설정 여부는 조건이 아니다(기획서 REQ-053) */
   {id:'sj.lim',   name:'임승주', mail:'sj.lim@okestro.com',   role:'일반 사용자',
-   apv:'승인', active:true, at:'2026-07-10 09:14:30', ws:[{n:'ai-service-team',role:'편집자'}], upd:'2026-07-10 09:14:30', last:'2026-08-20 11:40:52'},
+   apv:'승인', active:true, pw:false, sso:true, at:'2026-07-10 09:14:30', ws:[{n:'ai-service-team',role:'편집자'}], upd:'2026-07-10 09:14:30', last:'2026-08-20 11:40:52'},
   /* 소속 워크스페이스와 그 안의 역할. 플랫폼 역할(최고 관리자·일반 사용자)과 다른 축이다.
      한 사용자가 워크스페이스마다 다른 역할을 갖는다(워크스페이스 정책 7장) */
   /* 비활성 사유 — 관리자가 껐는지 로그인 실패로 잠겼는지 갈린다(계정정책 3장).
@@ -2258,8 +2308,9 @@ const USERS=[
    apv:'승인', active:false, why:'로그인 실패 누적', at:'2026-07-11 13:40:15', ws:[{n:'ai-service-team',role:'뷰어'}], upd:'2026-08-19 17:30:02', last:'2026-08-19 17:22:03'},
   {id:'bg.kim',   name:'김병건', mail:'bg.kim@okestro.com',   role:'최고 관리자',
    apv:'승인', active:true, at:'2026-07-10 09:10:51', ws:[{n:'ai-service-team',role:'관리자'},{n:'platform-ops',role:'관리자'}], upd:'2026-07-10 09:10:22', last:'2026-08-20 09:55:12'},
+  /* 임시 비밀번호를 발급받아 비밀번호 로그인을 함께 쓰게 된 계정이다 — `둘 다` 가 된다 */
   {id:'tg.kim',   name:'김태건', mail:'tg.kim@okestro.com',   role:'일반 사용자',
-   apv:'승인', active:false, at:'2026-08-18 16:02:33', upd:'2026-08-05 11:20:33', last:null},
+   apv:'승인', active:false, sso:true, at:'2026-08-18 16:02:33', upd:'2026-08-05 11:20:33', last:null},
   {id:'jh.park',  name:'박지훈', mail:'jh.park@gmail.com',  role:'일반 사용자',
    apv:'반려', active:false, at:'2026-08-19 16:22:41', ws:[], upd:'2026-08-19 16:50:07', last:''}
 ];
@@ -2556,6 +2607,23 @@ function userSt(u){
   if(u.apv==='반려') return '반려';
   return u.active? '활성' : '비활성';
 }
+/* 로그인 수단 — 비밀번호 설정 여부와 인증 서버 연결 여부로 판정한다(기획서 7.2).
+   계정 종류가 아니다. SSO 첫 로그인으로 만들어진 계정에 관리자가 임시 비밀번호를 발급하면
+   그 계정이 `비밀번호·SSO` 로 넘어간다(계정정책 2.2·4.3) — 종류로 두면 이 전환이 설명되지 않는다.
+   값은 나열로 쓴다. `둘 다` 는 무엇과 무엇인지 드러나지 않는다.
+   `아이디·비밀번호` 는 목록 열에 넣기엔 길어 `비밀번호` 로 줄였다 — 수단을 가리키는 말로 통한다.
+   `일반 로그인` 은 쓰지 않는다. 무엇이 일반인지가 설치마다 달라진다(SSO 를 쓰는 고객사에서는 SSO 가 일반이다).
+   내부 표기(pw·sso)를 사용자 문구에 노출하지 않는다(공통정책 7.9).
+   ⚠ 최고 관리자는 인증 서버 자동 연결 대상이 아니다(CON-614 2026-10-02 팀장 결정).
+     인증 서버에서 같은 이메일을 쓰는 사용자가 최고 관리자 권한을 넘겨받는 것을 막는다.
+     데이터로 표현되므로 함수에 예외를 두지 않는다 — 최고 관리자 계정에 sso 값을 두지 않는다 */
+function authLabel(u){
+  var pw = u.pw!==false;          /* 값이 없으면 비밀번호가 있는 계정이다 */
+  var sso = u.sso===true;
+  if(pw && sso) return '비밀번호·SSO';
+  if(sso) return 'SSO';
+  return '비밀번호';
+}
 
 /* 정렬 — 워크스페이스 목업과 같은 규격. 목록마다 키를 따로 둔다.
    일시는 최신이 먼저다(공통정책 3.1) */
@@ -2606,6 +2674,11 @@ const COLDEF={
   role:'플랫폼 전체에 대한 권한입니다. 워크스페이스 안의 역할과는 별개입니다.'
     +'<dl><dt>최고 관리자</dt><dd>플랫폼 설정과 전체 워크스페이스에 접근합니다.</dd>'
     +'<dt>일반 사용자</dt><dd>소속된 워크스페이스에서만 활동합니다.</dd></dl>',
+  /* 값별 의미를 함께 둔다(공통정책 2.3). 세 값의 차이가 라벨만으로 드러나지 않는다 */
+  auth:'이 계정이 쓸 수 있는 로그인 방법입니다.'
+    +'<dl><dt>비밀번호</dt><dd>아이디와 비밀번호로 로그인합니다.</dd>'
+    +'<dt>SSO</dt><dd>인증 기관으로만 로그인합니다. 콘체르토 비밀번호가 없어 임시 비밀번호를 발급해야 비밀번호로도 로그인할 수 있습니다.</dd>'
+    +'<dt>비밀번호·SSO</dt><dd>두 가지를 모두 쓸 수 있습니다. 비밀번호가 있는 계정이 인증 기관에 연결되거나, 비밀번호가 없던 계정에 임시 비밀번호를 발급하면 이 값이 됩니다.</dd></dl>',
   resp:'최근 5분 평균입니다. 직전 한 건은 튀는 값에 흔들려 상태를 판정할 수 없습니다.',
   comp:'구성 요소가 정상 동작하는지를 나타냅니다.'
     +'<dl><dt>정상</dt><dd>정상 동작 중입니다.</dd>'
@@ -2634,10 +2707,14 @@ const COLDEF={
 };
 /* 값이 2종인 열에만 필터를 둔다 — 역할·상태. 이름·이메일처럼 값이 다 다른 열은 검색으로 찾는다.
    감사 로그와 같은 규격(.thfilter + .fdd)이다 */
-let uRole=[], uAct=[];
+let uRole=[], uAct=[], uAuth=[];
 function tgURole(v){ const i=uRole.indexOf(v); if(i<0) uRole.push(v); else uRole.splice(i,1); drawUsers(); }
 function tgUAct(v){ const i=uAct.indexOf(v); if(i<0) uAct.push(v); else uAct.splice(i,1); drawUsers(); }
-function resetU(){ uq=''; uRole=[]; uAct=[]; $('uq').value=''; drawUsers(); }
+/* 로그인 수단 필터 — 연결 해제 전에 `SSO` 만 쓰는 계정을 찾아야 한다.
+   해제 차단 안내가 이 화면에서 임시 비밀번호를 발급하라고 하는데,
+   목록에서 거를 수단이 없으면 계정을 한 명씩 열어 봐야 한다 */
+function tgUAuth(v){ const i=uAuth.indexOf(v); if(i<0) uAuth.push(v); else uAuth.splice(i,1); drawUsers(); }
+function resetU(){ uq=''; uRole=[]; uAct=[]; uAuth=[]; $('uq').value=''; drawUsers(); }
 /* 필터가 없는 상태 컬럼에도 값별 설명을 붙인다 */
 function thHelp(k, label){
   const def=COLDEF[k];
@@ -2652,11 +2729,12 @@ function uFilter(key, label, opts, sel, fn){
    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button></span>'
    + (def? '<div class="thpop">'+def+'</div>' : '')
    + '<div class="fdd" onclick="event.stopPropagation()">'
-   + '<label><input type="checkbox" '+(sel.length===0?'checked':'')+' onchange="'+(key==='role'?'uRole':'uAct')+'=[];drawUsers()">전체</label><hr>'
+   + '<label><input type="checkbox" '+(sel.length===0?'checked':'')+' onchange="'+(key==='role'?'uRole':key==='auth'?'uAuth':'uAct')+'=[];drawUsers()">전체</label><hr>'
    + opts.map(function(o){
        return '<label><input type="checkbox" '+(sel.indexOf(o)>=0?'checked':'')
         + ' onchange="'+fn+'(\''+o+'\')">'+o
-        + '<span class="fc">'+USERS.filter(function(u){ return key==='role'? u.role===o : userSt(u)===o; }).length+'</span></label>';
+        + '<span class="fc">'+USERS.filter(function(u){
+            return key==='role'? u.role===o : key==='auth'? authLabel(u)===o : userSt(u)===o; }).length+'</span></label>';
      }).join('')
    + '</div>';
 }
@@ -2667,6 +2745,7 @@ function drawUsers(){
     if(u.apv==='삭제됨') return false;
     if(uRole.length && uRole.indexOf(u.role)<0) return false;
     if(uAct.length && uAct.indexOf(userSt(u))<0) return false;
+    if(uAuth.length && uAuth.indexOf(authLabel(u))<0) return false;
     return true;
   }).filter(function(u){
     return !q || [u.id,u.name,u.mail,u.role].some(function(x){
@@ -2700,6 +2779,11 @@ function drawUsers(){
    + sortTh('usr','id','아이디')
    + '<th class="thcell">'+uFilter('act','상태',['승인 대기','활성','비활성','반려'],uAct,'tgUAct')+'</th>'
    + '<th class="thcell">'+uFilter('role','역할',['최고 관리자','일반 사용자'],uRole,'tgURole')+'</th>'
+   /* 로그인 수단 — 역할 다음에 둔다. 공통정책 2.2 가 유형 자리를 셋째로 잡는데
+      이 목록은 역할이 그 자리를 쓰고 있어 바로 뒤에 붙인다.
+      필터를 두는 이유는 연결 해제 전에 `SSO` 만 쓰는 계정을 찾아야 하기 때문이다 —
+      해제 차단 안내가 이 화면을 가리키는데 거를 수단이 없으면 한 명씩 열어 봐야 한다 */
+   + '<th class="thcell">'+uFilter('auth','로그인 수단',['비밀번호','SSO','비밀번호·SSO'],uAuth,'tgUAuth')+'</th>'
    + '<th>이메일</th>'
    + sortTh('usr','at','등록일시')
    + sortTh('usr','last','최근 로그인')
@@ -2729,6 +2813,7 @@ function drawUsers(){
            이미 있어 필을 붙이면 배지가 둘이 되어 무엇을 볼지 흐려진다.
            워크스페이스 목업도 멤버 역할을 맨 텍스트로 둔다 — 그쪽에 맞춘다 */
         + '<td>'+u.role+'</td>'
+        + '<td>'+authLabel(u)+'</td>'
         + '<td>'+u.mail+'</td>'
         + '<td>'+u.at+'</td>'
         /* 로그인한 적이 없으면 빈 값이 아니라 없다고 쓴다 */
@@ -2795,7 +2880,15 @@ function drawPw(){
   if(pwStep===1){
     $('pwTitle').textContent='관리자 본인 확인';
     $('pwBody').innerHTML =
-       '<p class="segnote" style="margin:0 0 14px">'+u.name+'('+u.id+')님의 임시 비밀번호를 발급합니다.</p>'
+       '<p class="segnote" style="margin:0 0 14px">'+u.name+'('+u.id+')님의 임시 비밀번호를 발급합니다.'
+     /* 비밀번호가 없는 계정은 발급 결과가 달라진다 — 재설정이 아니라 수단이 하나 늘어난다.
+        관리자가 그 결과를 알아야 한다(공통정책 7.9). 발급 가능 여부는 상태 조건만 본다
+        (기획서 REQ-053) — 비밀번호 설정 여부는 조건이 아니라 결과 안내 대상이다.
+        ⚠ 이 문구는 기획서 5.2 에 없다. 함께 반영할 항목이다 */
+     + (u.pw===false
+        ? ' 발급하면 이 계정의 로그인 수단이 비밀번호·SSO 가 됩니다.'
+        : '')
+     + '</p>'
      + '<div class="fld"><label>현재 비밀번호<span class="req">*</span></label>'
      +   '<input class="inp" type="password" id="pwCur" placeholder="비밀번호를 입력해 주세요.">'
      +   '<div class="hint">관리자 본인 확인이 필요합니다.</div></div>';
@@ -2894,6 +2987,7 @@ function udNameMsg(){
   return nameMsg(el.value);
 }
 function udMailMsg(){
+  /* 인증 서버 연결 계정은 이메일 입력란이 없다 — 검증 대상이 아니다 */
   const el=$('udMail'); if(!el) return '';
   const v=(el.value||'').trim();
   if(!v) return '이메일을 입력해 주세요.';
@@ -2913,7 +3007,9 @@ function udBlur(){
 }
 function udRefresh(){
   const b=$('udSave'); if(!b || !udInit || !$('udName')) return;
-  const nm=($('udName').value||'').trim(), ml=($('udMail').value||'').trim(), rl=$('udRole').value;
+  const nm=($('udName').value||'').trim(), rl=$('udRole').value;
+  /* 입력란이 없으면 원래 값을 그대로 둔다. 변경 여부에서도 빠진다 */
+  const me=$('udMail'), ml = me? (me.value||'').trim() : udInit.mail;
   const changed = nm!==udInit.name || ml!==udInit.mail || rl!==udInit.role;
   b.disabled = !(changed && udNameMsg()==='' && udMailMsg()==='');
 }
@@ -2922,12 +3018,12 @@ function saveUsr(){
   /* 첫 번째 에러 필드로 포커스를 옮긴다(공통정책 7.8) */
   if(nMsg || mMsg){
     ufShow('udNameErr', nMsg||null); ufShow('udMailErr', mMsg||null);
-    (nMsg? $('udName') : $('udMail')).focus();
+    (nMsg? $('udName') : ($('udMail')||$('udName'))).focus();
     return;
   }
   const u=USERS[udCur];
   u.name=($('udName').value||'').trim();
-  u.mail=($('udMail').value||'').trim();
+  if($('udMail')) u.mail=($('udMail').value||'').trim();
   u.role=$('udRole').value;
   u.upd=nowStr();
   udEdit=false; udInit=null; drawUsrDetail(); drawUsers();
@@ -2994,9 +3090,17 @@ function drawUsrDetail(){
         +   '<div class="errmsg" id="udNameErr"></div></div>'
         /* 이메일은 확인 버튼을 두지 않는다. 형식이 맞으면 필드를 벗어날 때 중복을 조회한다
            (계정정책 2.3 · 회원가입·계정 추가와 같은 규격) */
-        + '<div class="fld"><label>이메일<span class="req">*</span></label>'
-        +   '<input class="inp" id="udMail" value="'+esc(u.mail)+'" onblur="udBlur()" oninput="udChange()">'
-        +   '<div class="errmsg" id="udMailErr"></div></div>'
+        /* 인증 서버에 연결된 계정은 이메일을 고치지 않는다. 인증 서버의 값을 따른다
+           (CON-614 2026-10-06 · 계정정책 4.3). 관리자도 같다 —
+           본인만 막고 관리자를 열어 두면 검증되지 않은 주소가 그 경로로 들어온다.
+           이메일이 계정 연결 기준이라 바뀌면 연결이 어긋난다.
+           자리를 없애지 않고 읽기 전용으로 남긴다(공통정책 7.11) */
+        + (u.sso===true
+           ? '<div class="fld"><label>이메일</label><div class="ro">'+esc(u.mail)+'</div>'
+             + '<div class="hint">인증 기관에서 관리하는 값입니다. 인증 기관에서 변경한 뒤 다시 로그인하면 반영됩니다.</div></div>'
+           : '<div class="fld"><label>이메일<span class="req">*</span></label>'
+             + '<input class="inp" id="udMail" value="'+esc(u.mail)+'" onblur="udBlur()" oninput="udChange()">'
+             + '<div class="errmsg" id="udMailErr"></div></div>')
         /* 마지막 최고 관리자는 역할을 바꿀 수 없다. 권한이 아니라 상태 때문에 막히는 것이라
            미노출(공통정책 7.10)이 아니라 비활성으로 두고 사유를 알린다 */
         /* 사유를 hint 로 알린다 — disabled 요소는 마우스 이벤트를 받지 않아
@@ -3010,6 +3114,8 @@ function drawUsrDetail(){
         + '</div>'
         /* 바꿀 수 없는 값도 자리를 지킨다. 사라지면 무엇이 빠졌는지 알 수 없다(7.11) */
         + '<dl class="dl two" style="margin-top:16px">'
+        /* 로그인 수단은 수정 대상이 아니다(기획서 7.2 — 수정 N). 바꿀 수 없는 값도 자리를 지킨다 */
+        +   '<dt>로그인 수단</dt><dd>'+authLabel(u)+'</dd>'
         +   '<dt>상태</dt><dd>'+userSt(u)
         +     (!u.active && u.why? '<span class="sub">('+u.why+')</span>' : '')+'</dd>'
         +   '<dt>등록일시</dt><dd>'+u.at+'</dd>'
@@ -3021,6 +3127,12 @@ function drawUsrDetail(){
         +   '<dt>아이디</dt><dd>'+u.id+'</dd>'
         +   '<dt>이메일</dt><dd>'+u.mail+'</dd>'
         +   '<dt>플랫폼 역할</dt><dd>'+u.role+'</dd>'
+        /* 로그인 수단 — 기획서 7.2. 관리자가 임시 비밀번호 발급 여부를 판단하려면
+           그 계정이 비밀번호를 갖고 있는지 보여야 한다. 목록에는 두지 않는다 —
+           조치를 정할 때 보는 값이고 목록은 훑는 자리다(5.1 비활성 사유와 같은 판단).
+           인증 기관을 쓰지 않는 설치에서는 전원 같은 값이 된다. 조건부 노출은 두지 않았다 —
+           기획서 7.2 가 조건을 두지 않았고, 값이 틀리지도 않는다 */
+        +   '<dt>로그인 수단</dt><dd>'+authLabel(u)+'</dd>'
         /* 사유는 상태를 설명하는 부가 정보라 괄호로 잇는다. 가운뎃점으로 두면
            별개 값 둘로 읽힌다(공통정책 1.5 — 괄호는 한 값의 일부) */
         +   '<dt>상태</dt><dd>'+userSt(u)
