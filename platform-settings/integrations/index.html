@@ -1,6 +1,57 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.12 (2026-09-22)
+  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.13 (2026-10-02)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.13 (CON-614) ──
+  · 인증 기관 등록·수정 폼에 인라인 에러를 넣었다(공통정책 7.8). 발급자 주소·클라이언트 ID·
+    클라이언트 시크릿 세 필드에 `.errmsg` 자리를 두고, 검증 시점은 필드 이탈과 저장 시점 둘이다.
+    사용자 추가 폼의 `ufShow` 와 같은 규격이고 입력 중에는 띄우지 않는다.
+    ⚠ 종전에는 저장 버튼만 비활성이어서 왜 막혔는지 알 수 없었다.
+  · 필드도 에러 상태로 둔다(`.inp.err`). 문구만 띄우면 어느 칸인지 눈이 따라가지 않는다.
+  · 등록 화면의 시크릿을 필수로 세게 했다. 수정 화면은 비워 두면 기존 값을 유지하므로
+    종전처럼 세지 않는다(REQ-039).
+  · 저장 시점에 첫 오류 필드로 포커스를 옮긴다(공통정책 7.8).
+  · 힌트 문구 둘을 고쳤다 — 리디렉션 URI `이 주소를 인증 서버에 등록해 주세요.` →
+    `이 주소를 인증 서버에 등록합니다.` 이 화면에서 할 수 없는 일을 요청하지 않는다.
+    프로토콜 `이 버전은 OIDC 만 지원합니다.` → `OIDC 만 지원합니다.` — `이 버전` 이
+    사용자에게 무슨 버전인지 드러나지 않는다.
+  · `secretField` 에 errId 인자를 더했다. 주지 않는 자리(스토리지·모델 저장소)는 종전과 같다.
+  ⚠ 플레이스홀더 형식이 화면마다 다르다 — 계정 정책 2.1~2.3 은 `{항목}을 입력해 주세요.` 인데
+    목업 관행은 형식·예시(`영문 소문자·숫자·마침표` · `name@okestro.com` · `https://`)다.
+    이 폼은 두 방식이 섞여 있다. 전 화면에 걸리는 건이라 별건으로 둔다.
+  · 인증 기관 설정 화면(SET-INTEG-SSO-F01)을 뷰로 추가했다. 기획서 7.3 이 `설정 변경은 별도 화면으로
+    이동한다` 로 분리를 정해 두었고, 값이 넷에 저장 뒤 연결 확인이 붙어 탭 안에서 처리하면 조회와 편집이 섞인다.
+    별도 파일로 두지 않은 이유는 같은 메뉴의 하위 화면이기 때문이다 — 사용자 및 역할이 목록·상세·추가 페이지를
+    한 파일에 담은 것과 같다. 브레드크럼은 상위 경로를 모두 적는다(공통정책 4.3).
+  · 등록과 수정을 갈랐다. 제목·브레드크럼·실행 버튼이 함께 바뀐다 —
+    등록은 `인증 기관 등록` 에 버튼 `등록`, 수정은 `인증 기관 수정` 에 버튼 `저장` 이다 —
+    신규는 제목의 동작, 수정은 `저장` 이라는 선례를 따랐다.
+    제목을 동작으로 두는 것은 사용자 추가·워크스페이스 생성과 같은 규격이고,
+    진입 버튼도 가는 화면의 동작을 따른다(빈 상태 `인증 기관 등록` · 연결됨 `수정`).
+    저장 활성 조건도 갈린다 — 등록은 필수 입력만, 수정은 변경이 하나 이상 있어야 한다(공통정책 7.1).
+  · 폼을 2열 풀 폭으로 뒀다. 같은 화면의 전역 저장소·모델 저장소 편집이 2열 풀 폭이고
+    사용자 추가(1148px)·워크스페이스 생성(1092px)·마이페이지 수정(1148px)도 모두 풀 폭이다.
+    주소 두 개(발급자 주소·리디렉션 URI)는 값이 길어 `.full` 로 한 줄을 다 쓴다.
+    처음에는 단일 열 + 560px 로 뒀다가 되돌렸다 — 필드 간격이 빠져 힌트가 다음 라벨에 붙어 보였고,
+    같은 화면의 다른 탭과도 어긋났다.
+    ⚠ 공통정책 4.6 은 입력 폼을 `단일 열 + 폭 제한` 으로 정하는데 어느 화면도 지키지 않는다.
+      조항과 실제가 어긋난다 — 공통정책 개정 제안 대상.
+  · 라벨 옆 물음표(용어 풀이)와 필드 아래 힌트(입력 형식·조치 안내)를 갈랐다(공통정책 4.7).
+    다섯 값 모두 OIDC 규격 용어라 뜻을 모르면 어디서 받아올 값인지 알 수 없다.
+    처음에는 전부 힌트로 깔아 안내가 섞여 보였다.
+  · 저장 토스트가 등록할 때도 수정 문구로 나오던 것을 고쳤다. `SSO.on` 을 바꾸기 전에 판정한다.
+  · 연결 확인을 단일 로그인 탭에 뒀다. 설정 화면에 두면 저장 전에는 저장되지 않은 값으로 확인하는 것이 되고,
+    저장 후 남기면 조회 자리와 편집 자리가 섞인다.
+  · 연결 해제를 선제 차단으로 바꿨다. SSO 로그인만 쓰는 계정이 있으면 버튼을 비활성으로 두고 인원수와
+    선행 조건을 안내한다(공통정책 7.5 `연결된 하위 데이터가 있어 삭제 불가한 경우 사전 감지하여 선제 안내`).
+    영향이 가는 작업을 경고하고 실행시키는 것보다 선행 조건을 알려주는 쪽이 7.5 가 정한 순서다.
+    0 명이면 영향이 없어 이름 재입력 대상이 아니다.
+  · 빈 상태 문구에서 `기업 계정` 을 걷어냈다. 계정이 따로 생기는 것으로 읽히는데 계정은 하나이고
+    로그인 수단이 늘어난다(공통정책 1.1·7.9).
+  · 단일 로그인 조회에 `클라이언트 시크릿` 행을 더했다. 응답에 등록 여부가 내려와 `등록됨` 으로 표시한다.
+  · 프로토콜 선택 수단을 두지 않았다. 이 버전은 OIDC 만 지원한다(계정 정책 4.3).
+  · 데모 바 `연동: 연결됨` 에서 해제 차단을, `설정 안 됨` 에서 빈 상태를 확인한다.
+    SSO.pwless 는 실제 화면에서 백엔드 응답으로 받는 값이다 — 데모라 값을 고정해 뒀다.
 
   ── v0.12 (CON-562) ──
   · 알림 채널 설명 `씁니다` → `사용합니다`(UI 문구 규칙 8).
@@ -628,7 +679,8 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .inp:focus{outline:none;border-color:var(--ring);box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
 .inp.err{border-color:var(--destructive)}
 .hint{font-size:11.5px;color:var(--muted-foreground);margin-top:5px;line-height:1.55}
-.errmsg{font-size:11.5px;color:var(--destructive);margin-top:5px}
+.errmsg{font-size:11.5px;color:var(--destructive);margin-top:5px;display:none}
+  .errmsg.show{display:block}
 .row2{display:grid;grid-template-columns:150px 1fr;gap:8px}
 .noderow{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer}
 .noderow:has(input:checked){border-color:var(--primary);background:var(--selected)}
@@ -2015,6 +2067,22 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
       <div id="extBody"></div>
     </div>
 
+    <!-- ══════════ 인증 기관 설정 SET-INTEG-SSO-F01 ══════════ -->
+    <!-- 단일 로그인 탭에서 진입한다. 값이 넷이고 저장 뒤 연결 확인이 붙어
+         탭 안에서 처리하면 조회와 편집이 섞인다(기획서 7.3).
+         폼이라 단일 열 + 폭 제한으로 둔다(공통정책 4.6) — 다른 탭이 2열인 것과 갈린다.
+         연결 확인은 이 화면에 두지 않는다. 저장 전에는 저장되지 않은 값으로 확인하는 것이 되고
+         저장 후 남기면 조회 자리와 편집 자리가 섞인다 — 단일 로그인 탭에서 한다 -->
+    <!-- 제목·버튼은 등록·수정에 따라 갈린다. drawSsoForm 에서 갈아 끼운다 -->
+    <!-- 폭을 제한하지 않는다. 같은 화면의 전역 저장소·모델 저장소 편집이 2열 풀 폭이고
+         사용자 추가·워크스페이스 생성·마이페이지 수정도 모두 풀 폭이다.
+         ⚠ 공통정책 4.6 은 입력 폼을 `단일 열 + 폭 제한` 으로 정하는데 어느 화면도 지키지 않는다.
+           조항과 실제가 어긋난다 — 개정 제안 대상 -->
+    <div class="page" id="pgSso" style="display:none">
+      <div class="phead"><div id="ssoHead"></div></div>
+      <div id="ssoForm"></div>
+    </div>
+
     <!-- ══════════ 접근 권한 없음 SET-L01.E01 ══════════ -->
     <!-- 공통정책 4.1 No Permission. 플랫폼 설정은 최고 관리자 전용이라(9.4)
          GNB 진입점 자체를 노출하지 않는다. 이 화면은 URL 직접 진입 케이스다 —
@@ -2262,14 +2330,20 @@ const EXT={
            model:'model-registry', engine:'llm-runtime' },
   hf:{ url:'', proxy:false, token:true }
 };
-const SSO={ on:false };
+/* pwless 는 SSO 로그인만 쓰는 계정 수다. 연결 해제 차단 조건에 쓴다(공통정책 7.5).
+   실제 화면에서는 백엔드 응답으로 받는다 — 데모라 값을 고정해 둔다 */
+const SSO={ on:false, pwless:3 };
 
 /* ══════════ 공통 ══════════ */
 function $(id){ return document.getElementById(id); }
 function act(msg){ toast('ok', msg); }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
-const PAGES={'ext':'연동 및 알림'};
+/* 인증 기관 화면은 등록·수정 둘이다. 제목은 동작으로 둔다 —
+   사용자 추가가 `사용자 추가`, 워크스페이스가 `워크스페이스 생성` 인 것과 같은 규격이다.
+   진입 버튼과 실행 버튼도 그 동작을 따른다 */
+const PAGES={'ext':'연동 및 알림','sso':'인증 기관 설정'};
+function ssoPageName(){ return SSO.on? '인증 기관 수정' : '인증 기관 등록'; }
 
 /* 다운로드 — 공통정책 3.5. 필터가 적용된 목록 기준으로 전체를 뽑는다.
    파일명은 {메뉴명}_{YYYYMMDD_HHMM}.{확장자} 다.
@@ -2329,6 +2403,8 @@ function setConn(v,btn){
   document.querySelectorAll('#demoBar .cn').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
   SSO.on=v;
+  /* 연결 상태를 끄면 해제 차단 조건도 되돌린다. 켠 상태에서만 차단이 뜬다 */
+  SSO.pwless = v? 3 : 0;
   EXT.s3.url    = v? 'http://concerto-minio.concerto.svc.cluster.local:9000' : '';
   EXT.s3.key    = v? 'minioadmin' : '';
   EXT.s3.secret = v;
@@ -2359,7 +2435,7 @@ function setRole(v,btn){
 
 function go(v){
   view=v;
-  ['ext'].forEach(function(k){
+  ['ext','sso'].forEach(function(k){
     $('pg'+k[0].toUpperCase()+k.slice(1)).style.display = (k===v && role==='super'?'':'none');
     const m=$('m'+k[0].toUpperCase()+k.slice(1));
     if(m) m.classList.toggle('on', k===v);
@@ -2371,7 +2447,10 @@ function go(v){
     $('bc').innerHTML='<a href="#">콘체르토 플랫폼</a> / 플랫폼 설정';
     return false;
   }
-  $('bc').innerHTML='<a href="#">콘체르토 플랫폼</a> / <a href="#">플랫폼 설정</a> / <b>'+PAGES[v]+'</b>';
+  /* 인증 기관 설정은 연동 및 알림 하위다. 상위 경로를 모두 적는다(4.3) */
+  $('bc').innerHTML = (v==='sso')
+    ? '<a href="#">콘체르토 플랫폼</a> / <a href="#">플랫폼 설정</a> / <a href="#" onclick="return go(\'ext\')">연동 및 알림</a> / <b>'+ssoPageName()+'</b>'
+    : '<a href="#">콘체르토 플랫폼</a> / <a href="#">플랫폼 설정</a> / <b>'+PAGES[v]+'</b>';
   render();
   return false;
 }
@@ -2397,6 +2476,7 @@ function errBox(){
 
 function render(){
   if(role!=='super') return;
+  if(view==='sso'){ drawSsoForm(); return; }
   if(view==='aud') drawAudit();
   if(view==='sys') drawSys();
   if(view==='run') drawRun();
@@ -2593,14 +2673,175 @@ function drawSso(){
   if(!$('ssoBody')) return;
   $('ssoBody').innerHTML = SSO.on
     /* 액션은 카드 제목 옆에 있다 */
-    ? dl([['프로토콜','OIDC'],['발급자','https://sso.okestro.com/realms/concerto'],['클라이언트 ID','concerto-manager']])
+    /* 시크릿은 저장 후 조회할 수 없다. 등록 여부만 보인다(기획서 5.1 · REQ-035) */
+    ? dl([['프로토콜','OIDC'],['발급자','https://sso.okestro.com/realms/concerto'],
+          ['클라이언트 ID','concerto-manager'],['클라이언트 시크릿','<span class="stbadge ok">등록됨</span>']])
     /* 연결 전에는 빈 상태로 둔다. 다른 목록과 같은 규격이다(.state + 버튼) */
     : '<div class="state">'
       + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'
       +   '<rect x="3" y="11" width="18" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>'
       + '<h3>연결된 인증 기관이 없습니다.</h3>'
-      + '<p>기업 계정으로 로그인하려면 인증 기관을 등록해 주세요.</p>'
-      + '<button class="btn" onclick="act(\'인증 기관 설정 화면을 엽니다.\')">인증 기관 설정</button></div>';
+      /* `기업 계정` 을 쓰지 않는다. 계정은 하나이고 로그인 수단이 늘어난다(공통정책 1.1·7.9) */
+      + '<p>인증 기관을 등록하면 SSO 로그인을 사용할 수 있습니다.</p>'
+      /* 진입 버튼은 가는 화면의 동작과 같은 말로 둔다 — 모델 저장소 빈 상태가
+         `모델 저장소 연결` 인 것과 같은 규격이다(사용자 추가 주석 참조) */
+      + '<button class="btn" onclick="return go(\'sso\')">인증 기관 등록</button></div>';
+  if(SSO.on && SSO.pwless>0){
+    /* 조치 방법을 함께 적는다. 이 화면에서 할 수 없는 것을 요청하지 않는다 —
+       임시 비밀번호 발급은 사용자 및 역할 화면 소관이라 어디서 하는지 밝힌다 */
+    $('ssoBody').innerHTML += '<div class="hint" style="margin-top:10px">'
+      + 'SSO 로그인만 사용하는 계정이 '+SSO.pwless+'명 있어 연결을 해제할 수 없습니다. '
+      + '사용자 및 역할 화면에서 해당 계정에 임시 비밀번호를 발급한 뒤 해제할 수 있습니다.</div>';
+  }
+}
+
+/* 연결 확인 결과는 폼 위 알림으로 남긴다. 값을 고쳐야 하는 결과라 토스트로 두지 않는다
+   (기획서 5.1 · REQ-SET-INTEG-004). 스토리지·모델 저장소와 같은 규격이다 */
+function ssoVerify(){ act('인증 기관에 연결했습니다.'); }
+function ssoRelease(){ act('연결을 해제했습니다.'); }
+
+/* ── 인증 기관 등록·수정 SET-INTEG-SSO-F01 ── */
+/* 등록 전 값. 수정 화면은 이 값과 비교해 변경 여부를 본다(공통정책 7.1) */
+const SSO_VAL={ iss:'https://sso.okestro.com/realms/concerto', cid:'concerto-manager' };
+function drawSsoForm(){
+  if(!$('ssoForm')) return;
+  const on=SSO.on;
+  /* 제목은 동작이다(사용자 추가·워크스페이스 생성 규격). 등록과 수정이 갈린다 */
+  $('ssoHead').innerHTML = '<h1>'+ssoPageName()
+    + tabTip('외부 인증 서버와 연결할 정보를 등록합니다. 값은 인증 서버 관리자에게 받습니다.')+'</h1>';
+  /* 2열로 둔다. 같은 화면의 전역 저장소·모델 저장소 편집과 같은 규격이다.
+     주소는 길어 한 줄을 다 쓴다(.full) — 2열에 넣으면 값이 잘린다 */
+  /* 라벨 옆 물음표는 용어 풀이, 필드 아래 힌트는 입력 형식·조치 안내로 가른다(공통정책 4.7).
+     네 값 모두 OIDC 규격 용어라 뜻을 모르면 어디서 받아올 값인지 알 수 없다 */
+  $('ssoForm').innerHTML =
+    '<div class="ssec"><h4>연결 정보</h4><div class="fgrid">'
+    /* 프로토콜은 고르지 않는다. 이 버전은 OIDC 만 지원한다(계정정책 4.3) */
+    + '<div class="fld full"><label>프로토콜'
+    +   tabTip('콘체르토와 인증 서버가 주고받는 방식의 규격입니다.')+'</label>'
+    +   '<div class="credbox"><span class="dv">OIDC</span></div>'
+    +   '<div class="hint">OIDC 만 지원합니다.</div></div>'
+    + '<div class="fld full"><label>발급자 주소<span class="req">*</span>'
+    /* `토큰` 은 내부 기술 용어라 사용자 문구에 쓰지 않는다(공통정책 7.9) */
+    +   tabTip('인증 서버 자체의 주소입니다. 인증 결과가 이 서버에서 온 것인지 확인하는 데 씁니다.')+'</label>'
+    +   '<input class="inp" id="ssoIss" placeholder="https://" value="'+(on?SSO_VAL.iss:'')+'" onblur="ssoBlur(\'iss\')" oninput="ssoChange(\'iss\')">'
+    +   '<div class="errmsg" id="ssoIssErr"></div>'
+    +   '<div class="hint">인증 서버 주소를 전체 경로로 입력합니다.</div></div>'
+    + '<div class="fld"><label>클라이언트 ID<span class="req">*</span>'
+    +   tabTip('인증 서버에 콘체르토를 등록하면 받는 식별자입니다.')+'</label>'
+    +   '<input class="inp" id="ssoCid" placeholder="클라이언트 ID를 입력해 주세요." value="'+(on?SSO_VAL.cid:'')+'" onblur="ssoBlur(\'cid\')" oninput="ssoChange(\'cid\')">'
+    +   '<div class="errmsg" id="ssoCidErr"></div>'
+    +   '</div>'
+    /* 시크릿 처리는 스토리지·모델 저장소와 같은 함수를 쓴다. 등록돼 있으면 `등록됨` 과 `변경` 만 둔다 */
+    + secretField('클라이언트 시크릿', on, '저장한 뒤에는 다시 볼 수 없습니다.',
+        '클라이언트 ID 와 쌍으로 발급되는 비밀값입니다. 요청이 콘체르토에서 온 것임을 증명합니다.',
+        'ssoSecErr')
+    /* 리디렉션 URI 는 콘체르토가 정하는 값이다. 사용자가 고치는 값이 아니라 인증 서버에 옮겨 적는 값이다 */
+    + '<div class="fld full"><label>리디렉션 URI'
+    /* 어디서 돌아오는지를 문장에 넣는다. 둘째 문장은 왜 입력란이 아닌지를 밝힌다 */
+    +   tabTip('사용자가 인증 서버에서 로그인을 마치면 이 주소로 돌아옵니다. 콘체르토가 정하는 값이라 고칠 수 없습니다.')+'</label>'
+    +   '<div class="credbox"><span class="dv">https://concerto.okestro.com/auth/callback</span>'
+    +   '<span class="credact"><button class="btn ghost sm" onclick="act(\'복사했습니다.\')">복사</button></span></div>'
+    +   '<div class="hint">이 주소를 인증 서버에 등록합니다.</div></div>'
+    + '</div></div>'
+    /* 실행 버튼 라벨은 선례를 따른다 — 신규는 화면 제목의 동작(`등록`), 수정은 `저장` 이다.
+       근거는 운영룸 생성·설정(`pcNew?'생성':'저장'`) 과 연동 탭 카드 안 편집(`수정` 진입 → `저장`),
+       사용자 추가(진입 버튼 `사용자 추가` → 실행 `추가`) 셋이다.
+       ⚠ 공통정책 4.5 는 Confirm 모달과 입력 모달까지만 정하고 페이지 폼 조항이 없다 —
+         개정 제안 대상이다. 4.5 를 근거로 적었던 것을 고쳤다.
+       자리는 `.formfoot` 다 — 사용자 추가 폼이 쓰는 클래스이고 우측 정렬이 들어 있다.
+       `.secbtns` 는 `.ssechd .secbtns` 로만 정의돼 카드 머리 밖에서는 정렬이 걸리지 않는다 */
+    + '<div class="formfoot">'
+    +   '<button class="btn ghost" onclick="ssoCancel()">취소</button>'
+    +   '<button class="btn" id="ssoSave" disabled onclick="ssoSave()">'+(on?'저장':'등록')+'</button>'
+    + '</div>';
+  ssoChk();
+}
+/* 등록은 필수 항목이 모두 채워지면 연다. 수정은 거기에 변경이 하나 이상이어야 한다(공통정책 7.1).
+   시크릿은 수정 화면에서 비워 두면 기존 값을 유지하므로 변경으로 세지 않는다 */
+/* 인라인 에러 — 사용자 추가 폼의 ufShow 와 같은 규격이다(공통정책 7.8).
+   검증 시점은 필드 이탈과 저장 시점 둘이다. 입력 중에는 띄우지 않는다 */
+function ssoShow(id, msg){
+  const el=$(id); if(!el) return;
+  if(msg!==null) el.textContent=msg;
+  el.classList.toggle('show', msg!==null);
+  /* 필드도 에러 상태로 둔다 — 문구만 띄우면 어느 칸인지 눈이 못 따라간다 */
+  const inp=el.previousElementSibling;
+  if(inp && inp.classList && inp.classList.contains('inp')) inp.classList.toggle('err', msg!==null);
+}
+function ssoSecInput(){ const f=$('ssoForm'); return f? f.querySelector('input[type=password]') : null; }
+
+/* 필드별 검증 문구. 값이 맞으면 빈 문자열을 돌려준다 */
+function ssoIssMsg(){
+  const el=$('ssoIss'); if(!el) return '';
+  const v=(el.value||'').trim();
+  if(!v) return '발급자 주소를 입력해 주세요.';
+  /* 형식은 `https://` 로 시작하고 호스트가 있는지만 본다. 실제 도달 여부는 연결 확인이 본다 */
+  if(!/^https?:\/\/[^\s/]+/.test(v)) return '올바른 주소 형식이 아닙니다.';
+  return '';
+}
+function ssoCidMsg(){
+  const el=$('ssoCid'); if(!el) return '';
+  return (el.value||'').trim()? '' : '클라이언트 ID를 입력해 주세요.';
+}
+/* 시크릿은 등록 화면에서만 필수다. 수정 화면에서는 비워 두면 기존 값을 유지한다(REQ-039) */
+function ssoSecMsg(){
+  if(SSO.on) return '';
+  const el=ssoSecInput(); if(!el) return '';
+  return (el.value||'').trim()? '' : '클라이언트 시크릿을 입력해 주세요.';
+}
+
+/* 입력 중에는 에러를 지우고 저장 버튼만 다시 판정한다(사용자 추가 폼과 같다) */
+function ssoChange(k){
+  if(k==='iss') ssoShow('ssoIssErr', null);
+  if(k==='cid') ssoShow('ssoCidErr', null);
+  if(k==='sec') ssoShow('ssoSecErr', null);
+  ssoChk();
+}
+function ssoBlur(k){
+  if(k==='iss') ssoShow('ssoIssErr', ssoIssMsg()||null);
+  if(k==='cid') ssoShow('ssoCidErr', ssoCidMsg()||null);
+  if(k==='sec') ssoShow('ssoSecErr', ssoSecMsg()||null);
+  ssoChk();
+}
+
+function ssoChk(){
+  const b=$('ssoSave'); if(!b) return;
+  const iss=(($('ssoIss')||{}).value||'').trim(), cid=(($('ssoCid')||{}).value||'').trim();
+  const sec=ssoSecInput();
+  /* 등록은 시크릿도 필수다. 수정은 비워 두면 기존 값을 유지하므로 세지 않는다 */
+  const filled = SSO.on
+    ? !!(iss && cid)
+    : !!(iss && cid && sec && (sec.value||'').trim());
+  if(!SSO.on){ b.disabled = !filled; return; }
+  const changed = iss!==SSO_VAL.iss || cid!==SSO_VAL.cid || !!(sec && sec.value);
+  b.disabled = !(filled && changed);
+}
+function ssoSave(){
+  /* 저장 시점 검증 — 필드별 문구를 띄우고 첫 오류 필드로 포커스를 옮긴다(공통정책 7.8).
+     버튼이 비활성이라 여기 닿지 않는 것이 보통이나, 비활성만으로는 왜 막혔는지 알 수 없어
+     blur 로 먼저 띄운다. 이 블록은 마지막 방어다 */
+  const ms=[['ssoIssErr', ssoIssMsg(), 'ssoIss'],
+            ['ssoCidErr', ssoCidMsg(), 'ssoCid'],
+            ['ssoSecErr', ssoSecMsg(), null]];
+  let first=null;
+  ms.forEach(function(m){
+    ssoShow(m[0], m[1]||null);
+    if(m[1] && !first) first = m[2]? $(m[2]) : ssoSecInput();
+  });
+  if(first){ first.focus(); return; }
+
+  /* 저장하면 단일 로그인 탭으로 돌아가고 완료 토스트를 낸다(공통정책 7.4·7.7).
+     동기 작업이라 완료형으로 쓴다. 등록과 수정은 문구가 갈린다 —
+     SSO.on 을 바꾸기 전에 판정한다. 먼저 바꾸면 등록도 수정 문구로 나온다 */
+  const was=SSO.on;
+  if($('ssoIss')) SSO_VAL.iss=$('ssoIss').value.trim();
+  if($('ssoCid')) SSO_VAL.cid=$('ssoCid').value.trim();
+  SSO.on=true; go('ext');
+  act(was? '인증 기관 정보를 저장했습니다.' : '인증 기관을 등록했습니다.');
+}
+function ssoCancel(){
+  /* 입력값이 있으면 확인을 받는다(공통정책 7.2). 데모라 값 비교는 두지 않는다 */
+  go('ext');
 }
 
 /* ══════════ 보안 및 감사 ══════════ */
@@ -3108,9 +3349,17 @@ function ssoPane(){
   setTimeout(drawSso,0);
   return '<div class="ssec"><div class="ssechd"><div><h4>단일 로그인 (SSO)</h4></div>'
    + (SSO.on
+      /* 연결 해제는 비밀번호가 없는 계정이 있으면 막는다. 삭제 불가 사전 감지와 같은 처리다
+         (공통정책 7.5 — `연결된 하위 데이터가 있어 삭제 불가한 경우 사전 감지하여 선제 안내`).
+         영향이 가는 작업을 경고하고 실행시키는 것보다 선행 조건을 알려주는 쪽이 7.5 가 정한 순서다.
+         0 명이면 영향이 없어 이름 재입력 대상이 아니다 */
       ? '<div class="secbtns">'
-        + '<button class="btn ghost sm" onclick="act(\'설정 화면으로 이동합니다.\')">설정 변경</button>'
-        + '<button class="btn danger-line sm" onclick="act(\'연결을 해제했습니다.\')">연결 해제</button>'
+        /* 가는 화면이 `인증 기관 수정` 이므로 같은 말로 둔다. 다른 섹션의 카드 안 편집도 `수정` 이다 */
+        + '<button class="btn ghost sm" onclick="return go(\'sso\')">수정</button>'
+        + '<button class="btn ghost sm" onclick="ssoVerify()">연결 확인</button>'
+        + (SSO.pwless>0
+           ? '<button class="btn danger-line sm" disabled>연결 해제</button>'
+           : '<button class="btn danger-line sm" onclick="ssoRelease()">연결 해제</button>')
         + '</div>'
       : '')
    + '</div><div id="ssoBody"></div></div>';
@@ -3278,17 +3527,26 @@ function drawExt(){
 }
 
 /* 저장한 비밀값은 다시 보여주지 않는다. 바꿀 때만 새로 받는다 */
-function secretField(label, set, hint){
+/* tip 은 라벨 옆 용어 풀이다(공통정책 4.7). 없으면 붙이지 않는다 —
+   기존 호출부(전역 저장소·모델 저장소)는 넘기지 않아 지금과 같이 나온다 */
+function secretField(label, set, hint, tip, errId){
+  const lb = '<label>'+label+(tip? tabTip(tip) : '')+'</label>';
+  /* 등록 화면에서는 필수라 인라인 에러 자리를 둔다(공통정책 7.8).
+     errId 를 주지 않는 자리(스토리지·모델 저장소)는 종전과 같다 */
+  const er = errId? '<div class="errmsg" id="'+errId+'"></div>' : '';
   /* 등록돼 있으면 `등록됨` 배지와 `변경` 만 둔다. 빈 입력란을 두면 비운 채 저장했을 때
      지워지는지 유지되는지 알 수 없다 — 워크스페이스 연동 탭과 같은 규격이다 */
-  if(set) return '<div class="fld"><label>'+label+'</label>'
+  if(set) return '<div class="fld">'+lb
     + '<div class="credbox"><span class="stbadge ok">등록됨</span>'
     +   '<span class="credact"><button class="btn ghost sm" onclick="secChg(this)">변경</button></span></div>'
-    + '<input class="inp" type="password" placeholder="새 '+label+jo(label,'을')+' 입력해 주세요." style="display:none">'
+    + '<input class="inp" type="password" placeholder="새 '+label+jo(label,'을')+' 입력해 주세요." style="display:none" oninput="if(typeof ssoChange===\'function\')ssoChange(\'sec\')">'
+    + er
     + (hint? '<div class="hint">'+hint+'</div>' : '')
     + '</div>';
-  return '<div class="fld"><label>'+label+'</label>'
-    + '<input class="inp" type="password" placeholder="'+label+jo(label,'을')+' 입력해 주세요.">'
+  return '<div class="fld">'+lb
+    + '<input class="inp" type="password" placeholder="'+label+jo(label,'을')+' 입력해 주세요."'
+    +   (errId? ' onblur="ssoBlur(\'sec\')" oninput="ssoChange(\'sec\')"' : '')+'>'
+    + er
     + (hint? '<div class="hint">'+hint+'</div>' : '')
     + '</div>';
 }
