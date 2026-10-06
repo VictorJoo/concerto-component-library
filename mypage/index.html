@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>콘체르토 매니저 · 마이페이지</title>
 <!--
-  콘체르토 매니저 — 마이페이지 화면 목업 v0.21 (2026-09-18)
+  콘체르토 매니저 — 마이페이지 화면 목업 v0.23 (2026-10-06)
   · 컴포넌트 라이브러리 v0.2 색상 토큰에 맞춤. (: 라이브러리에 없던 레이아웃 전용 색 sidebar·flyout·border-soft·faint·active를 기존 라이브러리 토큰으로 치환 — 모든 색이 라이브러리 역할 토큰만 참조)
   · 치환 매핑: sidebar·header(크롬)→card(흰 크롬), flyout→card, border-soft→border, faint→muted-foreground, active(선택)→border, 메뉴 hover·칩→card-2(muted). 본문 캔버스만 background. 라이브러리 밖 색 제거.
   · 언어·테마 위치: 1안(프로필 팝오버) 확정 반영.
@@ -14,6 +14,27 @@
   · 실제 아이콘·간격·모션은 디자인 라이브러리로 확정. 본 파일은 구조·배치 전달용.
 
   ── 변경 ────────────────────────────────────────
+  v0.23 (CON-614) 비밀번호가 없는 계정을 갈랐다. 기준은 계정 종류가 아니라 비밀번호 설정 여부다 —
+        SSO 계정이라는 종류를 두면 관리자가 임시 비밀번호를 발급한 계정의 처리가 설명되지 않는다
+        (기획서 5.2 · 계정정책 4.3).
+        · 비밀번호 영역 전체를 노출하지 않는다. 마지막 변경일·주기 안내·버튼 셋 다 대상이다.
+          버튼만 감추면 마지막 변경일만 남아 없는 값에 빈 칸이 생긴다(계정정책 2.2).
+        · 이름은 본인 확인 없이 바로 수정한다. 표시용 값이라 권한·로그인·알림 어디에도 쓰이지 않아
+          본인 확인을 걸 이유가 없고, 이름 하나 바꾸는 데 인증 서버를 다녀오게 하면 불편만 남는다.
+        · 이메일은 읽기 전용이다. 인증 서버의 값을 따른다 — 계정 복구 경로이자 기존 계정을
+          연결하는 기준이라 인증 서버가 검증하지 않은 주소로 바뀌면 안 된다.
+          바꿔야 하면 인증 서버에서 바꾼 뒤 다시 로그인한다.
+        · 자리를 없애지 않고 읽기 전용으로 남겼다(공통정책 7.11). 사라지면 무엇이 빠졌는지 알 수 없다.
+          필수 표시를 떼고 안내를 붙였다 — 고칠 수 없는 값이다.
+        · 이메일을 수정 대상에서 뺐으므로 변경 여부 판정에서도 뺐다. 값이 같아도 저장이 활성되면
+          무엇이 바뀌었는지 알 수 없다(공통정책 7.1).
+        · 본인 확인(현재 비밀번호) 섹션을 걷어냈다. 받을 비밀번호가 없는 계정이 있고,
+          남은 수정 항목이 이름뿐이라 확인을 걸 대상이 없다.
+          ⚠ 작업 중 저장 시 인증 기관으로 이동해 본인 확인을 받는 안을 먼저 뒀다가 걷어냈다.
+            이름만 두고 보면 본인 확인이 필요한 값이 아니다.
+        · 데모 바 `비밀번호: 없음(SSO 첫 로그인)` 으로 확인한다. 실제 화면에는 없는 검토용 처리다.
+        · 버전을 기획서(SYS-MYPAGE-F01 v0.23)에 맞췄다. 목업이 v0.21 에 머물러 있었다 —
+          ⚠ 기획서 v0.22 변경분이 이 파일에 들어갔는지 확인하지 않았다. 확인 대상.
   v0.21 이름 유효성 문구를 계정정책 2.4 안내 문구표에 맞췄다.
         `2자 이상 입력해 주세요.` → `2자 이상 입력해주세요.` (정책 표 표기).
         공백 전용 문구(`공백은 사용할 수 없습니다.`)를 없애고 허용 문자 문구로 덮는다 —
@@ -464,7 +485,12 @@ var PAGES = {
       </section>
 
       <!-- 마지막 변경일은 권고 주기(90일) 초과 여부를 판단하는 근거다(계정정책 2.2) -->
-      <section class="mp-sec">
+      <!-- 비밀번호가 없는 계정은 이 영역 전체를 노출하지 않는다 — 마지막 변경일·주기 안내·
+           비밀번호 변경 버튼 셋 다 대상이다(계정정책 2.2·4.3). 확인할 현재 비밀번호가 없어
+           변경이 성립하지 않는다. 관리자가 임시 비밀번호를 발급하면 그 뒤부터 노출된다.
+           버튼만 감추지 않는다 — 마지막 변경일만 남으면 없는 값에 빈 칸이 생긴다.
+           (주석에 백틱을 쓰지 않는다. 이 블록은 템플릿 리터럴 안이라 문자열이 끊긴다) -->
+      <section class="mp-sec" id="pwSec">
         <h3>비밀번호<button class="btn sm ghost" style="margin-left:auto" onclick="openPw()">비밀번호 변경</button></h3>
         <!-- 권고 주기를 넘겼을 때만 나타난다. 강제하지 않으므로 닫을 수 있다(라이브러리 v0.3) -->
         <div id="pwAlert"></div>
@@ -488,9 +514,16 @@ var PAGES = {
           <input id="mpName" value="성유진" maxlength="50" oninput="onMp()" onblur="vName(true)">
           <p class="mp-err" id="mpNameErr"></p>
         </div>
-        <div class="mp-f">
-          <label>이메일 주소 <span class="req">*</span>${mpTip('알림 수신에 사용됩니다.')}</label>
+        <!-- 비밀번호가 없는 계정은 이메일을 고치지 않는다. 인증 서버의 값을 따른다
+             (CON-614 2026-10-06 · 계정정책 4.3). 이메일은 계정 복구 경로이자 기존 계정을
+             연결하는 기준이라 인증 서버가 검증하지 않은 주소로 바뀌면 안 된다.
+             바꿔야 하면 인증 서버에서 바꾼 뒤 다시 로그인한다.
+             자리를 없애지 않고 읽기 전용으로 남긴다 — 사라지면 무엇이 빠졌는지 알 수 없다(7.11) -->
+        <div class="mp-f" id="mpEmailFld">
+          <label>이메일 주소 <span class="req" id="mpEmailReq">*</span>${mpTip('알림 수신에 사용됩니다.')}</label>
           <input id="mpEmail" value="yj.seong@okestro.com" oninput="onMp()" onblur="vEmail(true)">
+          <div class="rov" id="mpEmailRo" style="display:none">yj.seong@okestro.com</div>
+          <p class="mp-hint" id="mpEmailNote" style="display:none;margin:6px 0 0">인증 기관에서 관리하는 값입니다. 인증 기관에서 변경한 뒤 다시 로그인하면 반영됩니다.</p>
           <p class="mp-err" id="mpEmailErr"></p>
         </div>
       </section>
@@ -519,6 +552,11 @@ var PAGES = {
         </div>
       </section>
 
+      <!-- 비밀번호가 없는 계정에는 본인 확인을 두지 않는다. 이름은 표시용 값이라 권한·로그인·알림
+           어디에도 쓰이지 않아 확인할 이유가 없고, 이메일은 아예 수정 대상이 아니다
+           (CON-614 2026-10-06 · 계정정책 4.3). 인증 기관 재인증도 두지 않는다 —
+           이름 하나 바꾸는 데 인증 서버를 다녀오게 하면 불편만 남는다 -->
+
       <div class="mp-act">
         <button class="btn ghost" onclick="cancelMp()">취소</button>
         <button class="btn" id="mpSave" onclick="saveMp()" disabled><span class="spin"></span><span>저장</span></button>
@@ -540,7 +578,11 @@ function render(key, subLabel){
   /* 조회 화면을 다시 그리면 비밀번호 상태 표시가 초기화되므로 복원한다 */
   if(key==='mypage' && typeof drawPwHint==='function') drawPwHint();
   /* 수정 화면을 다시 그리면 본인 확인을 처음부터 받는다 */
-  if(key==='mypageEdit' && typeof refreshSave==='function'){ pwChecked=false; refreshSave(); }
+  if(key==='mypageEdit' && typeof refreshSave==='function'){
+    pwChecked=false;
+    if(typeof drawEmailField==='function') drawEmailField();
+    refreshSave();
+  }
 }
 function nav(key){
   document.querySelectorAll('.nav a').forEach(function(a){a.classList.remove('active')});
@@ -603,17 +645,44 @@ function nameMsg(){ var el=$mp('mpName'); if(!el) return ''; var v=el.value.trim
   return ''; }
 /* 이메일은 중복 불가다(계정정책 2.3). 저장 시 서버가 판정하며 여기서는 데모용으로 확인한다 */
 var MP_TAKEN=['admin@okestro.com','sj.lim@okestro.com'];
-function emailMsg(){ var el=$mp('mpEmail'); if(!el) return ''; var v=el.value.trim();
+function emailMsg(){ var el=$mp('mpEmail'); if(!el) return '';
+  if(!hasPw()) return '';   /* 수정 대상이 아니라 검증하지 않는다 */
+  var v=el.value.trim();
   if(!mpEmailRe.test(v)) return '올바른 이메일 형식이 아닙니다.';
   if(MP_TAKEN.indexOf(v.toLowerCase())>=0) return '이미 사용 중인 이메일입니다.';
   return ''; }
 function vName(show){ return showMpErr($mp('mpName'),$mp('mpNameErr'), show?nameMsg():''); }
 function vEmail(show){ return showMpErr($mp('mpEmail'),$mp('mpEmailErr'), show?emailMsg():''); }
-function isChanged(){ return $mp('mpName').value.trim()!==MP_ORIG.name || $mp('mpEmail').value.trim()!==MP_ORIG.email; }
+/* 비밀번호가 없는 계정은 이메일이 수정 대상이 아니라 변경 여부에서도 뺀다 */
+function isChanged(){
+  if($mp('mpName').value.trim()!==MP_ORIG.name) return true;
+  return hasPw() && $mp('mpEmail').value.trim()!==MP_ORIG.email;
+}
+/* 이메일 입력란과 읽기 전용 표시를 갈아 끼운다(CON-614 2026-10-06) */
+function drawEmailField(){
+  var fld=$mp('mpEmailFld'); if(!fld) return;
+  var editable=hasPw();
+  $mp('mpEmail').style.display   = editable? '' : 'none';
+  $mp('mpEmailRo').style.display = editable? 'none' : '';
+  $mp('mpEmailNote').style.display = editable? 'none' : '';
+  /* 고칠 수 없는 값에는 필수 표시를 두지 않는다 */
+  $mp('mpEmailReq').style.display = editable? '' : 'none';
+  if(!editable){
+    $mp('mpEmailRo').textContent = MP_ORIG.email;
+    $mp('mpEmail').value = MP_ORIG.email;
+    showMpErr($mp('mpEmail'),$mp('mpEmailErr'),'');
+  }
+}
 /* 현재 비밀번호 — 계정정책 2.2 의 허용 문자 규칙을 그대로 적용한다.
    복잡도(길이·조합)는 새 비밀번호를 만들 때 쓰는 규칙이라 여기서 보지 않는다.
    이미 발급된 값을 확인하는 자리다 */
+/* 비밀번호 설정 여부 — `없음` 은 SSO 첫 로그인으로 만들어져 콘체르토 비밀번호가 없는 계정이다
+   (계정정책 4.3). pwState 는 데모 바 블록에 있어 이 블록이 실행될 때는 아직 값이 없다 —
+   그때는 비밀번호가 있는 쪽으로 본다 */
+function hasPw(){ return typeof pwState==='undefined' || pwState!=='none'; }
 function pwMsg(){ var el=$mp('mpPw'); if(!el) return '';
+  /* 비밀번호가 없는 계정은 받을 값이 없어 검증 대상이 아니다. 저장 시 인증 기관 재인증으로 대신한다 */
+  if(!hasPw()) return '';
   if(!el.value) return '현재 비밀번호를 입력해 주세요.';
   if(!/^[\x21-\x7E]+$/.test(el.value)) return '영문·숫자·특수문자만 사용할 수 있습니다.';
   if(!pwChecked) return '확인이 필요합니다.';
@@ -662,7 +731,8 @@ function refreshSave(){
   /* 바꾼 항목이 생겨야 본인 확인을 받는다. 없으면 확인할 이유가 없다 */
   var sec=$mp('mpAuthSec');
   if(sec){
-    sec.style.display = changed ? '' : 'none';
+    /* 비밀번호가 없는 계정은 본인 확인 입력을 받지 않는다(기획서 5.2) */
+    sec.style.display = (changed && hasPw()) ? '' : 'none';
     if(!changed && pwChecked){ pwChecked=false; showPwOk(false); }
     if(!changed){ var pw=$mp('mpPw'); if(pw && pw.value){ pw.value=''; showMpErr(pw,$mp('mpPwErr'),''); } }
   }
@@ -677,6 +747,9 @@ function saveMp(){
   /* 첫 오류 필드에 포커스한다(공통정책 7.8) */
   if(!okN||!okE||!okP){ (!okN?$mp('mpName'):!okE?$mp('mpEmail'):$mp('mpPw')).focus(); return; }
   var b=$mp('mpSave'); b.classList.add('loading'); b.disabled=true;
+  /* 비밀번호가 없는 계정은 여기서 인증 기관으로 이동해 재인증하고 돌아와 저장된다(기획서 5.2).
+     이 목업에는 인증 서버가 없어 이동을 생략하고 저장 결과만 보인다 —
+     저장 흐름이 이 화면의 검토 대상이라 스피너에서 멈추지 않는다 */
   setTimeout(function(){ b.classList.remove('loading');
     MP_ORIG.name=$mp('mpName').value.trim(); MP_ORIG.email=$mp('mpEmail').value.trim();
     /* 저장하면 조회 화면으로 돌아간다 */
@@ -722,6 +795,9 @@ refreshSave();
   <span class="demo-label" style="margin-left:12px;">비밀번호:</span>
   <button class="pw on" onclick="setPw('ok',this)">정상</button>
   <button class="pw" onclick="setPw('old',this)">주기 초과</button>
+  <!-- 없음 = SSO 첫 로그인으로 만들어져 콘체르토 비밀번호가 없는 계정이다(계정정책 4.3).
+       실제 화면에는 없는 검토용 처리다 — 실제로는 백엔드 응답으로 받는다 -->
+  <button class="pw" onclick="setPw('none',this)">없음(SSO 첫 로그인)</button>
   <span class="demo-label" style="margin-left:12px;">데이터:</span>
   <button class="st on" onclick="setState('default',this)">기본</button>
   <button class="st" onclick="setState('loading',this)">로딩</button>
@@ -763,6 +839,9 @@ function goDemo(key,btn){
 /* 비밀번호 상태 — 권고 주기 90일 초과 시 안내한다(계정정책 2.2).
    임시 비밀번호는 최초 로그인 시 변경을 강제하므로 마이페이지에 도달할 수 없다.
    강제 변경 화면은 별도 기획 대상이다.
+   `없음` 은 SSO 첫 로그인으로 만들어져 콘체르토 비밀번호가 없는 계정이다(계정정책 4.3).
+   계정 종류가 아니라 비밀번호 설정 여부로 가른다 — 관리자가 임시 비밀번호를 발급하면
+   같은 계정이 `정상` 으로 넘어간다. 실제 화면에서는 백엔드 응답으로 받는다.
    초기 렌더가 이 선언보다 먼저 실행되므로 var 로 둔다 */
 var pwState='ok';
 function setPw(v,btn){
@@ -770,10 +849,19 @@ function setPw(v,btn){
   document.querySelectorAll('#demoBar .pw').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
   drawPwHint();
+  /* 수정 화면에서 바꾸면 본인 확인과 이메일 필드가 갈려야 한다 */
+  if(document.getElementById('mpSave')){
+    if(typeof drawEmailField==='function') drawEmailField();
+    if(typeof refreshSave==='function') refreshSave();
+  }
 }
 /* 화면을 다시 그릴 때도 비밀번호 상태를 유지한다 */
 function drawPwHint(){
   const v=pwState;
+  /* 비밀번호가 없는 계정은 영역 전체를 숨긴다. 수정 화면에는 pwSec 이 없어 미리 빠져나오지 않는다 */
+  const sec=document.getElementById('pwSec');
+  if(sec) sec.style.display = (v==='none') ? 'none' : '';
+  if(v==='none') return;
   const el=document.getElementById('pwHint'); if(!el) return;
   const box=document.getElementById('pwAlert');
   /* 마지막 변경일은 값이라 늘 남긴다. 주기 초과는 조건부라 알림 박스로 분리한다 */
