@@ -1,3 +1,45 @@
+<!--
+  콘체르토 매니저 — 로그인 · 회원가입 목업 v0.23 (2026-10-02)
+  색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.23 (CON-614) ──
+  · `SSO 로그인` 진입점을 더했다. 인증 기관이 연결된 설치에만 노출하고, 판정 기준은
+    플랫폼 설정 값이다 — 접속한 사람의 속성이 아니다(기획서 5.1 · REQ-LOGIN-014).
+  · 아이디·비밀번호 입력란은 손대지 않았다. 아이디·비밀번호가 기본이고 SSO 가 추가되는 구조다
+    (계정 정책 4.3). 아이디를 먼저 받아 도메인으로 분기하는 방식은 두지 않았다 —
+    아이디는 `@` 를 허용하지 않아(계정 정책 2.1) 도메인을 판별할 수 없다.
+  · 배치는 `로그인` 아래다. 구분선은 라이브러리 `hr` 규격(`border-top:1px solid var(--border)`)만 썼다.
+    `또는` 같은 라벨 달린 구분선은 라이브러리에 없어 만들지 않았다.
+  · 버튼은 `.btn.ghost` 로 뒀다. 라이브러리에 있는 보조 버튼 변형을 이 파일로 가져온 것이고
+    값은 라이브러리 정의 그대로다. 함께 쓰이는 `--border-strong` · `--hover` 를 토큰으로 더했다.
+  · 입력란을 두지 않았다. OIDC 는 콘체르토가 자격 증명을 받지 않고 인증 서버가 인증한 결과를 받는다
+    (기획서 7장). 누르면 외부 인증 서버로 이동하므로 이동 중 비활성 + 스피너를 둔다(공통정책 7.3).
+  · 인증 서버에 닿지 않는 경우를 더했다. 이 화면에서 아이디·비밀번호로 들어올 수 있어
+    조치 방법을 함께 적는다(기획서 5.2 · 공통정책 6.3).
+  · 인증 기관에서 돌아온 직후 화면을 더했다. 리디렉션 URI 로 돌아오면 콘체르토가 토큰을 받아
+    계정을 찾고 세션을 발급하는데, 그 사이 서버 왕복이 있어 빈 화면이 생기면 안 된다(공통정책 4.1).
+    SSO 결과 네 갈래가 모두 이 화면을 거쳐 간다 — 성공이면 홈, 계정이 없으면 승인 대기,
+    로그인할 수 없는 상태면 상태 안내, 인증 서버에 닿지 않으면 로그인 화면 배너다.
+    이 파일에 전체 로딩 규격이 없어 가입 완료 화면 레이아웃을 그대로 쓰고 뱃지만 갈았다.
+    완료 상태는 두지 않았다 — 실제로는 처리가 끝나는 즉시 홈으로 넘어가 이 화면이 완료 상태로
+    머무르지 않는다. 목업 편의로 완료 표시를 두면 실제에 없는 화면을 만들게 된다(doc-sync 5.6).
+    성공 뒤의 홈은 이 목업에 없어 처리 중 상태에서 멈춘다.
+    ⚠ 이 화면은 기획서 6장 UI 상태에 없다. 함께 반영할 항목이다.
+  · `SSO 로그인` 을 누르면 인증 서버 화면을 건너뛰고 돌아온 직후 화면으로 넘어간다.
+    인증 서버 로그인 화면은 고객사 소관이라 이 목업에 둘 수 없다 — 검토용 처리다.
+  · ghost 버튼 hover 에 `opacity:1` 을 넣었다. 이 파일은 버튼 hover 를 `opacity:.9` 로 처리하는데
+    라이브러리 ghost 는 `background:var(--hover)` 로 처리해, 둘이 겹치면 배경이 생기면서
+    동시에 흐려진다. 라이브러리에 없는 한 줄이다.
+    ⚠ 이 파일의 `.btn` 기본형(높이 46px 전폭·폰트 15px·hover 가 opacity)도 라이브러리와 다르다.
+      이번 작업에서 생긴 것이 아니라 원래 그렇다. 확인 대상.
+  · SSO 첫 로그인·로그인 불가 상태에 케이스를 새로 두지 않았다. 기획서 5.2 가 승인 대기·비활성·반려와
+    같은 문구를 쓰도록 정해 기존 `승인 대기` · `비활성` · `반려` 케이스가 그대로 그 화면이다.
+  · 2차 인증 입력 단계를 두지 않았다. 인증 서버가 담당한다(기획서 5.1).
+  · 데모 바 `인증 기관` 으로 노출·미노출을 확인한다. 실제 화면에는 없는 검토용 처리다.
+
+  ── v0.22 이전 ──
+  이 파일에 변경 내역 주석이 없었다. v0.22 까지의 내역은 기획서 SYS-LOGIN-L01 변경이력에 있다.
+-->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,6 +51,8 @@
     /* 콘체르토 공통 레이아웃 팔레트 / 컴포넌트 라이브러리 v0.1 라이트 토큰 기준 */
     --page:#f4f6fc; --panel:#ffffff; --field:#eef1f9;
     --border:#dce2f1; --border-soft:#e9edf7;
+    /* 버튼 테두리는 면 구분보다 진한 값을 쓴다 — 라이브러리 v0.6 값 그대로다 */
+    --border-strong:#b9c3dd; --hover:#fafbfe;
     --text:#171d33; --muted:#565f7e;
     --primary:#3346c9; --accent:#4f6fe6;
     --ring:rgba(79,111,230,.22); --danger:#d64a51; --success:#2f9e6f;
@@ -18,6 +62,7 @@
   body.dark{
     --page:#0d0f14; --panel:#16181f; --field:#1c1f27;
     --border:#262a33; --border-soft:#20242c;
+    --border-strong:#3d4454; --hover:#1b1e26;
     --text:#e6e8ee; --muted:#969ba6;
     --primary:#4159d6; --accent:#7d97f0;
     --ring:rgba(125,151,240,.28); --danger:#e0585f; --success:#46b17f;
@@ -152,6 +197,18 @@
   .btn.loading .spinner{display:inline-block;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
+  /* 보조 버튼 — 라이브러리 v0.6 `.btn.ghost` 정의를 그대로 가져왔다.
+     이 파일은 `--foreground` 대신 `--text` 를 쓰고 있어 이름만 맞췄다 */
+  .btn.ghost{background:transparent;border:1px solid var(--border-strong);color:var(--text);}
+  .btn.ghost:hover:not(:disabled){background:var(--hover);border-color:var(--text);opacity:1;}
+  /* 흰 배경 위 보조 버튼이라 스피너를 밝은 테두리로 두면 보이지 않는다 */
+  .btn.ghost .spinner{border-color:var(--border);border-top-color:var(--muted);}
+  /* SSO 블록 — 비밀번호 로그인과 갈라 보이게 구분선을 둔다.
+     라이브러리 hr 규격(`border-top:1px solid var(--border)`)만 쓴다.
+     `또는` 같은 라벨 달린 구분선은 라이브러리에 없어 만들지 않았다 */
+  .sso-block{display:none;margin-top:18px;padding-top:18px;border-top:1px solid var(--border);}
+  .sso-block.show{display:block;}
+
   .links{display:flex;justify-content:center;gap:20px;margin-top:20px;font-size:13px;}
   .links a{color:var(--muted);text-decoration:none;cursor:pointer;}
   .links a:hover{color:var(--accent);}
@@ -169,6 +226,10 @@
   }
   .done h1{font-size:22px;font-weight:700;margin:0 0 12px;}
   .done p{font-size:14px;color:var(--muted);line-height:1.65;margin:0 0 28px;}
+  /* 인증 기관에서 돌아온 직후 처리 중 — 완료 뱃지 자리에 스피너를 둔다.
+     돌아오자마자 토큰 교환·계정 조회가 서버에서 일어나므로 빈 화면이 생기면 안 된다(공통정책 4.1).
+     이 파일에 전체 로딩 규격이 없어 .done 레이아웃을 그대로 쓰고 뱃지만 갈았다 */
+  .done .badge.load{background:transparent;border:3px solid var(--border);border-top-color:var(--accent);animation:spin .8s linear infinite;}
 
   /* 비밀번호 재설정 안내 모달 (공통정책 4.5) */
   .modal-overlay{
@@ -209,6 +270,8 @@
   .demo-bar .demo-label{color:#7f88a8;margin-right:4px;}
   .demo-bar button{background:#1c2136;border:1px solid #2f3654;color:#c9cfe0;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;}
   .demo-bar button:hover{border-color:var(--accent);color:#fff;}
+  /* 인증 기관 연결 여부는 켜고 끄는 값이라 현재 선택을 남긴다 — 케이스 버튼과 다르다 */
+  .demo-bar button.on{background:#2a3358;border-color:#4a5589;color:#fff;}
   /* 승인 대기 등 계정 상태 안내는 오류가 아니라 정보성 — 중립 배너 */
   .form-error.info{background:#eef2fd;border-color:#c7d2f0;color:#2f3d7a;}
 
@@ -254,6 +317,14 @@
         <div class="row-remember"><input type="checkbox" id="remember" checked /><label for="remember">아이디 저장</label></div>
 
         <button type="submit" class="btn" id="loginBtn"><span class="spinner"></span><span class="btn-label">로그인</span></button>
+
+        <!-- SSO 로그인 (REQ-LOGIN-014·015) — 인증 기관이 연결된 설치에만 노출한다.
+             판정 기준은 플랫폼 설정 값이고 접속한 사람의 속성이 아니다(기획서 5.1).
+             입력란을 두지 않는다. 콘체르토가 자격 증명을 받지 않고 인증 서버가 인증한 결과를 받는다.
+             type="button" 이다 — 폼 제출이 아니라 외부 인증 서버로 이동하는 동작이다. -->
+        <div class="sso-block" id="ssoBlock">
+          <button type="button" class="btn ghost" id="ssoBtn"><span class="spinner"></span><span class="btn-label">SSO 로그인</span></button>
+        </div>
 
         <div class="links"><a id="toSignup">회원가입</a><a id="resetLink">비밀번호 재설정</a></div>
         <p class="copyright">© 2025 OKESTRO Co., Ltd. All Rights Reserved.</p>
@@ -318,6 +389,18 @@
         <button type="button" class="btn" id="doneToLogin"><span class="btn-label">로그인 화면으로</span></button>
       </div>
 
+      <!-- ④ 인증 기관에서 돌아온 직후 (리디렉션 URI 수신) -->
+      <!-- 인증 서버가 사용자를 이 주소로 돌려보내면 콘체르토가 토큰을 받아 계정을 찾고 세션을 발급한다.
+           그 사이 서버 왕복이 있어 처리 중 화면이 필요하다(공통정책 4.1).
+           SSO 결과 네 갈래가 모두 이 화면을 거쳐 간다 — 성공이면 홈, 계정이 없으면 승인 대기,
+           로그인할 수 없는 상태면 상태 안내, 인증 서버에 닿지 않으면 로그인 화면 배너다.
+           ⚠ 이 화면은 기획서 6장 UI 상태에 없다. 함께 반영할 항목이다 -->
+      <div class="form done" id="cbView">
+        <div class="badge load" id="cbIcon"></div>
+        <h1 id="cbTitle">로그인 중입니다.</h1>
+        <p id="cbDesc">인증 결과를 확인하고 있습니다.</p>
+      </div>
+
     </section>
   </div>
 
@@ -332,6 +415,19 @@
     <button data-case="locked">계정 잠금</button>
     <button data-case="expired">세션 만료</button>
     <button data-case="temppw">임시 비밀번호</button>
+    <!-- ── SSO ── 프론트가 새로 만들 단위만 모았다. 실제 화면에는 없는 검토용 처리다.
+         ① 진입점 노출 — 플랫폼 설정의 인증 기관 연결 여부로 갈린다. 접속한 사람의 속성이 아니다
+         ② 돌아온 직후 — 리디렉션 URI 로 들어온 뒤 토큰 교환·계정 조회가 끝날 때까지의 화면
+         ③ 연결 실패 — 인증 서버에 닿지 않을 때의 배너
+         SSO 로 들어와 승인 대기·비활성·반려로 막히는 경우는 케이스를 따로 두지 않았다.
+         기획서 5.2 가 비밀번호 경로와 같은 문구를 쓰도록 정해 왼쪽 케이스가 그대로 그 화면이다 —
+         프론트가 새로 만들 것이 없다 -->
+    <span class="demo-label" style="margin-left:12px;">SSO 진입점:</span>
+    <button data-sso="off" class="on">미노출</button>
+    <button data-sso="on">노출</button>
+    <span class="demo-label" style="margin-left:12px;">SSO 화면:</span>
+    <button data-case="cb">돌아온 직후</button>
+    <button data-case="ssofail">연결 실패</button>
     <span class="demo-label" style="margin-left:12px;">피드백(가입 신청 완료 시):</span>
     <button data-case="toast">가입 접수 토스트</button>
     <span class="demo-label" style="margin-left:12px;">테마:</span>
@@ -424,7 +520,7 @@
   })();
 
   // ── 뷰 전환 ──
-  const views = { login:$('loginView'), signup:$('signupView'), done:$('doneView') };
+  const views = { login:$('loginView'), signup:$('signupView'), done:$('doneView'), cb:$('cbView') };
   function show(name){ Object.values(views).forEach(v=>v.classList.remove('active')); views[name].classList.add('active'); }
   $('toSignup').addEventListener('click', e=>{ e.preventDefault(); resetLogin(); show('signup'); });
   $('toLogin').addEventListener('click', e=>{ e.preventDefault(); resetSignup(); show('login'); });
@@ -507,6 +603,7 @@
     [li_id,li_pw].forEach(el=>{ el.value=''; el.classList.remove('has-error'); });
     ['li_idErr','li_pwErr'].forEach(id=>$(id).classList.remove('show'));
     formError.classList.remove('show');
+    resetSso();   // 이동 중 상태로 두고 화면을 떠났다 돌아오면 스피너가 남는다
   }
   $('loginView').addEventListener('submit', e=>{
     e.preventDefault(); formError.classList.remove('show');
@@ -644,11 +741,50 @@ function vEmail(){
     invalid: { msg:'아이디 또는 비밀번호가 일치하지 않습니다.' },
     locked:  { msg:'로그인 시도가 많아 계정이 잠겼습니다. 관리자에게 문의해 주세요.' },
     pending: { msg:'승인 대기 중인 계정입니다. 관리자 승인 후 로그인할 수 있습니다.', info:true },
+    /* 인증 서버에 닿지 않는 경우다(기획서 5.2 · 공통정책 6.3). 이 화면에서 아이디·비밀번호로
+       들어올 수 있어 조치 방법을 함께 적는다. 자격 불일치(9.1)와 다른 사유라 문구를 갈랐다 */
+    ssofail: { msg:'인증 기관에 연결할 수 없습니다. 아이디와 비밀번호로 로그인해 주세요.' },
   };
   const stateModal=$('stateModal');
   const expiredModal=$('expiredModal');
+
+  /* ── SSO 로그인 진입점 (REQ-LOGIN-014) ──
+     인증 기관이 연결된 설치에만 노출한다. 실제 화면에서는 플랫폼 설정 값으로 받는다 —
+     데모라 값을 두고 데모 바로 바꾼다 */
+  let ssoOn=false;
+  function renderSso(){ $('ssoBlock').classList.toggle('show', ssoOn); }
+  /* 누르면 외부 인증 서버로 이동한다(REQ-LOGIN-015). 이동하는 동안 비활성 + 스피너를 둔다(공통정책 7.3).
+     아이디·비밀번호 입력값을 보내지 않으므로 미입력 검증을 걸지 않는다.
+     실제로는 여기서 화면이 인증 서버로 넘어가고 아이디·비밀번호는 그쪽에서 입력한다.
+     그 화면은 고객사 소관이라 이 목업에 없다 — 건너뛰고 돌아온 직후 화면으로 넘긴다 */
+  $('ssoBtn').addEventListener('click', ()=>{
+    formError.classList.remove('show','info');
+    const b=$('ssoBtn');
+    b.classList.add('loading'); b.disabled=true;
+    b.querySelector('.btn-label').textContent='인증 기관으로 이동 중';
+    setTimeout(()=>{ resetSso(); show('cb'); }, 1100);
+  });
+  function resetSso(){
+    const b=$('ssoBtn');
+    b.classList.remove('loading'); b.disabled=false;
+    b.querySelector('.btn-label').textContent='SSO 로그인';
+  }
+  renderSso();
+
   document.querySelectorAll('#demoBar button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
+      /* 인증 기관 연결 여부는 켜고 끄는 값이다. 연결 전·후를 다 확인할 수 있게 둔다 —
+         값이 하나로 고정되면 한쪽 화면을 볼 수 없다.
+         효과가 로그인 화면에서만 보이므로 다른 화면에 있으면 로그인 화면으로 돌려준다.
+         입력값·에러는 건드리지 않는다 — 설치 설정값이라 사용자가 하던 것과 무관하다 */
+      if(btn.dataset.sso){
+        ssoOn = btn.dataset.sso==='on';
+        document.querySelectorAll('#demoBar button[data-sso]').forEach(b=>b.classList.remove('on'));
+        btn.classList.add('on');
+        resetSso(); renderSso();
+        if(!views.login.classList.contains('active')) show('login');
+        return;
+      }
       const key=btn.dataset.case;
       if(key==='theme'){ document.body.classList.toggle('dark'); return; }   // 테마 전환(다크/라이트) — 현재 화면·입력값 유지
       if(key==='toast'){   // 가입 접수 토스트 = 회원가입 화면에서 값이 모두 채워지고 제출된 실제 흐름으로 시연
@@ -664,7 +800,34 @@ function vEmail(){
       li_id.classList.remove('has-error'); li_pw.classList.remove('has-error');
       $('li_idErr').classList.remove('show'); $('li_pwErr').classList.remove('show');
       formError.classList.remove('show','info'); stateModal.classList.remove('show');
+      resetSso();
       if(key==='default') return;
+      /* 인증 기관에서 돌아온 직후 — SSO 결과가 갈리기 직전 화면이다.
+         실제로는 잠깐 스쳐 가지만 리뷰에서 봐야 해서 케이스로 둔다.
+         처리가 끝나면 결과에 따라 홈·승인 대기 안내·상태 안내·배너로 갈린다.
+         성공한 뒤의 홈은 이 목업에 없어 이 화면에서 멈춘다 */
+      if(key==='cb'){
+        ssoOn=true;
+        document.querySelectorAll('#demoBar button[data-sso]').forEach(b=>{
+          b.classList.toggle('on', b.dataset.sso==='on');
+        });
+        renderSso(); show('cb');
+        return;
+      }
+      /* 인증 기관 연결 실패 = SSO 로그인을 눌러 다녀왔으나 인증 서버에 닿지 않은 상태다.
+         입력값을 채우지 않는다 — 아이디·비밀번호를 넣어 시도한 흐름이 아니다.
+         이 케이스는 인증 기관이 연결된 설치에서만 생기므로 진입점을 함께 노출한다 */
+      if(key==='ssofail'){
+        ssoOn=true;
+        document.querySelectorAll('#demoBar button[data-sso]').forEach(b=>{
+          b.classList.toggle('on', b.dataset.sso==='on');
+        });
+        renderSso();
+        const c=BANNER_CASES.ssofail;
+        formError.querySelector('span').textContent=c.msg;
+        formError.classList.add('show');
+        return;
+      }
       if(key==='expired'){   // 세션 만료 = 자동 로그아웃 후 빈 로그인 화면 + 안내 모달(로그인 시도 실패와 별도 채널)
         expiredModal.classList.add('show');
         return;   // 입력값은 비운 상태 유지
