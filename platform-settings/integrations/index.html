@@ -1,6 +1,32 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.13 (2026-10-02)
+  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.14 (2026-10-07)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.14 (CON-614) ──
+  · 인증 기관 수정 화면에서 발급자 주소를 바꿀 수 없는 조건을 넣었다. SSO 로그인만 쓰는 계정이
+    하나라도 있으면 변경할 수 없다 — 계정 연결 키가 발급자 주소에 묶여 있어 주소가 바뀌면
+    그 계정들이 로그인하지 못한다(CON-614 2026-10-07).
+    · 입력란을 비활성으로 두고 사유와 조치 자리를 힌트에 적었다. 연결 해제 차단과 같은 조건이라
+      문구 형식을 맞췄다 — 임시 비밀번호 발급은 사용자 및 역할 화면 소관이라 어디서 하는지 밝힌다.
+    · 자리를 없애지 않고 비활성으로 남긴다. 권한이 아니라 상태 때문에 막히는 것이라 미노출이
+      아니다(공통정책 7.10·7.11). 마지막 최고 관리자의 역할 선택과 같은 처리다.
+    · 필수 표시는 그대로 둔다. 값이 이미 있고 비울 수 없는 필드다.
+    · 클라이언트 ID·클라이언트 시크릿은 제한하지 않는다. 그 둘만 고쳐도 저장 버튼이 열린다 —
+      변경 판정이 값 비교라 비활성 필드는 자동으로 변경에서 빠진다.
+    · 등록 화면은 제한 대상이 아니다. 연결된 계정이 아직 없다.
+  · 비활성 입력 규격을 넣었다(`.inp:disabled`). 발급자 주소가 막혀도 일반 입력란과 같아 보여
+    왜 안 써지는지 알 수 없었다. devroom 목업에 있던 규칙과 같고 라이브러리 토큰만 쓴다.
+    ⚠ 라이브러리에는 이 규격이 없다 — 두 화면 이상에서 쓰이므로 추가 대상이다. 별건으로 올린다.
+  · 데모 바에 `SSO 전용 계정` 토글을 두었다. 제한이 걸릴 때와 걸리지 않을 때를 둘 다 확인하려는
+    검토용 장치라 실제 화면에는 없다. 연결 해제 차단도 같은 값으로 갈린다.
+  · 데모 바 표시와 화면이 어긋나던 것을 고쳤다. 둘이다.
+    · `SSO.on` 초기값이 false 였다. 데모 바 `연동: 설정됨` 이 켜진 채 단일 로그인만 미설정으로
+      그려져, 제한을 보려면 연동 토글을 한 번 눌러야 했다. EXT 와 같은 설정됨 상태로 맞췄다.
+    · 연동 토글이 `SSO.pwless` 를 덮어쓰던 것을 뺐다. `SSO 전용 계정: 없음` 을 골라도 연동 토글을
+      누르면 되돌아가 두 토글이 서로 간섭했다. 이제 각각 따로 움직인다.
+    · `SSO 전용 계정` 토글을 누르면 단일 로그인 탭으로 옮긴다. 이 값이 걸리는 자리가 그 탭과
+      인증 기관 수정 화면 둘뿐이라, 스토리지·모델 저장소·알림 채널 탭에 머문 채 누르면
+      아무 변화가 없어 죽은 토글로 보였다. 수정 화면에 있을 때는 거기서도 제한이 보여 옮기지 않는다.
 
   ── v0.13 (CON-614) ──
   · 인증 기관 등록·수정 폼에 인라인 에러를 넣었다(공통정책 7.8). 발급자 주소·클라이언트 ID·
@@ -678,6 +704,9 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .inp{width:100%;padding:9px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--foreground);font-size:13px;font-family:inherit;color-scheme:light dark}
 .inp:focus{outline:none;border-color:var(--ring);box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
 .inp.err{border-color:var(--destructive)}
+/* 비활성 입력 — 상태 때문에 막힌 필드다. 막힌 것이 보이지 않으면 왜 안 써지는지 알 수 없다.
+   devroom 목업과 같은 규격이고 라이브러리 토큰만 쓴다 */
+.inp:disabled,.inp[readonly]{background:var(--muted);color:var(--muted-foreground);cursor:default}
 .hint{font-size:11.5px;color:var(--muted-foreground);margin-top:5px;line-height:1.55}
 .errmsg{font-size:11.5px;color:var(--destructive);margin-top:5px;display:none}
   .errmsg.show{display:block}
@@ -2201,6 +2230,9 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <span class="dgrp"><span class="demo-label">연동:</span>
     <button class="cn on" onclick="setConn(true,this)">설정됨</button>
     <button class="cn" onclick="setConn(false,this)">설정 안 됨</button></span>
+  <span class="dgrp"><span class="demo-label">SSO 전용 계정:</span>
+    <button class="pw on" onclick="setPwless(3,this)">있음</button>
+    <button class="pw" onclick="setPwless(0,this)">없음</button></span>
   <span class="dgrp"><span class="demo-label">데이터:</span>
   <button class="st on" onclick="setState('default',this)">기본</button>
   <button class="st" onclick="setState('empty',this)">빈 상태</button>
@@ -2330,9 +2362,11 @@ const EXT={
            model:'model-registry', engine:'llm-runtime' },
   hf:{ url:'', proxy:false, token:true }
 };
-/* pwless 는 SSO 로그인만 쓰는 계정 수다. 연결 해제 차단 조건에 쓴다(공통정책 7.5).
-   실제 화면에서는 백엔드 응답으로 받는다 — 데모라 값을 고정해 둔다 */
-const SSO={ on:false, pwless:3 };
+/* pwless 는 SSO 로그인만 쓰는 계정 수다. 발급자 주소 변경 제한과 연결 해제 차단 조건에 쓴다(공통정책 7.5).
+   실제 화면에서는 백엔드 응답으로 받는다 — 데모라 값을 고정해 둔다.
+   on 은 EXT 와 같은 설정됨 상태로 둔다. 데모 바 `연동: 설정됨` 이 켜진 채 이 값만 false 면
+   표시와 화면이 어긋나 무엇을 보고 있는지 알 수 없다 */
+const SSO={ on:true, pwless:3 };
 
 /* ══════════ 공통 ══════════ */
 function $(id){ return document.getElementById(id); }
@@ -2344,6 +2378,18 @@ function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
    진입 버튼과 실행 버튼도 그 동작을 따른다 */
 const PAGES={'ext':'연동 및 알림','sso':'인증 기관 설정'};
 function ssoPageName(){ return SSO.on? '인증 기관 수정' : '인증 기관 등록'; }
+/* 데모 — SSO 로그인만 쓰는 계정이 있는지. 발급자 주소 변경 제한과 연결 해제 차단이 이 값으로 갈린다.
+   실제 화면에는 없는 검토용 처리다 */
+function setPwless(n,btn){
+  document.querySelectorAll('#demoBar .pw').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  SSO.pwless=n;
+  /* 이 값이 걸리는 자리는 단일 로그인 탭과 인증 기관 수정 화면 둘뿐이다.
+     다른 탭에 머문 채 누르면 아무 변화가 없어 죽은 토글로 보인다 — 단일 로그인 탭으로 옮긴다.
+     수정 화면에 있을 때는 거기서도 제한이 보이므로 화면을 옮기지 않는다 */
+  if(view==='sso'){ drawSsoForm(); return; }
+  eTab=2; drawExt(); drawSso();
+}
 
 /* 다운로드 — 공통정책 3.5. 필터가 적용된 목록 기준으로 전체를 뽑는다.
    파일명은 {메뉴명}_{YYYYMMDD_HHMM}.{확장자} 다.
@@ -2403,8 +2449,8 @@ function setConn(v,btn){
   document.querySelectorAll('#demoBar .cn').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
   SSO.on=v;
-  /* 연결 상태를 끄면 해제 차단 조건도 되돌린다. 켠 상태에서만 차단이 뜬다 */
-  SSO.pwless = v? 3 : 0;
+  /* pwless 는 건드리지 않는다. 연동 토글이 이 값을 덮으면 `SSO 전용 계정: 없음` 을 골라도
+     연동 토글을 누르는 순간 되돌아가 두 토글이 서로 간섭한다 */
   EXT.s3.url    = v? 'http://concerto-minio.concerto.svc.cluster.local:9000' : '';
   EXT.s3.key    = v? 'minioadmin' : '';
   EXT.s3.secret = v;
@@ -2706,6 +2752,8 @@ const SSO_VAL={ iss:'https://sso.okestro.com/realms/concerto', cid:'concerto-man
 function drawSsoForm(){
   if(!$('ssoForm')) return;
   const on=SSO.on;
+  /* 수정 화면에서만, SSO 로그인만 쓰는 계정이 있을 때 발급자 주소를 잠근다 */
+  const issLock = on && SSO.pwless>0;
   /* 제목은 동작이다(사용자 추가·워크스페이스 생성 규격). 등록과 수정이 갈린다 */
   $('ssoHead').innerHTML = '<h1>'+ssoPageName()
     + tabTip('외부 인증 서버와 연결할 정보를 등록합니다. 값은 인증 서버 관리자에게 받습니다.')+'</h1>';
@@ -2720,12 +2768,22 @@ function drawSsoForm(){
     +   tabTip('콘체르토와 인증 서버가 주고받는 방식의 규격입니다.')+'</label>'
     +   '<div class="credbox"><span class="dv">OIDC</span></div>'
     +   '<div class="hint">OIDC 만 지원합니다.</div></div>'
+    /* 발급자 주소는 수정 화면에서 SSO 로그인만 쓰는 계정이 있으면 바꿀 수 없다.
+       계정 연결 키가 이 주소에 묶여 있어 주소가 바뀌면 그 계정들이 로그인하지 못한다
+       (CON-614 2026-10-07). 등록 화면은 연결된 계정이 없어 대상이 아니다.
+       권한이 아니라 상태 때문에 막히므로 미노출이 아니라 비활성으로 둔다(공통정책 7.10·7.11).
+       사유는 hint 자리에 둔다 — 비활성 요소는 마우스 이벤트를 받지 않아 툴팁이 뜨지 않는다 */
     + '<div class="fld full"><label>발급자 주소<span class="req">*</span>'
     /* `토큰` 은 내부 기술 용어라 사용자 문구에 쓰지 않는다(공통정책 7.9) */
     +   tabTip('인증 서버 자체의 주소입니다. 인증 결과가 이 서버에서 온 것인지 확인하는 데 씁니다.')+'</label>'
-    +   '<input class="inp" id="ssoIss" placeholder="https://" value="'+(on?SSO_VAL.iss:'')+'" onblur="ssoBlur(\'iss\')" oninput="ssoChange(\'iss\')">'
+    +   '<input class="inp" id="ssoIss" placeholder="https://" value="'+(on?SSO_VAL.iss:'')+'"'
+    +     (issLock? ' disabled' : '')+' onblur="ssoBlur(\'iss\')" oninput="ssoChange(\'iss\')">'
     +   '<div class="errmsg" id="ssoIssErr"></div>'
-    +   '<div class="hint">인증 서버 주소를 전체 경로로 입력합니다.</div></div>'
+    /* 조치 방법을 함께 적는다. 이 화면에서 할 수 없는 것이라 어디서 하는지 밝힌다 —
+       연결 해제 차단 안내와 같은 형식이다 */
+    +   '<div class="hint">'+(issLock
+          ? 'SSO 로그인만 사용하는 계정이 '+SSO.pwless+'명 있어 발급자 주소를 변경할 수 없습니다. 사용자 및 역할 화면에서 해당 계정에 임시 비밀번호를 발급한 뒤 변경할 수 있습니다.'
+          : '인증 서버 주소를 전체 경로로 입력합니다.')+'</div></div>'
     + '<div class="fld"><label>클라이언트 ID<span class="req">*</span>'
     +   tabTip('인증 서버에 콘체르토를 등록하면 받는 식별자입니다.')+'</label>'
     +   '<input class="inp" id="ssoCid" placeholder="클라이언트 ID를 입력해 주세요." value="'+(on?SSO_VAL.cid:'')+'" onblur="ssoBlur(\'cid\')" oninput="ssoChange(\'cid\')">'
@@ -2813,6 +2871,8 @@ function ssoChk(){
     ? !!(iss && cid)
     : !!(iss && cid && sec && (sec.value||'').trim());
   if(!SSO.on){ b.disabled = !filled; return; }
+  /* 발급자 주소가 잠긴 경우 값이 그대로라 변경에서 자동으로 빠진다.
+     클라이언트 ID·시크릿만 고쳐도 저장 버튼이 열린다(CON-614 2026-10-07) */
   const changed = iss!==SSO_VAL.iss || cid!==SSO_VAL.cid || !!(sec && sec.value);
   b.disabled = !(filled && changed);
 }
