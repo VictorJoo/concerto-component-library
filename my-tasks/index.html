@@ -38,6 +38,9 @@
     승인자가 이미 만료됐는지 봐야 한다(CDE 정책 5.3). 만료된 CDE 의 연장 샘플을 추가했다.
   · 승인 전에 회수된 연장 신청은 승인을 막고 사유를 알린다 — 접근 허용 모델 무효와 같은 오류 토스트다(REQ-TASK-038).
     데모 바 `연장 대상` 으로 확인한다.
+    · 토글이 값만 바꾸고 화면을 다시 그리지 않아 눌러도 변화가 없던 것을 고쳤다. 누르면 그 건으로
+      옮겨 상세를 열고, 상세 `CDE 상태` 를 `만료` · `회수` 로 함께 바꾼다(CDE 정책 5.2·6장).
+      종전에는 회수 후에도 `만료` 로 보여 승인이 왜 막히는지 드러나지 않았다.
   · 셸(플라이아웃·본문) 배경을 공통 레이아웃 값으로 맞췄다.
   · 반려 건 상세가 열리지 않던 것을 고쳤다 — 알림 박스 순번(alertSeq)·아이콘(AICO) 선언이 빠져 반려 사유를 그리다 오류로 멈췄다(v0.2부터).
   · 증액 신청 샘플의 신청자를 워크스페이스 관리자로 바꿨다. 최고 관리자는 증액을 신청하지 않고 직접 조정한다(워크스페이스 정책 2.4).
@@ -2509,9 +2512,24 @@ function guardDone(t){
 /* 목록 행 메뉴에서도 부르므로 대상 인덱스를 받는다. 생략하면 열려 있는 상세를 쓴다 */
 /* 데모 — 만료된 CDE 연장 신청(jh-jupyter-01)이 승인 전에 회수됐는지 */
 function setReclaim(on,btn){
-  TASKS.forEach(function(t){ if(t.tgt==='jh-jupyter-01' && t.type==='CDE 연장') t.reclaimed=on; });
+  let idx=-1;
+  TASKS.forEach(function(t,i){
+    if(t.tgt==='jh-jupyter-01' && t.type==='CDE 연장'){
+      t.reclaimed=on;
+      /* 상세 `CDE 상태` 를 토글에 맞춘다. 회수되면 상태가 `회수` 로 바뀐다(CDE 정책 5.2·6장).
+         값을 고치지 않으면 회수 후에도 `만료` 로 보여 승인이 왜 막히는지 드러나지 않는다 */
+      (t.body||[]).forEach(function(r){ if(r[0]==='CDE 상태') r[1]= on? '회수' : '만료'; });
+      idx=i;
+    }
+  });
   document.querySelectorAll('#demoBar .rc').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
+  /* 이 값이 걸리는 자리는 그 한 건뿐이라 다른 화면에 머문 채 누르면 변화가 없다 —
+     승인 요청 탭의 그 건으로 옮겨 바로 확인하게 한다. 실제 화면에는 없는 검토용 처리다 */
+  if(idx<0) return;
+  if(cur!==null){ cur=idx; drawDetail(); return; }
+  if(tab!==1) setTab(1);
+  openDetail(idx);
 }
 function approveTask(i){
   const t=TASKS[i==null? cur : i];
