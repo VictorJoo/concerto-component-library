@@ -1,6 +1,18 @@
 <!--
-  콘체르토 매니저 — 로그인 · 회원가입 목업 v0.23 (2026-10-06)
+  콘체르토 매니저 · 로그인 · 회원가입 목업 v0.24 (2026-10-12)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.24 ──
+  · 인증 기관에서 돌아온 직후의 처리 중 화면을 걷어냈다(기획서 3장·REQ-LOGIN-019·6장 · 계정정책 4.3).
+    토큰 교환은 서버가 처리하고 결과에 따라 바로 이동한다. 성공이면 원래 가려던 화면(없으면 홈),
+    실패면 로그인 화면으로 돌아와 배너로 안내한다. 처리 중 화면은 실패 안내를 붙일 자리로 두었는데
+    그 자리를 로그인 화면이 맡는다.
+  · 인증 서버가 오류로 돌려보낸 경우(사용자 취소 포함)의 배너를 더했다(기획서 5.2).
+    `SSO 로그인을 완료하지 못했습니다. 다시 시도해 주세요.` 다시 누르면 풀릴 수 있어 재시도를 안내한다.
+    연결 실패·SSO 사용 불가와 같은 배너 자리를 쓰고 문구만 갈린다.
+  · `SSO 로그인` 을 누르면 이동 중 상태에서 멈춘다. 실제로는 인증 서버 화면으로 넘어가고 그 화면은
+    고객사 소관이라 이 목업에 없다. 돌아온 뒤의 결과는 데모 바 `SSO 화면` 케이스로 확인한다.
+  · 데모 바 `돌아온 직후` 를 빼고 `로그인 취소` 를 더했다. 실제 화면에는 없는 검토용 처리다.
 
   ── v0.23 (CON-614) ──
   · 최고 관리자 이메일로 SSO 인증이 들어온 경우를 더했다. 최고 관리자는 자동 연결 대상이 아니어서
@@ -238,10 +250,6 @@
   }
   .done h1{font-size:22px;font-weight:700;margin:0 0 12px;}
   .done p{font-size:14px;color:var(--muted);line-height:1.65;margin:0 0 28px;}
-  /* 인증 기관에서 돌아온 직후 처리 중 — 완료 뱃지 자리에 스피너를 둔다.
-     돌아오자마자 토큰 교환·계정 조회가 서버에서 일어나므로 빈 화면이 생기면 안 된다(공통정책 4.1).
-     이 파일에 전체 로딩 규격이 없어 .done 레이아웃을 그대로 쓰고 뱃지만 갈았다 */
-  .done .badge.load{background:transparent;border:3px solid var(--border);border-top-color:var(--accent);animation:spin .8s linear infinite;}
 
   /* 비밀번호 재설정 안내 모달 (공통정책 4.5) */
   .modal-overlay{
@@ -401,16 +409,6 @@
         <button type="button" class="btn" id="doneToLogin"><span class="btn-label">로그인 화면으로</span></button>
       </div>
 
-      <!-- ④ 인증 기관에서 돌아온 직후 (리디렉션 URI 수신) -->
-      <!-- 인증 서버가 사용자를 이 주소로 돌려보내면 콘체르토가 토큰을 받아 계정을 찾고 세션을 발급한다.
-           그 사이 서버 왕복이 있어 처리 중 화면이 필요하다(공통정책 4.1).
-           SSO 결과 네 갈래가 모두 이 화면을 거쳐 간다 — 성공이면 홈, 계정이 없으면 승인 대기,
-           로그인할 수 없는 상태면 상태 안내, 인증 서버에 닿지 않으면 로그인 화면 배너다 -->
-      <div class="form done" id="cbView">
-        <div class="badge load" id="cbIcon"></div>
-        <h1 id="cbTitle">로그인 중입니다.</h1>
-        <p id="cbDesc">인증 결과를 확인하고 있습니다.</p>
-      </div>
 
     </section>
   </div>
@@ -428,9 +426,10 @@
     <button data-case="temppw">임시 비밀번호</button>
     <!-- ── SSO ── 프론트가 새로 만들 단위만 모았다. 실제 화면에는 없는 검토용 처리다.
          ① 진입점 노출 — 플랫폼 설정의 인증 기관 연결 여부로 갈린다. 접속한 사람의 속성이 아니다
-         ② 돌아온 직후 — 리디렉션 URI 로 들어온 뒤 토큰 교환·계정 조회가 끝날 때까지의 화면
-         ③ SSO 사용 불가 — 최고 관리자 이메일로 인증이 들어왔을 때의 배너
-         ④ 연결 실패 — 인증 서버에 닿지 않을 때의 배너
+         ② 로그인 취소. 인증 서버가 오류로 돌려보냈을 때(사용자 취소 포함)의 배너
+         ③ SSO 사용 불가. 최고 관리자 이메일로 인증이 들어왔을 때의 배너
+         ④ 연결 실패. 인증 서버에 닿지 않을 때의 배너
+         돌아온 직후의 처리 중 화면은 두지 않는다(v0.24). 결과에 따라 바로 이동한다
          SSO 로 들어와 승인 대기·비활성·반려로 막히는 경우는 케이스를 따로 두지 않았다.
          기획서 5.2 가 비밀번호 경로와 같은 문구를 쓰도록 정해 왼쪽 케이스가 그대로 그 화면이다 —
          프론트가 새로 만들 것이 없다 -->
@@ -438,7 +437,7 @@
     <button data-sso="off" class="on">미노출</button>
     <button data-sso="on">노출</button>
     <span class="demo-label" style="margin-left:12px;">SSO 화면:</span>
-    <button data-case="cb">돌아온 직후</button>
+    <button data-case="ssocancel">로그인 취소</button>
     <button data-case="ssoadmin">SSO 사용 불가</button>
     <button data-case="ssofail">연결 실패</button>
     <span class="demo-label" style="margin-left:12px;">피드백(가입 신청 완료 시):</span>
@@ -533,7 +532,7 @@
   })();
 
   // ── 뷰 전환 ──
-  const views = { login:$('loginView'), signup:$('signupView'), done:$('doneView'), cb:$('cbView') };
+  const views = { login:$('loginView'), signup:$('signupView'), done:$('doneView') };
   function show(name){ Object.values(views).forEach(v=>v.classList.remove('active')); views[name].classList.add('active'); }
   $('toSignup').addEventListener('click', e=>{ e.preventDefault(); resetLogin(); show('signup'); });
   $('toLogin').addEventListener('click', e=>{ e.preventDefault(); resetSignup(); show('login'); });
@@ -763,6 +762,9 @@ function vEmail(){
        그 계정이 최고 관리자임이 드러나면 안 된다(계정정책 5장).
        이 화면에서 아이디·비밀번호로 들어올 수 있어 조치 방법을 함께 적는다 */
     ssoadmin:{ msg:'SSO 로그인을 사용할 수 없는 계정입니다. 아이디와 비밀번호로 로그인해 주세요.' },
+    /* 인증 서버가 오류로 돌려보낸 경우다. 사용자가 인증 서버 화면에서 취소한 경우를 포함한다(기획서 5.2).
+       다시 누르면 풀릴 수 있어 재시도를 안내한다(공통정책 7.9). 취소와 서버 오류를 사용자에게 가르지 않는다 */
+    ssocancel:{ msg:'SSO 로그인을 완료하지 못했습니다. 다시 시도해 주세요.' },
   };
   const stateModal=$('stateModal');
   const expiredModal=$('expiredModal');
@@ -775,13 +777,13 @@ function vEmail(){
   /* 누르면 외부 인증 서버로 이동한다(REQ-LOGIN-015). 이동하는 동안 비활성 + 스피너를 둔다(공통정책 7.3).
      아이디·비밀번호 입력값을 보내지 않으므로 미입력 검증을 걸지 않는다.
      실제로는 여기서 화면이 인증 서버로 넘어가고 아이디·비밀번호는 그쪽에서 입력한다.
-     그 화면은 고객사 소관이라 이 목업에 없다 — 건너뛰고 돌아온 직후 화면으로 넘긴다 */
+     그 화면은 고객사 소관이라 이 목업에 없어 이동 중 상태에서 멈춘다.
+     돌아온 뒤의 결과는 데모 바 SSO 화면 케이스로 본다. 처리 중 화면은 두지 않는다(v0.24) */
   $('ssoBtn').addEventListener('click', ()=>{
     formError.classList.remove('show','info');
     const b=$('ssoBtn');
     b.classList.add('loading'); b.disabled=true;
     b.querySelector('.btn-label').textContent='인증 기관으로 이동 중';
-    setTimeout(()=>{ resetSso(); show('cb'); }, 1100);
   });
   function resetSso(){
     const b=$('ssoBtn');
@@ -821,16 +823,17 @@ function vEmail(){
       formError.classList.remove('show','info'); stateModal.classList.remove('show');
       resetSso();
       if(key==='default') return;
-      /* 인증 기관에서 돌아온 직후 — SSO 결과가 갈리기 직전 화면이다.
-         실제로는 잠깐 스쳐 가지만 리뷰에서 봐야 해서 케이스로 둔다.
-         처리가 끝나면 결과에 따라 홈·승인 대기 안내·상태 안내·배너로 갈린다.
-         성공한 뒤의 홈은 이 목업에 없어 이 화면에서 멈춘다 */
-      if(key==='cb'){
+      /* 로그인 취소 = 인증 서버가 오류로 돌려보내 로그인 화면으로 돌아온 상태다(기획서 5.2).
+         연결 실패·SSO 사용 불가와 같은 배너 자리를 쓰고 문구만 갈린다 */
+      if(key==='ssocancel'){
         ssoOn=true;
         document.querySelectorAll('#demoBar button[data-sso]').forEach(b=>{
           b.classList.toggle('on', b.dataset.sso==='on');
         });
-        renderSso(); show('cb');
+        renderSso();
+        const c=BANNER_CASES.ssocancel;
+        formError.querySelector('span').textContent=c.msg;
+        formError.classList.add('show');
         return;
       }
       /* SSO 사용 불가 = 최고 관리자 이메일로 인증이 들어온 상태다(REQ-LOGIN-018).
