@@ -7,9 +7,30 @@
     사유 문구는 WKSP-L01 5.2 표를 따르고, 다시 시도로 풀릴 수 있는 사유만 다시 시도를 안내한다(공통정책 7.9).
     사유 값이 없거나 표에 없는 값이면 기본 문구를 쓴다. `관리자에게 문의` 는 뺐다. 워크스페이스 삭제는
     최고 관리자가 하므로 문의할 대상이 본인이다.
-  · 사유 다섯 종(EVENT_UNDELIVERABLE·K8S_ERROR·INVALID_PAYLOAD·SYSTEM_NAMESPACE_REFUSED·UNKNOWN)은
-    발생 조건을 받기 전이라 코드 이름으로 판단한 가안이다. 확인되면 문구를 확정한다(WKSP-L01 5.2 확인 필요).
-  · 룸 삭제 실패 안내도 같은 문구 표를 쓴다(워크스페이스 정책 3.5 · REQ-WKSP-058). 사유 값이 없으면 종전 문구다.
+  · 사유 일곱 종의 문구와 처리를 확정했다(WKSP-L01 5.2 · CON-596 2026-10-12). 종전 `가안 · 확인 필요` 를 닫는다.
+    INVALID_PAYLOAD·SYSTEM_NAMESPACE_REFUSED·UNKNOWN 은 같은 값으로 다시 보내도 풀리지 않아 다시 시도를
+    안내하지 않는다. 최고 관리자가 원인을 확인한 뒤 정리한다(워크스페이스 정책 2.6).
+  · 룸 삭제 실패 안내도 같은 문구 표를 쓴다(워크스페이스 정책 3.5 · REQ-WKSP-058). 사유 값이 없거나 표에 없는
+    값이면 표의 기본 문구 `삭제에 실패했습니다. 다시 시도해 주세요.` 를 쓴다. 종전 `원인을 확인한 뒤 다시
+    삭제해 주세요.` · `원인을 확인한 뒤 다시 시도해 주세요.` 는 확인할 화면이 없어 뺐다. 상세 환경 섹션
+    실패 안내·카드 룸 버튼·목록 환경 컬럼의 사유가 같은 문구를 쓴다(roomDelFailMsg).
+  · 룸에 한해 위 세 사유 문구 뒤에 `최고 관리자에게 문의해 주세요.` 를 붙인다. 최고 관리자 본인에게는
+    붙이지 않는다. 룸은 워크스페이스 관리자가 지우고(정책 3.4) 세 사유는 최고 관리자가 정리한다(정책 2.6 ·
+    WKSP-L01 5.2 아래 문단). 워크스페이스 배지 툴팁에는 붙이지 않는다 — 워크스페이스 삭제는 최고 관리자가 한다.
+  · 룸 실패 안내의 다시 실행 버튼은 사유와 관계없이 둔다. 같은 삭제 요청을 다시 보내는 것이라 사유로
+    막지 않는다(WKSP-L01 5.2 · 정책 2.6). 강제 삭제 진입점은 두지 않는다 — 화면 진입점이 기획서·정책서에
+    정해지지 않았다(CON-596 2026-10-12).
+  · 상세 환경 표의 개발룸 행 진입을 룸 상태로 가른다(워크스페이스 정책 3.5 상태별 제약 · WKSP-L01 3장 ·
+    REQ-WKSP-026 · CON-732). 미생성(워크스페이스 관리자 이상)·정상·오류는 개발룸 화면으로 이동하고,
+    생성 중·생성 실패·삭제 중·삭제 실패는 이동 표시를 떼고 상태 배지에 사유 툴팁을 둔다.
+    카드 룸 버튼(roomBtn)과 같은 판정이다. 종전에는 상태와 관계없이 이동했다.
+    운영룸 행·패널 룸 버튼은 이번 범위 밖이라 그대로다.
+  · 상세·룸에서 뒤로가기·브레드크럼으로 목록에 돌아오면 스위처를 상세 진입 전 범위로 되돌린다
+    (워크스페이스 정책 2.7.1 · 2026-10-12 결정). 종전에는 `전체` 로 초기화했다. 상세 진입은 표시를 맞출 뿐
+    조회 범위를 바꾸지 않는다. 생성 완료·나가기·작성 취소 뒤 목록 이동(backToList)은 종전대로 `전체` 로
+    둔다 — 나간 워크스페이스로 되돌아가지 않게 하려는 것이다. 스위처를 직접 고르면 기억한 범위를 비운다.
+  · 데모 `ml-research` 개발룸을 삭제 실패(WS_DELETE_UNKNOWN)로 두었다. 사유별 문구와 역할별 문의 안내를
+    보이기 위한 것으로 실제 화면에는 없는 검토용 값이다.
   · 상태 컬럼 도움말의 삭제 실패 풀이를 사유 확인 위치로 바꿨다.
   · 데모 `legacy-batch` 에 사유 값을 넣었다. 실제 화면에는 없는 검토용 값이다.
   · 스크린 ID 주석을 기획서·IA 기준으로 맞췄다(WKSP-L01 v0.57). 화면은 바뀌지 않는다.
@@ -2046,8 +2067,11 @@ const WS=[
   members:[{n:'임승주',id:'sj.lim',role:'관리자'},{n:'오경환',id:'kh.oh',role:'관리자'},{n:'성유진',id:'yj.seong',role:'편집자'}],
   models:[{n:'gemma-4-12b-it',st:'캐싱됨',use:'미사용'}],
   deps:[], cdes:[], keys:[], jobs:[]},
+ /* 개발룸 삭제 실패 데모 — 사유 값(devFail)으로 룸 실패 안내·배지 툴팁의 사유별 문구를 보인다.
+    다시 시도로 풀리지 않는 사유라 최고 관리자가 아닌 역할에서 문의 안내가 붙는다(WKSP-L01 5.2).
+    실제 화면에는 없는 검토용 값이다 */
  {n:'ml-research',ico:'flask',st:'활성',desc:'모델 실험 및 벤치마크',
-  prod:'정상',dev:'정상',host:'',by:'성유진(yj.seong)',at:'2026-07-02 11:40:18',
+  prod:'정상',dev:'삭제 실패',devFail:'WS_DELETE_UNKNOWN',host:'',by:'성유진(yj.seong)',at:'2026-07-02 11:40:18',
   quota:{cpu:20,ram:80,gpu:2,vol:60},
   devq:{cpu:12,ram:48,gpu:2},
   use:{cpu:14,ram:56,gpu:2},
@@ -2113,6 +2137,8 @@ const DOT={'정상':'ok','오류':'cr','생성 중':'ac load','미생성':'mu',
 const WST={'활성':'ok','삭제 중':'ac load','삭제 실패':'cr'};
 
 let state='default', role='super', view='list', listView='card', cur=null, formKind='new', roomKind='prod';
+/* 상세 진입 전 스위처 범위. 뒤로가기·브레드크럼으로 목록에 돌아올 때 되돌린다(listFromDetail) */
+let wsBack=null;
 
 /* 권한 (RBAC + 자원 배분은 플랫폼 운영자 소관) */
 const isSuper =()=>role==='super';
@@ -2438,7 +2464,7 @@ function roomBtn(m,idx,kind){
   /* 실패한 룸의 다시 시도는 더보기 메뉴에 둔다.
      카드의 룸 버튼은 진입 수단이므로 실행 액션을 섞지 않는다 */
   const canEnter = !wsBusy && (st==='정상'||st==='오류');
-  const why = wsBusy? busyMsg(m) : roomMsg(st);
+  const why = wsBusy? busyMsg(m) : roomMsg(st, isDev? m.devFail : m.prodFail);
   /* 개발룸은 개발룸 화면으로 보낸다. CDE·작업 이력·설정이 그쪽 소관이다 */
   const go = isDev ? 'goDevRoom()' : 'openRoom('+idx+',\''+kind+'\')';
   return '<button class="roombtn'+(canEnter?'':' off')+'"'
@@ -2456,10 +2482,14 @@ function roomFailAlert(m,kind){
   if(st!=='생성 실패' && st!=='삭제 실패') return '';
   const del = st==='삭제 실패';
   const idx = WS.indexOf(m);
-  /* 삭제 실패는 사유 문구를 앞에 둔다(워크스페이스 정책 3.5 · WKSP-L01 5.2). 사유 값이 없으면 종전 문구 */
+  /* 삭제 실패는 사유 문구를 앞에 둔다(워크스페이스 정책 3.5 · WKSP-L01 5.2).
+     사유 값이 없거나 표에 없는 값이면 표의 기본 문구를 쓴다. 종전 `원인을 확인한 뒤 다시 삭제해 주세요.`
+     는 확인할 화면이 없어 뺐다. 다시 실행 버튼은 사유와 관계없이 둔다 — 같은 삭제 요청을 다시
+     보내는 것이라 사유로 막지 않는다(WKSP-L01 5.2 · 정책 2.6). 강제 삭제 진입점은 두지 않는다 —
+     화면 진입점이 기획서·정책서에 정해지지 않았다(CON-596 2026-10-12) */
   const code = isDev? m.devFail : m.prodFail;
   return alertBox('warn', lb+' '+(del?'삭제':'생성')+'에 실패했습니다.',
-    del ? (code? delFailMsg(code)+' ' : '원인을 확인한 뒤 다시 삭제해 주세요. ')+'CDE와 공유 볼륨이 함께 제거되고 자원은 운영룸으로 반환됩니다.'
+    del ? roomDelFailMsg(code)+' CDE와 공유 볼륨이 함께 제거되고 자원은 운영룸으로 반환됩니다.'
         : '원인을 확인한 뒤 다시 생성해 주세요. 워크스페이스 할당량에서 자원을 배정합니다.',
     '<button class="btn '+(del?'danger-line':'ghost')+' sm" onclick="askRetryRoom('+idx+',\''+kind+'\')">'
       + lb+' '+(del?'삭제':'생성')+'</button>', false);
@@ -2530,14 +2560,14 @@ function cardView(d){
 
 /* 환경 셀 — 라벨과 값을 띄워 두어 값인지 라벨인지 구분되게 한다 */
 function envCell(m){
-  const one = function(lb,v){
+  const one = function(lb,v,code){
     /* 정상은 대부분이라 색을 넣지 않는다. 문제 상태에만 색을 쓴다 */
     const bad = (v==='오류'||v==='생성 실패'||v==='삭제 실패');
     const cls = bad? ' err' : (v==='정상' ? '' : ' mu');
     return '<span class="envone"><span class="envlb">'+lb+'</span>'
-         + '<span class="envv'+cls+'" title="'+roomMsg(v)+'">'+v+'</span></span>';
+         + '<span class="envv'+cls+'" title="'+roomMsg(v,code)+'">'+v+'</span></span>';
   };
-  return one('운영', m.prod) + one('개발', m.dev);
+  return one('운영', m.prod, m.prodFail) + one('개발', m.dev, m.devFail);
 }
 function tableView(d){
   /* 컬럼 순서 — 이름 → 상태 → 설명 → 환경.
@@ -2758,8 +2788,9 @@ function syncView(){
      리소스 이름은 넣지 않는다 — 상단 전환 드롭다운과 화면 헤더가 이미 표시한다.
      목록은 소속 개수와 무관하게 항상 존재한다(정책 2.7) */
   const bc=document.querySelector('.breadcrumb');
-  const root='<a href="#" onclick="backToList();return false">콘체르토 플랫폼</a>';
-  const wsStep = '<a href="#" onclick="backToList();return false">워크스페이스</a>';
+  /* 브레드크럼으로 목록에 돌아오면 상세 진입 전 범위로 되돌린다(listFromDetail) */
+  const root='<a href="#" onclick="listFromDetail();return false">콘체르토 플랫폼</a>';
+  const wsStep = '<a href="#" onclick="listFromDetail();return false">워크스페이스</a>';
   const detailStep = '<a href="#" onclick="openDetail();return false">상세</a>';
   if(view==='detail')      bc.innerHTML=root+' / '+wsStep+' / <b>상세</b>';
   else if(view==='room')   bc.innerHTML=root+' / '+wsStep+' / '+detailStep+' / <b>운영룸</b>';
@@ -2768,13 +2799,24 @@ function syncView(){
       : root+' / '+wsStep+' / <b>'+(formKind==='new'?'생성':'신청')+'</b>';
   else                     bc.innerHTML=root+' / <b>워크스페이스</b>';
 }
+/* 생성 완료·나가기·작성 취소 뒤 목록으로 — 스위처를 `전체` 로 둔다(종전 동작).
+   나간 워크스페이스로 되돌아가지 않게 하려는 것이다 */
 function backToList(){
+  wsBack=null;
   cur=null; wsCur=wsAllLabel(); drawWsBtn();
   view='list'; syncView(); render();
   document.querySelectorAll('#demoBar .vw')[0].click();
 }
+/* 상세·룸에서 뒤로가기·브레드크럼으로 목록에 돌아올 때 — 스위처를 상세 진입 전 범위로 되돌린다
+   (워크스페이스 정책 2.7.1 `상세에서 목록 복귀 시`).
+   상세 진입은 표시를 맞출 뿐 조회 범위를 바꾸지 않는다. 기억한 값이 없으면 종전 동작과 같다 */
+function listFromDetail(){
+  const back=wsBack;
+  backToList();
+  if(back!==null){ wsCur=back; drawWsBtn(); render(); }
+}
 function vwBtn(btn){ document.querySelectorAll('#demoBar .vw').forEach(b=>b.classList.remove('on')); if(btn)btn.classList.add('on'); }
-function goList(btn){ view='list'; syncView(); render(); vwBtn(btn); }
+function goList(btn){ wsBack=null; view='list'; syncView(); render(); vwBtn(btn); }
 function goDemo(kind,btn){
   cur={m:WS[1]};
   if(kind==='detail'){ view='detail'; wTab=0; drawDetail(); }
@@ -2816,14 +2858,27 @@ const DEL_FAIL={
 };
 /* 값이 없거나 표에 없는 값이면 기본 문구 */
 function delFailMsg(code){ return DEL_FAIL[code] || '삭제에 실패했습니다. 다시 시도해 주세요.'; }
-/* 룸 상태 사유 — 룸 화면과 목록 환경 컬럼에서 함께 쓴다 */
-function roomMsg(st){
+/* 같은 값으로 다시 보내도 풀리지 않는 세 사유. 최고 관리자가 원인을 확인한 뒤 정리한다
+   (WKSP-L01 5.2 처리 칸 · 워크스페이스 정책 2.6 · CON-596 2026-10-12) */
+const DEL_FAIL_NORETRY=['WS_DELETE_INVALID_PAYLOAD','WS_DELETE_SYSTEM_NAMESPACE_REFUSED','WS_DELETE_UNKNOWN'];
+/* 룸 삭제 실패 문구. 룸은 워크스페이스 관리자가 지우고(정책 3.4) 세 사유는 최고 관리자가
+   정리하므로, 최고 관리자가 아닌 사용자에게만 문의 안내를 붙인다(WKSP-L01 5.2 아래 문단).
+   워크스페이스 배지 툴팁(busyMsg)에는 붙이지 않는다 — 워크스페이스 삭제는 최고 관리자가 해
+   문의할 대상이 본인이다 */
+function roomDelFailMsg(code){
+  const s=delFailMsg(code);
+  return (!isSuper() && DEL_FAIL_NORETRY.indexOf(code)>=0) ? s+' 최고 관리자에게 문의해 주세요.' : s;
+}
+/* 룸 상태 사유 — 룸 화면과 목록 환경 컬럼에서 함께 쓴다.
+   삭제 실패는 그 룸의 사유 값(code)으로 문구를 고른다 */
+function roomMsg(st,code){
   if(st==='미생성')    return '아직 만들지 않았습니다.';
   if(st==='생성 중')   return '네임스페이스와 게이트웨이를 만들고 있습니다.';
   if(st==='오류')      return '게이트웨이 동작에 실패했습니다. 개발룸은 공유 볼륨도 함께 판정합니다.';
   if(st==='생성 실패') return '생성에 실패했습니다. 다시 시도하거나 삭제할 수 있습니다.';
   if(st==='삭제 중')   return '개발룸을 삭제하고 있습니다.';
-  if(st==='삭제 실패') return '삭제에 실패했습니다. 원인을 확인한 뒤 다시 시도해 주세요.';
+  /* 종전 `원인을 확인한 뒤` 는 확인할 화면이 없어 뺐다(WKSP-L01 5.2 · 워크스페이스 정책 3.5) */
+  if(st==='삭제 실패') return roomDelFailMsg(code);
   return '';
 }
 /* 개발룸·운영룸은 각각 독립 화면이다 */
@@ -2841,7 +2896,7 @@ function goDevRoom(){
   act('개발룸 화면으로 이동합니다. CDE·작업 이력·개발룸 설정은 개발룸 화면에서 다룹니다.');
 }
 
-function backFromRoom(){ if(roomFrom==='list') backToList(); else openDetail(); }
+function backFromRoom(){ if(roomFrom==='list') listFromDetail(); else openDetail(); }
 /* 운영룸 생성 — 입력받을 값이 없어 확인 알럿으로 처리한다.
    대상 클러스터를 받게 되면 개발룸처럼 폼으로 바꾼다 */
 /* 운영룸 설정 — 호스트 도메인 하나를 받는다.
@@ -2970,7 +3025,7 @@ function drawDetail(){
   const cp=pct(m.use.cpu,m.quota.cpu), rp=pct(m.use.ram,m.quota.ram), gp=pct(m.use.gpu,m.quota.gpu);
   let h='';
   h+='<div class="dhead">'
-   + '<button class="back" onclick="backToList()" title="워크스페이스 목록으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>'
+   + '<button class="back" onclick="listFromDetail()" title="워크스페이스 목록으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>'
    + '<div class="dinfo"><h1>'+m.n+'</h1>'
    + '<div class="dmeta">'+(m.desc?'<span style="font-size:12.5px;color:var(--muted-foreground)">'+m.desc+'</span>':'<span style="font-size:12.5px;color:var(--faint)">-</span>')+'</div>'
    /* 배지는 진행 중·실패 상태에만 표시한다(정책 2.6).
@@ -3022,6 +3077,11 @@ function drawDetail(){
   /* 자원은 상한·사용·배분을 한자리에서 본다. 세 곳에 흩어지면 관계가 드러나지 않는다.
      환경은 워크스페이스의 핵심 구조이자 룸 화면 진입 경로라 탭 안에 두지 않는다 */
   const pq=prodQ(m);
+  /* 개발룸 행 진입 조건 — 카드 룸 버튼(roomBtn)과 같은 판정을 쓴다 */
+  const devEnter = m.st==='활성' && (m.dev==='미생성' ? canEditQuota(m) : (m.dev==='정상'||m.dev==='오류'));
+  const devWhy = m.st!=='활성' ? busyMsg(m)
+    : m.dev==='미생성' ? '개발룸은 워크스페이스 관리자가 만듭니다.'
+    : roomMsg(m.dev, m.devFail);
   /* 액션은 그 액션이 걸리는 대상 옆에 둔다(공통정책 3.6).
      멤버·API Key 섹션과 같은 자리다 */
   h+='<div class="dsec"><h4>환경별 배분'+tip('운영룸이 개발룸보다 우선합니다. 운영룸 자원이 부족해지면 개발룸에 배정된 자원을 회수해 사용합니다.')
@@ -3043,8 +3103,18 @@ function drawDetail(){
        '개발룸을 만들면 멤버가 CDE를 신청할 수 있습니다. 할당한 자원만큼 운영룸 한도에서 옮겨지며, 운영룸 자원이 부족해지면 회수될 수 있습니다.',
        canEditQuota()?'<button class="btn sm" onclick="act(\'개발룸 생성 화면으로 이동합니다.\')">개발룸 생성</button>':'', false) : '')
    + '<div class="tblwrap" style="border:0"><table class="tbl enter"><thead><tr><th>환경</th><th>상태</th><th>CPU</th><th>Memory</th><th>가속기</th><th>내역</th></tr></thead><tbody>'
-   + '<tr onclick="goDevRoom()" title="개발룸으로 이동"><td><span class="mname">개발룸</span></td>'
-   +   '<td><span class="stbadge '+RB[m.dev]+'">'+m.dev+'</span><span class="entgo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-8 8M10 6H5a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1v-5"/></svg></span></td>'
+   /* 개발룸 행은 룸 상태에 따라 진입을 가른다(워크스페이스 정책 3.5 상태별 제약 · WKSP-L01 3장·REQ-WKSP-026).
+      조건은 카드 룸 버튼(roomBtn)과 같다 — 미생성은 생성 진입(워크스페이스 관리자 이상), 정상·오류는 진입.
+      생성 중·생성 실패·삭제 중·삭제 실패는 들어갈 수 없어 이동 표시를 떼고 상태 배지 툴팁에 사유를 둔다.
+      실패한 룸의 다시 실행은 위 실패 안내(roomFailAlert)가 맡는다.
+      ⚠ 운영룸 행·패널 룸 버튼은 이번 반영 범위 밖이라 상태와 관계없이 이동하는 종전 동작 그대로다 */
+   + (devEnter
+       ? '<tr onclick="goDevRoom()" title="개발룸으로 이동"><td><span class="mname">개발룸</span></td>'
+       +   '<td><span class="stbadge '+RB[m.dev]+'">'+m.dev+'</span><span class="entgo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-8 8M10 6H5a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1v-5"/></svg></span></td>'
+       : '<tr style="cursor:default"><td><span class="mname">개발룸</span></td>'
+       /* 사유는 배지 호버로 안내한다 — 워크스페이스 삭제 실패 배지(REQ-WKSP-101)와 같은 툴팁이다 */
+       +   '<td><span class="tip-anchor stwrap" style="margin-left:0"><span class="stbadge '+RB[m.dev]+'">'+m.dev+'</span>'
+       +   '<span class="tip">'+devWhy+'</span></span></td>')
    +   (m.sys? '<td colspan="3"><span class="dash">배정 없음 · 잔여 사용</span></td>'
         : '<td>'+m.devq.cpu+' Cores 이하</td><td>'+m.devq.ram+' Gi 이하</td><td>'+m.devq.gpu+'장 이하</td>')
    +   '<td>CDE '+m.cdes.length+'건</td></tr>'
@@ -4742,6 +4812,7 @@ function wsAllLabel(){ return '전체'; }
 /* 공용 워크스페이스가 항상 소속에 포함되므로 고를 대상이 최소 2개다.
    소속이 하나뿐인 상태가 생기지 않아 기본값은 언제나 전체다(정책 2.7) */
 function wsInit(){
+  wsBack = null;
   wsCur = wsAllLabel();
   wsQ='';
   drawWsBtn();
@@ -4811,6 +4882,7 @@ function formDirty(){
    상세 진입 바로가기로 두면 상단 표기가 무엇을 뜻하는지 흐려진다(8/19 회의 3.1) */
 function pickWs(name){
   const go=function(){
+    wsBack=null;   /* 직접 고르면 그 범위가 기준이 된다 */
     wsCur=name; closeWs(); drawWsBtn(); closePanel();
     cur=null; view='list'; syncView(); render();
     vwBtn(document.querySelectorAll('#demoBar .vw')[0]);
@@ -4824,7 +4896,9 @@ function pickWs(name){
 }
 /* 상세·룸 진입 시 컨텍스트를 함께 이동한다 — 보고 있는 대상과 조회 범위를 일치시킨다 */
 /* 목록에서 상세로 들어가도 드롭다운 표시를 맞춘다 */
+/* 상세·룸에 처음 들어갈 때 진입 전 범위(wsBack)를 기억한다. 상세 → 룸처럼 안에서 옮겨 다닐 때는 덮어쓰지 않는다 */
 function syncWsCtx(){
+  if(cur && wsBack===null) wsBack=wsCur;
   if(cur && wsCur!==cur.m.n){ wsCur=cur.m.n; drawWsBtn(); }
 }
 document.addEventListener('click',function(){ if(accMenuOpen){ accMenuOpen=false; if(view==='form') drawForm(); } });
