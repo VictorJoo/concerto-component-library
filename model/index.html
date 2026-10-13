@@ -1,6 +1,120 @@
 <!--
-  콘체르토 매니저 — 모델 화면 목업 v0.33 (2026-09-30)
+  콘체르토 매니저 — 모델 화면 목업 v0.34 (2026-10-13)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다.
+
+  ── v0.34 (CON-596 · CON-527) ──
+  · 컬럼 도움말을 호버·키보드 포커스로도 열게 했다. 종전에는 클릭해야만 열려 다른 목업과 달랐다(공통정책 2.3·4.7).
+  · 헤더 필터 버튼 호버 배경을 --border 에서 --hover-strong 으로 바꿨다. 경계선 토큰을 호버 배경으로 쓰지 않는다(라이브러리).
+  · 모달 그림자의 고정 색값을 --shadow 토큰으로 바꿨다. 다른 목업과 같은 값이다.
+  · 평가 결과 모달에 이전 버전 비교를 두었다. 같은 평가명으로 평가한 바로 앞 모델 버전 대비 태스크별 증감과, 차트에 이전
+    버전 점선 다각형. 무엇과 비교했는지는 점수 목록 열 머리, 점선은 차트 오른쪽 위 범례로 밝힌다. 증감은 ▲▼와 값.
+    범례·증감 표기는 라이브러리 v0.23 정본을 쓴다. 이전 결과가 없으면 한 줄로 알린다(기획서 7.4).
+    데모 바 `바로 보기 › 이전 버전 비교` 로 바로 연다.
+  · 데모 바에 `바로 보기`(평가 탭 · 실패한 평가 · 작업 이력·다시 시도)를 두었다. 상세 안쪽 화면을 경로를 몰라도 연다. 검토용이다.
+  · 평가 탭 상단 안내 박스를 없앴다. 항상 같은 내용이라 라이브러리 기준으로 알림 박스가 아니라 툴팁이다.
+  · 평가명 열에 도움말을 두었다. 한 모델에 여러 평가가 섞이고 같은 평가명끼리만 비교가 의미 있다.
+  · 실패한 평가는 사유 칸 대신 알림 박스(crit)로 `평가를 완료하지 못했습니다.` 를 두고, 작업 상세를 볼 수 있는 사람에게만
+    `작업 로그 보기` 를 붙였다. 평가 결과에는 실패 사유 값이 없다(CON-527). 공통정책 7.6.
+  · 표 마지막 열의 도움말이 오른쪽 경계에서 잘리던 것을 고쳤다. 마지막 열은 오른쪽 끝에 맞춰 연다.
+  · 모델·버전 삭제 확인 문구를 자산마다 나눴다. 이미지는 레지스트리의 이미지도 지워져 복구할 수 없고, 가중치는 저장소
+    파일이 남아 다시 등록할 수 있다. 종전 문구는 가중치에도 `복구할 수 없습니다` 라 실제 동작과 달랐다(CON-745 6항).
+  · 평가 결과 모달 원본 지표에 복사 버튼을 두었다. 보고서·외부 수치 비교에 붙여 쓰는 값이다. 버튼은 라이브러리 .cbtn.sm,
+    토스트는 배포 목업 복사와 같은 꼴이다.
+  · 평가 탭 실행자·실행일시를 제출자·제출일시로 바꿨다. 평가는 개발룸에서 작업으로 제출하고, 개발룸 작업 이력도 제출자로
+    부른다. 대기 중인 평가는 아직 실행되지 않아 실행일시라는 이름이 맞지 않는다.
+  근거: CON-596 2026-10-12 코멘트(① 등록 상태 칸 ② 작업 이력·다시 시도) · 2026-09-29 코멘트 7번(H-2 학습 이력)
+        · CON-527 2026-09-14·15 코멘트(답변 성능 평가는 모델 상세, 서빙 성능은 배포 벤치마크, 결과는 작업 단위 저장)
+        · CON-736 B-5(등록 시 반입 잡 생성, SYNCING → READY / FAILED). 기획서 MODEL-L01 v0.34 · 모델 정책 v0.23.
+  · 원천 가중치 목록에 `등록 상태` 열을 모델명(버전) 바로 뒤에 두었다(기획서 7.2). 값은 등록 중 · 등록됨 ·
+    등록 실패(원천값 SYNCING · READY · FAILED, 화면에는 노출하지 않음 · 공통정책 7.9).
+    등록 중 · 등록 실패만 배지로, 등록됨은 텍스트로 둔다 — 같은 행에 빌드 상태 배지가 있어 배지가 둘이면
+    조치 대상이 묻힌다(공통정책 1.9 · 모델 정책 3.6). 배지 클래스는 기존 것을 쓴다(등록 중 = `빌드 중` 과
+    같은 `ac load`, 등록 실패 = `빌드 실패` 와 같은 `cr`).
+  · 빌드 상태는 등록됨일 때만 표시하고 그 외에는 `-` 로 둔다. 가져오기가 끝나지 않으면 빌드할 대상이 없다.
+    열 도움말에 값별 의미를 넣었다(기존 thHelp 규격). 값 설명은 빌드 상태 도움말과 길이를 맞췄다.
+    등록 상태 열에도 빌드 상태와 같은 헤더 필터를 둔다(REQ-MODEL-010·012 · 기획서 7.2). 값이 2종 이상일 때 선택지가 생긴다.
+  · 등록 직후의 임시 진행 행(colspan 한 줄)을 없애고 실제 행으로 바꿨다. 요청하면 `등록 중` 인 행이 생기고
+    3단계 진행률(다운로드 → 압축·변환 → 스토리지 이관)을 등록 상태 칸에 함께 보인다. 끝나면 등록됨 + 미빌드다
+    (모델 정책 2.3 · CON-736 B-5 "등록 시 반입 잡이 같은 커밋에서 만들어진다").
+    반입 완료 알림에 대상 이름을 넣었다 — 캐싱·빌드 완료 알림과 같은 형식(v0.32).
+  · 등록 실패 샘플 1건(exaone-4.0-32b)을 넣었다. 실패 사유와 다시 시도는 상세 작업 이력 탭에서 본다.
+  · `이미지 빌드` 는 등록됨이 아니면 비활성 + 사유로 둔다(목록 행 메뉴 · 패널 · 상세 버전 메뉴).
+    권한으로 막힌 것이 아니라 상태로 막힌 것이라 미노출(7.10)이 아니라 비활성 + 사유다 — v0.31 에서
+    빌드 중·캐싱 중에 정한 기준과 같다.
+    기획서 7.3 실행 액션 비고와 8장 점검 항목도 `비활성 + 사유` 로 맞췄다(MODEL-L01 v0.34).
+  · 상세에 세 번째 탭 `작업 이력`(MODEL-L01.D01.T03)을 두었다. 등록·빌드·캐싱 작업을 쌓는다(모델 정책 4.4).
+    열: 종류 · 상태 · 버전 · 시작일시 · 종료일시 · 실패 사유 · 경로·출처 · 작업(기획서 7.4 · 공통정책 2.2).
+    - 상태는 진행 중 · 완료 · 실패 배지다. 작업 결과 원천값은 아직 없다 — 이력 API 통지 후 맞춘다.
+    - 실패 사유는 말줄임으로 두고 툴팁에 두지 않는다. 실패 행을 누르면 실패 사유 모달
+      (MODEL-L01.D01.T03.M01)이 열린다. 배포 실행 이력과 같은 규격이다(배포 정책 7.2).
+    - 경로·출처는 등록 작업의 소스 경로만 둔다. 빌드·캐싱은 `-`. 코멘트의 `출발지` 를 기존 열 이름
+      `경로·출처` 에 맞췄다(공통정책 1.1).
+    - `다시 시도` 는 실패 행에만 두고, 같은 버전의 같은 작업이 이후 완료되었으면 두지 않는다(모델 정책 4.4).
+      이후 같은 작업이 진행 중일 때도 두지 않는다 — 동일 작업 중복 실행 차단(기획서 5.1 진행 상태 표시)과
+      같은 기준이다. 권한은 그 작업과 같아 뷰어에게는 두지 않는다(7.10).
+    - 다시 시도는 접수형 토스트 후 같은 탭에 진행 중 행을 새로 쌓는다. 이전 실패 행은 지우지 않는다.
+    - 기본 정렬은 시작일시 내림차순(공통정책 3.1). 빈 상태 · 로딩 · 오류는 데모 바 `데이터 상태` 로 본다
+      (기획서 6장). 다시 시도 직후에도 잠시 로딩을 보인다.
+  · 등록 모달 · 버전 추가 모달에 접힌 `학습 이력(선택)` 블록을 두었다. 원본 모델 · 데이터셋 이름 ·
+    데이터셋 버전 · 학습 작업, 모두 text, 비워도 등록된다(모델 정책 3.7). 평가 결과 파일은 두지 않는다.
+    평가 결과는 평가 탭에서 본다(모델 정책 3.8).
+    입력이 늘었으나 모달을 유지한다 — 선택 입력을 접어 두면 필수 입력 양은 그대로라 기획서 2.1 전환 조건
+    (`탭이 필요해지면 페이지로`)에 걸리지 않는다. 접힘 블록은 배포 목업 `.adv` 를 그대로 가져왔다.
+  · 작업 산출물에서 들어오면(데모 바 `등록 진입`) 학습 이력을 펼치고 그 작업의 값으로 채운 읽기 전용으로 둔다
+    (기획서 REQ-MODEL-070). 게시할 때 이력이 자동으로 채워진다는 코멘트(09-29)를 따른다.
+  · 버전 행을 누르면 버전 상세 모달(MODEL-L01.D01.T01.M02)이 열린다. 종전 목업에는 없던 모달이다.
+    변경 사유 · 설명 · 학습 이력을 둔다(기획서 1장 · REQ-MODEL-034). 값이 없으면 `-`(공통정책 1.7).
+    학습 이력은 원천 가중치 버전에만 둔다 — 빌드된 이미지는 원본 가중치와 상호 링크되므로 가중치 버전에서
+    본다(모델 정책 3.7).
+    `수정` 은 작업 산출물에서 채운 값이 아니면 둔다. 비워 두고 등록한 버전도 여기서 나중에 채운다
+    (모델 정책 3.7 · REQ-MODEL-071). 그 모델의 등록 권한이 있는 사용자에게만, 전역 모델은 최고 관리자만.
+    작업 산출물에서 채운 값은 수정할 수 없어 `수정` 을 두지 않고 그 사실만 안내한다.
+  · 버전 추가를 요청하면 버전 목록에 `등록 중` 인 버전이 생기고 진행률이 함께 보인다(기획서 3장 버전 추가 6번).
+    토스트를 완료형(`추가했습니다`)에서 접수형(`요청했습니다`)으로 바꿨다(UI 문구 규칙 4). 원천 가중치만 해당.
+  · 상세 탭 목록의 버전은 그 모델의 현재 버전 전체를 다시 모아 그린다. 종전에는 목록을 그릴 때 만든 값을
+    그대로 써서 상세에서 버전을 더하면 탭에 반영되지 않았다.
+  · `다시 시도` 는 더보기 메뉴가 아니라 버튼이다. 이력 표라 행에서 할 일이 다시 시도 하나이고, 배포 실행 이력·
+    감사 로그가 같은 규격이다. 다시 시도할 수 없는 행은 칸을 비운다. 전역 모델의 등록 다시 시도는 최고 관리자만
+    (모델 정책 1.1). 처음과 같은 버전·노드 수로 다시 실행한다(모델 정책 4.4).
+  · 결과 열과 상세 버전 탭 상태 열에 도움말을 두었다. 목록 상태 열과 같은 정의다.
+  · 작업 이력 표본을 채웠다. 등록됨 가중치는 등록 완료, 빌드됨은 빌드 완료, 캐싱된 이미지는 캐싱 완료가 있다.
+    Official Base 이미지는 등록을 거치지 않아 캐싱 이력만 있다. 다시 시도가 보이는 표본은
+    solar-open-100b(빌드 실패) · exaone-4.0-32b(등록 실패)다.
+  · 빌드한 이미지와 원본 가중치를 서로 잇는다. 이미지 패널·버전 상세에 `원본 가중치`, 가중치 패널에
+    `빌드 산출 이미지` 링크를 두고 누르면 상대 탭의 패널이 열린다(REQ-MODEL-029 · 모델 정책 3.2).
+  · 배포명(패널 `이 모델을 쓰는 배포` · 상세 배포 탭)을 누르면 그 배포 화면으로 이동한다(목업은 토스트로 보인다 ·
+    기획서 7.3·7.4). 배포 상태 배지 색을 배포 목업과 맞췄다.
+  · 등록 중인 가중치는 기본 정보 수정·삭제를 비활성 + 사유로 둔다(모델 정책 3.4·3.5).
+    전역 모델의 기본 정보 수정은 최고 관리자에게만 보인다(모델 정책 1.1).
+  · 버전 추가는 원천 가중치 상세에만 둔다. 이미지는 빌드로만 생긴다(모델 정책 2.3 · REQ-MODEL-039).
+    버전 추가에 `변경 사유` 를 받아 버전 상세에 보인다(REQ-MODEL-034). 버전 상세의 설명은 모델 설명이다.
+  · 상세 버전 탭 메뉴가 목록 메뉴와 같은 동작을 하게 고쳤다(노드 캐싱 모달 · 그 버전 빌드 · 미캐싱 배포 안내).
+    가중치 버전의 경로 열 이름은 `경로·출처`, 등록자는 {이름}({아이디})다(기획서 7.4 · 공통정책 1.5).
+  · 작성 취소 알럿 버튼을 [계속 작성] / [취소]로 고쳤다(공통정책 7.2). 접수 토스트 끝에 `처리가 끝나면 알림으로
+    안내됩니다.` 를 붙이고, 완료 토스트는 `수정했습니다.` · `모델을 삭제했습니다.`, 오류 상태 버튼은 `다시 시도`,
+    화면 문구 `반입` 은 `등록` 으로 맞췄다(다른 목업과 같은 문구 · 모델 정책 3.6).
+  · 엔진 열 필터를 뺐다. 정의된 값이 vLLM 하나다(REQ-MODEL-012).
+  · 버전 중복 확인과 상세 헤더 버전이 상세에서 더한 버전을 반영하게 고쳤다. 시각은 한국 시간으로 기록한다.
+  · v0.33 주석의 사람 언급을 지라 키로 바꿨다(주석 규칙).
+  · 상세에 네 번째 탭 `평가`(MODEL-L01.D01.T04)를 두었다. 개발룸 평가 작업 결과 중 이 모델에 연결된 것을
+    모은다(모델 정책 3.8 · CON-527). 이미지·가중치 모두 둔다.
+    - 열: 평가명 · 상태 · 모델 버전 · 태스크 · 제출자 · 제출일시 · 개발룸 작업(기획서 7.4 · 공통정책 2.2).
+      정렬은 모델 버전과 제출일시 둘(기본 제출일시 내림차순). 모델 버전으로 정렬해 버전끼리 견준다.
+    - 상태는 대기 · 실행 중 · 완료 · 실패 배지에 열 도움말(원천값 PENDING · RUNNING · SUCCESS · 그 밖의 값,
+      화면에는 노출하지 않음 · 공통정책 7.9). 배지 클래스는 기존 것을 쓴다(대기 = `mu`, 실행 중 = `ac load`).
+    - 개발룸 작업은 볼 수 있는 작업만 링크다. 작업 상세는 관리자 이상 전체, 그 외 본인 것만이라(CDE 정책 4.5)
+      남의 작업은 텍스트로 둔다.
+    - 화면에서 입력·수정·삭제하지 않아 작업 열을 두지 않는다. 개발룸 작업 열은 `.lnk` 이동 링크다
+      (목업은 토스트로 보인다 · 실제 화면에는 없는 검토용 처리다).
+    - 탭 상단 안내 한 줄에 보존 기간 2년과 서빙 성능을 보는 자리를 적었다. 배포 벤치마크 결과 모달이
+      모니터링을 안내하는 것과 같은 꼴이다.
+    - 빈 상태 `평가 결과가 없습니다.` + `개발룸에서 평가 작업을 실행하면 표시됩니다.` 작업 이력 탭과 같은 꼴.
+  · 평가 행을 누르면 평가 결과 모달(MODEL-L01.D01.T04.M01)이 열린다. 상태 · 제출자 · 개발룸 작업 아래에
+    점수 섹션을 둔다. 태스크가 3개 이상이면 레이더 차트와 점수 목록을 함께, 2개 이하면 목록만 둔다.
+    차트만으로는 정확한 값을 읽을 수 없다(기획서 5.1). 꼭짓점에 마우스를 올리면 태스크 이름과 점수가 뜬다.
+    점수가 없거나 0~100 을 벗어나면 `-`, 차트에서는 0 에 둔다. 원본 지표는 접어 두고 코드 블록이다(공통정책 1.2).
+    실패는 사유만, 대기·실행 중은 `평가가 끝나면 표시됩니다.` 만 둔다.
+  · 레이더 차트 · 말풍선 규격은 컴포넌트 라이브러리 v0.23 `레이더 차트` 를 그대로 가져왔다. 색은 토큰만 쓴다.
 
   ── v0.33 (CON-446) ──
   · 상세 `삭제` 가 강조색 채움 버튼으로 렌더되던 것을 고쳤다. `.btn.danger-line` 규칙이 이
@@ -15,7 +129,7 @@
   · 수정 모달의 표시 범위를 읽기 전용으로 바꿨다. 표시 범위는 등록 시 정하며 바꾸지 않는다
     (모델 정책 2.4·6장 · 워크스페이스 정책 2.1). 범위를 바꾸려면 대상 범위로 다시 등록한다.
     ⚠ v0.32 는 전용 모델의 워크스페이스 칸만 잠그고 전역 ⇄ 전용 전환은 최고 관리자에게 열어
-      두었다. 9/23 팀장 확정(3안)으로 전환도 소속 변경에 해당해 차단한다 — 빌드 이미지·노드
+      두었다. 9/23 확정(3안 · CON-446)으로 전환도 소속 변경에 해당해 차단한다 — 빌드 이미지·노드
       캐시·배포가 워크스페이스에 묶여 있어 범위를 바꾸면 실물이 따라가지 못한다.
       백엔드는 9/28 dev 배포부터 전환 요청을 400 으로 거부한다.
   · 라디오·워크스페이스 셀렉트를 없애고 현재 값만 텍스트로 둔다. 모델명·버전과 같은 층위다
@@ -333,7 +447,8 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 /* 모달 */
 .mdbg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
 .mdbg.on{display:flex}
-.modal{width:440px;max-width:100%;max-height:88vh;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+/* 그림자는 토큰으로 쓴다. 다른 목업과 같은 값(라이브러리 --shadow) */
+.modal{width:440px;max-width:100%;max-height:88vh;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 24px 60px var(--shadow)}
 .modal.w520{width:520px}
 .mdhead{padding:20px 22px 0}
 .mdhead h3{margin:0 0 5px;font-size:15.5px}
@@ -542,13 +657,18 @@ body.gnb-fold-on .gnb-fold{justify-content:center}
 th .thwrap{display:inline-flex;align-items:center;gap:5px}
 .thic{width:15px;height:15px;border-radius:50%;border:1px solid var(--muted-foreground);color:var(--muted-foreground);font-size:10px;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex:0 0 auto}
 .thfilter{width:18px;height:18px;display:inline-grid;place-items:center;border:0;background:transparent;color:var(--muted-foreground);border-radius:4px;cursor:pointer;flex:0 0 auto}
-.thfilter:hover{background:var(--border);color:var(--foreground)}
+/* 헤더가 --thead 면이라 강조 호버를 쓴다. 경계선 토큰을 호버 배경으로 쓰지 않는다(라이브러리) */
+.thfilter:hover{background:var(--hover-strong);color:var(--foreground)}
 .thfilter.on{color:var(--primary)}
 .dark .thfilter.on{color:var(--accent)}
 .thfilter svg{width:12px;height:12px}
 .thpop{position:absolute;left:0;top:calc(100% + 6px);width:230px;background:var(--flyout);border:1px solid var(--border);border-radius:9px;padding:9px 10px;font-size:12px;font-weight:400;color:var(--foreground);line-height:1.55;box-shadow:0 12px 30px var(--shadow);z-index:75;display:none;white-space:normal;text-align:left}
 th.thcell{position:relative}
 th.thcell.pop-on .thpop{display:block}
+/* 호버·키보드 포커스로도 연다(공통정책 2.3·4.7). 다른 목업과 같은 규칙 */
+th.thcell:hover .thpop,th.thcell:focus-within .thpop{display:block}
+/* 마지막 열 도움말은 오른쪽 끝에 맞춰 연다. 왼쪽 기준으로 열면 표 오른쪽 경계(.tblwrap overflow)에서 잘린다 */
+th.thcell:last-child .thpop{left:auto;right:0}
 .fdd{position:absolute;left:0;top:calc(100% + 6px);min-width:210px;background:var(--flyout);border:1px solid var(--border);border-radius:10px;padding:7px;box-shadow:0 12px 30px var(--shadow);z-index:80;display:none;font-weight:400}
 th.thcell.fdd-on .fdd{display:block}
 .fdd label{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:7px;font-size:12.5px;color:var(--foreground);cursor:pointer;white-space:nowrap}
@@ -583,6 +703,22 @@ th.thcell.fdd-on .fdd{display:block}
 .prog .pstep.on{color:var(--primary);font-weight:600;background:color-mix(in srgb,var(--primary) 12%,transparent)}
 .prog .pstep.done{color:var(--success)}
 
+/* 접힘 블록 — 배포 목업 `.adv` 와 같은 규격이다(값을 그대로 가져왔다). 등록·버전 추가의 학습 이력에 쓴다 */
+.adv{border:1px solid var(--border);border-radius:10px;margin-top:16px}
+/* overflow:hidden 을 두면 툴팁이 잘린다. 모서리는 안쪽 요소에서 다듬는다 */
+.adv > summary{border-radius:9px 9px 0 0}
+.adv:not([open]) > summary{border-radius:9px}
+.adv > .advbody{border-radius:0 0 9px 9px}
+.adv > summary{padding:11px 14px;font-size:12.5px;font-weight:600;color:var(--foreground);cursor:pointer;background:var(--muted);list-style:none;display:flex;align-items:center;justify-content:space-between}
+.adv > summary::-webkit-details-marker{display:none}
+.adv > summary .fold{margin-left:auto;display:grid;place-items:center;color:var(--muted-foreground);
+  transform:rotate(-90deg);transition:transform .15s}
+.adv[open] > summary .fold{transform:rotate(0)}
+.adv > summary .fold svg{width:14px;height:14px}
+.advbody{padding:14px}
+/* 등록 상태 칸 안 진행률 — 칸이 좁으면 단계 이름이 겹친다. 진행률이 있을 때만 폭을 지킨다 */
+td.regcell .prog{min-width:220px}
+
 /* 컬럼 도움말 — 상태값 목록 */
 .thpop dl{margin:8px 0 0;display:grid;grid-template-columns:auto 1fr;gap:5px 9px;font-size:11.5px}
 .thpop dt{font-weight:600;color:var(--foreground);white-space:nowrap}
@@ -595,6 +731,70 @@ th.thcell.fdd-on .fdd{display:block}
 .rowmenu .disw{display:block}
 /* 비활성 사유 툴팁 — 라이브러리 .tip 과 같은 값(목업 공통 처리) */
 .distip{position:fixed;z-index:200;display:none;background:var(--flyout);color:var(--foreground);border:1px solid var(--border-strong);font-size:12px;font-weight:400;line-height:1.5;padding:8px 11px;border-radius:7px;box-shadow:0 6px 18px var(--shadow);max-width:340px;white-space:normal;text-align:left;pointer-events:none}
+
+/* 레이더 차트: 라이브러리 v0.23 `레이더 차트` 규격 그대로. 평가 결과의 태스크별 점수(0~100)를 축마다 둔다.
+   색은 토큰만 쓴다. 꼭짓점 호버 말풍선(.ctip)은 모니터링 목업 차트 말풍선과 같은 규격이다 */
+.radarwrap{position:relative;display:flex;justify-content:center;background:var(--muted);border:1px solid var(--border);border-radius:9px;padding:10px 8px;margin:0 0 12px}
+.radar{width:300px;height:250px;display:block;overflow:visible}
+.radar .grid{fill:none;stroke:var(--border);stroke-width:1}
+.radar .axis{stroke:var(--border);stroke-width:1}
+.radar .area{fill:color-mix(in srgb,var(--primary) 16%,transparent);stroke:var(--primary);stroke-width:1.8;stroke-linejoin:round}
+.radar .pt{fill:var(--card);stroke:var(--primary);stroke-width:1.6;pointer-events:none}
+.radar .pt.on{fill:var(--primary)}
+.radar .hit{fill:transparent;cursor:default}
+.radar .lb{font-size:11px;fill:var(--muted-foreground)}
+.radar .tk{font-size:9.5px;fill:var(--faint)}
+.ctip{position:absolute;top:6px;background:var(--card);border:1px solid var(--border-strong);border-radius:8px;
+  padding:7px 10px;font-size:11.5px;line-height:1.6;white-space:nowrap;box-shadow:0 6px 18px var(--shadow);pointer-events:none;z-index:5}
+.ctip b{display:block;color:var(--foreground);margin-bottom:3px;font-size:11px}
+.ctip span{display:block;color:var(--muted-foreground)}
+/* 점수 목록: 차트만으로는 정확한 값을 읽을 수 없어 함께 둔다 */
+.scorelist{display:grid;grid-template-columns:1fr auto;gap:6px 16px;font-size:12.5px;margin:0}
+.scorelist dt{color:var(--muted-foreground)}
+.scorelist dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;color:var(--foreground)}
+.cbtn.sm{width:26px;height:26px;border-radius:6px}
+.cbtn.sm svg{width:13px;height:13px}
+/* 원본 값 복사 버튼: 코드 블록 오른쪽 위에 얹는다. 버튼 규격은 라이브러리 .cbtn.sm */
+.rawwrap{position:relative}
+.rawwrap .rawcp{position:absolute;top:22px;right:22px}
+/* 알림 박스: 라이브러리 정본(.alertbox) */
+.alertbox) 신설 — 조건부 상태 알림     · 툴팁 / hint / 알림 박스 구분 기준 정리 — 항목 설명 · 입력 규칙 · 상태 알림     · 모달 안 확인 알럿 금지 규칙 — 취소는 즉시 닫고 경고는 인라인     · --border-strong 신설 — 버튼·아이콘 버튼 등 클릭 대상의 테두리.       면을 나누는 --border를 그대로 쓰면 배경과 대비가 낮아 버튼이 보이지 않던 문제     · 신규: 링크·텍스트 버튼 / 사이드 패널·섹션 접기 / 항목 도움말 / 컬럼 헤더 필터 / 검색 조건 칩       / 진행률(단계) / 선택지 카드 / 마법사 네비게이터 / 진단 박스 / 로그 뷰 / 접기 버튼    콘체르토 매니저 — 컴포넌트 라이브러리 v0.1 (프론트 핸드오프용)   탭 1 색상 팔레트 : 표기 규칙 · 원시 램프 · 라이트/다크 역할 토큰 · 대비 검증 · shadcn 정의   탭 2 컴포넌트    : 공통정책 조항 매핑(상태 5종 · 배지 · 토스트 · 처리중 · 모달/팝오버 · 테이블)   · 색값은 로그인 배너 이미지 근사치. 시각(간격·모션)은 예시이며 컴포넌트 라이브러리로 확정. --> <style>   :root{     --background:#f4f6fc; --foreground:#171d33;     --card:#ffffff; --card-foreground:#171d33;     --muted:#eef1f9; --muted-foreground:#565f7e;   /* 용도별 표면 — 표면·호버·선택을 한 토큰으로 쓰면 인접했을 때 구분이 사라진다 */     --hover:#fafbfe; --hover-strong:#dce2f1; --selected:#dde6f8; --selected-soft:#f2f6fd; --thead:#edf0f7;     --border:#dce2f1; --border-strong:#b9c3dd; --input:#dce2f1;     --primary:#3346c9; --primary-foreground:#ffffff; --primary-hover:#26368f;     --accent:#4f6fe6; --accent-foreground:#0a1026;     --success:#2f9e6a; --warning:#c98a2e; --destructive:#d64a51; --destructive-hover:#b93b42;     --ring:#4f6fe6; --underline:#a8b0c8;     --card-2:#f0f3fb; --flyout:#ffffff; --faint:#8b93ad;     --shadow:rgba(23,29,51,.10);     /* 레이아웃 치수 */     --header-h:58px; --gnb-w:236px; --panel-w:440px;     --font:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;     --radius:12px;   }
+.alertbox{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;margin-bottom:14px;   border:1px solid var(--border);background:var(--muted)}
+.alertbox.info{border-color:color-mix(in srgb,var(--accent) 30%,transparent);background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.alertbox.warn{border-color:color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 8%,transparent)}
+.alertbox.crit{border-color:color-mix(in srgb,var(--destructive) 30%,transparent);background:color-mix(in srgb,var(--destructive) 7%,transparent)}
+.alertbox .aic{width:17px;height:17px;flex:0 0 auto;margin-top:1px}
+.alertbox.info .aic{color:var(--accent)}
+.alertbox.warn .aic{color:var(--warning)}
+.alertbox.crit .aic{color:var(--destructive)}
+.alertbox .atx{flex:1;min-width:0;font-size:12.5px;line-height:1.65;color:var(--foreground)}
+.alertbox .atx b{display:block;margin-bottom:3px}
+.alertbox .aact{margin-top:9px;display:flex;gap:7px}
+.alertbox .aclose{width:22px;height:22px;flex:0 0 auto;display:grid;place-items:center;border:0;background:transparent;   color:var(--muted-foreground);cursor:pointer;border-radius:5px;font-size:13px;line-height:1}
+.alertbox .aclose:hover{background:var(--card);color:var(--foreground)}
+/* 차트 범례 · 증감 표기: 라이브러리 v0.23 정본 */
+.radarwrap .lgd{position:absolute;top:10px;right:12px;display:flex;gap:12px;font-size:11px;color:var(--muted-foreground)}
+.lgd i{display:inline-block;width:14px;height:0;border-top:2px solid var(--primary);margin-right:5px;vertical-align:middle}
+.lgd .s2 i{border-top-style:dashed;border-top-color:var(--muted-foreground)}
+.radar .area.prev{fill:none;stroke:var(--muted-foreground);stroke-width:1.8;stroke-dasharray:5 4}
+.schead{display:grid;grid-template-columns:1fr auto 132px;gap:0 16px;font-size:11.5px;color:var(--muted-foreground);padding:0 0 6px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.schead span:not(:first-child){text-align:right}
+.scorelist.cmp{grid-template-columns:1fr auto 132px}
+.scorelist .dcell{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.dlt{display:inline-block;min-width:42px;font-size:11.5px;color:var(--muted-foreground);text-align:right;font-variant-numeric:tabular-nums}
+.dlt.up{color:var(--success)}
+.dlt.dn{color:var(--destructive)}
+.dbar{display:inline-block;position:relative;width:64px;height:8px;background:var(--muted);border-radius:4px}
+.dbar::before{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;border-left:1px solid var(--border-strong)}
+.dbar i{position:absolute;top:0;bottom:0;border-radius:4px}
+.dbar i.up{background:var(--success)}
+.dbar i.dn{background:var(--destructive)}
+.cmpnone{margin:8px 0 0;font-size:12px;color:var(--muted-foreground)}
+.rawbox{margin:0;padding:10px 12px;background:var(--muted);border:1px solid var(--border);border-radius:8px;
+  font-family:ui-monospace,Menlo,monospace;font-size:11.5px;line-height:1.6;color:var(--foreground);white-space:pre;overflow:auto;max-height:220px}
+/* 이동 링크: 라이브러리 `.lnk` 그대로. 색이 아니라 밑줄로 가른다 */
+.lnk{color:var(--foreground);cursor:pointer;text-decoration:underline;text-decoration-color:var(--underline);text-underline-offset:3px}
+.lnk:hover{text-decoration-color:var(--foreground)}
 
 </style><body class="dark">
 <div class="app">
@@ -656,7 +856,7 @@ th.thcell.fdd-on .fdd{display:block}
       <div class="phead">
         <div>
           <h1>모델
-            <span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span><span class="tip">배포에 사용할 모델 이미지와 원천 가중치를 관리합니다. 모델 사양은 반입 시 수집된 값 기준이며 일부 항목은 제공되지 않을 수 있습니다.</span></span>
+            <span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span><span class="tip">배포에 사용할 모델 이미지와 원천 가중치를 관리합니다. 모델 사양은 등록 시 수집된 값 기준이며 일부 항목은 제공되지 않을 수 있습니다.</span></span>
           </h1>
         </div>
         <div class="pact" id="pact">
@@ -731,9 +931,9 @@ th.thcell.fdd-on .fdd{display:block}
       <div class="more" id="pnMore">
         <button class="morebtn" onclick="tgMore(event,'pnMore')">⋯</button>
         <div class="rowmenu">
-          <button onclick="openEdit()">기본 정보 수정</button>
+          <button id="pnEditBtn" onclick="openEdit()">기본 정보 수정</button>
           <button id="pnActBtn" onclick="panelAct()">노드 캐싱</button>
-          <hr><button class="d" onclick="panelDel()">삭제</button>
+          <hr><button class="d" id="pnDelBtn" onclick="panelDel()">삭제</button>
         </div>
       </div>
       <button class="pnexp" onclick="expandDetail()" title="상세 페이지로 이동">
@@ -807,6 +1007,8 @@ th.thcell.fdd-on .fdd{display:block}
         <input class="inp" id="rTag" placeholder="예) 추천, 한국어, 경량">
         <div class="hint">쉼표로 구분해 입력합니다. 검색할 때 함께 찾습니다.</div>
       </div>
+      <!-- 학습 이력 — 선택 입력이라 접어 둔다(모델 정책 3.7). 작업 산출물 진입이면 펼치고 읽기 전용 -->
+      <details class="adv" id="rLin"></details>
 
     </div>
     <div class="mdfoot">
@@ -848,16 +1050,50 @@ th.thcell.fdd-on .fdd{display:block}
         <div class="errmsg" id="vVerErr" style="display:none">이미 등록된 버전입니다.</div>
         <div class="hint">모델명과 조합해 중복을 확인합니다.</div>
       </div>
+      <div class="f">
+        <label>변경 사유</label>
+        <textarea class="inp" id="vReason" rows="2" style="resize:vertical" placeholder="이 버전에서 바뀐 점"></textarea>
+        <div class="hint">버전 상세에 표시됩니다.</div>
+      </div>
       <div class="f" id="vTokRow" style="margin-bottom:0">
         <label>토크나이저 경로</label>
         <input class="inp" id="vTok" placeholder="llama-3.2-1b/tokenizer.json">
         <div class="hint">입력하지 않으면 벤치마크 실행이 제한됩니다.</div>
       </div>
+      <details class="adv" id="vLin"></details>
     </div>
     <div class="mdfoot">
       <button class="btn ghost" onclick="closeVer()">취소</button>
       <button class="btn" id="vSubmit" disabled onclick="submitVer()">추가</button>
     </div>
+  </div>
+</div>
+
+<!-- 버전 상세 MODEL-L01.D01.T01.M02 — 변경 사유·설명·학습 이력(기획서 1장 · REQ-MODEL-034).
+     별도 페이지를 두지 않는다. 항목이 적고 버전 목록에서 바로 보고 닫는 용도다 -->
+<div class="mdbg" id="mdVerDt">
+  <div class="modal w520">
+    <div class="mdhead"><h3 id="vdTitle">버전 상세</h3><p id="vdSub"></p></div>
+    <div class="mdbody" id="vdBody" style="padding-top:6px"></div>
+    <div class="mdfoot" id="vdFoot"></div>
+  </div>
+</div>
+
+<!-- 실패 사유 MODEL-L01.D01.T03.M01. 작업 이력의 실패 행을 누르면 열린다 -->
+<div class="mdbg" id="mdJobFail">
+  <div class="modal w520">
+    <div class="mdhead"><h3>실패 사유</h3><p id="jfSub"></p></div>
+    <div class="mdbody" id="jfBody" style="padding-top:6px"></div>
+    <div class="mdfoot" id="jfFoot"></div>
+  </div>
+</div>
+
+<!-- 평가 결과 MODEL-L01.D01.T04.M01. 평가 탭 행을 누르면 열린다. 닫기만 둔다: 입력·수정이 없다 -->
+<div class="mdbg" id="mdEval">
+  <div class="modal w520">
+    <div class="mdhead"><h3 id="evTitle">평가 결과</h3><p id="evSub"></p></div>
+    <div class="mdbody" id="evBody" style="padding-top:6px"></div>
+    <div class="mdfoot"><button class="btn ghost" onclick="closeEval()">닫기</button></div>
   </div>
 </div>
 
@@ -951,6 +1187,12 @@ th.thcell.fdd-on .fdd{display:block}
     <button class="rl" onclick="setRole('admin',this)">WS 관리자</button>
     <button class="rl" onclick="setRole('editor',this)">편집자</button>
     <button class="rl" onclick="setRole('viewer',this)">뷰어</button></span>
+  <!-- 검토용 바로 보기: 상세 안쪽 화면을 경로를 몰라도 열어 본다. 실제 화면에는 없다 -->
+  <span class="dgrp"><span class="demo-label">바로 보기:</span>
+    <button onclick="demoGo('eval')">평가 탭</button>
+    <button onclick="demoGo('evalfail')">실패한 평가</button>
+    <button onclick="demoGo('jobs')">작업 이력·다시 시도</button>
+    <button onclick="demoGo('cmp')">이전 버전 비교</button></span>
   <span class="dgrp"><span class="demo-label">등록 진입:</span>
     <button class="rg on" onclick="demoReg('direct',this)">직접 등록</button>
     <button class="rg" onclick="demoReg('job',this)">작업 산출물</button></span>
@@ -1008,7 +1250,7 @@ function userRef(txt){
 const IMG=[
  {n:'gpt-oss-120b-furiosa',v:'1.0.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',tags:['추천','대형'],by:'관리자(admin)',at:'2026-07-08 17:47:25',eng:'vLLM',base:'Official Base',
   arch:{p:'-',c:'-',q:'적용 안 함',d:'-'},infra:{v:'-',r:'아니요',g:'제한 없음'},store:'model-registry/gpt-oss-120b-furiosa:v1.0.0',mode:'단일',prof:0,deps:[]},
- {n:'gpt-oss-20b',v:'latest',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',tags:['경량'],by:'관리자(admin)',at:'2026-04-15 11:02:10',eng:'vLLM',base:'Custom Build',
+ {n:'gpt-oss-20b',v:'latest',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',tags:['경량'],by:'관리자(admin)',at:'2026-04-15 11:16:40',eng:'vLLM',base:'Custom Build',src:'gpt-oss-20b:1.0.0',
   arch:{p:'20B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'48',r:'아니요',g:'제한 없음'},store:'model-registry/gpt-oss-20b:latest',mode:'단일',prof:0,deps:[]},
  {n:'k-exaone-236b-a23b-nvfp4a16',v:'1.0.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 14:20:00',eng:'vLLM',base:'Official Base',
   arch:{p:'236B',c:'-',q:'NVFP4',d:'-'},infra:{v:'320',r:'예',g:'NVIDIA-H200'},store:'model-registry/k-exaone-236b-a23b-nvfp4a16:v1.0.0',mode:'프리필·디코드 분리',prof:0,deps:[]},
@@ -1018,20 +1260,20 @@ const IMG=[
   arch:{p:'122B',c:'-',q:'GPTQ-INT4',d:'-'},infra:{v:'96',r:'아니요',g:'제한 없음'},store:'model-registry/qwen3-5-122b-a10b-gptq-int4:v1.0.0',mode:'단일',prof:0,deps:[]},
  {n:'furiosa-qwen3-32b-fp8',v:'latest',ready:'캐싱됨',cn:2,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-25 16:40:33',eng:'vLLM',base:'Official Base',
   arch:{p:'32B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'Furiosa RNGD'},store:'model-registry/furiosa-qwen3-32b-fp8:latest',mode:'단일',prof:0,deps:[{n:'furiosa-qwen3-32b-npu',ws:'test-npu',st:'오류'}]},
- {n:'qwen-next-80b-a3b-thinking',v:'latest',ready:'미캐싱',cn:0,use:'미사용',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-20 10:05:12',eng:'vLLM',base:'Custom Build',
+ {n:'qwen-next-80b-a3b-thinking',v:'latest',ready:'미캐싱',cn:0,use:'미사용',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-20 10:05:12',eng:'vLLM',base:'Custom Build',src:'qwen3-next-80b-a3b-thinking:latest',
   arch:{p:'80B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'128',r:'아니요',g:'제한 없음'},store:'model-registry/qwen-next-80b-a3b-thinking:latest',mode:'단일',prof:0,deps:[]},
- {n:'llama-3.2-1b-instruct',v:'latest',ready:'캐싱 중',cn:1,use:'배포 중',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-18 15:32:44',eng:'vLLM',base:'Custom Build',
+ {n:'llama-3.2-1b-instruct',v:'latest',ready:'캐싱 중',cn:1,use:'배포 중',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-18 15:32:44',eng:'vLLM',base:'Custom Build',src:'llama-3.2-1b:latest',
   arch:{p:'1B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'8',r:'아니요',g:'제한 없음'},store:'model-registry/llama-3.2-1b-instruct:latest',mode:'단일',prof:0,deps:[{n:'llama-3-2-1b-prod',ws:'ai-service-team',st:'정상'}]},
  {n:'gemma-4-12b-it',v:'1.0.0',ready:'미캐싱',cn:0,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-15 11:18:29',eng:'vLLM',base:'Official Base',
   arch:{p:'12B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'32',r:'아니요',g:'제한 없음'},store:'model-registry/gemma-4-12b-it:v1.0.0',mode:'단일',prof:0,deps:[{n:'gemma-4-12b-it-idle',ws:'ai-service-team',st:'유휴'}]},
- {n:'gpt-oss-120b',v:'latest',ready:'캐싱됨',cn:3,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-10 09:44:51',eng:'vLLM',base:'Custom Build',
+ {n:'gpt-oss-120b',v:'latest',ready:'캐싱됨',cn:3,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-10 09:44:51',eng:'vLLM',base:'Custom Build',src:'gpt-oss-120b:1.0.0',
   arch:{p:'120B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'160',r:'아니요',g:'제한 없음'},store:'model-registry/gpt-oss-120b:latest',mode:'단일',prof:0,deps:[{n:'gpt-oss-120b-symphony',ws:'ai-service-team',st:'정상'}]},
  {n:'gemma-4-31b-it-fp8-block',v:'1.0.0',ready:'캐싱됨',cn:3,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-05 17:22:03',eng:'vLLM',base:'Official Base',
   arch:{p:'31B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'제한 없음'},store:'model-registry/gemma-4-31b-it-fp8-block:v1.0.0',mode:'단일',prof:0,deps:[{n:'gemma-4-31b-fp8-failed',ws:'test-npu',st:'생성 실패'}]},
  {n:'qwen3-6-35b-a3b-fp8',v:'1.0.0',ready:'캐싱됨',cn:3,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-01 13:07:38',eng:'vLLM',base:'Official Base',
   arch:{p:'35B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'제한 없음'},store:'model-registry/qwen3-6-35b-a3b-fp8:v1.0.0',mode:'단일',prof:0,deps:[{n:'qwen3-6-35b-a3b-fp8-bench',ws:'ml-research',st:'유휴'}]},
  /* 같은 모델의 여러 버전 — 목록 행 단위를 비교하기 위한 데모 데이터 */
- {n:'qwen3-32b',v:'v3.6',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',tags:['추천'],by:'임승주(sj.lim)',at:'2026-08-01 09:12:00',eng:'vLLM',base:'Official Base',
+ {n:'qwen3-32b',v:'v3.6',reason:'긴 문서 요약용으로 컨텍스트 길이를 늘렸다',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',tags:['추천'],by:'임승주(sj.lim)',at:'2026-08-01 09:12:00',eng:'vLLM',base:'Official Base',
   arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.6',mode:'단일',prof:0,deps:[]},
  {n:'qwen3-32b',v:'v3.2',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',tags:['추천'],by:'성유진(yj.seong)',at:'2026-06-11 15:40:22',eng:'vLLM',base:'Official Base',
   arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.2',mode:'단일',prof:0,deps:[]},
@@ -1042,20 +1284,73 @@ const IMG=[
  {n:'llama-3.2-1b-instruct',v:'v2.0',ready:'캐싱됨',cn:3,use:'미사용',scope:'워크스페이스 전용',ws:'ai-service-team',by:'유지현(jh.yu)',at:'2026-07-20 16:33:41',eng:'vLLM',base:'Custom Build',
   arch:{p:'1B',c:'8,192',q:'적용 안 함',d:'BF16'},infra:{v:'8',r:'아니요',g:'제한 없음'},store:'model-registry/llama-3.2-1b-instruct:v2.0',mode:'단일',prof:0,deps:[]}
 ];
+/* reg = 등록 상태(모델 정책 3.6). 원천값 SYNCING·READY·FAILED 를 화면 문구로 받는다(7.9).
+   ready = 빌드 상태. 등록됨이 아니면 비워 두고 `-` 로 보인다.
+   lin = 학습 이력(모델 정책 3.7). src 는 `job`(작업 산출물에서 채움 · 수정 불가) 또는 `direct`(직접 입력) */
 const WGT=[
- {n:'gpt-oss-20b',v:'1.0.0',ready:'빌드 중',path:'s3://concerto-models/gpt-oss-20b',size:'2.02 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-04-15 10:58:00',tok:'gpt-oss-20b/tokenizer.json',built:'gpt-oss-20b:latest',
+ {n:'gpt-oss-20b',v:'1.0.0',reg:'등록됨',ready:'빌드됨',path:'s3://concerto-models/gpt-oss-20b',size:'2.02 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-04-15 10:58:00',tok:'gpt-oss-20b/tokenizer.json',built:'gpt-oss-20b:latest',
   arch:{p:'20B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'48',r:'아니요',g:'제한 없음'}},
- {n:'qwen3.5-122b-a10b-fp8',v:'1.0.0',ready:'미빌드',path:'s3://concerto-models/qwen3.5-122b-a10b-fp8',size:'12.23 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-28 09:02:11',tok:'-',built:'',
+ {n:'qwen3.5-122b-a10b-fp8',v:'1.0.0',reg:'등록됨',ready:'미빌드',path:'s3://concerto-models/qwen3.5-122b-a10b-fp8',size:'12.23 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-28 09:02:11',tok:'-',built:'',
   arch:{p:'122B',c:'-',q:'FP8',d:'-'},infra:{v:'96',r:'아니요',g:'제한 없음'}},
- {n:'solar-open-100b',v:'1.0.0',ready:'미빌드',path:'s3://concerto-models/solar-open-100b',size:'1.71 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 13:40:22',tok:'-',built:'',
+ {n:'solar-open-100b',v:'1.0.0',reg:'등록됨',ready:'빌드 실패',path:'s3://concerto-models/solar-open-100b',size:'1.71 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 13:40:22',tok:'-',built:'',
   arch:{p:'100B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'160',r:'아니요',g:'제한 없음'}},
- {n:'qwen3-next-80b-a3b-thinking',v:'latest',ready:'미빌드',path:'s3://concerto-models/qwen3-next-80b-a3b-thinking',size:'12.23 MB',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-20 09:50:03',tok:'-',built:'',
-  arch:{p:'80B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'128',r:'아니요',g:'제한 없음'}},
- {n:'llama-3.2-1b',v:'latest',ready:'미빌드',path:'s3://concerto-models/llama-3.2-1b',size:'6.71 MB',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-18 15:20:17',tok:'llama-3.2-1b/tokenizer.json',built:'',
-  arch:{p:'1B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'8',r:'아니요',g:'제한 없음'}},
- {n:'gpt-oss-120b',v:'1.0.0',ready:'미빌드',path:'s3://concerto-models/gpt-oss-120b',size:'2.02 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-10 09:30:44',tok:'-',built:'',
-  arch:{p:'120B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'160',r:'아니요',g:'제한 없음'}}
+ {n:'qwen3-next-80b-a3b-thinking',v:'latest',reg:'등록됨',ready:'빌드됨',path:'s3://concerto-models/qwen3-next-80b-a3b-thinking',size:'12.23 MB',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-20 09:50:03',tok:'-',built:'qwen-next-80b-a3b-thinking:latest',
+  arch:{p:'80B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'128',r:'아니요',g:'제한 없음'},
+  lin:{src:'direct',o:'Qwen/Qwen3-Next-80B-A3B-Thinking',dn:'internal-docs-qa',dv:'2026-06',job:''}},
+ {n:'llama-3.2-1b',v:'latest',reg:'등록됨',ready:'빌드됨',path:'s3://concerto-models/llama-3.2-1b',size:'6.71 MB',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-18 15:20:17',tok:'llama-3.2-1b/tokenizer.json',built:'llama-3.2-1b-instruct:latest',
+  arch:{p:'1B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'8',r:'아니요',g:'제한 없음'},
+  lin:{src:'job',o:'meta-llama/Llama-3.2-1B',dn:'cs-faq-ko',dv:'v3',job:'job-20260612-03'}},
+ {n:'gpt-oss-120b',v:'1.0.0',reg:'등록됨',ready:'빌드됨',path:'s3://concerto-models/gpt-oss-120b',size:'2.02 MB',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-10 09:30:44',tok:'-',built:'gpt-oss-120b:latest',
+  arch:{p:'120B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'160',r:'아니요',g:'제한 없음'}},
+ /* 등록 실패 샘플 — 가져오기가 끝나지 않아 용량·사양을 모른다. 빌드 상태는 `-` */
+ {n:'exaone-4.0-32b',v:'1.0.0',reg:'등록 실패',ready:'',path:'s3://concerto-models/exaone-4.0-32b',size:'-',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-05 11:20:31',tok:'-',built:'',
+  arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'}}
 ];
+/* 작업 이력(모델 정책 4.4). 모델 단위로 쌓는다. 키는 `탭:모델명`.
+   kind 등록·빌드·캐싱 / res 진행 중·완료·실패 / src 는 등록 작업의 소스 경로만 / np 는 캐싱한 노드 수(다시 시도 입력).
+   등록됨인 가중치는 버전마다 등록 완료가 한 건 이상 있다. 빌드됨이면 빌드 완료가, 캐싱된 이미지는 캐싱 완료가 있다.
+   Official Base 이미지는 등록 작업을 거치지 않아 캐싱 이력만 쌓인다 */
+const J=function(kind,v,st,et,res,why,src,np){ return {kind:kind,v:v,st:st,et:et,res:res,why:why||'',src:src||'',np:np||0}; };
+const JOBS={
+ 'B:gpt-oss-20b':[
+   J('등록','1.0.0','2026-04-15 10:58:00','2026-04-15 11:01:12','완료','','s3://concerto-models/gpt-oss-20b'),
+   J('빌드','1.0.0','2026-04-15 11:02:40','2026-04-15 11:09:03','실패','이미지 저장소 용량이 부족해 빌드한 이미지를 저장소에 올리지 못했습니다.'),
+   J('빌드','1.0.0','2026-04-15 11:10:05','2026-04-15 11:16:40','완료')],
+ 'B:qwen3.5-122b-a10b-fp8':[
+   J('등록','1.0.0','2026-06-28 08:40:02','2026-06-28 08:51:47','실패','다운로드 중 연결이 끊겼습니다.','s3://concerto-models/qwen3.5-122b-a10b-fp8'),
+   J('등록','1.0.0','2026-06-28 09:02:11','2026-06-28 09:20:36','완료','','s3://concerto-models/qwen3.5-122b-a10b-fp8')],
+ 'B:solar-open-100b':[
+   J('등록','1.0.0','2026-07-02 13:40:22','2026-07-02 13:43:05','완료','','s3://concerto-models/solar-open-100b'),
+   J('빌드','1.0.0','2026-07-02 13:44:00','2026-07-02 13:47:31','실패','빌드에 쓸 수 있는 노드가 없어 빌드를 시작하지 못했습니다.')],
+ 'B:qwen3-next-80b-a3b-thinking':[
+   J('등록','latest','2026-06-20 09:50:03','2026-06-20 09:53:40','완료','','s3://concerto-models/qwen3-next-80b-a3b-thinking'),
+   J('빌드','latest','2026-06-20 09:54:30','2026-06-20 10:05:12','완료')],
+ 'B:llama-3.2-1b':[
+   J('등록','latest','2026-06-18 15:20:17','2026-06-18 15:24:50','완료','','s3://concerto-models/llama-3.2-1b'),
+   J('빌드','latest','2026-06-18 15:25:30','2026-06-18 15:32:44','완료')],
+ 'B:gpt-oss-120b':[
+   J('등록','1.0.0','2026-06-10 09:30:44','2026-06-10 09:34:02','완료','','s3://concerto-models/gpt-oss-120b'),
+   J('빌드','1.0.0','2026-06-10 09:35:10','2026-06-10 09:44:51','완료')],
+ 'B:exaone-4.0-32b':[
+   J('등록','1.0.0','2026-07-05 11:20:31','2026-07-05 11:21:05','실패','소스 경로에 가중치 파일이 없습니다.','s3://concerto-models/exaone-4.0-32b')],
+ 'A:gpt-oss-20b':[
+   J('캐싱','latest','2026-04-15 11:40:00','2026-04-15 11:52:31','완료','','',3)],
+ 'A:furiosa-qwen3-32b-fp8':[
+   J('캐싱','latest','2026-06-25 16:45:00','2026-06-25 16:58:12','완료','','',2)],
+ 'A:llama-3.2-1b-instruct':[
+   J('캐싱','v2.0','2026-07-20 16:40:00','2026-07-20 16:46:02','완료','','',3),
+   J('캐싱','latest','2026-06-18 15:40:10','2026-06-18 15:47:02','완료','','',1),
+   J('캐싱','latest','2026-10-12 09:10:44','','진행 중','','',2)],
+ 'A:gpt-oss-120b':[
+   J('캐싱','latest','2026-06-10 09:50:00','2026-06-10 10:02:13','완료','','',3)],
+ 'A:gemma-4-31b-it-fp8-block':[
+   J('캐싱','1.0.0','2026-06-05 17:30:00','2026-06-05 17:41:27','완료','','',3)],
+ 'A:qwen3-6-35b-a3b-fp8':[
+   J('캐싱','1.0.0','2026-06-01 13:15:00','2026-06-01 13:26:44','완료','','',3)],
+ 'A:qwen3-32b':[
+   J('캐싱','v3.6','2026-08-01 09:20:00','2026-08-01 09:33:15','완료','','',3),
+   J('캐싱','v3.2','2026-06-11 15:50:00','2026-06-11 16:02:48','완료','','',3)]
+};
 const NODES=[
  {n:'furiosa',acc:'rngd',cpu:'128',mem:'1,007 GB',cached:true},
  {n:'gpu-svr',acc:'NVIDIA-H200',cpu:'128',mem:'1,007 GB',cached:false},
@@ -1068,7 +1363,50 @@ IMG.push({n:'oci-storage-initializer',v:'v0.15.2',ready:'캐싱됨',cn:3,use:'�
   arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'},store:'model-registry/oci-storage-initializer:v0.15.2',mode:'-',prof:0,deps:[],gpu:'-',vram:'-',sys:true});
 WGT.forEach(m=>{ m.gpu=m.infra.g; m.vram=m.infra.v; });
 const RB={'캐싱됨':'ok','미캐싱':'mu','캐싱 중':'ac load','미빌드':'mu','빌드 중':'ac load','빌드됨':'ok','빌드 실패':'cr'};
-const RB2={'정상':'ok','경고':'wa','위험':'cr'};
+/* 등록 상태 — 등록됨은 배지가 아니라 텍스트다(공통정책 1.9 · 모델 정책 3.6). 배지 클래스는 빌드 상태와 같은 것을 쓴다 */
+const REGB={'등록 중':'ac load','등록 실패':'cr'};
+/* 작업 결과 — 진행 중은 `빌드 중` 과, 실패는 `빌드 실패` 와 같은 클래스 */
+const JOBB={'진행 중':'ac load','완료':'ok','실패':'cr'};
+const regOf=m=>m.reg||'등록됨';
+const regOk=m=>regOf(m)==='등록됨';
+/* 표본과 같은 한국 시간(UTC+9)으로 기록한다 */
+function nowStr(){ return new Date(Date.now()+9*3600*1000).toISOString().slice(0,19).replace('T',' '); }
+/* 등록 상태 칸. 등록 중이면 3단계 진행률을 같은 칸에 함께 보인다(모델 정책 2.3) */
+function regCell(m, withProg){
+  const r=regOf(m);
+  if(!REGB[r]) return r;
+  let h='<span class="stbadge '+REGB[r]+'"><span class="d"></span>'+r+'</span>';
+  if(withProg && r==='등록 중' && m.prog){
+    const pg=m.prog;
+    h+='<div class="prog">'
+     + '<div class="plabel"><span>'+IMPORT_STEPS[pg.step]+'</span><span>'+pg.pct+'%</span></div>'
+     + '<div class="pbar"><div class="pfill" style="width:'+pg.pct+'%"></div></div>'
+     + '<div class="psteps">'+IMPORT_STEPS.map(function(t,i){
+         return '<span class="pstep'+(i<pg.step?' done':(i===pg.step?' on':''))+'">'+t+'</span>';
+       }).join('')+'</div></div>';
+  }
+  return h;
+}
+/* 빌드 상태 칸. 등록됨이 아니면 `-`(모델 정책 3.6) */
+function buildCell(m){
+  if(!regOk(m) || !m.ready) return '<span class="dash">-</span>';
+  return '<span class="stbadge '+RB[m.ready]+'"><span class="d"></span>'+m.ready+'</span>';
+}
+/* 등록이 끝나지 않은 가중치는 빌드할 대상이 없다. 상태로 막힌 것이라 비활성 + 사유다(v0.31 기준) */
+function regMsg(m){
+  return regOf(m)==='등록 중' ? '지금은 등록 중 상태라 실행할 수 없습니다.'
+       : '등록에 실패한 가중치는 빌드할 수 없습니다.';
+}
+/* 이미지 빌드를 막는 사유. 없으면 빈 문자열 */
+function buildBlock(m){
+  if(!regOk(m)) return regMsg(m);
+  if(m.ready==='빌드 중') return busyMsg(m);
+  return '';
+}
+/* 배포 상태 배지. 배포 목업의 상태 → 배지 등급과 같다(같은 표기가 화면마다 다른 색이면 안 된다 · 공통정책 5.1) */
+const RB2={'정상':'ok','오류':'cr','생성 중':'ac load','유휴':'mu','중지됨':'mu','생성 실패':'cr','삭제 중':'ac load','삭제 실패':'cr'};
+/* 배포명은 그 배포 화면으로 이동한다(기획서 7.3·7.4 · 공통정책 2.1). 목업은 이동을 토스트로 보인다 */
+function goDep(n){ toast('ok', n+' 배포 화면으로 이동합니다.'); }
 /* `배포 중` 은 지금 배포에 쓰이고 있다는 뜻이다. 무언가 되고 있는 진행 상태가 아니라
    정상 사용 중이므로 .ok 다(용어집 5.2) */
 const UB={'배포 중':'ok','미사용':'mu'};
@@ -1219,9 +1557,10 @@ const FDEF={
      /* 값은 `전역` 과 `워크스페이스 전용` 둘이다. 컬럼에는 전용일 때 워크스페이스 이름이
         보이나 필터는 두 갈래로 좁힌다 */
      {k:'scope',l:'표시 범위',opts:['전역','워크스페이스 전용']},
-     {k:'eng',  l:'엔진',    opts:['vLLM']},
+     /* 엔진은 정의된 값이 vLLM 하나라 필터를 두지 않는다(REQ-MODEL-012). 값이 늘면 축을 더한다 */
      {k:'gpu',  l:'요구 가속기',opts:['제한 없음','NVIDIA-H200','Furiosa RNGD']}],
-  B:[{k:'ready',l:'빌드 상태',opts:['미빌드','빌드 중','빌드됨','빌드 실패']},
+  B:[{k:'reg',  l:'등록 상태',opts:['등록 중','등록됨','등록 실패']},
+     {k:'ready',l:'빌드 상태',opts:['미빌드','빌드 중','빌드됨','빌드 실패']},
      {k:'scope',l:'표시 범위',opts:['전역','워크스페이스']}]
 };
 let fsel={};
@@ -1231,7 +1570,12 @@ const COLDEF={
     +'<dl><dt>캐싱됨</dt><dd>노드에 이미지가 있어 바로 기동할 수 있습니다.</dd>'
     +'<dt>캐싱 중</dt><dd>이미지를 내려받고 있습니다.</dd>'
     +'<dt>미캐싱</dt><dd>배포 시 이미지를 내려받아야 해 초기 기동에 시간이 걸립니다.</dd></dl>',
-  ready_B:'원천 가중치가 컨테이너 이미지로 빌드되었는지를 표시합니다.'
+  /* 값 설명은 빌드 상태 도움말과 길이를 맞춘다(한 문장, 실패만 두 문장) */
+  reg:'원천 가중치를 저장소에서 가져오는 작업이 끝났는지를 표시합니다.'
+    +'<dl><dt>등록됨</dt><dd>가져오기가 끝나 이미지로 빌드할 수 있습니다.</dd>'
+    +'<dt>등록 중</dt><dd>가중치를 가져오고 있습니다.</dd>'
+    +'<dt>등록 실패</dt><dd>가져오기에 실패했습니다. 다시 시도할 수 있습니다.</dd></dl>',
+  ready_B:'원천 가중치가 컨테이너 이미지로 빌드되었는지를 표시합니다. 등록됨인 가중치만 표시합니다.'
     +'<dl><dt>빌드됨</dt><dd>모델 이미지로 만들어져 배포할 수 있습니다.</dd>'
     +'<dt>빌드 중</dt><dd>이미지를 만들고 있습니다.</dd>'
     +'<dt>미빌드</dt><dd>아직 이미지로 만들지 않았습니다.</dd>'
@@ -1240,7 +1584,21 @@ const COLDEF={
   use:'이 모델을 쓰는 배포입니다. 여러 건이면 첫 배포와 나머지 건수를 보입니다. 전체는 상세의 배포 탭에서 확인합니다.',
   eng:'모델 이미지에 결합된 서빙 엔진을 표시합니다.',
   gpu:'이 모델을 배포하는 데 필요한 가속기를 벤더·유형으로 표시합니다.',
-  vram:'노드당 필요한 최소 가속기 메모리를 표시합니다.'
+  vram:'노드당 필요한 최소 가속기 메모리를 표시합니다.',
+  jres:'작업의 진행 상태를 표시합니다.'
+    +'<dl><dt>진행 중</dt><dd>작업을 처리하고 있습니다.</dd>'
+    +'<dt>완료</dt><dd>작업이 끝났습니다.</dd>'
+    +'<dt>실패</dt><dd>작업에 실패했습니다. 행을 누르면 사유를 볼 수 있습니다.</dd></dl>',
+  /* 평가 결과 원천값 PENDING·RUNNING·SUCCESS·그 밖의 값을 화면 문구로 받는다(기획서 5.1 · 공통정책 7.9) */
+  eres:'평가 작업의 진행 상태를 표시합니다.'
+    +'<dl><dt>대기</dt><dd>평가 작업이 자원을 기다리고 있습니다.</dd>'
+    +'<dt>실행 중</dt><dd>평가 작업이 실행되고 있습니다.</dd>'
+    +'<dt>완료</dt><dd>평가가 끝났습니다. 행을 누르면 점수를 볼 수 있습니다.</dd>'
+    +'<dt>실패</dt><dd>평가에 실패했습니다. 행을 누르면 사유를 볼 수 있습니다.</dd></dl>',
+  /* 링크 권한을 밝힌다. 남의 작업은 텍스트로 보여 왜 못 누르는지 알 수 없다(CDE 정책 4.5 조회 범위) */
+  ejob:'이 결과를 만든 개발룸 평가 작업입니다. 관리자와 작업을 제출한 사용자만 작업 상세로 이동할 수 있습니다.',
+  /* 한 모델에 여러 평가가 섞여 쌓인다. 같은 평가명끼리만 비교가 의미 있다(MODEL-L01 5.1) */
+  esuite:'개발룸 평가 작업에 쓰인 평가 이름입니다. 평가명이 같은 결과끼리 점수를 비교할 수 있습니다.'
 };
 /* 패널 항목 도움말 (공통정책 4.7) */
 const ITEMDEF={
@@ -1248,7 +1606,8 @@ const ITEMDEF={
   rdma:'노드 간 고속 통신이 필요한지를 표시합니다. 여러 노드에 분산 배포할 때 사용됩니다.',
   mode:'이 모델에 적합한 서빙 방식입니다. 배포 생성 시 기본값으로 사용됩니다.',prof:0,
   sync:'저장소의 실제 이미지와 플랫폼에 등록된 정보가 일치하는지를 표시합니다.',
-  cnode:'이 이미지를 사전 다운로드한 노드 수입니다.'
+  cnode:'이 이미지를 사전 다운로드한 노드 수입니다.',
+  ejob:'이 결과를 만든 개발룸 평가 작업입니다. 관리자와 작업을 제출한 사용자만 작업 상세로 이동할 수 있습니다.'
 };
 let ftmp={};
 function axis(k){ return FDEF[tab].find(f=>f.k===k); }
@@ -1261,7 +1620,7 @@ function thFilter(k){
   const on=fsel[k]||[];
   const def=COLDEF[k==='ready'?('ready_'+tab):k];
   return '<span class="thwrap">'+f.l
-    + (def?'<span class="thic" onclick="tgPop(event,this)">?</span>':'')
+    + (def?'<span class="thic" tabindex="0" onclick="tgPop(event,this)">?</span>':'')
     + '<button class="thfilter'+(on.length?' on':'')+'" onclick="tgFdd(event,\''+k+'\')" title="필터">'
     + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button>'
     + '</span>'
@@ -1275,7 +1634,7 @@ function thFilter(k){
 }
 function thHelp(k,label){
   const def=COLDEF[k];
-  return '<span class="thwrap">'+label+(def?'<span class="thic" onclick="tgPop(event,this)">?</span>':'')+'</span>'
+  return '<span class="thwrap">'+label+(def?'<span class="thic" tabindex="0" onclick="tgPop(event,this)">?</span>':'')+'</span>'
     + (def?'<div class="thpop">'+def+'</div>':'');
 }
 function tgPop(e,el){e.stopPropagation();const th=el.closest('th');const o=th.classList.contains('pop-on');
@@ -1358,7 +1717,7 @@ function render(){
   if(state==='loading'){pg.style.display='none';
     el.innerHTML='<div class="tblwrap" style="padding:14px">'+Array(6).fill('<div class="skrow" style="margin:13px 0"></div>').join('')+'</div>';return;}
   if(state==='error'){pg.style.display='none';
-    el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p><button class="btn ghost" onclick="setState(\'default\')">재시도</button></div>';return;}
+    el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p><button class="btn ghost" onclick="setState(\'default\')">다시 시도</button></div>';return;}
   if(state==='empty'){pg.style.display='none';const nm=tab==='A'?'모델 이미지':'원천 가중치';
     el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg><h3>등록된 '+nm+'이(가) 없습니다.</h3><p>모델을 등록하면 목록에 표시됩니다.</p>'+(canWrite()?'<button class="btn" onclick="openReg()">모델 등록</button>':'')+'</div>';return;}
 
@@ -1382,22 +1741,28 @@ function render(){
      /* 배지는 상태만, 수량은 값이다 — 배포 레플리카와 같은 규격 */
      +'<th class="thcell">'+thHelp('cnode','캐싱 노드')+'</th>'
      +'<th class="thcell">'+thFilter('use')+'</th>'
-     +'<th class="thcell">'+thFilter('eng')+'</th>'
+     +'<th class="thcell">'+thHelp('eng','엔진')+'</th>'
      +'<th class="thcell">'+thFilter('gpu')+'</th>'
      +'<th class="thcell">'+thHelp('vram','최소 vRAM')+'</th>'
      +(showWs?'<th>표시 범위</th>':'')+'<th>등록자</th>'+sortTh('at','등록일시')+'<th style="width:64px">작업</th>'
-   : sortTh('n','모델명')+'<th class="thcell">'+thFilter('ready')+'</th><th>경로·출처</th><th>용량</th>'
+   /* 등록 상태는 모델명(버전) 바로 뒤에 둔다(기획서 7.2 `버전` 행 아래). 빌드보다 앞 단계다 */
+   : sortTh('n','모델명')+'<th class="thcell">'+thFilter('reg')+'</th>'
+     +'<th class="thcell">'+thFilter('ready')+'</th><th>경로·출처</th><th>용량</th>'
      +(showWs?'<th>표시 범위</th>':'')+'<th>등록자</th>'+sortTh('at','등록일시')+'<th style="width:64px">작업</th>';
 
-  el.innerHTML='<div class="tblwrap"><table class="tbl"><thead><tr>'+th+'</tr></thead><tbody>'+importRow()+
+  el.innerHTML='<div class="tblwrap"><table class="tbl"><thead><tr>'+th+'</tr></thead><tbody>'+
     d.map(m=>{const idx=(isA?IMG:WGT).indexOf(m);
       const busy = m.ready==='캐싱 중'||m.ready==='빌드 중';
+      const lock = lockMsg(m);
+      const bwhy = isA? '' : buildBlock(m);
       /* 모델 단위에서는 최신 버전과 버전 수를 함께 둔다(npm·MLflow와 같은 형태) */
       const vlabel = (unit==='model' && m._vcnt>1)
         ? '<span class="mver">'+m.v+' · '+m._vcnt+'개 버전</span>'
         : '<span class="mver">'+m.v+'</span>';
       const name='<td><span class="mname">'+m.n+'</span>'+vlabel+'</td>';
-      const rd='<td><span class="stbadge '+RB[m.ready]+(m.ready.indexOf('중')>-1?' load':'')+'"><span class="d"></span>'+m.ready+'</span></td>'
+      const rd=(isA
+          ? '<td><span class="stbadge '+RB[m.ready]+(m.ready.indexOf('중')>-1?' load':'')+'"><span class="d"></span>'+m.ready+'</span></td>'
+          : '<td class="regcell">'+regCell(m,true)+'</td><td>'+buildCell(m)+'</td>')
     /* 이미지 탭에만 둔다. 원천 가중치는 캐싱 대상이 아니다 */
     + (isA? '<td class="num">'+cnCell(m)+'</td>' : '');
       const uv=useOf(m);
@@ -1406,19 +1771,19 @@ function render(){
      어느 배포인지는 호버로 보인다. 목록에 이름을 늘어놓으면 셀이 밀린다(1.2) */
   const mid=isA?'<td>'+useCell(m)+'</td><td>'+m.eng+'</td>'
                    +'<td>'+m.gpu+'</td><td>'+(m.vram==='-'?'<span class="dash">-</span>':m.vram+' GB')+'</td>'
-                   :'<td><span class="path" title="'+m.path+'">'+m.path+'</span></td><td>'+m.size+'</td>';
+                   :'<td><span class="path" title="'+m.path+'">'+m.path+'</span></td><td>'+dv(m.size)+'</td>';
       /* 맨 텍스트로 둔다. 같은 행에 상태 배지가 둘(캐싱·사용) 있어 배지를 더 붙이면
      무엇을 볼지 흐려진다(공통정책 1.9). 값이 `전역` 인지 워크스페이스 이름인지로 갈린다 */
   const ws='<td>'+(m.scope==='전역'? '전역'
       : (m.ws==='-'? '<span class="dash">-</span>' : m.ws))+'</td>';
       /* 목록 행과 패널의 액션 메뉴를 같게 둔다(공통정책 3.6). 수정이 패널에만 있으면
          목록에서 고치려면 패널을 먼저 열어야 한다 */
-      const menu = '<button onclick="editFromRow('+idx+','+isA+')"'+(busy?' disabled title="'+busyMsg(m)+'"':'')+'>기본 정보 수정</button>'
+      const menu = (canEditBasic(m)? '<button onclick="editFromRow('+idx+','+isA+')"'+(lock?' disabled title="'+lock+'"':'')+'>기본 정보 수정</button>' : '')
         + (isA
         ? '<button onclick="openCache(\''+m.n+'\')"'+(busy?' disabled title="'+busyMsg(m)+'"':'')+'>노드 캐싱</button><button onclick="goDeploy(\''+m.n+'\',\''+m.ready+'\')">배포</button>'
-        : '<button onclick="build(\''+m.n+'\')"'+(busy?' disabled title="'+busyMsg(m)+'"':'')+'>이미지 빌드</button>');
+        : '<button onclick="build(\''+m.n+'\')"'+(bwhy?' disabled title="'+bwhy+'"':'')+'>이미지 빌드</button>');
       const act=canWrite()
-        ? '<td onclick="event.stopPropagation()"><div class="more" id="m'+(isA?'i':'w')+idx+'"><button class="morebtn" onclick="tgMore(event,\'m'+(isA?'i':'w')+idx+'\')">⋯</button><div class="rowmenu">'+menu+'<hr><button class="d" onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+','+(m._vcnt||1)+')">삭제</button></div></div></td>'
+        ? '<td onclick="event.stopPropagation()"><div class="more" id="m'+(isA?'i':'w')+idx+'"><button class="morebtn" onclick="tgMore(event,\'m'+(isA?'i':'w')+idx+'\')">⋯</button><div class="rowmenu">'+menu+'<hr><button class="d"'+(m.reg==='등록 중'?' disabled title="'+lock+'"':' onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+','+(m._vcnt||1)+','+isA+')"')+'>삭제</button></div></div></td>'
         : '<td></td>';
       return '<tr onclick="openPanel('+idx+')">'+name+rd+mid+ws+'<td>'+userRef(m.by)+'</td><td>'+m.at+'</td>'+act+'</tr>';
     }).join('')+'</tbody></table></div>';
@@ -1433,7 +1798,8 @@ function setUnit(u,btn){
 }
 function setState(s,btn){state=s;
   if(btn){document.querySelectorAll('#demoBar .st').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
-  render();}
+  /* 상세가 열려 있으면 작업 이력 탭의 빈 상태·로딩·오류도 같은 토글로 본다(검토용 처리) */
+  render(); if(dCur) drawDetail();}
 function setRole(r,btn){
   role=r;
   /* 버튼 없이 호출되는 초기화(setRole('super'))에서도 표시가 맞아야 한다 —
@@ -1484,6 +1850,15 @@ function dv(v){return (v===''||v==='-'||v==null)?'<span class="dash">-</span>':v
 function busyMsg(m){
   return '지금은 '+m.ready+' 상태라 실행할 수 없습니다.';
 }
+/* 기본 정보 수정·삭제를 막는 사유. 캐싱 중·빌드 중에 더해 등록 중도 막는다(모델 정책 3.4·3.5).
+   상태로 잠시 막히는 것이라 비활성 + 사유다. 없으면 빈 문자열 */
+function lockMsg(m){
+  if(m.reg==='등록 중') return '지금은 등록 중 상태라 실행할 수 없습니다.';
+  if(m.ready==='캐싱 중'||m.ready==='빌드 중') return busyMsg(m);
+  return '';
+}
+/* 기본 정보 수정은 전역 모델이면 최고 관리자만 한다(모델 정책 1.1). 권한이라 미노출이다(7.10) */
+const canEditBasic=m=>canWrite() && (m.scope!=='전역' || isSuper());
 
 function openPanel(i){
   document.body.classList.add('panel-on');
@@ -1498,12 +1873,21 @@ function openPanel(i){
     +'<span class="chip">'+(m.scope==='전역'?'전역':'워크스페이스 전용')+'</span>'
     +(isA?'<span class="chip">'+m.eng+'</span>':'');
   document.getElementById('pnMore').style.display=canWrite()?'':'none';
-  document.getElementById('pnActBtn').textContent=isA?'노드 캐싱':'이미지 빌드';
+  /* 기본 정보 수정·삭제는 목록 행 메뉴와 같은 기준이다. 등록 중이면 비활성 + 사유, 전역 모델의 수정은 최고 관리자만 */
+  const plock=lockMsg(m), pe=document.getElementById('pnEditBtn'), pd=document.getElementById('pnDelBtn');
+  pe.style.display=canEditBasic(m)?'':'none'; pe.disabled=!!plock; if(plock) pe.title=plock; else pe.removeAttribute('title');
+  const pdl = m.reg==='등록 중'? plock : ''; pd.disabled=!!pdl; if(pdl) pd.title=pdl; else pd.removeAttribute('title');
+  const pab=document.getElementById('pnActBtn');
+  pab.textContent=isA?'노드 캐싱':'이미지 빌드';
+  /* 패널 메뉴의 이미지 빌드도 목록 행 메뉴와 같은 기준으로 막는다 */
+  const pwhy = isA? '' : buildBlock(m);
+  pab.disabled = !!pwhy;
+  if(pwhy) pab.title = pwhy; else pab.removeAttribute('title');
 
   let h='';
   /* ① 기본 정보 — 식별·귀속 */
   h+=sec('기본 정보',
-      '<div class="desc">'+(isA?'서빙 엔진 드라이버가 결합된 배포용 컨테이너 이미지입니다.':'S3에서 반입한 원천 가중치입니다. 배포하려면 이미지 빌드가 필요합니다.')+'</div>'
+      '<div class="desc">'+(isA?'서빙 엔진 드라이버가 결합된 배포용 컨테이너 이미지입니다.':'저장소에서 가져와 등록한 원천 가중치입니다. 배포하려면 이미지 빌드가 필요합니다.')+'</div>'
     + '<dl class="dl">'
     + '<dt>버전</dt><dd>'+m.v+'</dd>'
     + '<dt>표시 범위</dt><dd>'+(m.scope==='전역'?'전역':'워크스페이스 전용')+'</dd>'
@@ -1541,6 +1925,8 @@ function openPanel(i){
       + '<dt>캐싱된 노드'+help('cnode')+'</dt><dd>'
       +   (m.cn? cnCell(m)+'<span class="mver">'+cnNames(m).join(' · ')+'</span>'
                 : '<span class="dash">-</span>')+'</dd>'
+      /* 빌드한 이미지는 원본 가중치와 상호 링크된다(모델 정책 3.2 · 기획서 7.3). 학습 이력은 그 가중치 버전에서 본다 */
+      + (m.base==='Custom Build'? '<dt>원본 가중치</dt><dd>'+(m.src? '<a href="#" class="mname" onclick="goWgt(\''+m.src+'\');return false">'+m.src+'</a>' : '<span class="dash">-</span>')+'</dd>' : '')
       + '</dl>'
       + (canWrite()?'<div class="secact"><button class="btn ghost sm" '+(busy?'disabled title="'+busyMsg(m)+'"':'')+' onclick="openCache(\''+m.n+'\')">'+(busy?'캐싱 중…':'노드 캐싱')+'</button>'
         +'<button class="btn sm" onclick="goDeploy(\''+m.n+'\',\''+m.ready+'\')">배포</button></div>':'')
@@ -1553,18 +1939,20 @@ function openPanel(i){
     const dps=depsOf(m);
     h+=sec('이 모델을 쓰는 배포',
         (dps.length
-          ? '<div class="linklist">'+dps.map(d=>'<a href="#" onclick="return false"><span class="nm">'+d.n+'<span class="chip" style="margin-left:6px">'+d.ws+'</span></span><span class="stbadge '+RB2[d.st]+'"><span class="d"></span>'+d.st+'</span></a>').join('')+'</div>'
+          ? '<div class="linklist">'+dps.map(d=>'<a href="#" onclick="goDep(\''+d.n+'\');return false"><span class="nm">'+d.n+'<span class="chip" style="margin-left:6px">'+d.ws+'</span></span><span class="stbadge '+RB2[d.st]+'"><span class="d"></span>'+d.st+'</span></a>').join('')+'</div>'
           : '<div class="emptyline">이 모델을 사용하는 배포가 없습니다.</div>'), 'deps');
   }else{
     /* ③ 빌드 준비 — 상태·현황 */
     h+=sec('빌드 준비',
         '<dl class="dl">'
       + '<dt>경로·출처</dt><dd><span class="path" style="max-width:100%">'+m.path+'</span></dd>'
-      + '<dt>용량</dt><dd>'+m.size+'</dd>'
-      + '<dt>빌드 상태</dt><dd><span class="stbadge '+RB[m.ready]+(m.ready.indexOf('중')>-1?' load':'')+'"><span class="d"></span>'+m.ready+'</span></dd>'
+      + '<dt>용량</dt><dd>'+dv(m.size)+'</dd>'
+      /* 등록 상태를 빌드 상태 앞에 둔다. 빌드 상태는 등록됨일 때만 표시한다(기획서 7.3) */
+      + '<dt>등록 상태</dt><dd>'+regCell(m,false)+'</dd>'
+      + '<dt>빌드 상태</dt><dd>'+buildCell(m)+'</dd>'
       + '<dt>빌드 산출 이미지</dt><dd>'+(m.built?'<a href="#" class="mname" onclick="goImg(\''+m.built+'\');return false">'+m.built+'</a>':'<span class="dash">-</span>')+'</dd>'
       + '</dl>'
-      + (canWrite()?'<div class="secact"><button class="btn ghost sm" '+(busy?'disabled title="'+busyMsg(m)+'"':'')+' onclick="build(\''+m.n+'\')">'+(busy?'빌드 중…':'이미지 빌드')+'</button></div>':'')
+      + (canWrite()?'<div class="secact"><button class="btn ghost sm" '+(buildBlock(m)?'disabled title="'+buildBlock(m)+'"':'')+' onclick="build(\''+m.n+'\')">'+(m.ready==='빌드 중'&&regOk(m)?'빌드 중…':'이미지 빌드')+'</button></div>':'')
       + '<div class="secnote">원천 가중치는 배포 대상이 아닙니다. 이미지로 빌드한 뒤 배포할 수 있습니다.</div>', 'ready');
   }
   document.getElementById('pnBody').innerHTML=h;
@@ -1608,14 +1996,29 @@ function closeDetail(){
   document.querySelector('.breadcrumb').innerHTML='<a href="#">콘체르토 플랫폼</a> / <b>모델</b>';
 }
 function setDTab(i){ dTab=i; drawDetail(); }
+/* 데모 바 `바로 보기` — 검토용. 평가 탭은 qwen3-32b(ko-general v3.6·v3.2·v3.1과 long-context 실행 중·실패),
+   작업 이력은 원천 가중치 solar-open-100b(빌드 실패 → 다시 시도)를 연다 */
+function demoGo(k){
+  const isA = k!=='jobs', name = isA? 'qwen3-32b' : 'solar-open-100b';
+  if(tab!==(isA?'A':'B')) setTab(isA?'A':'B');
+  if(state!=='default') setState('default');
+  const i=(isA?IMG:WGT).findIndex(function(x){ return x.n===name; }); if(i<0) return;
+  openDetail(i); setDTab(isA?3:2);
+  /* 이전 버전 비교가 보이는 결과(ko-general v3.6, 직전 v3.2) */
+  if(k==='cmp'){ openEval('A:qwen3-32b', EVALS['A:qwen3-32b'].findIndex(function(e){ return e.suite==='ko-general' && e.v==='v3.6'; })); return; }
+  if(k==='evalfail'){ const j=EVALS['A:qwen3-32b'].findIndex(function(e){ return e.res==='실패'; }); if(j>=0) openEval('A:qwen3-32b',j); }
+}
 function drawDetail(){
   if(!dCur) return;
   const m=dCur.m, isA=dCur.isA;
-  const vers = (m._vers && m._vers.length) ? m._vers : [m];
+  const vers = versOf(m, isA);
   const dps  = depsOf(m);
+  const jobs = jobsOf(m, isA);
 
+  /* 헤더 버전은 지금 버전 목록의 최신 버전이다. 상세에서 버전을 더하거나 지우면 함께 바뀐다 */
+  const vLatest = vers.length? vers[0].v : m.v;
   document.getElementById('dName').innerHTML = m.n
-    + '<span class="ver">'+(vers.length>1 ? m.v+' · '+vers.length+'개 버전' : m.v)+'</span>'
+    + '<span class="ver">'+(vers.length>1 ? vLatest+' · '+vers.length+'개 버전' : vLatest)+'</span>'
     /* 상세에는 컬럼이 없으므로 배지로 밝힌다. 기본 정보 섹션에 워크스페이스가 함께 있다 */
    + (m.scope==='전역'? ' <span class="chip">전역</span>' : ' <span class="chip">전용</span>');
   document.getElementById('dMeta').innerHTML =
@@ -1623,14 +2026,16 @@ function drawDetail(){
   /* 액션은 그 액션이 걸리는 대상 옆에 둔다 — 공통정책에 조항이 없어 화면 주석으로 관리한다.
      `삭제` 는 모델 전체에 걸리므로 화면 헤더, `수정` 은 기본 정보 카드에 걸리므로 그 제목 옆,
      `＋ 버전 추가` 는 버전 목록에 걸리므로 그 탭 줄 우측이다 */
+  const dlock = vers.some(function(x){ return x.reg==='등록 중'; })? '지금은 등록 중 상태라 실행할 수 없습니다.' : '';
   document.getElementById('dAct').innerHTML = canWrite()
-    ? '<button class="btn danger-line" onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+','+(m._vcnt||1)+')">삭제</button>'
+    ? (dlock? '<span class="tip-anchor"><button class="btn danger-line" disabled>삭제</button><span class="tip">'+dlock+'</span></span>'
+            : '<button class="btn danger-line" onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+','+vers.length+','+isA+')">삭제</button>')
     : '';
 
   let h='';
   /* ① 기본 정보 — 모델 속성. 버전과 무관하다 */
   h+='<div class="dsec"><h4>기본 정보'
-   + (canWrite()?'<span class="secbtns"><button class="btn ghost sm" onclick="openEditFrom()">수정</button></span>':'')
+   + (canEditBasic(m)?'<span class="secbtns"><button class="btn ghost sm" onclick="openEditFrom()">수정</button></span>':'')
    + '</h4><div class="dgrid">'
    + kv('모델명', m.n)
    + kv('표시 범위', m.scope + (m.scope==='전역'?'':' · '+m.ws))
@@ -1667,44 +2072,62 @@ function drawDetail(){
   h+='<div class="tabrow"><div class="tabs">'
    + '<button class="'+(dTab===0?'on':'')+'" onclick="setDTab(0)">버전 <span class="cnt">'+vers.length+'</span></button>'
    + '<button class="'+(dTab===1?'on':'')+'" onclick="setDTab(1)">배포 <span class="cnt">'+dps.length+'</span></button>'
+   /* 작업 이력 MODEL-L01.D01.T03 — 실패 건수가 아니라 전체 건수다. 다른 탭과 같은 규격 */
+   + '<button class="'+(dTab===2?'on':'')+'" onclick="setDTab(2)">작업 이력 <span class="cnt">'+jobs.length+'</span></button>'
+   /* 평가 MODEL-L01.D01.T04: 개발룸 평가 작업 결과 중 이 모델에 연결된 것(모델 정책 3.8). 건수 규격은 다른 탭과 같다 */
+   + '<button class="'+(dTab===3?'on':'')+'" onclick="setDTab(3)">평가 <span class="cnt">'+evalsOf(m,isA).length+'</span></button>'
    + '</div>'
    /* 배포 탭에는 항목을 더하는 액션이 없어 우측을 비운다 — 배포는 배포 화면에서 만든다 */
-   + '<div>' + ((dTab===0 && canWrite())
+   /* 버전 추가는 원천 가중치에만 둔다. 이미지는 빌드로만 생긴다(모델 정책 2.3 · REQ-MODEL-039) */
+   + '<div>' + ((dTab===0 && canWrite() && !isA)
        ? '<button class="btn ghost sm" onclick="openVerAdd()">＋ 버전 추가</button>' : '') + '</div>'
    + '</div>';
 
   if(dTab===0){
     h+='<div class="tblwrap"><table class="tbl"><thead><tr>'
-     + '<th>버전</th><th>'+(isA?'캐싱 상태':'빌드 상태')+'</th>'
+     /* 원천 가중치는 캐싱 상태 대신 등록 상태·빌드 상태다(기획서 7.4) */
+     /* 상태 열 도움말은 목록과 같은 정의를 쓴다 */
+     + '<th>버전</th>'+(isA?'<th class="thcell">'+thHelp('ready_A','캐싱 상태')+'</th>':'<th class="thcell">'+thHelp('reg','등록 상태')+'</th><th class="thcell">'+thHelp('ready_B','빌드 상태')+'</th>')
    + (isA?'<th>캐싱 노드</th><th>사용 여부</th>':'')
-     + '<th>저장 경로</th><th>등록자</th><th>등록일시</th><th style="width:64px">작업</th></tr></thead><tbody>'
+     /* 가중치 버전은 소스 경로라 목록과 같은 이름 `경로·출처` 를 쓴다(기획서 7.4) */
+     + '<th>'+(isA?'저장 경로':'경로·출처')+'</th><th>등록자</th><th>등록일시</th><th style="width:64px">작업</th></tr></thead><tbody>'
      + vers.map(function(v,vi){
         const busy = v.ready==='캐싱 중'||v.ready==='빌드 중';
-        return '<tr>'
+        const why = isA? (busy? '지금은 '+v.ready+' 상태라 실행할 수 없습니다.' : '') : buildBlock(v);
+        /* 행을 누르면 버전 상세(D01.T01.M02)가 열린다 */
+        return '<tr onclick="openVerDt('+vi+')">'
          + '<td><span class="mname">'+v.v+'</span></td>'
-         + '<td><span class="stbadge '+RB[v.ready]+(busy?' load':'')+'"><span class="d"></span>'+v.ready+'</span></td>'
+         + (isA? '<td><span class="stbadge '+RB[v.ready]+(busy?' load':'')+'"><span class="d"></span>'+v.ready+'</span></td>'
+               : '<td class="regcell">'+regCell(v,true)+'</td><td>'+buildCell(v)+'</td>')
          /* 버전마다 캐싱 노드가 다르다 */
        + (isA?'<td class="num">'+cnCell(v)+'</td>':'')
        /* 목록과 같은 규칙이다 — 배지는 캐싱 하나만 두고 사용은 건수로 내린다 */
        + (isA?'<td>'+useCell(v)+'</td>':'')
          + '<td><span class="path" title="'+(v.store||v.path||'')+'">'+(v.store||v.path||'-')+'</span></td>'
-         + '<td>'+v.by+'</td><td>'+v.at+'</td>'
-         + '<td>'+(canWrite()
+         + '<td>'+userRef(v.by)+'</td><td>'+v.at+'</td>'
+         + '<td onclick="event.stopPropagation()">'+(canWrite()
              ? '<div class="more" id="vm'+vi+'"><button class="morebtn" onclick="tgMore(event,\'vm'+vi+'\')">⋯</button><div class="rowmenu">'
-               + '<button '+(busy?'disabled title="지금은 '+v.ready+' 상태라 실행할 수 없습니다."':'')+' onclick="act(\''+(isA?'노드 캐싱':'이미지 빌드')+'을 요청했습니다.\')">'+(isA?'노드 캐싱':'이미지 빌드')+'</button>'
-               + (isA?'<button onclick="act(\'배포 화면으로 이동합니다.\')">배포</button>':'')
-               /* 배포에 쓰이는 버전은 삭제할 수 없다(정책 2.5) */
-               + '<hr><button class="d"'+(v.use==='배포 중'?' disabled title="배포에 사용 중인 버전은 삭제할 수 없습니다."':'')
+               /* 목록 행 메뉴와 같은 동작이다. 노드 캐싱은 모달, 빌드는 그 버전, 배포는 미캐싱 사전 안내를 거친다 */
+               + '<button '+(why?'disabled title="'+why+'"':'')+' onclick="'+(isA? 'openCache(\''+v.n+'\',\''+v.v+'\')' : 'build(\''+v.n+'\',false,\''+v.v+'\')')+'">'+(isA?'노드 캐싱':'이미지 빌드')+'</button>'
+               + (isA?'<button onclick="goDeploy(\''+v.n+'\',\''+v.ready+'\')">배포</button>':'')
+               /* 배포에 쓰이는 버전은 삭제할 수 없다(정책 2.5). 등록 중인 버전도 삭제하지 않는다(정책 3.5) */
+               + '<hr><button class="d"'+(v.use==='배포 중'?' disabled title="배포에 사용 중인 버전은 삭제할 수 없습니다."'
+                  : v.reg==='등록 중'? ' disabled title="지금은 등록 중 상태라 실행할 수 없습니다."' : '')
                + ' onclick="delVer(\''+v.v+'\')">삭제</button>'
                + '</div></div>' : '')+'</td></tr>';
        }).join('')
      + '</tbody></table></div>';
+  } else if(dTab===2){
+    h+=jobTab(m, isA, jobs);
+  } else if(dTab===3){
+    h+=evalTab(m, isA);
   } else {
     h+= dps.length
       ? '<div class="tblwrap"><table class="tbl"><thead><tr><th>배포명</th><th>워크스페이스</th><th>상태</th></tr></thead><tbody>'
         + dps.map(function(d){
-            return '<tr><td><span class="mname">'+d.n+'</span></td><td>'+d.ws+'</td>'
-             + '<td><span class="stbadge '+(RB[d.st]||'mu')+'"><span class="d"></span>'+d.st+'</span></td></tr>';
+            /* 배포명을 누르면 그 배포 화면으로 이동한다(기획서 7.4 · 2.1) */
+            return '<tr onclick="goDep(\''+d.n+'\')"><td><span class="mname">'+d.n+'</span></td><td>'+d.ws+'</td>'
+             + '<td><span class="stbadge '+(RB2[d.st]||'mu')+'"><span class="d"></span>'+d.st+'</span></td></tr>';
           }).join('')
         + '</tbody></table></div>'
       : '<div class="state"><h3>이 모델을 쓰는 배포가 없습니다.</h3><p>이 모델을 참조하는 배포가 없습니다.</p></div>';
@@ -1712,6 +2135,430 @@ function drawDetail(){
   document.getElementById('detailBody').innerHTML=h;
 }
 function kv(k,v){ return '<div><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'; }
+
+/* 상세의 버전 목록 — 그릴 때마다 그 모델의 버전을 다시 모은다. 목록을 그릴 때 만든 값을 쓰면
+   상세에서 버전을 더해도 탭에 반영되지 않는다. 버전 단위 보기에서는 그 행 하나다(종전과 같음) */
+function versOf(m, isA){
+  if(unit!=='model') return [m];
+  return scoped(isA?IMG:WGT).filter(function(x){ return x.n===m.n && !x.sys; })
+    .sort(function(a,b){ return String(b.at).localeCompare(String(a.at)); });
+}
+
+/* ===== 작업 이력 MODEL-L01.D01.T03 (모델 정책 4.4 · 기획서 7.4) ===== */
+let jobLoading=false;
+function jobKey(m, isA){ return (isA?'A:':'B:')+m.n; }
+function jobsOf(m, isA){ return JOBS[jobKey(m,isA)] || []; }
+function logJob(m, isA, kind, ver, src, np){
+  const k=jobKey(m,isA); JOBS[k]=JOBS[k]||[];
+  const j={kind:kind,v:ver,st:nowStr(),et:'',res:'진행 중',why:'',src:kind==='등록'?(src||''):'',np:np||0};
+  JOBS[k].push(j); return j;
+}
+function endJob(j){ j.et=nowStr(); j.res='완료'; }
+/* 다시 시도는 실패 행에만 둔다. 같은 버전의 같은 작업이 이후 완료되었거나 진행 중이면 두지 않는다
+   (모델 정책 4.4 · 동일 작업 중복 실행 차단). 권한은 그 작업과 같다 — 뷰어에게는 두지 않는다(7.10) */
+function canRetry(j, list, m){
+  if(j.res!=='실패' || !canWrite()) return false;
+  /* 전역 모델의 등록은 최고 관리자만 한다. 다시 시도도 그 작업의 권한을 따른다(모델 정책 1.1·4.4) */
+  if(j.kind==='등록' && m && m.scope==='전역' && !isSuper()) return false;
+  return !list.some(function(x){
+    return x!==j && x.kind===j.kind && x.v===j.v && x.st>j.st && (x.res==='완료'||x.res==='진행 중');
+  });
+}
+/* 이력 표다. 행 작업은 더보기 메뉴가 아니라 버튼으로 둔다. 배포 실행 이력·감사 로그와 같은 규격(기획서 7.4).
+   실패 사유는 툴팁에 두지 않는다. 툴팁은 항목 설명에 쓰고, 그 건에 무슨 일이 있었는지는
+   실패 행을 눌러 모달로 본다(배포 정책 7.2 · 라이브러리 구분 기준) */
+function jobTab(m, isA, jobs){
+  /* 로딩은 영역 크기를 유지한다(기획서 6장) */
+  if(state==='loading' || jobLoading)
+    return '<div class="tblwrap" style="padding:14px">'+Array(4).fill('<div class="skrow" style="margin:13px 0"></div>').join('')+'</div>';
+  if(state==='error')
+    return '<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p><button class="btn ghost" onclick="setState(\'default\')">다시 시도</button></div>';
+  if(state==='empty' || !jobs.length)
+    return '<div class="state"><h3>작업 이력이 없습니다.</h3><p>등록·빌드·캐싱 작업을 실행하면 표시됩니다.</p></div>';
+  /* 기본 정렬은 시작일시 내림차순(공통정책 3.1) */
+  const order=jobs.map(function(j,i){ return {j:j,i:i}; })
+    .sort(function(a,b){ return String(b.j.st).localeCompare(String(a.j.st)); });
+  const key=jobKey(m,isA);
+  return '<div class="tblwrap"><table class="tbl"><thead><tr>'
+    + '<th>종류</th><th class="thcell">'+thHelp('jres','상태')+'</th><th>버전</th><th>시작일시</th><th>종료일시</th>'
+    + '<th>실패 사유</th><th>경로·출처</th><th style="width:96px">작업</th>'
+    + '</tr></thead><tbody>'
+    + order.map(function(o){
+        const j=o.j, fail=j.res==='실패';
+        return '<tr'+(fail? ' onclick="openJobFail(\''+key+'\','+o.i+')" style="cursor:pointer"' : ' style="cursor:default"')+'>'
+         + '<td>'+j.kind+'</td>'
+         + '<td><span class="stbadge '+JOBB[j.res]+'"><span class="d"></span>'+j.res+'</span></td>'
+         + '<td>'+j.v+'</td><td>'+j.st+'</td><td>'+dv(j.et)+'</td>'
+         /* 장문은 말줄임(공통정책 1.2). 전체는 실패 사유 모달에서 본다 */
+         + '<td>'+(j.why? '<span class="usecell" style="max-width:240px">'+j.why+'</span>' : '<span class="dash">-</span>')+'</td>'
+         /* 경로·출처는 등록 작업의 소스 경로만. 빌드·캐싱은 `-`. 목록의 같은 이름 열과 같은 처리(1.2) */
+         + '<td>'+(j.kind==='등록' && j.src? '<span class="path" title="'+j.src+'">'+j.src+'</span>' : '<span class="dash">-</span>')+'</td>'
+         + '<td onclick="event.stopPropagation()">'+(canRetry(j,jobs,m)? '<button class="btn ghost sm" onclick="retryJob(\''+key+'\','+o.i+')">다시 시도</button>' : '')+'</td>'
+         + '</tr>';
+      }).join('')
+    + '</tbody></table></div>';
+}
+/* 실패 사유 MODEL-L01.D01.T03.M01. 어느 작업인지와 사유 전체. 다시 시도는 목록에서 보일 때만 둔다 */
+let jfKey='', jfIdx=-1;
+function jobOwner(key){
+  const isA=key.indexOf('A:')===0, name=key.slice(2);
+  return (isA?IMG:WGT).find(function(x){ return x.n===name; });
+}
+function openJobFail(key, i){
+  const j=(JOBS[key]||[])[i]; if(!j) return;
+  jfKey=key; jfIdx=i;
+  document.getElementById('jfSub').textContent=j.kind+' · '+j.v+' · '+(j.et||'-');
+  document.getElementById('jfBody').innerHTML='<div class="sec"><dl class="dl">'
+    + '<dt>종류</dt><dd>'+j.kind+'</dd><dt>버전</dt><dd>'+j.v+'</dd>'
+    + '<dt>시작일시</dt><dd>'+j.st+'</dd><dt>종료일시</dt><dd>'+dv(j.et)+'</dd>'
+    + '<dt>실패 사유</dt><dd>'+dv(j.why)+'</dd></dl></div>';
+  const can=canRetry(j, JOBS[key], jobOwner(key));
+  document.getElementById('jfFoot').innerHTML='<button class="btn ghost" onclick="closeJobFail()">닫기</button>'
+    + (can? '<button class="btn" onclick="closeJobFail();retryJob(\''+key+'\','+i+')">다시 시도</button>' : '');
+  document.getElementById('mdJobFail').classList.add('on');
+}
+function closeJobFail(){ document.getElementById('mdJobFail').classList.remove('on'); }
+/* 다시 시도 — 같은 입력으로 다시 실행한다. 이전 실패 행은 지우지 않고 새 행으로 쌓는다(기획서 3장 작업 다시 시도) */
+function retryJob(key, i){
+  const j=(JOBS[key]||[])[i]; if(!j) return;
+  const isA=key.indexOf('A:')===0, name=key.slice(2);
+  const m=(isA?IMG:WGT).find(function(x){ return x.n===name && x.v===j.v; }) || (isA?IMG:WGT).find(function(x){ return x.n===name; });
+  if(!m) return;
+  toast('ok','다시 시도를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.');
+  jobLoading=true; drawDetail();
+  setTimeout(function(){
+    jobLoading=false;
+    /* 처음과 같은 입력으로 다시 실행한다(모델 정책 4.4). 버전과 캐싱 노드 수를 이력에서 가져온다 */
+    if(j.kind==='등록') startImport(m);
+    else if(j.kind==='빌드') build(m.n, true, j.v);
+    else runCache(m, j.np||1);
+    refresh();
+  }, 600);
+}
+/* 상태가 바뀌면 목록·상세·패널을 함께 다시 그린다 */
+function refresh(){
+  render();
+  if(dCur) drawDetail();
+  if(cur && document.getElementById('panel').classList.contains('on') && cur.isA===(tab==='A'))
+    openPanel((cur.isA?IMG:WGT).indexOf(cur.m));
+}
+
+/* ===== 레이더 차트 (라이브러리 v0.23) =====
+   tasks = [[이름, 점수]]. 점수가 없거나 0~100 을 벗어나면 화면에는 `-`, 차트에서는 0 에 둔다(기획서 5.1).
+   태스크가 2개 이하면 다각형이 생기지 않아 차트를 그리지 않는다: 호출하는 쪽이 목록만 둔다 */
+function scoreOk(s){ return typeof s==='number' && isFinite(s) && s>=0 && s<=100; }
+function scoreTxt(s){ return scoreOk(s)? s.toFixed(1)+' / 100' : '-'; }
+function radarSvg(tasks, prev){
+  const n=tasks.length, cx=150, cy=124, R=84;
+  const pt=function(i,r){ const a=-Math.PI/2+i*2*Math.PI/n; return [cx+r*Math.cos(a), cy+r*Math.sin(a)]; };
+  const ring=function(f){ return tasks.map(function(_,i){ return pt(i,R*f).map(function(x){return x.toFixed(1);}).join(','); }).join(' '); };
+  let s='<svg class="radar" viewBox="0 0 300 250">';
+  [0.25,0.5,0.75,1].forEach(function(f){ s+='<polygon class="grid" points="'+ring(f)+'"/>'; });
+  tasks.forEach(function(_,i){ const p=pt(i,R); s+='<line class="axis" x1="'+cx+'" y1="'+cy+'" x2="'+p[0].toFixed(1)+'" y2="'+p[1].toFixed(1)+'"/>'; });
+  /* 눈금 값은 50·100 둘만 둔다. 넷을 다 적으면 첫 축 위 글자가 겹친다 */
+  s+='<text class="tk" x="'+(cx+4)+'" y="'+(cy-R*0.5+3)+'">50</text><text class="tk" x="'+(cx+4)+'" y="'+(cy-R+3)+'">100</text>';
+  const val=function(t){ return scoreOk(t[1])? t[1] : 0; };
+  /* 이전 버전(v0.35 검토): 같은 태스크 순서로 흐린 점선 다각형을 먼저 그린다 */
+  if(prev) s+='<polygon class="area prev" points="'+tasks.map(function(t,i){ const q=prevScore(prev,t[0]); return pt(i,R*(scoreOk(q)?q:0)/100).map(function(x){return x.toFixed(1);}).join(','); }).join(' ')+'"/>';
+  s+='<polygon class="area" points="'+tasks.map(function(t,i){ return pt(i,R*val(t)/100).map(function(x){return x.toFixed(1);}).join(','); }).join(' ')+'"/>';
+  tasks.forEach(function(t,i){
+    const p=pt(i,R*val(t)/100), l=pt(i,R+16);
+    const anc = Math.abs(l[0]-cx)<6? 'middle' : (l[0]>cx? 'start':'end');
+    s+='<text class="lb" x="'+l[0].toFixed(1)+'" y="'+(l[1]+4).toFixed(1)+'" text-anchor="'+anc+'">'+t[0]+'</text>'
+     + '<circle class="pt" r="3.5" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'"/>'
+     /* 꼭짓점이 작아 맞히기 어렵다. 보이지 않는 넓은 원으로 호버를 받는다 */
+     + '<circle class="hit" r="11" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" data-i="'+i+'"'
+     + ' onmouseenter="rdHover(this)" onmouseleave="rdOut(this)"/>';
+  });
+  /* 이전 버전이 있으면 범례를 둔다. 선 모양(실선·점선)으로 가른다. 색만으로 가르지 않는다 */
+  /* 범례: 라이브러리 `차트 범례`. 오른쪽 위 모서리, 두 번째 계열은 점선. 선 모양으로 가르고 색만으로 가르지 않는다 */
+  const lg = prev? '<div class="lgd"><span><i></i>'+RD_CURV+'</span><span class="s2"><i></i>'+prev.v+'</span></div>' : '';
+  return '<div class="radarwrap">'+s+'</svg>'+lg+'<div class="ctip" style="display:none"></div></div>';
+}
+let RD_TASKS=[], RD_PREV=null, RD_CURV='';
+function rdHover(el){
+  const wrap=el.closest('.radarwrap'), tip=wrap.querySelector('.ctip'), i=+el.getAttribute('data-i'), t=RD_TASKS[i];
+  if(!t) return;
+  wrap.querySelectorAll('.pt').forEach(function(c,k){ c.classList.toggle('on', k===i); });
+  /* 이전 버전이 있으면 말풍선에 두 버전 값과 증감을 함께 보인다 */
+  const q=RD_PREV? prevScore(RD_PREV,t[0]) : null;
+  tip.innerHTML='<b>'+t[0]+'</b><span>'+(RD_PREV? RD_CURV+' '+scoreTxt(t[1])+'<br>'+RD_PREV.v+' '+(scoreOk(q)? scoreTxt(q) : '-')
+      +(scoreOk(q)&&scoreOk(t[1])? (function(d){ return d===0? ' · 변화 없음' : ' · '+(d>0?'\u25b2 ':'\u25bc ')+Math.abs(d).toFixed(1); })(Math.round((t[1]-q)*10)/10) : '') : scoreTxt(t[1]))+'</span>';
+  tip.style.display='block';
+  const wr=wrap.getBoundingClientRect(), er=el.getBoundingClientRect();
+  let x=er.left-wr.left+er.width/2+10, y=er.top-wr.top-8;
+  if(x+tip.offsetWidth>wr.width-4) x=er.left-wr.left-tip.offsetWidth-6;
+  tip.style.left=x+'px'; tip.style.top=Math.max(4,y)+'px';
+}
+function rdOut(el){
+  const wrap=el.closest('.radarwrap');
+  wrap.querySelector('.ctip').style.display='none';
+  wrap.querySelectorAll('.pt').forEach(function(c){ c.classList.remove('on'); });
+}
+/* 점수 영역: 차트(3개 이상일 때)와 점수 목록을 함께 그린다 */
+function scoreBlock(tasks, prev, curV){
+  RD_TASKS=tasks; RD_PREV=cmpOn? prev : null; RD_CURV=curV||'';
+  const on = cmpOn && !!prev;
+  /* 증감 막대 길이는 이 결과의 가장 큰 증감을 끝으로 맞춘다. 가운데가 0 */
+  const maxAbs = on? Math.max(0.1, ...tasks.map(function(t){ const q=prevScore(prev,t[0]); return scoreOk(q)&&scoreOk(t[1])? Math.abs(t[1]-q) : 0; })) : 1;
+  const dl=function(t){
+    const q=prevScore(prev,t[0]);
+    if(!scoreOk(q) || !scoreOk(t[1])) return '<dd class="dcell"><span class="dash">-</span></dd>';
+    const d=Math.round((t[1]-q)*10)/10, w=Math.min(50, Math.abs(d)/maxAbs*50);
+    const bar='<span class="dbar"><i class="'+(d>=0?'up':'dn')+'" style="width:'+w.toFixed(1)+'%;'+(d>=0?'left:50%':'right:50%')+'"></i></span>';
+    return '<dd class="dcell">'+bar+(d===0? '<span class="dlt">변화 없음</span>'
+      : '<span class="dlt '+(d>0?'up':'dn')+'">'+(d>0?'\u25b2 ':'\u25bc ')+Math.abs(d).toFixed(1)+'</span>')+'</dd>';
+  };
+  /* 무엇과 비교했는지는 열 머리로 밝힌다. 점선이 무엇인지는 범례가 밝힌다. 따로 설명 문장을 두지 않는다 */
+  const head = on? '<div class="schead"><span></span><span>'+RD_CURV+'</span><span>'+prev.v+' 대비</span></div>' : '';
+  return (tasks.length>=3? radarSvg(tasks, on? prev : null) : '') + head
+    + '<dl class="scorelist'+(on?' cmp':'')+'">'+tasks.map(function(t){ return '<dt>'+t[0]+'</dt><dd>'+(scoreOk(t[1])? scoreTxt(t[1]) : '<span class="dash">-</span>')+'</dd>'+(on? dl(t) : ''); }).join('')+'</dl>'
+    /* 이전 결과가 없을 때만 한 줄로 알린다(기획서 7.4) */
+    + (cmpOn && !prev? '<p class="cmpnone">비교할 이전 버전 결과가 없습니다.</p>' : '');
+}
+/* ── 이전 버전 비교(MODEL-L01 7.4 · 모델 정책 3.8) ──
+   이전 버전 = 모델 버전 등록 순서상 바로 앞 버전부터 거슬러 올라가, 같은 평가명의 완료 결과가 있는 첫 버전.
+   그 버전에 결과가 여럿이면 가장 최근 것. 화면에서 계산하며 백엔드 추가는 없다 */
+const cmpOn=true;   /* 평가 결과 모달은 항상 이전 버전과 비교한다(MODEL-L01 7.4) */
+function prevOf(key, e){
+  const isA=key.indexOf('A:')===0, m=(isA?IMG:WGT).find(function(x){ return x.n===key.slice(2); });
+  const vs=m? versOf(m,isA).map(function(v){ return v.v; }) : [];   /* 등록일시 내림차순 = 최신 버전이 먼저 */
+  const at=vs.indexOf(e.v);
+  for(let k=at+1; k>0 && k<vs.length; k++){
+    const hit=(EVALS[key]||[]).filter(function(x){ return x.suite===e.suite && x.res==='완료' && x.v===vs[k]; })
+      .sort(function(a,b){ return String(b.at).localeCompare(String(a.at)); })[0];
+    if(hit) return hit;
+  }
+  return null;
+}
+function prevScore(prev, name){ const t=prev.tasks.filter(function(x){ return x[0]===name; })[0]; return t? t[1] : null; }
+/* 원본 지표: 평가 도구가 남긴 값. 장문이라 접어 두고 코드 블록으로 둔다(공통정책 1.2) */
+function rawBlock(raw, label){
+  label = label || '원본 지표';
+  return '<details class="adv"><summary>'+label+'<span class="fold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></summary>'
+    + '<div class="advbody rawwrap"><pre class="rawbox">'+raw+'</pre>'
+    /* 복사 — 보고서·외부 비교에 붙여 쓰는 값이다. 부가 동작이라 아이콘으로 둔다(배포 목업 copyBtn · 라이브러리 .cbtn) */
+    + '<button class="cbtn sm rawcp" title="복사" onclick="cpRaw(this,\''+label+'\')">'
+    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 011-1h10"/></svg></button></div></details>';
+}
+/* 원본 그대로 복사한다. 토스트 문구는 배포 목업 복사와 같은 꼴(공통정책 7.7 완료형) */
+function cpRaw(btn, label){
+  const pre = btn.parentNode.querySelector('pre');
+  try{ navigator.clipboard && navigator.clipboard.writeText(pre.textContent); }catch(e){}
+  toast('ok', label+'를 복사했습니다.');
+}
+
+
+/* ===== 평가 MODEL-L01.D01.T04 (모델 정책 3.8 · 기획서 7.4) =====
+   개발룸 평가 작업 결과 중 이 모델에 연결된 것만 모은다. 화면에서 입력·수정·삭제하지 않는다(REQ-MODEL-073).
+   키는 `탭:모델명`. 버전은 평가한 모델 버전이다: 평가 API 에 버전 값이 아직 없어 저장을 요청한 상태다(CON-596 회신).
+   tasks 는 제출할 때 정한 태스크라 대기·실행 중에도 이름이 있다. 점수는 완료일 때만 채운다.
+   표본: qwen3-32b: 버전 셋 견주기 + 실행 중·실패 / gpt-oss-120b: 범위 밖 점수 1건(-) + 대기 /
+   llama-3.2-1b: 태스크 2개라 차트 없이 목록만 + 점수 빈 값 1건 */
+const E=function(suite,v,tasks,res,by,at,job,why){ return {suite:suite,v:v,tasks:tasks,res:res,by:by,at:at,job:job,why:why||''}; };
+const EVALS={
+ 'A:qwen3-32b':[
+   E('ko-general','v3.6',[['KMMLU',63.8],['KoBEST',81.2],['HAE-RAE',72.5],['MMLU',75.1],['GSM8K',84.0]],'완료','성유진(yj.seong)','2026-08-22 10:12:40','job-20260822-02'),
+   E('ko-general','v3.2',[['KMMLU',60.4],['KoBEST',78.9],['HAE-RAE',69.0],['MMLU',73.8],['GSM8K',80.2]],'완료','성유진(yj.seong)','2026-06-12 09:40:11','job-20260612-01'),
+   E('ko-general','v3.1',[['KMMLU',57.9],['KoBEST',76.0],['HAE-RAE',66.4],['MMLU',72.9],['GSM8K',77.5]],'완료','유지현(jh.yu)','2026-04-03 15:22:08','job-20260403-02'),
+   E('long-context','v3.6',[['LongBench',null],['RULER',null],['InfiniteBench',null]],'실행 중','성유진(yj.seong)','2026-08-23 14:05:09','job-20260823-01'),
+   E('long-context','v3.2',[['LongBench',null],['RULER',null],['InfiniteBench',null]],'실패','성유진(yj.seong)','2026-06-13 11:30:52','job-20260613-04','')
+ ],
+ 'A:gpt-oss-120b':[
+   E('ko-general','latest',[['KMMLU',58.1],['KoBEST',104.2],['HAE-RAE',66.3],['MMLU',79.9]],'완료','관리자(admin)','2026-06-11 08:55:30','job-20260611-02'),
+   E('code','latest',[['HumanEval',null],['MBPP',null],['LiveCodeBench',null]],'대기','관리자(admin)','2026-08-24 09:01:17','job-20260824-01')
+ ],
+ 'B:llama-3.2-1b':[
+   E('cs-faq-ko','latest',[['정답률',64.0],['KoBEST',null]],'완료','성유진(yj.seong)','2026-06-12 18:20:44','job-20260612-04')
+ ]
+};
+/* 상태값은 개발룸 작업 상태와 같은 말을 쓴다(공통정책 2.3·5.1) */
+const EVB={'대기':'mu','실행 중':'ac load','완료':'ok','실패':'cr'};
+function evKey(m,isA){ return (isA?'A:':'B:')+m.n; }
+function evalsOf(m,isA){ return EVALS[evKey(m,isA)]||[]; }
+/* 정렬: 제출일시(기본, 내림차순)와 모델 버전 둘. 버전으로 정렬해 버전끼리 견준다(REQ-MODEL-072).
+   다른 목록과 같이 정렬 열은 둘만 둔다 */
+let evSortK='at', evSortD='desc';
+function evSort(k){ if(evSortK===k) evSortD=evSortD==='asc'?'desc':'asc'; else { evSortK=k; evSortD=k==='at'?'desc':'asc'; } drawDetail(); }
+function evTh(k,label){ const on=evSortK===k; return '<th class="sortable" onclick="evSort(\''+k+'\')">'+label+(on?' <span class="sar">'+(evSortD==='asc'?'▲':'▼')+'</span>':'')+'</th>'; }
+/* 개발룸 작업 상세로 이동한다. 목업은 화면이 하나라 토스트로 보인다: 실제 화면에는 없는 검토용 처리다 */
+function goJob(id){ toast('ok', id+' 작업 상세로 이동합니다.'); }
+/* 실패한 평가의 원인 확인 경로: 개발룸 작업 상세로 가서 로그를 연다. 목업은 토스트로 대신한다 */
+function goJobLog(id){ toast('ok', id+' 작업 상세에서 로그를 엽니다.'); }
+/* 개발룸 작업 상세는 관리자 이상은 전체, 그 외에는 본인 작업만 본다(CDE 정책 4.5). 평가 결과는 워크스페이스 전체가
+   보므로 남의 작업이면 들어갈 수 없는 화면으로 보내게 된다. 볼 수 있는 작업만 링크로 두고 그 외는 텍스트다.
+   목업의 현재 사용자는 성유진(yj.seong) */
+function canSeeJob(e){ return role==='super' || role==='admin' || e.by.indexOf('(yj.seong)')>=0; }
+function jobLink(e){ return canSeeJob(e)? '<a class="lnk" href="#" onclick="goJob(\''+e.job+'\');return false">'+e.job+'</a>' : e.job; }
+function evalTab(m, isA){
+  /* 탭 상단 안내: 보존 기간과 서빙 성능을 보는 자리(REQ-MODEL-082). 벤치마크 결과 모달의 모니터링 안내와 같은 꼴 */
+  /* 탭 상단 안내 박스를 두지 않는다. 항상 같은 내용은 알림 박스가 아니라 툴팁이다(라이브러리 `툴팁 · hint · 알림 박스 구분`) */
+  const note='';
+  if(state==='loading')
+    return note+'<div class="tblwrap" style="padding:14px">'+Array(4).fill('<div class="skrow" style="margin:13px 0"></div>').join('')+'</div>';
+  if(state==='error')
+    return note+'<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p><button class="btn ghost" onclick="setState(\'default\')">다시 시도</button></div>';
+  const list=evalsOf(m,isA);
+  if(state==='empty' || !list.length)
+    return note+'<div class="state"><h3>평가 결과가 없습니다.</h3><p>개발룸에서 평가 작업을 실행하면 표시됩니다.</p></div>';
+  const key=evKey(m,isA), dir=evSortD==='asc'?1:-1;
+  const order=list.map(function(e,i){ return {e:e,i:i}; }).sort(function(a,b){
+    const x=String(a.e[evSortK]), y=String(b.e[evSortK]);
+    return (x.localeCompare(y,'ko',{numeric:true})||String(b.e.at).localeCompare(String(a.e.at)))*(x===y?1:dir);
+  });
+  /* 입력·수정·삭제 진입점이 없어 작업 열을 두지 않는다. 개발룸 작업 열은 이동 링크다 */
+  return note+'<div class="tblwrap"><table class="tbl"><thead><tr>'
+    + '<th class="thcell">'+thHelp('esuite','평가명')+'</th><th class="thcell">'+thHelp('eres','상태')+'</th>'+evTh('v','모델 버전')+'<th>태스크</th>'
+    + '<th>제출자</th>'+evTh('at','제출일시')+'<th class="thcell">'+thHelp('ejob','개발룸 작업')+'</th>'
+    + '</tr></thead><tbody>'
+    + order.map(function(o){
+        const e=o.e, names=e.tasks.map(function(t){ return t[0]; }).join(' · ');
+        return '<tr onclick="openEval(\''+key+'\','+o.i+')">'
+         + '<td><span class="mname">'+e.suite+'</span></td>'
+         + '<td><span class="stbadge '+EVB[e.res]+'"><span class="d"></span>'+e.res+'</span></td>'
+         + '<td>'+e.v+'</td>'
+         /* 장문은 말줄임 + 호버 전체(공통정책 1.2) */
+         + '<td><span class="usecell" style="max-width:220px" title="'+names+'">'+names+'</span></td>'
+         + '<td>'+userRef(e.by)+'</td><td>'+e.at+'</td>'
+         + '<td onclick="event.stopPropagation()">'+jobLink(e)+'</td>'
+         + '</tr>';
+      }).join('')
+    + '</tbody></table></div>';
+}
+/* 평가 결과 MODEL-L01.D01.T04.M01: 레이더 차트 · 태스크별 점수 · 원본 지표(기본 접힘).
+   실패는 사유만, 대기·실행 중은 끝나면 표시된다는 안내만 둔다(기획서 6장) */
+function rawOf(e){
+  return '{\n'+e.tasks.map(function(t){ return '  "'+t[0].toLowerCase()+'": {"score": '+(t[1]==null?'null':t[1])+'}'; }).join(',\n')+'\n}';
+}
+let evCur=null;
+function openEval(key, i){
+  const e=(EVALS[key]||[])[i]; if(!e) return;
+  evCur={key:key, i:i};
+  document.getElementById('evTitle').textContent=e.suite;
+  document.getElementById('evSub').textContent=e.v+' · '+e.at;
+  let b='<div class="sec"><dl class="dl">'
+    + '<dt>상태</dt><dd><span class="stbadge '+EVB[e.res]+'"><span class="d"></span>'+e.res+'</span></dd>'
+    + '<dt>제출자</dt><dd>'+userRef(e.by)+'</dd>'
+    + '<dt>개발룸 작업'+help('ejob')+'</dt><dd>'+jobLink(e)+'</dd></dl></div>';
+  if(e.res==='실패')
+    /* 평가 결과에는 실패 사유 값이 없다(CON-527). 원인은 개발룸 작업 로그에 있다. 조건부·조치 가능이라 알림 박스(crit)이고,
+       작업 상세를 볼 수 있는 사람에게만 경로를 붙인다(공통정책 7.6·7.9·7.10) */
+    b+='<div class="sec"><div class="alertbox crit" style="margin:0">'
+      + '<svg class="aic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>'
+      + '<div class="atx"><b>평가를 완료하지 못했습니다.</b>'+(canSeeJob(e)? '원인은 작업 로그에서 확인할 수 있습니다.'
+          + '<div class="aact"><button class="btn ghost sm" onclick="goJobLog(\''+e.job+'\')">작업 로그 보기<span class="ar">→</span></button></div>' : '')
+      + '</div></div></div>';
+  else if(e.res!=='완료')
+    b+='<div class="sec"><h4>점수</h4><p class="secnote" style="margin:0">평가가 끝나면 표시됩니다.</p></div>';
+  else
+    b+='<div class="sec"><h4>점수</h4>'+scoreBlock(e.tasks, prevOf(key,e), e.v)+'</div>'+rawBlock(rawOf(e));
+  document.getElementById('evBody').innerHTML=b;
+  document.getElementById('mdEval').classList.add('on');
+}
+function closeEval(){ evCur=null; document.getElementById('mdEval').classList.remove('on'); }
+
+/* ===== 학습 이력 (모델 정책 3.7) ===== */
+const LIN_F=[
+  ['o','원본 모델','예) meta-llama/Llama-3.2-1B'],
+  ['dn','데이터셋 이름','예) cs-faq-ko'],
+  ['dv','데이터셋 버전','예) v3'],
+  ['job','학습 작업','예) job-20260820-01']
+];
+function linHas(l){ return !!l && LIN_F.some(function(f){ return !!l[f[0]]; }); }
+/* 입력 칸. ro = 작업 산출물에서 채운 값(읽기 전용) */
+function linFields(pre, l, ro, onInput){
+  return LIN_F.map(function(f,i){
+    const val=(l && l[f[0]])||'';
+    return '<div class="f"'+(i===LIN_F.length-1?' style="margin-bottom:0"':'')+'>'
+      + '<label>'+f[1]+'</label>'
+      + '<input class="inp" id="'+pre+'Lin_'+f[0]+'" value="'+val+'"'+(ro?' readonly':' placeholder="'+f[2]+'"')
+      + (onInput?' oninput="'+onInput+'"':'')+'></div>';
+  }).join('');
+}
+/* 등록·버전 추가의 접힘 블록. 작업 산출물 진입이면 펼치고 채운 읽기 전용(기획서 REQ-MODEL-070) */
+function drawLinBlock(pre, l, ro){
+  const el=document.getElementById(pre+'Lin'); if(!el) return;
+  el.open = !!ro;
+  el.innerHTML='<summary>학습 이력(선택)<span class="fold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></summary>'
+    + '<div class="advbody">'
+    + '<div class="hint" style="margin:0 0 12px">'+(ro
+        ? '개발룸 작업에 기록된 값으로 채워집니다. 바꿀 수 없습니다.'
+        : '이 버전이 어떤 모델과 데이터로 학습되었는지 기록합니다. 비워 두어도 등록됩니다.')+'</div>'
+    + linFields(pre, l, ro) + '</div>';
+}
+function readLin(pre, from){
+  if(from) return Object.assign({}, from);
+  const l={src:'direct'};
+  LIN_F.forEach(function(f){ const el=document.getElementById(pre+'Lin_'+f[0]); l[f[0]]=el? el.value.trim() : ''; });
+  return linHas(l)? l : null;
+}
+
+/* ===== 버전 상세 MODEL-L01.D01.T01.M02 (기획서 REQ-MODEL-034 · 7.4) ===== */
+let vdCur=null, vdEdit=false;
+function openVerDt(vi){
+  if(!dCur) return;
+  const v=versOf(dCur.m, dCur.isA)[vi]; if(!v) return;
+  vdCur=v; vdEdit=false; drawVerDt();
+  document.getElementById('mdVerDt').classList.add('on');
+}
+/* 학습 이력 수정 — 작업 산출물에서 채운 값이 아니면, 비어 있는 버전도 그 모델의 등록 권한이 있는
+   사용자에게 둔다. 전역 모델은 최고 관리자만(모델 정책 3.7·7장). 작업 산출물에서 채운 값은 고치지 않는다.
+   비워 두고 등록한 버전을 나중에 채울 수 있어야 작업 산출물과 이어지지 않은 모델도 이력이 남는다 */
+function canEditLin(v){
+  return !dCur.isA && canWrite() && (v.scope!=='전역' || isSuper())
+      && !(v.lin && v.lin.src==='job');
+}
+function drawVerDt(){
+  const v=vdCur, isA=dCur.isA;
+  document.getElementById('vdTitle').textContent='버전 상세';
+  document.getElementById('vdSub').textContent=v.n+' · '+v.v;
+  let h='<div class="sec"><h4 style="cursor:default">기본 정보</h4><dl class="dl">'
+    + '<dt>버전</dt><dd>'+v.v+'</dd>'
+    + '<dt>변경 사유</dt><dd>'+dv(v.reason)+'</dd>'
+    /* 설명은 모델 속성이라 버전마다 따로 두지 않는다. 고치는 곳은 기본 정보 수정이다 */
+    + '<dt>설명</dt><dd>'+(isA?'서빙 엔진 드라이버가 결합된 배포용 컨테이너 이미지입니다.':'저장소에서 가져와 등록한 원천 가중치입니다. 배포하려면 이미지 빌드가 필요합니다.')+'</dd>'
+    /* 이미지 버전은 원본 가중치로 가는 링크를 둔다. 학습 이력은 그 가중치 버전에서 본다(모델 정책 3.7) */
+    + (isA && v.base==='Custom Build'? '<dt>원본 가중치</dt><dd>'+(v.src? '<a href="#" class="mname" onclick="goWgt(\''+v.src+'\');return false">'+v.src+'</a>' : '<span class="dash">-</span>')+'</dd>' : '')
+    + '<dt>등록자</dt><dd>'+userRef(v.by)+'</dd>'
+    + '<dt>등록일시</dt><dd>'+v.at+'</dd>'
+    + '</dl></div>';
+  /* 학습 이력은 원천 가중치 버전에만 둔다. 빌드된 이미지는 원본 가중치와 상호 링크되므로
+     가중치 버전에서 본다(모델 정책 3.7) */
+  if(!isA){
+    const l=v.lin||{};
+    h+='<div class="sec"><h4 style="cursor:default">학습 이력'
+      + (!vdEdit && canEditLin(v)? '<button class="btn ghost sm" style="margin-left:auto" onclick="editLin()">수정</button>' : '')
+      + '</h4>'
+      + (vdEdit
+          ? linFields('vd', l, false, 'linDirty()')
+          : '<dl class="dl">'+LIN_F.map(function(f){ return '<dt>'+f[1]+'</dt><dd>'+dv(l[f[0]])+'</dd>'; }).join('')+'</dl>'
+            + (l.src==='job'? '<div class="secnote">개발룸 작업에 기록된 값입니다. 수정할 수 없습니다.</div>' : ''))
+      + '</div>';
+  }
+  document.getElementById('vdBody').innerHTML=h;
+  document.getElementById('vdFoot').innerHTML = vdEdit
+    ? '<button class="btn ghost" onclick="cancelLin()">취소</button><button class="btn" id="vdSave" disabled onclick="saveLin()">저장</button>'
+    : '<button class="btn ghost" onclick="closeVerDt()">닫기</button>';
+}
+function closeVerDt(){ vdCur=null; vdEdit=false; document.getElementById('mdVerDt').classList.remove('on'); }
+function editLin(){ vdEdit=true; drawVerDt(); }
+function linChanged(){
+  const now=readLin('vd')||{}, was=vdCur.lin||{};
+  return LIN_F.some(function(f){ return (now[f[0]]||'')!==(was[f[0]]||''); });
+}
+/* 저장은 변경이 하나 이상일 때 활성(공통정책 7.1) */
+function linDirty(){ const b=document.getElementById('vdSave'); if(b) b.disabled=!linChanged(); }
+/* 작성 취소 확인은 바뀐 값이 있을 때만 띄운다(공통정책 7.2 · 기본 정보 수정과 같은 처리) */
+function cancelLin(){
+  if(linChanged()){ openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.', function(){ vdEdit=false; drawVerDt(); },'취소','계속 작성'); return; }
+  vdEdit=false; drawVerDt();
+}
+function saveLin(){
+  const l=readLin('vd');
+  vdCur.lin = l || {src:'direct'};
+  vdEdit=false; drawVerDt();
+  toast('ok','수정했습니다.');
+}
 function expandDetail(){ if(cur) openDetail((cur.isA?IMG:WGT).indexOf(cur.m)); }
 function openEditFrom(){ if(dCur){ cur=dCur; openEdit(); } }
 /* 목록 행 메뉴에서 바로 수정한다. 패널을 열지 않아도 대상이 정해진다 */
@@ -1724,11 +2571,13 @@ function editFromRow(i, isA){
 function openVerAdd(){
   if(!dCur) return;
   document.getElementById('vName').value = dCur.m.n;
-  ['vPath','vVer','vTok'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['vPath','vVer','vTok','vReason'].forEach(function(id){ document.getElementById(id).value=''; });
   ['vPathErr','vVerErr'].forEach(function(id){ document.getElementById(id).style.display='none'; });
   srcOpts('vSrc');
   document.getElementById('vSrc').value = GS_ON? 'S3' : 'HuggingFace';
   onVSrcChange();
+  /* 학습 이력은 버전 단위다(모델 정책 3.7). 버전 추가에도 같은 접힘 블록을 둔다 */
+  drawLinBlock('v', null, false);
   document.getElementById('mdVer').classList.add('on');
   verValid();
 }
@@ -1787,8 +2636,8 @@ function setGs(on,btn){
 function verDup(){
   if(!dCur) return false;
   const v=document.getElementById('vVer').value.trim();
-  const vers=(dCur.m._vers&&dCur.m._vers.length)?dCur.m._vers:[dCur.m];
-  return !!v && vers.some(function(x){ return x.v===v; });
+  /* 지금 버전 목록으로 본다. 상세에서 방금 더한 버전도 중복으로 잡는다 */
+  return !!v && versOf(dCur.m, dCur.isA).some(function(x){ return x.v===v; });
 }
 function verValid(){
   const p=document.getElementById('vPath').value.trim();
@@ -1808,8 +2657,22 @@ function verBlur(id){
 }
 function submitVer(){
   const v=document.getElementById('vVer').value.trim();
+  const path=document.getElementById('vPath').value.trim();
+  const tok=document.getElementById('vTok').value.trim();
+  const lin=readLin('v');
+  const reason=document.getElementById('vReason').value.trim();
   closeVer();
-  act(dCur.m.n+' 에 버전 '+v+' 을 추가했습니다.');
+  /* 버전 추가는 원천 가중치에만 있다(진입점이 이미지 상세에 없다) */
+  /* 원천 가중치는 버전 목록에 `등록 중` 인 버전이 생기고 진행률을 함께 보인다(기획서 3장 버전 추가).
+     비동기 요청이라 접수형으로 알린다(UI 문구 규칙 4) */
+  const b=dCur.m;
+  const m={n:b.n,v:v,reg:'등록 중',ready:'',path:path,size:'-',scope:b.scope,ws:b.ws,by:'성유진(yj.seong)',
+    at:nowStr(),tok:tok||'-',built:'',tags:b.tags,reason:reason,
+    arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'},gpu:'-',vram:'-',lin:lin};
+  WGT.push(m);
+  toast('ok','버전 추가를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.');
+  dTab=0;
+  startImport(m);
 }
 
 function closePanel(){document.getElementById('panel').classList.remove('on'); document.body.classList.remove('panel-on');
@@ -1823,13 +2686,13 @@ function openEdit(){
   const m=cur.m, isA=cur.isA;
   /* 진행 중인 자산은 고치지 않는다. 표시 범위가 바뀌면 캐싱·빌드 대상이 달라진다.
      버전 메뉴(노드 캐싱·이미지 빌드)와 같은 기준이다 */
-  if(m.ready==='캐싱 중' || m.ready==='빌드 중'){
-    openConfirm('수정할 수 없습니다', busyMsg(m), null, '확인');
+  if(lockMsg(m)){
+    openConfirm('수정할 수 없습니다', lockMsg(m), null, '확인');
     return;
   }
   document.getElementById('eName').value = m.n;
   document.getElementById('eVer').value = m.v;
-  document.getElementById('eDesc').value = isA?'서빙 엔진 드라이버가 결합된 배포용 컨테이너 이미지입니다.':'S3에서 반입한 원천 가중치입니다.';
+  document.getElementById('eDesc').value = isA?'서빙 엔진 드라이버가 결합된 배포용 컨테이너 이미지입니다.':'저장소에서 가져와 등록한 원천 가중치입니다.';
   document.getElementById('eEngWrap').style.display = isA?'':'none';
   document.getElementById('eTag').value='';
   const p=document.getElementById('eScope'), hint=document.getElementById('eScopeHint');
@@ -1851,7 +2714,7 @@ function openEdit(){
 }
 function closeEdit(){
   const changed=isEditChanged();
-  if(changed){ openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.', function(){ document.getElementById('mdEdit').classList.remove('on'); },'취소'); return; }
+  if(changed){ openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.', function(){ document.getElementById('mdEdit').classList.remove('on'); },'취소','계속 작성'); return; }
   document.getElementById('mdEdit').classList.remove('on');
 }
 function isEditChanged(){
@@ -1859,12 +2722,24 @@ function isEditChanged(){
 }
 /* 수정은 변경 1개 이상 + 검증 통과 시 활성 (7.1) */
 function editValid(){ document.getElementById('eSubmit').disabled = !isEditChanged(); }
-function submitEdit(){ document.getElementById('mdEdit').classList.remove('on'); toast('ok','수정이 완료되었습니다.'); }
+function submitEdit(){ document.getElementById('mdEdit').classList.remove('on'); toast('ok','수정했습니다.'); }
 
 function panelDel(){if(cur)del(cur.m.n, useOf(cur.m)==='배포 중', cur.m._vcnt||1);}
 function panelAct(){if(!cur)return;cur.isA?openCache(cur.m.n):build(cur.m.n);}
-function goImg(name){setTab('A');sconds=[{val:name.split(':')[0]}];drawChips();render();
-  toast('ok','모델 이미지 탭으로 이동했습니다.');}
+/* 빌드 산출 이미지 ⇄ 원본 가중치. 상대 탭으로 바꾼 뒤 그 자산의 패널을 연다(REQ-MODEL-029 · 기획서 7.3).
+   상세 페이지·버전 상세에서 눌렀으면 그것을 닫고 목록으로 돌아간다 */
+function goAsset(ref, toA){
+  const list=toA?IMG:WGT;
+  let i=list.findIndex(function(x){ return x.n+':'+x.v===ref; });
+  if(i<0) i=list.findIndex(function(x){ return x.n===ref.split(':')[0]; });
+  if(i<0) return;
+  if(vdCur) closeVerDt();
+  if(dCur) closeDetail();
+  setTab(toA?'A':'B');
+  openPanel(i);
+}
+function goImg(ref){ goAsset(ref, true); }
+function goWgt(ref){ goAsset(ref, false); }
 /* ===== 모델 등록 모달 (표시 범위 — 7.2 안 A: 전역 등록은 Super Admin 전용) ===== */
 /* 등록 폼 — 표시 범위와 워크스페이스를 먼저 받는다.
    상단 스위처는 조회 범위를 좁히는 장치이지 귀속을 정하지 않는다(워크스페이스 정책 2.7.1) */
@@ -1881,12 +2756,14 @@ function demoReg(v,btn){
   document.querySelectorAll('#demoBar .rg').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
   closeReg();
-  if(v==='job') openRegFromJob('/workspace/outputs/job-20260820-01/');
+  if(v==='job') openRegFromJob('s3://concerto-models/outputs/job-20260820-01/');
   else openReg();
 }
 
+/* 학습 이력은 그 작업의 값으로 채운다(기획서 REQ-MODEL-070). 값은 데모 샘플이다 */
 function openRegFromJob(path){
-  regFrom = { path: path };
+  regFrom = { path: path,
+    lin:{src:'job',o:'meta-llama/Llama-3.2-1B',dn:'card-cs-qa',dv:'v2',job:'job-20260820-01',ev:path+'eval/result.json'} };
   openReg();
 }
 
@@ -1923,6 +2800,7 @@ function drawRegFrom(){
     if(src){ srcOpts('rSrc'); }
     if(note){ note.hidden=true; }
   }
+  drawLinBlock('r', regFrom? regFrom.lin : null, !!regFrom);
 }
 
 function drawScopePick(){
@@ -2011,7 +2889,6 @@ function regValid(){
 /* 모델 반입 — 3단계 진행률 (기술문서 §7.3)
    다운로드 → 압축·변환 → 스토리지 이관 */
 const IMPORT_STEPS=['다운로드','압축·변환','스토리지 이관'];
-let importing=null;
 function submitReg(){
   /* 비활성이라 도달하지 않지만, 방어적으로 첫 오류 필드에 포커스한다 */
   const miss=['rPath','rVer','rName'].filter(function(id){ return !document.getElementById(id).value.trim(); });
@@ -2019,57 +2896,62 @@ function submitReg(){
   const name=document.getElementById('rName').value.trim();
   const ver=document.getElementById('rVer').value.trim();
   const path=document.getElementById('rPath').value.trim();
+  const tok=document.getElementById('rTok').value.trim();
   /* 폼에서 고른 표시 범위를 그대로 넣는다. 종전에는 전역으로 고정되어 있었다 */
   const wsSel=document.getElementById('rWs');
   const scope = regScope==='global' ? '전역' : '워크스페이스 전용';
   const ws = regScope==='global' ? '-' : (wsSel ? wsSel.value : '-');
+  /* 작업 산출물에서 왔으면 그 작업의 값, 아니면 입력한 값(없으면 비워 둔다) */
+  const lin = readLin('r', regFrom && regFrom.lin);
   closeReg(); resetSearch();
-  toast('ok','모델 반입을 요청했습니다.');
-  importing={n:name,v:ver,path:path,scope:scope,ws:ws,step:0,pct:0};
+  toast('ok','모델 등록을 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.');
+  /* 임시 진행 행이 아니라 실제 행이다. 요청하면 `등록 중` 인 행이 생기고 진행률을 함께 보인다
+     (모델 정책 2.3 · CON-736 B-5). 가져오기가 끝나기 전에는 용량·사양을 모른다 */
+  const m={n:name,v:ver,reg:'등록 중',ready:'',path:path,size:'-',scope:scope,ws:ws,by:'성유진(yj.seong)',
+    at:nowStr(),tok:tok||'-',built:'',
+    arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'},gpu:'-',vram:'-',lin:lin};
+  WGT.unshift(m);
   setTab('B');
+  startImport(m);
+}
+/* 반입 — 등록 중 + 3단계 진행률 → 등록됨 + 미빌드. 완료는 알림(공통정책 7.6).
+   데모는 늘 성공한다. 실패 사례는 샘플 행(exaone-4.0-32b)으로 본다 */
+function startImport(m){
+  m.reg='등록 중'; m.ready=''; m.prog={step:0,pct:0};
+  const j=logJob(m, false, '등록', m.v, m.path);
+  refresh();
   const tick=setInterval(function(){
-    importing.pct+=10;
-    if(importing.pct>=100){ importing.pct=0; importing.step++; }
-    if(importing.step>=3){
+    m.prog.pct+=10;
+    if(m.prog.pct>=100){ m.prog.pct=0; m.prog.step++; }
+    if(m.prog.step>=3){
       clearInterval(tick);
-      WGT.unshift({n:importing.n,v:importing.v,ready:'미빌드',path:importing.path,size:'2.02 MB',
-        scope:importing.scope,ws:importing.ws,by:'성유진(yj.seong)',
-        at:new Date().toISOString().slice(0,19).replace('T',' '),tok:'-',built:'',
-        arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'},gpu:'-',vram:'-'});
-      importing=null; render();
-      notify('모델 반입이 완료되었습니다.');
+      delete m.prog;
+      m.reg='등록됨'; m.ready='미빌드';
+      if(m.size==='-') m.size='2.02 MB';
+      endJob(j);
+      refresh();
+      notify(m.n+'의 모델 등록이 완료되었습니다.');
       return;
     }
     render();
+    if(dCur && dCur.m.n===m.n && dTab===0) drawDetail();
   }, 400);
-}
-function importRow(){
-  if(!importing || tab!=='B') return '';
-  const pct=importing.pct;
-  return '<tr><td colspan="9"><div class="prog">'
-    /* 어디에 반입되는지 함께 보인다. 끝나면 그 범위로 목록에 들어간다 */
-    + '<div class="plabel"><span><b>'+importing.n+'</b> 반입 중'
-    +   '<span class="mver">'+(importing.scope==='전역' ? '전역' : importing.ws)+'</span></span>'
-    +   '<span>'+IMPORT_STEPS[importing.step]+' '+pct+'%</span></div>'
-    + '<div class="pbar"><div class="pfill" style="width:'+pct+'%"></div></div>'
-    + '<div class="psteps">'+IMPORT_STEPS.map(function(t,i){
-        return '<span class="pstep'+(i<importing.step?' done':(i===importing.step?' on':''))+'">'+t+'</span>';
-      }).join('')+'</div></div></td></tr>';
 }
 
 /* ===== 노드 캐싱 모달 (다중 선택 — 7.2 안 A) ===== */
-let cTarget='';
+let cTarget='', cTargetV='';
 /* 캐싱 상태는 노드마다 다르다. 전역 NODES.cached 가 아니라 그 모델의 캐싱 노드 수를 본다 —
    앞에서부터 cn 개가 캐싱된 것으로 둔다(데모). 실제로는 노드별 레코드를 받는다(모델정책 9. 9번) */
 function nodeCached(m, i){ return !!m && i < (m.cn||0); }
 
-function openCache(n){
-  cTarget=n; document.getElementById('cName').textContent=n;
+/* v 를 넘기면 그 버전을, 넘기지 않으면 최신 버전을 캐싱한다(상세 버전 탭은 버전을 넘긴다) */
+function openCache(n, v){
+  cTarget=n; cTargetV=v||''; document.getElementById('cName').textContent=n+(v?' '+v:'');
   const b=document.getElementById('cacheBody');
   if(!NODES.length){
     b.innerHTML='<div class="state" style="padding:36px 12px;border:0;background:transparent"><h3>캐싱 가능한 노드가 없습니다.</h3><p>클러스터에 가속기 노드가 없습니다.</p></div>';
   }else{
-    const tm=IMG.find(function(x){ return x.n===n; });
+    const tm=IMG.find(function(x){ return x.n===n && (!v || x.v===v); });
     b.innerHTML='<div class="selall"><span>클러스터 노드</span><button onclick="selAllNodes()">가속기 노드 전체 선택</button></div>'
      + NODES.map(function(nd,i){
        const done=nodeCached(tm,i);
@@ -2086,13 +2968,20 @@ function cacheValid(){document.getElementById('cSubmit').disabled=!document.quer
 function selAllNodes(){document.querySelectorAll('#mdCache input:not(:disabled)').forEach(c=>c.checked=true);cacheValid();}
 function submitCache(){
   closeCache();
-  const m=IMG.find(x=>x.n===cTarget); if(!m){ toast('ok','노드 캐싱을 요청했습니다.'); return; }
+  const m=IMG.find(x=>x.n===cTarget && (!cTargetV || x.v===cTargetV)); if(!m){ toast('ok','노드 캐싱을 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.'); return; }
   const picked=[].slice.call(document.querySelectorAll('#cacheBody input:checked')).length;
-  m.ready='캐싱 중'; render(); if(cur&&cur.m===m) openPanel(IMG.indexOf(m));
-  toast('ok','노드 캐싱을 요청했습니다.');
+  toast('ok','노드 캐싱을 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.');
+  runCache(m, picked);
+}
+/* 캐싱 실행 — 작업 이력에 쌓는다(모델 정책 4.4). 다시 시도에서도 부른다 */
+function runCache(m, picked){
+  m.ready='캐싱 중';
+  const j=logJob(m, true, '캐싱', m.v, '', picked);
+  refresh();
   setTimeout(function(){
+    endJob(j);
     m.cn=Math.min(NODES.length, (m.cn||0)+picked);
-    m.ready='캐싱됨'; render(); if(cur&&cur.m===m) openPanel(IMG.indexOf(m));
+    m.ready='캐싱됨'; refresh();
     notify(m.n+'의 노드 캐싱이 완료되었습니다.');
   }, 3000);
 }
@@ -2100,22 +2989,29 @@ function submitCache(){
 /* ===== 액션 ===== */
 /* 빌드 — 요청 시 토스트, 완료·실패 시 알림 (공통정책 7.6)
    진행 중에는 동일 작업 재실행 차단 */
-function build(name){
-  const m=WGT.find(x=>x.n===name); if(!m) return;
+/* quiet = 작업 이력의 다시 시도에서 부른 경우. 접수 토스트는 다시 시도 쪽에서 이미 띄웠다 */
+/* ver 를 넘기면 그 버전을, 넘기지 않으면 최신 버전을 빌드한다 */
+function build(name, quiet, ver){
+  const m=WGT.find(x=>x.n===name && (!ver || x.v===ver)); if(!m) return;
+  /* 등록이 끝나지 않은 가중치는 빌드할 대상이 없다(진입점은 비활성이라 도달하지 않는다) */
+  if(!regOk(m)) return;
   if(m.ready==='빌드 중'){ toast('cr','이미 빌드가 진행 중입니다.'); return; }
-  m.ready='빌드 중'; render(); if(cur&&cur.m===m) openPanel(WGT.indexOf(m));
-  toast('ok','이미지 빌드를 요청했습니다.');
+  m.ready='빌드 중';
+  const j=logJob(m, false, '빌드', m.v);
+  refresh();
+  if(!quiet) toast('ok','이미지 빌드를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.');
   setTimeout(function(){
+    endJob(j);
     m.ready='빌드됨';
     m.built=m.n+':'+m.v;
     /* 빌드 완료 시 모델 이미지 탭에 신규 등록 */
     if(!IMG.some(x=>x.n===m.n&&x.v===m.v)){
       IMG.unshift({n:m.n,v:m.v,ready:'미캐싱',cn:0,use:'미사용',scope:m.scope,ws:m.ws,by:m.by,
-        at:new Date().toISOString().slice(0,19).replace('T',' '),eng:'vLLM',base:'Custom Build',
+        at:nowStr(),eng:'vLLM',base:'Custom Build',src:m.n+':'+m.v,
         arch:m.arch,infra:m.infra,store:'model-registry/'+m.n+':'+m.v,mode:'단일',prof:0,deps:[],
         gpu:m.infra.g,vram:m.infra.v,sys:false});
     }
-    render(); if(cur&&cur.m===m) openPanel(WGT.indexOf(m));
+    refresh();
     notify(m.n+'의 이미지 빌드가 완료되었습니다.');
   }, 4000);
 }
@@ -2127,7 +3023,7 @@ function notify(msg){
 }
 /* 등록·수정·삭제 등 작업 완료 후 검색·필터 초기화 → 전체 재조회 (공통정책 3.3) */
 function resetSearch(){sconds=[];drawChips();document.getElementById('q').value='';fsel={};render();}
-function reconcile(){resetSearch();toast('ok','저장소 동기화를 요청했습니다.');}
+function reconcile(){resetSearch();toast('ok','저장소 동기화를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.');}
 function act(msg){toast('ok',msg);}
 /* 삭제 — 공통정책 7.5. 연결 데이터로 삭제 불가 시 클릭 전 사전 감지해 선제 안내 */
 /* 버전 삭제도 확인 알럿을 탄다(공통정책 7.5). 마지막 버전을 지우면 모델이 함께 사라지므로
@@ -2135,33 +3031,38 @@ function act(msg){toast('ok',msg);}
 function delVer(ver){
   if(!dCur) return;
   const m = dCur.m;
-  const vers = m._vers || [m];
+  const vers = versOf(m, dCur.isA);
   const last = vers.length<=1;
   openConfirm('버전 삭제',
-    '<b>'+m.n+' '+ver+'</b>을(를) 삭제하면 복구할 수 없습니다.'
+    (dCur.isA ? '<b>'+m.n+' '+ver+'</b>을(를) 삭제하면 레지스트리의 이미지가 함께 삭제되며 복구할 수 없습니다.'
+              : '<b>'+m.n+' '+ver+'</b>을(를) 삭제하면 목록에서 제거됩니다. 저장소의 가중치 파일은 남아 있어 다시 등록할 수 있습니다.')
     + (last? '<br>마지막 버전이라 모델도 함께 사라집니다.' : ''),
     function(){ toast('ok','버전을 삭제했습니다.'); }, '삭제');
 }
 
-function del(name,inUse,vcnt){
+function del(name,inUse,vcnt,isA){
   if(inUse){ openConfirm('삭제할 수 없습니다',
       '<b>'+name+'</b> 모델은 배포에 사용 중이므로 삭제할 수 없습니다. 연결된 배포를 먼저 종료해 주세요.',
       null,'확인'); return; }
   /* 모델을 지우면 버전이 다 사라진다. 몇 개가 함께 없어지는지 밝힌다(모델정책 2.5) */
   const n = vcnt||1;
   openConfirm('모델 삭제',
-    '<b>'+name+'</b>을(를) 삭제하면 버전 '+n+'개가 함께 제거되며 복구할 수 없습니다.',
-    function(){ resetSearch(); toast('ok','모델 삭제가 완료되었습니다.'); },'삭제');
+    /* 저장소에서 무엇이 지워지는지 자산마다 다르다(CON-745 6항 · 모델 정책 2.5·3.5).
+       이미지는 레지스트리의 이미지도 지워져 복구할 수 없고, 가중치는 저장소 파일이 남아 다시 등록할 수 있다.
+       문장을 조각으로 잇지 않는다(다국어) */
+    isA ? '<b>'+name+'</b>을(를) 삭제하면 버전 '+n+'개와 레지스트리의 이미지가 함께 삭제되며 복구할 수 없습니다.'
+        : '<b>'+name+'</b>을(를) 삭제하면 버전 '+n+'개가 목록에서 제거됩니다. 저장소의 가중치 파일은 남아 있어 다시 등록할 수 있습니다.',
+    function(){ resetSearch(); toast('ok','모델을 삭제했습니다.'); },'삭제');
 }
-function openConfirm(title,body,onOk,okLabel){
+function openConfirm(title,body,onOk,okLabel,cancelLabel){
   document.getElementById('cfTitle').textContent=title;
   document.getElementById('cfBody').innerHTML=body;
   const ok=document.getElementById('cfOk');
   ok.textContent=okLabel||'확인';
-  ok.className='btn'+(okLabel==='삭제'?' danger':'');
+  ok.className='btn'+((okLabel==='삭제'||okLabel==='취소')?' danger':'');
   ok.style.display=onOk?'':'none';
   ok.onclick=function(){closeConfirm(); if(onOk)onOk();};
-  document.querySelector('#mdConfirm .btn.ghost').textContent=onOk?'취소':'닫기';
+  document.querySelector('#mdConfirm .btn.ghost').textContent=cancelLabel||(onOk?'취소':'닫기');
   document.getElementById('mdConfirm').classList.add('on');
 }
 function closeConfirm(){document.getElementById('mdConfirm').classList.remove('on');}
