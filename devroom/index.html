@@ -1,6 +1,44 @@
 <!--
-  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.27 (2026-10-06)
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.28 (2026-10-13)
   CDE 정책 기준.
+
+  ── v0.28 (CON-732 · CON-734 · CON-527) ──
+  · 작업 유형을 화면 문구로 바꿨다. 종전에는 원천값 `train` 을 그대로 보였다(공통정책 7.9).
+    학습 · 평가 · 컴파일 · 데이터 가져오기 4종이다(CON-527 2026-09-15 · CDE 정책 4.5). 목록에서는 텍스트로
+    둔다. 상태 배지가 이미 있어 배지를 더 두지 않는다(공통정책 1.9). 유형 열에 헤더 필터를 두었다(REQ-CDE-076).
+  · 작업 상세의 결과 섹션을 유형별로 가른다(CDE 정책 4.6). 학습은 학습 지표, 평가는 평가 결과다. 컴파일·데이터
+    가져오기는 결과 섹션 없이 산출물로 본다. 해당하지 않는 섹션은 항목 자체가 없는 경우라 안내 없이 두지 않는다.
+  · 작업 상세·로그 모달의 `제출 일시` · `제출 시각` 을 `제출일시` 로 통일했다(공통정책 1.3 · 모델 평가 탭과 같은 말).
+  · 작업 상세 원본 지표·하이퍼파라미터에 복사 버튼을 두었다(모델 평가 결과 모달과 같은 규격).
+  · CDE 상세에서 반납·회수·삭제를 확인하면 바로 개발룸 CDE 목록으로 돌아간다(REQ-CDE-086). 종전에는 상세에
+    종료 중으로 머물다가 완료되면 목록으로 옮겼는데, 완료를 화면이 받는 방식이 정해져 있지 않고 사용자가 누르지 않았는데
+    화면이 바뀐다. 진행은 목록의 종료 중 배지로 보고, 종료되면 목록에서 빠지며 완료는 알림으로 안내한다(REQ-CDE-044).
+    개발룸 삭제 후 이동(REQ-CDE-075)과 같은 방식이다. 삭제(실패·만료·회수)는 종전에 상세가 그대로 남았다.
+  · 평가 결과 섹션: 평가명 · 연결된 모델 · 점수 · 원본 지표. 점수는 태스크가 3개 이상이면 레이더 차트와
+    목록을 함께, 2개 이하면 목록만 둔다. 꼭짓점에 마우스를 올리면 태스크 이름과 점수가 뜬다. 모델 평가 결과
+    모달과 같은 규칙이다(MODEL-L01 5.1). 연결된 모델은 `.lnk` 로 모델 상세 평가 탭에 간다. 연결 전이면 `-` 와
+    연결 안내를 둔다. 대기·실행 중은 `평가가 끝나면 표시됩니다.`, 값이 없으면 `기록된 평가 결과가 없습니다.`
+  · 학습 지표·평가 결과 섹션 제목 도움말에 보존 기간 2년을 넣었다(REQ-CDE-082 · CDE 정책 4.5).
+  · 학습 작업 기본 정보에 학습 방법(풀 파인튜닝 · LoRA · QLoRA, 원천값 full · lora · qlora 미노출)을 두었다(REQ-CDE-083).
+    학습 지표 섹션 아래에 하이퍼파라미터를 접힌 코드 블록으로 둔다. 값이 없으면 펼쳤을 때 `기록된 값이 없습니다.`(REQ-CDE-084).
+  · 유형 값이 없는 예전 작업 표본(job-20260801-02)을 더했다. 유형 `-`, 결과 섹션 없음(REQ-CDE-085).
+  · 표본: 평가 셋(완료 연결 · 완료 미연결 · 실행 중), 컴파일 하나, 데이터 가져오기 하나를 더했다. 모델 목업 평가 탭과
+    같은 작업 ID·점수를 쓴다. 레이더 차트 규격은 컴포넌트 라이브러리 v0.23 을 그대로 가져왔다.
+  · 개발룸 삭제 확인 뒤 바로 `미생성` 으로 돌리던 것을 고쳤다. 삭제는 접수형이라(공통정책 7.7)
+    상태가 `삭제 중` 이 되고 워크스페이스 상세로 이동한다(REQ-CDE-075 · 5.2 · 워크스페이스 정책 3.5).
+    삭제 중·삭제 실패인 개발룸에는 들어갈 수 없고, 실패 사유와 다시 시도는 워크스페이스 상세
+    환경 섹션이 맡는다(WKSP-L01 REQ-WKSP-058 · 5.2). 요청 접수 토스트는 그대로 둔다(공통정책 7.6).
+    · 목업이 화면 하나라 이동은 `act('워크스페이스 상세로 이동합니다.')` 로 보이고, 이 화면에는
+      삭제 중 상태를 그려 둔다. 실제 화면에는 없는 검토용 처리다 — 실제로는 이동해 이 화면이 남지 않는다.
+    · 데모 바 `개발룸` 의 생성됨·미생성을 누르면 삭제 중 표시가 풀린다. 삭제 중 버튼은 두지 않았다 —
+      삭제 흐름으로 확인할 수 있다.
+    · 이 화면에 삭제 실패·다시 시도는 두지 않았다. 들어올 수 없는 상태라 그 자리가 워크스페이스 상세다.
+  · 관리자에게 승인 대기 건수 안내를 다시 두었다(REQ-CDE-010 · CDE 정책 3.1). 앞 판에서 GNB 내 작업함 배지와
+    겹친다고 뺐으나, 그 배지는 모든 결재 건을 합친 숫자라 이 개발룸의 CDE 신청 건수와 같은 정보가 아니다.
+    컴포넌트 라이브러리 알림 박스 `조치 필요` 규격 그대로다 — 닫을 수 없고 내 작업함 이동 경로를 붙인다.
+    0건이면 두지 않는다. 승인 대기 건은 여전히 CDE 목록에 넣지 않는다(CDE 정책 6장).
+  · 사용 기간 입력은 이미 만료 예정일 날짜 지정이라(CDE 정책 3.2·5.2 · 기획서 7.3) 화면 변경이 없다.
+    기획서 5.3 C-6 은 날짜 지정으로 종결했다(CON-734).
 
   ── v0.27 (CON-596 A-1~A-5) ──
   · 가속기를 종류별로 다룬다. 한 CDE 가 여러 종류를 함께 받을 수 있고, 잔여 검사도 종류별이다
@@ -89,9 +127,9 @@
   · 기동 시각(현행 Uptime)을 두지 않는다. 상태마다 뜻이 달라 한 값으로 쓸 수 없고
     유휴는 절전이 자동으로 처리한다. 회수 판단에 필요한 것은 최근에 쓰였는지이므로
     마지막 접속 시각을 확인 대상으로 올렸다(정책 9. 28번).
-  · 작업 로그 모달 헤더를 정리했다. 제목이 작업 ID 이고 부제가 유형·제출자·CDE·제출 시각을
+  · 작업 로그 모달 헤더를 정리했다. 제목이 작업 ID 이고 부제가 유형·제출자·CDE·제출일시를
     라벨과 함께 2열로 보인다. `job-... · train · 제출자 · CDE명` 처럼 값만 늘어놓아
-    무엇이 무엇인지 읽는 사람이 맞춰야 했다. 제출 시각은 목록에 없어 함께 넣었다.
+    무엇이 무엇인지 읽는 사람이 맞춰야 했다. 제출일시는 목록에 없어 함께 넣었다.
   · 개발룸 설정 폼 섹션을 셋으로 정리했다 — 기본 정보(대상 클러스터) · 자원 · 스토리지·네트워크.
     대상 클러스터가 어느 섹션에도 속하지 않고 알림 박스 뒤에 홀로 떠 있었다.
   · 데모 바에서 라벨과 버튼을 그룹(.dgrp)으로 묶었다. 따로 두면 줄바꿈 지점에서 갈려
@@ -1701,6 +1739,41 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 /* 비활성 사유 툴팁 — 라이브러리 .tip 과 같은 값(목업 공통 처리) */
 .distip{position:fixed;z-index:200;display:none;background:var(--flyout);color:var(--foreground);border:1px solid var(--border-strong);font-size:12px;font-weight:400;line-height:1.5;padding:8px 11px;border-radius:7px;box-shadow:0 6px 18px var(--shadow);max-width:340px;white-space:normal;text-align:left;pointer-events:none}
 
+/* 레이더 차트: 라이브러리 v0.23 `레이더 차트` 규격 그대로. 평가 결과의 태스크별 점수(0~100)를 축마다 둔다.
+   색은 토큰만 쓴다. 꼭짓점 호버 말풍선(.ctip)은 모니터링 목업 차트 말풍선과 같은 규격이다 */
+.radarwrap{position:relative;display:flex;justify-content:center;background:var(--muted);border:1px solid var(--border);border-radius:9px;padding:10px 8px;margin:0 0 12px}
+.radar{width:300px;height:250px;display:block;overflow:visible}
+.radar .grid{fill:none;stroke:var(--border);stroke-width:1}
+.radar .axis{stroke:var(--border);stroke-width:1}
+.radar .area{fill:color-mix(in srgb,var(--primary) 16%,transparent);stroke:var(--primary);stroke-width:1.8;stroke-linejoin:round}
+.radar .pt{fill:var(--card);stroke:var(--primary);stroke-width:1.6;pointer-events:none}
+.radar .pt.on{fill:var(--primary)}
+.radar .hit{fill:transparent;cursor:default}
+.radar .lb{font-size:11px;fill:var(--muted-foreground)}
+.radar .tk{font-size:9.5px;fill:var(--faint)}
+.ctip{position:absolute;top:6px;background:var(--card);border:1px solid var(--border-strong);border-radius:8px;
+  padding:7px 10px;font-size:11.5px;line-height:1.6;white-space:nowrap;box-shadow:0 6px 18px var(--shadow);pointer-events:none;z-index:5}
+.ctip b{display:block;color:var(--foreground);margin-bottom:3px;font-size:11px}
+.ctip span{display:block;color:var(--muted-foreground)}
+/* 점수 목록: 차트만으로는 정확한 값을 읽을 수 없어 함께 둔다 */
+.scorelist{display:grid;grid-template-columns:1fr auto;gap:6px 16px;font-size:12.5px;margin:0}
+.scorelist dt{color:var(--muted-foreground)}
+.scorelist dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;color:var(--foreground)}
+.cbtn.sm{width:26px;height:26px;border-radius:6px}
+.cbtn.sm svg{width:13px;height:13px}
+/* 원본 값 복사 버튼: 코드 블록 오른쪽 위에 얹는다. 버튼 규격은 라이브러리 .cbtn.sm */
+.rawwrap{position:relative}
+.rawwrap .rawcp{position:absolute;top:22px;right:22px}
+.rawbox{margin:0;padding:10px 12px;background:var(--muted);border:1px solid var(--border);border-radius:8px;
+  font-family:ui-monospace,Menlo,monospace;font-size:11.5px;line-height:1.6;color:var(--foreground);white-space:pre;overflow:auto;max-height:220px}
+/* 이동 링크: 라이브러리 `.lnk` 그대로. 색이 아니라 밑줄로 가른다 */
+.lnk{color:var(--foreground);cursor:pointer;text-decoration:underline;text-decoration-color:var(--underline);text-underline-offset:3px}
+.lnk:hover{text-decoration-color:var(--foreground)}
+
+/* 접힘 블록 화살표: 모델 목업 `.adv` 와 같은 규격(원본 지표에 쓴다) */
+.adv > summary .fold{margin-left:auto;display:grid;place-items:center;color:var(--muted-foreground);transform:rotate(-90deg);transition:transform .15s}
+.adv[open] > summary .fold{transform:rotate(0)}
+.adv > summary .fold svg{width:14px;height:14px}
 </style>
 </head>
 <body class="dark">
@@ -2078,8 +2151,9 @@ function setEgressDeny(v, btn){
   EGRESS_DENY = v;
   document.querySelectorAll('#demoBar .eg').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
-  /* 개발룸이 없으면 설정 폼이 생성 폼으로 열려 비교할 값이 없다. 목록만 다시 그린다 */
-  if(!roomExists){ render(); return; }
+  /* 개발룸이 없으면 설정 폼이 생성 폼으로 열려 비교할 값이 없다. 목록만 다시 그린다.
+     삭제 중도 설정할 대상이 아니다(워크스페이스 정책 3.5) */
+  if(!roomExists || roomDeleting){ render(); return; }
   /* 허용 목록에 값을 넣지 않는다. 기본 목록을 제공한다는 결정이 없어(엑셀 G-1 — 허용 목록이
      비면 전체 허용, 스위치만 제공) 어떤 값을 채워도 근거가 없다.
      비우고 저장할 때의 확인 알럿은 도메인을 직접 입력한 뒤에 확인한다 */
@@ -2100,6 +2174,8 @@ let isSysWs = false;
 
 /* 개발룸 존재 여부 — 미생성이면 생성 화면으로 진입한다 */
 let roomExists = true;
+/* 개발룸 삭제 요청 뒤 삭제 중(워크스페이스 정책 2.6·3.5). 미생성과 다르다 — 삭제가 끝나야 미생성이 된다 */
+let roomDeleting = false;
 
 /* 개발룸 볼륨 — 공유 볼륨은 관리자가 개발룸 설정에서 정하고,
    개인 볼륨은 나머지 안에서 CDE 신청 시 개별 할당한다(정책 5.2) */
@@ -2127,34 +2203,66 @@ const ME = 'yj.seong';
    (CON-596 A-3 · CDE 정책 4.5). CDE 에 종류가 하나면 고르지 않아도 그 종류로 정해진다.
    가속기 없이 돌리는 작업은 빈 값이다 */
 const JOBS = [
+  /* 평가 작업: 결과(ev)는 작업에 저장되고 모델에 연결된 것은 모델 상세 평가 탭에도 나온다(CDE 정책 4.6 · 모델 정책 3.8).
+     ev.model 은 연결된 모델. 모델 목업 qwen3-32b 평가 탭의 같은 작업 ID 와 값이 같다.
+     job-20260821-03 은 튜닝한 모델을 아직 등록하지 않아 연결된 모델이 없다(`-` + 연결 안내) */
+  {id:'job-20260823-01', at:'2026-08-23 14:05:09', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'eval', acc:'NVIDIA-H200', gpu:1, disk:20, dur:'38분', st:'실행 중',
+   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', rec:''}, mt:null, out:null,
+   ev:{suite:'long-context', model:{n:'qwen3-32b',v:'v3.6'}, tasks:[['LongBench',null],['RULER',null],['InfiniteBench',null]]}},
+  {id:'job-20260822-02', at:'2026-08-22 10:12:40', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'eval', acc:'NVIDIA-H200', gpu:1, disk:20, dur:'52분', st:'완료',
+   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', rec:''}, mt:null, out:null,
+   ev:{suite:'ko-general', model:{n:'qwen3-32b',v:'v3.6'}, tasks:[['KMMLU',63.8],['KoBEST',81.2],['HAE-RAE',72.5],['MMLU',75.1],['GSM8K',84.0]]}},
+  {id:'job-20260821-03', at:'2026-08-21 16:20:31', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'eval', acc:'NVIDIA-H200', gpu:1, disk:20, dur:'24분', st:'완료',
+   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', rec:''}, mt:null, out:null,
+   ev:{suite:'cs-faq-ko', model:null, tasks:[['정답률',71.5],['KoBEST',62.0],['HAE-RAE',58.4]]}},
   /* 가용 자원이 요청량보다 적어도 제출은 막지 않는다. 사전 진단을 경고로 두고 자원이 생길 때까지
      대기한다(REQ-CDE-073 · CON-596 A-4). 개발룸 몫이 회수되면 작업은 종료가 아니라 지연된다
      (워크스페이스 정책 5.2). 종류는 그 CDE 에 할당된 것 중에서 고른다 — yj-jupyter-01 은 NVIDIA-H200 하나다
      (CON-596 A-3). 추천 자원은 두지 않는다 — 잡 한도가 CDE 할당 범위라 더 큰 값을 권할 수 없다(A-1).
      실행 시간은 아직 없어 `-` 다(공통정책 1.7) */
-  {id:'job-20260821-01', at:'2026-08-21 08:40:11', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', acc:'NVIDIA-H200', gpu:1, disk:40, dur:'-', st:'대기',
+  {id:'job-20260821-01', at:'2026-08-21 08:40:11', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', tm:'lora', acc:'NVIDIA-H200', gpu:1, disk:40, dur:'-', st:'대기',
    chk:{r:'경고', why:'요청한 가속기의 여유가 부족합니다. 자원이 확보되면 실행됩니다.', rec:''},
    mt:null, out:null},
-  {id:'job-20260820-01', at:'2026-08-20 09:14:02', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', acc:'NVIDIA-H200', gpu:1, disk:50,  dur:'1시간 22분', st:'완료',
+  {id:'job-20260820-01', at:'2026-08-20 09:14:02', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', tm:'lora', acc:'NVIDIA-H200', gpu:1, disk:50,  dur:'1시간 22분', st:'완료',
+   hp:{base_model:'meta-llama/Llama-3.2-1B', learning_rate:0.0002, epochs:6, batch_size:8, lora_r:16, lora_alpha:32},
    chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', rec:''},
    mt:{loss:[2.41,1.88,1.52,1.31,1.19,1.12], acc:[0.42,0.58,0.67,0.72,0.75,0.77]},
    out:{path:'/workspace/outputs/job-20260820-01/', size:'13.2 GB', kind:'safetensors'}},
-  {id:'job-20260820-02', at:'2026-08-20 14:31:20', u:'임승주(sj.lim)',  uid:'sj.lim',   cde:'sj-vscode-01',  t:'train', acc:'', gpu:0, disk:20,  dur:'12분', st:'실행 중',
+  {id:'job-20260820-02', at:'2026-08-20 14:31:20', u:'임승주(sj.lim)',  uid:'sj.lim',   cde:'sj-vscode-01',  t:'train', tm:'qlora', acc:'', gpu:0, disk:20,  dur:'12분', st:'실행 중',
+   hp:{base_model:'Qwen/Qwen3-32B', learning_rate:0.0001, epochs:3, batch_size:4, lora_r:8, quant_bits:4},
    chk:{r:'경고', why:'가속기 없이 실행합니다. 학습 시간이 길어질 수 있습니다.', rec:'가속기 1'},
    mt:{loss:[2.55,2.10,1.94], acc:[0.31,0.47,0.55]}, out:null},
   /* 요청 장수를 CDE 할당 범위 안으로 맞췄다. 잡 자원 한도는 제출한 CDE 의 할당 범위다(CON-596 A-1) —
      yj-jupyter-01 이 NVIDIA-H200 1 장이라 2 장을 요청한 작업이 성립하지 않았다.
      추천 자원도 같은 이유로 비운다. 더 큰 값을 권하려면 CDE 자원부터 늘려야 한다 */
-  {id:'job-20260819-07', at:'2026-08-19 22:07:45', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', acc:'NVIDIA-H200', gpu:1, disk:100, dur:'-', st:'실패',
+  {id:'job-20260819-07', at:'2026-08-19 22:07:45', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', tm:'lora', acc:'NVIDIA-H200', gpu:1, disk:100, dur:'-', st:'실패',
    err:'가속기 메모리가 부족해 중단되었습니다.',
    chk:{r:'경고', why:'요청한 자원으로 메모리가 부족할 수 있습니다.', rec:''}, mt:null, out:null},
   /* 반납된 CDE 의 작업이다. 자원 열은 제출 시점 요청값이라 CDE 가 없어도 그대로 남는다 */
-  {id:'job-20260819-03', at:'2026-08-19 11:52:10', u:'유지현(jh.yu)',   uid:'jh.yu',    cde:'',              t:'train', acc:'Furiosa RNGD', gpu:1, disk:30,  dur:'34분', st:'완료',
+  {id:'job-20260819-03', at:'2026-08-19 11:52:10', u:'유지현(jh.yu)',   uid:'jh.yu',    cde:'',              t:'train', tm:'full', acc:'Furiosa RNGD', gpu:1, disk:30,  dur:'34분', st:'완료',
    chk:null, mt:null,
-   out:{path:'/workspace/outputs/job-20260819-03/', size:'6.8 GB', kind:'safetensors'}}
+   out:{path:'/workspace/outputs/job-20260819-03/', size:'6.8 GB', kind:'safetensors'}},
+  /* 컴파일·데이터 가져오기는 결과 섹션 없이 산출물로 본다(CDE 정책 4.6) */
+  {id:'job-20260818-02', at:'2026-08-18 15:44:02', u:'유지현(jh.yu)',   uid:'jh.yu',    cde:'jh-jupyter-01', t:'compile', acc:'Furiosa RNGD', gpu:1, disk:30,  dur:'21분', st:'완료',
+   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', rec:''}, mt:null,
+   out:{path:'/workspace/outputs/job-20260818-02/', size:'4.1 GB', kind:'enf'}},
+  {id:'job-20260818-01', at:'2026-08-18 10:03:55', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'data-import', acc:'', gpu:0, disk:10,  dur:'6분', st:'완료',
+   chk:null, mt:null,
+   out:{path:'/workspace/shared/datasets/cs-faq-ko/', size:'820 MB', kind:'parquet'}},
+  /* 유형 값이 없는 예전 작업: 유형이 정해지기 전에 제출됐다(CON-527 2026-09-15 "job_type 이 없는 옛 작업은 null").
+     유형은 `-`, 결과 섹션은 두지 않는다(기획서 5.1 · 공통정책 1.7) */
+  {id:'job-20260801-02', at:'2026-08-01 17:12:48', u:'성유진(yj.seong)', uid:'yj.seong', cde:'', t:null, acc:'NVIDIA-H200', gpu:1, disk:20,  dur:'41분', st:'완료',
+   chk:null, mt:null,
+   out:{path:'/workspace/outputs/job-20260801-02/', size:'2.3 GB', kind:'safetensors'}}
 ];
 /* 중단됨은 실패와 가른다 — 실패는 시스템 사유이고 중단은 사람의 판단이다(기획서 5.1) */
 const JB={'대기':'mu','실행 중':'ac load','완료':'ok','실패':'cr','중단됨':'mu'};
+/* 작업 유형 원천값 train · eval · compile · data-import 를 화면 문구로 받는다(CON-527 2026-09-15 · 공통정책 7.9).
+   목록에서는 텍스트로 둔다. 상태 배지가 이미 있어 배지를 더 두지 않는다(공통정책 1.9 · 기획서 5.1) */
+const TKO={'train':'학습','eval':'평가','compile':'컴파일','data-import':'데이터 가져오기'};
+function tKo(v){ return v? (TKO[v]||v) : '-'; }
+/* 학습 방법 원천값 full · lora · qlora 를 화면 문구로 받는다(CON-527 2026-09-15 · CDE 정책 4.7 · 공통정책 7.9) */
+const TMKO={'full':'풀 파인튜닝','lora':'LoRA','qlora':'QLoRA'};
 
 const CDE = [
  /* 공용 CDE 유형을 두지 않고 신청 폼에 `전체 공개` 옵션도 두지 않는다(정책 2.5).
@@ -2209,7 +2317,7 @@ let role='super', state='default', cur=null, sq='', formOpen=false;
 let cdeTab=0;
 /* CDE 목록과 같은 규격으로 둔다 — 검색(3.3) + 헤더 필터(3.2) + 페이지네이션(3.7).
    같은 화면 안 목록 둘이 다른 형태면 어디서 무엇을 찾는지 갈린다 */
-let jq='', jSel=[], jTmp=[];
+let jq='', jSel=[], jTmp=[], tSel=[], tTmp=[];
 function setCdeTab(i){ cdeTab=i; render(); }
 const isSuper=()=>role==='super';
 const isAdmin=()=>role==='super'||role==='admin';
@@ -2307,6 +2415,7 @@ function render(){
   }
   const el=document.getElementById('listArea'), pg=document.getElementById('pager');
   /* 개발룸이 없으면 자원·CDE 목록이 성립하지 않는다. 생성 안내로 대체한다 */
+  if(roomDeleting){ drawDelRoom(); return; }
   if(!roomExists){ drawEmptyRoom(); return; }
   document.getElementById('quotaBox').style.display='';
   document.getElementById('pager').style.display='flex';
@@ -2584,11 +2693,16 @@ function drawQuota(){
 }
 
 
-/* 승인 대기 알림을 두지 않는다. 승인 대기 건은 이 목록에 나오지 않고
-   승인·반려도 내 작업함에서 처리한다. GNB 내 작업함 배지가 이미 건수를 알리므로
-   같은 것을 두 번 말하게 된다 */
+/* 관리자에게 이 개발룸의 승인 대기 건수와 내 작업함 이동 경로를 알린다(REQ-CDE-010 · CDE 정책 3.1).
+   승인 대기 건은 CDE 목록에 넣지 않는다(CDE 정책 6장) — 건수만 여기서 알리고 처리는 내 작업함에서 한다.
+   GNB 내 작업함 배지는 모든 결재 건의 합이라 이 개발룸 몫을 따로 알 수 없다.
+   라이브러리 알림 박스 `조치 필요` 규격 — 닫을 수 없고 실행 경로를 붙인다. 0건이면 두지 않는다 */
 function drawPend(){
-  document.getElementById('pendBox').innerHTML = '';
+  const n = CDE.filter(m=>m.st==='승인 대기').length;
+  document.getElementById('pendBox').innerHTML = (isAdmin() && n)
+    ? alertBox('warn','승인 대기 중인 CDE 신청이 '+n+'건 있습니다.','승인·반려 처리는 내 작업함에서 합니다.',
+        '<button class="btn ghost sm" onclick="act(\'내 작업함으로 이동합니다.\')">내 작업함으로<span class="ar">→</span></button>')
+    : '';
 }
 
 /* 개발룸은 별도로 만들고 지우는 대상이라 설정·삭제 진입점을 둔다(워크스페이스 정책 3.4) */
@@ -2605,14 +2719,34 @@ function drawRoomAct(){
         + '<button class="btn danger-line sm" onclick="askDelRoom()">삭제</button>'
       : '');
 }
-/* 개발룸을 지우면 미생성으로 돌아간다. CDE와 공유 볼륨이 함께 사라진다 */
+/* 삭제를 요청하면 삭제 중이 되어 들어갈 수 없다(워크스페이스 정책 3.5). 실패 사유와 다시 시도는
+   워크스페이스 상세 환경 섹션이 맡는다(REQ-CDE-075 · WKSP-L01 5.2). CDE와 공유 볼륨이 함께 사라진다.
+   요청 즉시 미생성으로 돌리지 않는다 — 삭제는 접수형이고(공통정책 7.7) 실패할 수 있다(워크스페이스 정책 2.6) */
 function askDelRoom(){
   const n=CDE.filter(function(m){ return m.st!=='종료'; }).length;
   const target=WS_NAME+' 개발룸';
   openConfirm('개발룸 삭제',
     '<b>'+target+'</b>을 삭제합니다. CDE '+n+'건과 공유 볼륨이 함께 제거되고 배정된 자원은 운영룸으로 반환됩니다.',
-    function(){ roomExists=false; render(); toast('ok','개발룸 삭제를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.'); },
+    function(){
+      roomDeleting=true; closePanel(); render();
+      toast('ok','개발룸 삭제를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.');
+      /* 워크스페이스 상세로 이동한다(REQ-CDE-075). 목업이 화면 하나라 이동을 토스트로 보인다.
+         실제 화면에는 없는 검토용 처리다 */
+      act('워크스페이스 상세로 이동합니다.');
+    },
     '삭제', target);
+}
+/* 삭제 중 — 실제로는 워크스페이스 상세로 이동해 이 화면이 남지 않는다(REQ-CDE-075).
+   이동을 보일 수 없어 요청 뒤의 상태를 여기 그린다. 실제 화면에는 없는 검토용 처리다.
+   다시 시도는 두지 않는다 — 그 자리는 워크스페이스 상세 환경 섹션이다(워크스페이스 정책 3.5) */
+function drawDelRoom(){
+  drawEmptyRoom();
+  document.getElementById('listArea').innerHTML =
+    '<div class="state" style="padding:60px 0">'
+  + '<p style="margin-bottom:10px"><span class="stbadge ac load">삭제 중</span></p>'
+  + '<h3>개발룸을 삭제하고 있습니다.</h3>'
+  + '<p>삭제 중인 개발룸에는 들어갈 수 없습니다.</p>'
+  + '</div>';
 }
 /* 사용자당 하나만 둔다(정책 3.3). 다만 버튼을 없애지 않는다 —
    신청 중인 건이 목록에 보이지 않으므로 버튼까지 사라지면 왜 못 하는지 알 수 없다.
@@ -2667,7 +2801,7 @@ function jobsFor(){
 function jBase(){
   const q=jq.trim().toLowerCase();
   return jobsFor().filter(function(j){
-    return !q || [j.id,j.u,j.t,j.cde,j.st].some(function(x){
+    return !q || [j.id,j.u,tKo(j.t),j.cde,j.st].some(function(x){
       return String(x).toLowerCase().indexOf(q)>=0;
     });
   });
@@ -2693,6 +2827,45 @@ function jFilter(){
    + '<div class="fddfoot"><button class="lvclr" onclick="jReset()">초기화</button>'
    + '<button class="btn sm" onclick="jApply()">적용</button></div>'
    + '</div>';
+}
+/* 유형 헤더 필터: 상태 필터와 같은 규격(REQ-CDE-076 · 기획서 7.6). 선택지는 검색 결과 안에 있는 값만 둔다 */
+const TOPTS=['학습','평가','컴파일','데이터 가져오기'];
+function tFilter(){
+  const all=jBase();
+  const opts=TOPTS.filter(function(o){ return all.some(function(j){ return tKo(j.t)===o; }); });
+  return '<span class="thwrap">유형'
+   + '<button class="thfilter'+(tSel.length?' on':'')+'" onclick="tgTdd(event)" title="필터">'
+   + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button></span>'
+   + '<div class="fdd" onclick="event.stopPropagation()">'
+   + '<label><input type="checkbox" '+(tSel.length===0?'checked':'')+' onchange="tPickAll()">전체<span class="fc">'+all.length+'</span></label><hr>'
+   + opts.map(function(o){
+       const c=all.filter(function(j){ return tKo(j.t)===o; }).length;
+       return '<label><input type="checkbox" '+(tTmp.indexOf(o)>=0?'checked':'')
+        + ' onchange="tPick(\''+o+'\',this.checked)">'+o+'<span class="fc">'+c+'</span></label>';
+     }).join('')
+   + '<div class="fddfoot"><button class="lvclr" onclick="jReset()">초기화</button>'
+   + '<button class="btn sm" onclick="tApply()">적용</button></div>'
+   + '</div>';
+}
+function tgTdd(e){
+  e.stopPropagation();
+  const th=e.target.closest('th'), o=th.classList.contains('fdd-on');
+  document.querySelectorAll('th').forEach(function(x){ x.classList.remove('fdd-on'); });
+  if(!o){ tTmp=tSel.slice(); th.classList.add('fdd-on'); }
+}
+function tPick(v,on){ const i=tTmp.indexOf(v); if(on && i<0) tTmp.push(v); if(!on && i>=0) tTmp.splice(i,1); }
+function tPickAll(){
+  tTmp=[];
+  const th=document.querySelector('th.fdd-on');
+  if(th) th.querySelectorAll('.fdd label input').forEach(function(cb,i){ cb.checked=(i===0); });
+}
+function tApply(){
+  const all=jBase();
+  const opts=TOPTS.filter(function(o){ return all.some(function(j){ return tKo(j.t)===o; }); });
+  let v=tTmp.slice(); if(v.length===opts.length) v=[];
+  tSel=v;
+  document.querySelectorAll('th').forEach(function(x){ x.classList.remove('fdd-on'); });
+  drawJobs();
 }
 function tgJdd(e){
   e.stopPropagation();
@@ -2735,7 +2908,7 @@ function clearJobQ(){
   drawJobs();
 }
 function jReset(){
-  jq=''; jTmp=[]; jSel=[];
+  jq=''; jTmp=[]; jSel=[]; tTmp=[]; tSel=[];
   const el=document.getElementById('jq'); if(el) el.value='';
   const cl=document.getElementById('jqclr'); if(cl) cl.hidden=true;
   document.querySelectorAll('th').forEach(function(x){ x.classList.remove('fdd-on'); });
@@ -2767,7 +2940,7 @@ function drawJobs(){
   }
   tool.style.display='';
   const J = jBase().filter(function(j){
-    return !jSel.length || jSel.indexOf(j.st)>=0;
+    return (!jSel.length || jSel.indexOf(j.st)>=0) && (!tSel.length || tSel.indexOf(tKo(j.t))>=0);
   });
   document.getElementById('jobBox').innerHTML =
     (J.length
@@ -2775,7 +2948,7 @@ function drawJobs(){
          /* 이름 → 상태 → 유형 → 담당자 순(공통정책 2.2). CDE 목록과 같은 순서다 */
          + '<th>작업 ID</th>'
          + '<th class="thcell">'+jFilter()+'</th>'
-         + '<th>유형</th><th>제출자</th><th>CDE</th><th>자원</th><th>실행 시간</th>'
+         + '<th class="thcell">'+tFilter()+'</th><th>제출자</th><th>CDE</th><th>자원</th><th>실행 시간</th>'
          + '<th style="width:100px">로그</th>'
          + '</tr></thead><tbody>'
          + J.map(function(j,i){
@@ -2786,7 +2959,7 @@ function drawJobs(){
               /* 실패 사유를 툴팁에 두지 않는다. 툴팁은 항목 설명에 쓰고
                  그 건에 무슨 일이 있었는지는 로그에서 본다(라이브러리 구분 기준) */
               + '<td><span class="stbadge '+(JB[j.st]||'mu')+'">'+j.st+'</span></td>'
-              + '<td>'+j.t+'</td><td>'+userRef(j.u)+'</td>'
+              + '<td>'+(j.t? tKo(j.t) : '<span class="dash">-</span>')+'</td><td>'+userRef(j.u)+'</td>'
               /* CDE 를 반납해도 작업은 남는다. 어디서 돌린 것인지 연결을 남긴다 */
               + '<td>'+(j.cde? j.cde : '<span class="dash">반납됨</span>')+'</td>'
               /* concerto run 에 넘긴 값이다. 자원이 얼마나 물려 있는지 알아야
@@ -3185,6 +3358,97 @@ function spark(vals, lo, hi){
     + '<polyline fill="none" stroke="var(--primary)" stroke-width="2" points="'+pts+'"/></svg>';
 }
 
+/* ===== 레이더 차트 (라이브러리 v0.23) =====
+   tasks = [[이름, 점수]]. 점수가 없거나 0~100 을 벗어나면 화면에는 `-`, 차트에서는 0 에 둔다(기획서 5.1).
+   태스크가 2개 이하면 다각형이 생기지 않아 차트를 그리지 않는다: 호출하는 쪽이 목록만 둔다 */
+function scoreOk(s){ return typeof s==='number' && isFinite(s) && s>=0 && s<=100; }
+function scoreTxt(s){ return scoreOk(s)? s.toFixed(1)+' / 100' : '-'; }
+function radarSvg(tasks){
+  const n=tasks.length, cx=150, cy=124, R=84;
+  const pt=function(i,r){ const a=-Math.PI/2+i*2*Math.PI/n; return [cx+r*Math.cos(a), cy+r*Math.sin(a)]; };
+  const ring=function(f){ return tasks.map(function(_,i){ return pt(i,R*f).map(function(x){return x.toFixed(1);}).join(','); }).join(' '); };
+  let s='<svg class="radar" viewBox="0 0 300 250">';
+  [0.25,0.5,0.75,1].forEach(function(f){ s+='<polygon class="grid" points="'+ring(f)+'"/>'; });
+  tasks.forEach(function(_,i){ const p=pt(i,R); s+='<line class="axis" x1="'+cx+'" y1="'+cy+'" x2="'+p[0].toFixed(1)+'" y2="'+p[1].toFixed(1)+'"/>'; });
+  /* 눈금 값은 50·100 둘만 둔다. 넷을 다 적으면 첫 축 위 글자가 겹친다 */
+  s+='<text class="tk" x="'+(cx+4)+'" y="'+(cy-R*0.5+3)+'">50</text><text class="tk" x="'+(cx+4)+'" y="'+(cy-R+3)+'">100</text>';
+  const val=function(t){ return scoreOk(t[1])? t[1] : 0; };
+  s+='<polygon class="area" points="'+tasks.map(function(t,i){ return pt(i,R*val(t)/100).map(function(x){return x.toFixed(1);}).join(','); }).join(' ')+'"/>';
+  tasks.forEach(function(t,i){
+    const p=pt(i,R*val(t)/100), l=pt(i,R+16);
+    const anc = Math.abs(l[0]-cx)<6? 'middle' : (l[0]>cx? 'start':'end');
+    s+='<text class="lb" x="'+l[0].toFixed(1)+'" y="'+(l[1]+4).toFixed(1)+'" text-anchor="'+anc+'">'+t[0]+'</text>'
+     + '<circle class="pt" r="3.5" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'"/>'
+     /* 꼭짓점이 작아 맞히기 어렵다. 보이지 않는 넓은 원으로 호버를 받는다 */
+     + '<circle class="hit" r="11" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" data-i="'+i+'"'
+     + ' onmouseenter="rdHover(this)" onmouseleave="rdOut(this)"/>';
+  });
+  return '<div class="radarwrap">'+s+'</svg><div class="ctip" style="display:none"></div></div>';
+}
+let RD_TASKS=[];
+function rdHover(el){
+  const wrap=el.closest('.radarwrap'), tip=wrap.querySelector('.ctip'), i=+el.getAttribute('data-i'), t=RD_TASKS[i];
+  if(!t) return;
+  wrap.querySelectorAll('.pt').forEach(function(c,k){ c.classList.toggle('on', k===i); });
+  tip.innerHTML='<b>'+t[0]+'</b><span>'+scoreTxt(t[1])+'</span>';
+  tip.style.display='block';
+  const wr=wrap.getBoundingClientRect(), er=el.getBoundingClientRect();
+  let x=er.left-wr.left+er.width/2+10, y=er.top-wr.top-8;
+  if(x+tip.offsetWidth>wr.width-4) x=er.left-wr.left-tip.offsetWidth-6;
+  tip.style.left=x+'px'; tip.style.top=Math.max(4,y)+'px';
+}
+function rdOut(el){
+  const wrap=el.closest('.radarwrap');
+  wrap.querySelector('.ctip').style.display='none';
+  wrap.querySelectorAll('.pt').forEach(function(c){ c.classList.remove('on'); });
+}
+/* 점수 영역: 차트(3개 이상일 때)와 점수 목록을 함께 그린다 */
+function scoreBlock(tasks){
+  RD_TASKS=tasks;
+  return (tasks.length>=3? radarSvg(tasks) : '')
+    + '<dl class="scorelist">'+tasks.map(function(t){ return '<dt>'+t[0]+'</dt><dd>'+(scoreOk(t[1])? scoreTxt(t[1]) : '<span class="dash">-</span>')+'</dd>'; }).join('')+'</dl>';
+}
+/* 원본 지표: 평가 도구가 남긴 값. 장문이라 접어 두고 코드 블록으로 둔다(공통정책 1.2) */
+function rawBlock(raw, label){
+  label = label || '원본 지표';
+  return '<details class="adv"><summary>'+label+'<span class="fold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></summary>'
+    + '<div class="advbody rawwrap"><pre class="rawbox">'+raw+'</pre>'
+    /* 복사 — 보고서·외부 비교에 붙여 쓰는 값이다. 부가 동작이라 아이콘으로 둔다(배포 목업 copyBtn · 라이브러리 .cbtn) */
+    + '<button class="cbtn sm rawcp" title="복사" onclick="cpRaw(this,\''+label+'\')">'
+    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 011-1h10"/></svg></button></div></details>';
+}
+/* 원본 그대로 복사한다. 토스트 문구는 배포 목업 복사와 같은 꼴(공통정책 7.7 완료형) */
+function cpRaw(btn, label){
+  const pre = btn.parentNode.querySelector('pre');
+  try{ navigator.clipboard && navigator.clipboard.writeText(pre.textContent); }catch(e){}
+  toast('ok', label+'를 복사했습니다.');
+}
+
+
+/* ===== 평가 결과 섹션 (CDE 정책 4.6 · 기획서 7.4) =====
+   평가명 · 연결된 모델 · 점수(레이더 차트 + 목록) · 원본 지표(기본 접힘). 차트 규칙은 모델 평가 결과 모달과 같다.
+   연결된 모델을 누르면 모델 상세 평가 탭으로 간다. 목업은 화면이 하나라 토스트로 보인다(실제 화면에는 없는 검토용 처리다) */
+function goModel(n){ act(n+' 모델 상세의 평가 탭으로 이동합니다.'); }
+function evRaw(e){ return '{\n'+e.tasks.map(function(t){ return '  "'+t[0].toLowerCase()+'": {"score": '+(t[1]==null?'null':t[1])+'}'; }).join(',\n')+'\n}'; }
+function evalSec(j, running){
+  let h='<div class="dsec"><h4>평가 결과'+tip('평가 작업이 잰 태스크별 점수입니다. 작업이 끝난 뒤 2년 동안 보존됩니다.')+'</h4>';
+  const e=j.ev;
+  if(running) return h+'<p class="secnote">평가가 끝나면 표시됩니다.</p></div>';
+  if(!e || j.st!=='완료') return h+'<p class="secnote">기록된 평가 결과가 없습니다.</p></div>';
+  h += '<dl class="dl">'
+    + '<dt>평가명</dt><dd>'+e.suite+'</dd>'
+    + '<dt>연결된 모델</dt><dd>'+(e.model
+        ? '<a class="lnk" href="#" onclick="goModel(\''+e.model.n+'\');return false">'+e.model.n+'</a> <span class="dash">'+e.model.v+'</span>'
+        : '<span class="dash">-</span>')+'</dd>'
+    + '</dl>'
+    + (e.model? '' : '<p class="secnote">평가한 모델을 등록하면 이 결과가 그 모델에 연결됩니다.</p>')
+    /* 상세 페이지는 폭이 넓어 점수 목록이 양 끝으로 벌어진다. 모델 평가 결과 모달 폭(520px)에 맞춘다 */
+    + '<div style="margin-top:14px;max-width:520px">'+scoreBlock(e.tasks)+'</div>'
+    + rawBlock(evRaw(e))
+    + '</div>';
+  return h;
+}
+
 function drawJobDetail(){
   const j=jdCur; if(!j) return;
   /* 상태 배지는 제목 옆에 붙인다. 배포 상세·CDE 상세와 같은 규격이다 */
@@ -3202,13 +3466,15 @@ function drawJobDetail(){
   let h='';
   /* .dl.two 는 4열 그리드다. 항목이 홀수면 마지막 행이 한쪽만 차 비뚤어지므로 짝수로 맞춘다 */
   h += '<div class="dsec"><h4>기본 정보</h4><dl class="dl two">'
-    + '<dt>유형</dt><dd>'+j.t+'</dd>'
+    + '<dt>유형</dt><dd>'+(j.t? tKo(j.t) : '<span class="dash">-</span>')+'</dd>'
+    /* 학습 방법은 학습 작업만 둔다(CDE 정책 4.6). 들어가면 항목이 8개라 빈 칸 채움을 빼서 짝수를 맞춘다 */
+    + (j.t==='train'? '<dt>학습 방법</dt><dd>'+(TMKO[j.tm]||'<span class="dash">-</span>')+'</dd>' : '')
     + '<dt>제출자</dt><dd>'+userRef(j.u)+'</dd>'
     + '<dt>CDE</dt><dd>'+(j.cde? j.cde : '<span class="dash">반납됨</span>')+'</dd>'
-    + '<dt>제출 일시</dt><dd>'+j.at+'</dd>'
+    + '<dt>제출일시</dt><dd>'+j.at+'</dd>'
     + '<dt>실행 시간</dt><dd>'+(j.dur!=='-'? j.dur : '<span class="dash">-</span>')+'</dd>'
     + '<dt>자원</dt><dd>'+jobRes(j)+'</dd>'
-    + '<dt></dt><dd></dd>'
+    + (j.t==='train'? '' : '<dt></dt><dd></dd>')
     + '</dl>'
     + (j.err? '<div class="secnote">'+j.err+'</div>' : '')
     + '</div>';
@@ -3223,7 +3489,12 @@ function drawJobDetail(){
   } else { h += '<p class="secnote">진단 결과가 없습니다.</p>'; }
   h += '</div>';
 
-  h += '<div class="dsec"><h4>학습 지표'+tip('학습 중 기록한 값입니다. 어떤 값을 남길지는 작업 스크립트가 정합니다.')+'</h4>';
+  /* 결과 섹션은 유형별로 둔다: 학습은 학습 지표, 평가는 평가 결과. 컴파일·데이터 가져오기는 결과 섹션 없이
+     산출물로 본다. 해당하지 않는 섹션은 항목 자체가 없는 경우라 안내 문구 없이 두지 않는다(공통정책 1.7 · CDE 정책 4.6).
+     보존 기간은 섹션 제목 도움말에 둔다(REQ-CDE-082) */
+  if(j.t==='eval') h += evalSec(j, running);
+  if(j.t==='train'){
+  h += '<div class="dsec"><h4>학습 지표'+tip('학습 중 기록한 값입니다. 어떤 값을 남길지는 작업 스크립트가 정합니다. 작업이 끝난 뒤 2년 동안 보존됩니다.')+'</h4>';
   if(j.mt){
     /* 차트가 들어가 2열로는 좁다. 1열로 둔다 */
     h += '<dl class="dl">'
@@ -3231,7 +3502,11 @@ function drawJobDetail(){
       + '<dt>Accuracy</dt><dd>'+spark(j.mt.acc,0,1)+'<span class="num">'+(j.mt.acc[j.mt.acc.length-1]*100).toFixed(0)+'%</span></dd>'
       + '</dl>';
   } else { h += '<p class="secnote">기록된 지표가 없습니다.</p>'; }
+  /* 하이퍼파라미터: 작업이 쓴 값을 그대로 접어 둔다. 키를 화면이 고정하지 않는다(CDE 정책 4.6 · 공통정책 1.2) */
+  h += j.hp? rawBlock(JSON.stringify(j.hp,null,2),'하이퍼파라미터')
+           : '<details class="adv"><summary>하이퍼파라미터<span class="fold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></summary><div class="advbody"><p class="secnote" style="margin:0">기록된 값이 없습니다.</p></div></details>';
   h += '</div>';
+  }
 
   h += '<div class="dsec"><h4>산출물</h4>';
   if(j.out){
@@ -3278,7 +3553,7 @@ function openLog(id){
     + '<dt>제출자</dt><dd>'+userRef(logCur.u)+'</dd>'
     /* CDE 를 반납해도 작업 기록은 남는다. 어디서 돌린 것인지 연결을 남긴다 */
     + '<dt>CDE</dt><dd>'+(logCur.cde? logCur.cde : '<span class="dash">반납됨</span>')+'</dd>'
-    + '<dt>제출 시각</dt><dd>'+logCur.at+'</dd>'
+    + '<dt>제출일시</dt><dd>'+logCur.at+'</dd>'
     + '</dl>';
   drawLog();
   document.getElementById('mdLog').classList.add('on');
@@ -3909,7 +4184,7 @@ function askReturn(name){
     if(t.st==='실패'){
       openConfirm('CDE 삭제',
         '<b>'+name+'</b>을 삭제합니다. 공유 볼륨의 데이터는 남습니다.',
-        function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료'; render(); } toast('ok','CDE를 삭제했습니다.'); },
+        function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료'; leaveCde(name); render(); } toast('ok','CDE를 삭제했습니다.'); },
         '삭제');
       return;
     }
@@ -3918,24 +4193,29 @@ function askReturn(name){
       held
         ? '<b>'+name+'</b>을 삭제합니다. 연산 자원이 개발룸으로 반환되고 개인 볼륨이 함께 사라집니다. 공유 볼륨의 데이터는 남습니다.'
         : '<b>'+name+'</b>을 삭제합니다. 보존 중인 개인 볼륨이 함께 사라져 새로 신청해도 이어서 사용할 수 없습니다. 공유 볼륨의 데이터는 남습니다.',
-      function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료'; render(); }
+      function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료'; leaveCde(name); render(); }
         toast('ok','CDE를 삭제했습니다.'); }, '삭제');
     return;
   }
   openConfirm('CDE 반납',
     '<b>'+name+'</b>을 반납합니다. 연산 자원이 개발룸으로 반환되고 개인 볼륨이 삭제됩니다. 공유 볼륨의 데이터는 남습니다.',
     /* 파드를 내리는 데 시간이 걸린다. 바로 종료로 넘기면 요청과 완료가 구분되지 않는다 */
-    function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료 중'; render(); finishRelease(name); }
+    function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료 중'; leaveCde(name); render(); finishRelease(name); }
       toast('ok','CDE 반납을 요청했습니다. 자원 회수가 끝나면 알림으로 안내됩니다.'); }, '반납');
 }
+/* 반납·회수·삭제를 확인하면 바로 개발룸 CDE 목록으로 돌아간다(REQ-CDE-086).
+   종료 중에는 상세에서 할 수 있는 조작이 없고(CDE 정책 6장), 진행은 목록의 상태 배지로 본다.
+   완료를 기다렸다가 화면을 옮기지 않는다. 사용자가 누르지 않았는데 화면이 바뀌기 때문이다.
+   개발룸 삭제 후 워크스페이스 상세로 가는 것과 같은 방식이다(REQ-CDE-075) */
+function leaveCde(name){ if(cdCur && cdCur.n===name) closeCde(); }
 /* 파드를 내리는 데 시간이 걸린다. 요청과 완료를 갈라 보이려고 종료 중을 거친다.
+   종료되면 목록에서 빠진다(CDE 정책 6장). 완료는 알림으로 안내한다(REQ-CDE-044). 아래 토스트는 알림 대신이다.
    ⚠ 대기 시간은 데모용이다. 실제로는 백엔드가 완료를 알린다 */
 function finishRelease(name){
   setTimeout(function(){
     const m=CDE.find(x=>x.n===name);
     if(!m || m.st!=='종료 중') return;
     m.st='종료';
-    if(cdCur && cdCur.n===name) closeCde();
     render();
     toast('ok','CDE 자원 회수가 완료되었습니다.');
   }, 2600);
@@ -3944,7 +4224,7 @@ function askRevoke(name){
   /* 회수는 남의 것을 지운다. 개인 볼륨이 함께 사라지므로 반납과 같이 밝힌다(회의 3.3) */
   openConfirm('CDE 회수',
     '<b>'+name+'</b>을 회수합니다. 연산 자원이 개발룸으로 반환되고 개인 볼륨이 삭제됩니다. 공유 볼륨의 데이터는 남습니다. 사용자에게 알림이 전송됩니다.',
-    function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료 중'; render(); finishRelease(name); }
+    function(){ const m=CDE.find(x=>x.n===name); if(m){ m.st='종료 중'; leaveCde(name); render(); finishRelease(name); }
       toast('ok','CDE 회수를 요청했습니다. 자원 회수가 끝나면 알림으로 안내됩니다.'); }, '회수');
 }
 /* 조사 — 받침 유무로 고른다. 영문·숫자로 끝나면 발음 기준으로 판정한다 */
@@ -4114,7 +4394,7 @@ function demoView(v,btn){
   }
 }
 function setRoom(v,btn){
-  roomExists=v;
+  roomExists=v; roomDeleting=false;
   document.querySelectorAll('#demoBar .rm').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
   closePanel(); render();
