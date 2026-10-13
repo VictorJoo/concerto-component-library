@@ -1,5 +1,13 @@
 <!--
-  콘체르토 매니저 · 워크스페이스 화면 목업 v0.57 (2026-10-12)
+  콘체르토 매니저 · 워크스페이스 화면 목업 v0.58 (2026-10-13)
+
+  ── v0.58 ──
+  · CDE 건수를 개발룸 CDE 목록과 같은 범위로 센다(REQ-WKSP-024·030 · WKSP-L01 5.1·7.2 · CDE 정책 4.1·6장).
+    관리자 이상은 워크스페이스 전체, 그 외에는 본인 것만 센다. 승인 대기·반려·취소·종료는 개발룸 목록에
+    나오지 않으므로 세지 않는다. 종전에는 전체 건수를 세어 편집자가 상세에서 본 숫자와 개발룸 목록이 어긋났다.
+    대상은 상세 환경 섹션 · 이 워크스페이스의 리소스 · 패널 환경 블록 셋이다. 워크스페이스 삭제 알럿은
+    최고 관리자 전용이라 그대로 둔다.
+  · 개발룸이 이 파일에 있던 시절의 `── 개발룸 ──` 주석 묶음을 지웠다. 개발룸 화면은 개발룸 목업 소관이다.
 
   ── v0.57 ──
   · 삭제 실패 사유를 배지 툴팁으로 안내한다(워크스페이스 정책 2.6 · WKSP-L01 5.2·REQ-WKSP-101).
@@ -288,13 +296,6 @@
     상세에서 들어왔으면 상세로 간다
   · 브레드크럼은 계층을 표시한다(공통정책 4.3). 개발룸은 상세 아래 화면이므로
     진입 경로와 무관하게 경로에 상세가 들어간다. 뒤로가기와 성격이 다르다
-
-  ── 개발룸 ──────────────────────────────────────
-  · CDE 목록은 워크스페이스 전체를 보여준다. 자원을 나눠 쓰므로 누가 무엇을
-    쓰고 있는지 서로 알아야 조정이 된다(기술문서 VIEWER 권한 — CDE 목록 읽기 전용)
-  · 접속·연장·반납은 본인 CDE에만 노출한다. 남의 것은 조회만 한다
-  · 본인 행은 배경과 `나` 태그로 구분한다
-  · 승인·반려 처리는 내 작업함 소관이다. 여기서는 대기 건수만 알리고 이동 경로를 준다
 
   ── 계정 ────────────────────────────────────────
   · 멤버 이름은 최고 관리자에게만 링크로 노출하고 플랫폼 설정 > 사용자 및 역할
@@ -2159,6 +2160,11 @@ const canAdminWs=(m)=>isSysWs(m)? isSuper() : isWsAdmin();
    실제로는 계정의 플랫폼 역할을 읽는다 */
 const SUPER_IDS=['admin','yj.seong'];
 const isSuperAcct=(id)=>SUPER_IDS.indexOf(id)>=0;
+/* CDE 건수 — 개발룸 CDE 목록과 같은 범위로 센다(REQ-WKSP-024·030 · CDE 정책 4.1·6장).
+   자원을 잡고 있는 상태만 목록에 나오고, 관리자 이상은 전체·그 외에는 본인 것만 본다.
+   상세에서 본 숫자와 개발룸에 들어가 본 목록이 어긋나지 않게 한다 */
+const CDE_LIVE=['준비 중','구동 중','정상','절전','실패','만료','회수','종료 중'];
+const cdeCnt=(m)=>m.cdes.filter(c=>CDE_LIVE.indexOf(c.st)>=0 && (isWsAdmin() || c.u==='yj.seong')).length;
 /* 공용은 기본 정보(이름·설명·아이콘)를 아무도 바꾸지 않는다(정책 6.1·8장).
    자산 등록·수정·삭제·자원 할당량이 이미 막혀 있어 기본 정보만 열어 두면 기준이 갈린다.
    설명은 설치 시 고정 문구로 둔다 — 전 사용자가 참조하는 문구다.
@@ -3117,7 +3123,7 @@ function drawDetail(){
        +   '<span class="tip">'+devWhy+'</span></span></td>')
    +   (m.sys? '<td colspan="3"><span class="dash">배정 없음 · 잔여 사용</span></td>'
         : '<td>'+m.devq.cpu+' Cores 이하</td><td>'+m.devq.ram+' Gi 이하</td><td>'+m.devq.gpu+'장 이하</td>')
-   +   '<td>CDE '+m.cdes.length+'건</td></tr>'
+   +   '<td>CDE '+cdeCnt(m)+'건</td></tr>'
    + '<tr onclick="openRoom(null,\'prod\')" title="운영룸으로 이동"><td><span class="mname">운영룸</span></td>'
    +   '<td><span class="stbadge '+RB[m.prod]+'">'+m.prod+'</span><span class="entgo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-8 8M10 6H5a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1v-5"/></svg></span></td>'
    +   (m.sys? '<td colspan="3"><span class="dash">배정 없음 · 잔여 사용</span></td>'
@@ -3135,7 +3141,7 @@ function drawDetail(){
       항목 설명은 툴팁으로 옮겨 섹션 안에 문구가 쌓이지 않게 한다 */
    + '<div class="resblock"><div class="rh"><h5>배포'+tip('운영룸에서 서비스 중인 배포입니다. 목록과 상세는 운영룸에서 확인합니다.')+'</h5><span class="cnt">'+m.deps.length+'건</span>'
    +   '<button class="all" onclick="openRoom(null,\'prod\')">운영룸으로 이동<span class="ar">→</span></button></div></div>'
-   + '<div class="resblock"><div class="rh"><h5>CDE'+tip('개발룸에서 멤버가 사용 중인 CDE입니다. 목록과 상세는 개발룸에서 확인합니다.')+'</h5><span class="cnt">'+m.cdes.length+'건</span>'
+   + '<div class="resblock"><div class="rh"><h5>CDE'+tip('개발룸에서 멤버가 사용 중인 CDE입니다. 목록과 상세는 개발룸에서 확인합니다.')+'</h5><span class="cnt">'+cdeCnt(m)+'건</span>'
    +   '<button class="all" onclick="goDevRoom()">개발룸으로 이동<span class="ar">→</span></button></div></div>'
    + '</div>';
 
@@ -3271,7 +3277,7 @@ function keyLabel(m,d){
 function pnRoomBlock(m){
   const rows=[
     {k:'prod', nm:'운영룸', st:m.prod, cnt:m.deps.length+'건', lb:'배포'},
-    {k:'dev',  nm:'개발룸', st:m.dev,  cnt:m.cdes.length+'건', lb:'CDE'}
+    {k:'dev',  nm:'개발룸', st:m.dev,  cnt:cdeCnt(m)+'건', lb:'CDE'}
   ];
   return rows.map(function(r){
     const off = r.st==='미생성';
