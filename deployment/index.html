@@ -1,8 +1,37 @@
 <!--
-  콘체르토 매니저 · 배포 화면 목업 v0.33 (2026-10-12)
+  콘체르토 매니저 · 배포 화면 목업 v0.34 (2026-10-14)
   색·컴포넌트 규격은 워크스페이스 목업 v0.33 를 그대로 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
 
   ── 변경 ────────────────────────────────────────
+  v0.34 (2026-10-14) · 4.0 범위에 맞춰 배포 상세를 정리했다(배포 정책 2.1·3.4 · DEP-L01 v0.34 화면 구성·
+          REQ-DEP-021·024·081·5.1·7.6 · CON-713).
+        · 모니터링 탭의 `전체 로그 →`·`추론 트레이스 →` 버튼을 뺐다. 두 화면으로 가는 경로는 4.1 범위다.
+          주요 이벤트 도움말의 `요청 단위 로그는 전체 로그에서 확인합니다.` 도 뺐다. `상세 지표 →` 는
+          모니터링 배포 성능 탭으로 가는 경로라 그대로 둔다.
+        · 헬스(안정·주의·위험)를 감췄다. 패널 모델·자원의 헬스 행, 모니터링 탭의 헬스 카드와 도움말이다.
+          헬스는 지표를 가공한 값이라(기술문서 10.5) 건전성 점수와 함께 4.1 범위다.
+        · 진단 박스는 상태가 오류일 때만 띄운다. 4.0 은 상태를 근거로 무엇이 일어났는지와 할 수 있는
+          조치만 적는다. 지표를 근거로 한 원인 설명과 헬스가 주의·위험일 때의 진단은 4.1 범위다.
+          패널의 오류 안내 문구도 `조치는 상세 화면에서 확인합니다.` 로 맞췄다. 생성 실패 안내는 그대로 둔다.
+        · 4.1 화면은 코드에 남기고 SCOPE_41 값 하나로 감춘다. true 로 바꾸면 v0.33 화면이 그대로 나온다.
+        · 설정 변경 주석의 구간 이름을 기획서와 맞췄다. 재기동 필요 / 재기동 없음 / 변경 불가. 화면은 바뀌지 않는다.
+        · 모델 배포 조건을 배포 생성·설정 변경에 적용했다(배포 정책 2.3·4.2·4.5 · DEP-L01 v0.34
+          REQ-DEP-085~089·5.3·7.3·7.7 · 모델 정책 2.9 · CON-596 2026-10-13).
+        · 01 모델: 모델을 고르면 요구 가속기·고정 장수·컨텍스트 상한·유의사항을 안내한다. 없으면 두지 않는다.
+        · 02 자원: 요구 가속기에 맞지 않는 가속기 종류는 비활성으로 두고 사유를 안내한다. 맞는 종류가
+          하나면 미리 고른다. 모델을 바꿔 고른 종류가 맞지 않게 되면 선택을 비운다(8/19 회의 4.2).
+        · 레플리카당 가속기 수는 모델 요구 값이 있으면 잠근다. 분리면 풀마다 잠근다.
+        · 고른 가속기가 지원하지 않는 서빙 방식은 비활성으로 둔다. 분리를 고른 상태였으면 단일로 되돌린다.
+          분리 가능 여부를 알려 주는 가속기 데이터는 없다. 백엔드와 같이 Furiosa 가속기에서 분리를 막는다
+          (CON-596 117756 SERVING_NPU_PD_UNSUPPORTED). 샘플의 noPd 는 그 판정을 목업에서 흉내 낸 값이다.
+        · 최대 컨텍스트 길이 선택지는 모델 상한 이하만 둔다. 설정 변경에서 상한을 넘기면 저장 시 인라인 에러.
+        · 배포 전 검사에 배포 조건 불일치 항목을 더했다. 화면이 이미 막아 데모에서는 나오지 않는다.
+        · 샘플: furiosa-qwen3-32b-fp8 · gpt-oss-120b-furiosa 에 배포 조건을 두었다(검토용 값).
+          모델의 kind 는 요구 가속기의 계열(GPU·NPU)이다. 모델 목업의 요구 가속기와 같게 두었고, `제한 없음` 인
+          모델은 kind 를 두지 않아 제한하지 않는다. 판정은 계열 단위라 H200 모델에 H200 MIG 도 고를 수 있다.
+        · 토큰 수는 천 단위 쉼표로 쓴다. 고급 설정 선택지 라벨(4K·32K 등)은 종전대로 둔다.
+        ⚠ GPU↔NPU 교차 배포를 백엔드도 거절하는지는 백엔드 확인 전이다(CON-596 117756 회신 확인 항목).
+
   v0.33 · 스크린 ID 주석을 기획서·IA 기준으로 맞췄다(DEP-L01 v0.33). 화면은 바뀌지 않는다.
           · 설정 변경 `DEP-L01.M01` → `DEP-L01.D01.M01`
         · 벤치마크 중단을 신설했다(배포 정책 7.2 · DEP-L01 REQ-DEP-084·7.4). 실행 중인 건의 작업 열에만
@@ -217,7 +246,7 @@
         · 플랫폼 기본값을 좌측에서 빼고 검수에만 둔다. 값이 바뀌지 않아 진행 중
           볼 이유가 없고, 검수와 중복이다. TUI 도 좌측 레일에는 std 배지만 둔다.
         · 전체 로그·추론 트레이스 화면을 뺐다. 배포는 배포된 자원의 관리와 상태 확인까지이고
-          상세 성능 정보는 모니터링 소관이다. 배포 상세에 진입점만 남긴다.
+          상세 성능 정보는 모니터링 소관이다. 배포 상세에 진입점만 남긴다(v0.34 에서 진입점도 뺐다. 4.1 범위).
   v0.1  최초 작성. 배포 정책 v0.1 · 배포 기획서 v0.1 과 함께 작성했다
 
   [검토용 임시 장치 — 확정 후 삭제]
@@ -229,7 +258,7 @@
   · 포함 — DEP-L01 목록 / DEP-L01.P01 패널 / DEP-L01.D01 상세(탭 3) / DEP-W01 생성 마법사
   · 포함 — DEP-L01.D01.M01 설정 변경 모달 · DEP-F01 외부 배포 가져오기
   · 미포함 — 전체 로그 · 추론 트레이스. 배포는 배포된 자원의 관리와 상태 확인까지이고
-    상세 성능 정보는 모니터링 소관이다(8/19 회의). 배포 상세에 진입점만 남긴다
+    상세 성능 정보는 모니터링 소관이다(8/19 회의). 진입점은 4.1 범위라 두지 않는다(v0.34)
   · 미포함 — 벤치마크 실행 중 화면. 돌려놓고 기다리는 작업이라 화면을 두지 않고
     이력에 `실행 중` 상태로 표시하고 완료되면 알림으로 안내한다
 
@@ -248,7 +277,8 @@
     차이는 깊이다 — GNB 는 게이트웨이·엔진·GPU 3계층 차트 9개와 인프라 건전성 점수·5지표,
     여기는 지금 어떤지 보여주고 넘긴다(현행 명세 5.2)
   · 헬스는 GNB 의 인프라 건전성 점수와 같은 값이다.
-    여기는 라벨만, 점수와 산출 지표는 모니터링 화면에서 본다(기술문서 10.5)
+    여기는 라벨만, 점수와 산출 지표는 모니터링 화면에서 본다(기술문서 10.5).
+    4.1 범위라 v0.34 부터 감춘다(SCOPE_41)
   · ⚠ 8/10 회의에서 "모니터링 범위는 워크스페이스 밖이므로 별도로 정리한다" 로 정리됐다.
     모니터링 화면이 재정리 대상이라 `상세 지표 →` 가 갈 곳은 바뀔 수 있다.
     다만 배포별 깊은 지표를 볼 자리가 필요하다는 것은 확실해 링크는 유지한다 — 확인 대상
@@ -260,8 +290,8 @@
   · 요약에 채널 배지·행 번호를 두지 않는다. 원문이 아니라 사건 기록이기 때문이다
 
   ── 진단 ────────────────────────────────────────
-  · 기술문서 10.5 — 메트릭을 가공해 원인과 조치를 문장으로 제안한다
-  · 상태가 오류일 때만이 아니라 헬스가 주의·위험일 때도 띄운다.
+  · 4.0 은 상태가 오류일 때만 띄운다. 상태를 근거로 무엇이 일어났는지와 할 수 있는 조치를 적는다(배포 정책 3.4)
+  · 4.1 은 기술문서 10.5 대로 메트릭을 가공한 원인 설명을 더하고, 헬스가 주의·위험일 때도 띄운다.
     상태는 떠 있는지를, 헬스는 잘 도는지를 말하므로 정상인데 헬스가 나쁠 수 있다
 
   ── 상태와 액션 ─────────────────────────────────
@@ -332,10 +362,10 @@
     단위라 워크로드가 있는 구획을 따라 정해진다. 다만 자원 한도는 적용되지 않는다
 
   ── 설정 변경 ───────────────────────────────────
-  · 저장 뒤에 무엇이 따르는지로 구간을 나눈다 — 재기동 필요(용량·엔진) / 기동 없이 반영(추론 기본값) /
+  · 저장 뒤에 무엇이 따르는지로 구간을 나눈다 — 재기동 필요(용량·엔진) / 재기동 없음(API Key 인증) /
     변경 불가(병렬 처리). 둘 다 저장을 눌러야 반영되고 차이는 재기동이 따르느냐다.
     "즉시 반영" 이라 쓰면 저장 없이 반영되는 것으로 읽혀 문구를 바꿨다
-  · 영향이 큰 것부터 둔다 — 용량 → 엔진 → 추론 기본값
+  · 영향이 큰 것부터 둔다 — 용량 → 엔진 → 접근 설정 → 병렬 처리
   · 재기동이 걸리는 값을 건드렸을 때만 하단에 알린다. 늘 띄우면 읽지 않는다
   · 바꿀 수 없는 값도 자리를 둔다. 없으면 어디서 바꾸는지 찾아 헤맨다
   · CPU·메모리와 추론 기본값(Temperature·Top P·시스템 프롬프트)은 두지 않는다.
@@ -1428,6 +1458,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   background:var(--card);border:1.5px solid var(--border);cursor:pointer;
   font-family:inherit;transition:border-color .12s}
 .pick .pk:hover{border-color:var(--border-strong)}
+.pick .pk:disabled{opacity:.45;cursor:default;border-color:var(--border)}
 .pick .pk.on{border-color:var(--primary);background:var(--selected-soft)}
 .pick .pk b{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;
     margin-bottom:4px;color:var(--foreground);min-height:20px}
@@ -2199,18 +2230,20 @@ function gpuTotal(ws){ const w=WSQ[ws]; return w? w.gpu : 0; }
 
 const MODELS=[
  {n:'llama-3.2-1b-instruct', v:'latest', cached:false},
- {n:'qwen3-32b',              v:'v3.6',   cached:true},
- {n:'k-exaone-236b-a23b-nvfp4a16', v:'1.0.0', cached:false},
+ {n:'qwen3-32b',              v:'v3.6',   cached:true,  kind:'gpu'},
+ {n:'k-exaone-236b-a23b-nvfp4a16', v:'1.0.0', cached:false, kind:'gpu'},
  {n:'qwen3-6-35b-a3b-fp8', v:'1.0.0', cached:true},
  {n:'qwen3-5-122b-a10b-gptq-int4', v:'1.0.0', cached:false},
  {n:'gemma-4-31b-it-fp8-block', v:'1.0.0', cached:true},
  {n:'gemma-4-12b-it', v:'1.0.0', cached:false},
  {n:'qwen-next-80b-a3b-thinking', v:'latest', cached:false},
- {n:'furiosa-qwen3-32b-fp8', v:'latest', cached:true},
+ {n:'furiosa-qwen3-32b-fp8', v:'latest', cached:true, kind:'npu',
+  req:{gpu:4, ctx:32768, note:'RNGD 4장 기준으로 컴파일한 모델입니다.', src:{gpu:'모델 파일', ctx:'모델 파일', note:'관리자 입력'}}},
  {n:'gpt-oss-20b', v:'latest', cached:true},
- {n:'gpt-oss-120b-furiosa', v:'1.0.0', cached:false},
+ {n:'gpt-oss-120b-furiosa', v:'1.0.0', cached:false, kind:'npu',
+  req:{gpu:8, ctx:65536, note:'', src:{gpu:'관리자 입력', ctx:'모델 파일'}}},
  {n:'gpt-oss-120b', v:'latest', cached:true},
- {n:'solar-open-100b-nvfp4a16', v:'1.0.0', cached:false}
+ {n:'solar-open-100b-nvfp4a16', v:'1.0.0', cached:false, kind:'gpu'}
 ];
 
 /* 가속기 목록은 ACCS 하나로 둔다. 목록용·마법사용으로 나눠 두었더니
@@ -2283,6 +2316,9 @@ const RB={'정상':'ok','오류':'cr','생성 중':'ac load','유휴':'mu','중�
              같은 표기가 화면마다 다른 색이면 안 된다(공통정책 5.1 · 2026-10-12 결정).
              확인 불가는 문제가 확인된 것이 아니라 확인할 수 없는 것이라 중립 mu 다 */
           '확인 불가':'mu','연결 불가':'cr'};
+/* 4.1 범위 화면 표시 여부(v0.34). 헬스 표시, 지표 기반 진단, 헬스 주의·위험 진단이 여기에 걸린다.
+   4.0 은 false. true 로 바꾸면 v0.33 화면이 그대로 나온다(배포 정책 3.4 · DEP-L01 REQ-DEP-021·081) */
+const SCOPE_41=false;
 /* 헬스는 상태와 다른 축이다(기술문서 §10.5). 목록 상태 컬럼과 섞지 않고 상세에서만 쓴다 */
 const HB={'안정':'ok','주의':'wa','위험':'cr','-':'mu'};
 /* 확인 불가·연결 불가는 외부 배포에만 쓴다(배포 정책 3.1 · DEP-L01 5.2·7.1 · CON-700).
@@ -2616,7 +2652,7 @@ function openPanel(i){
   const b=[];
   /* 상태로 조치가 필요한 건은 패널 상단에 먼저 알린다 */
   if(d.st==='오류')
-    b.push(alertBox('crit','요청을 처리하지 못하고 있습니다.','원인과 조치 권고는 상세 화면의 모니터링 탭에서 확인합니다.',
+    b.push(alertBox('crit','요청을 처리하지 못하고 있습니다.','조치는 상세 화면에서 확인합니다.',
       '<button class="btn ghost sm" onclick="openDetail()">상세 열기</button>', false));
   if(d.st==='생성 실패')
     b.push(alertBox('crit','배포를 기동하지 못했습니다.','설정을 확인한 뒤 다시 시도해 주세요.',
@@ -2649,10 +2685,12 @@ function openPanel(i){
     ['총 사용량', d.gpu && d.rep!==null
        ? (d.gpu*(d.tgt||d.rep))+'장'
        : '<span class="dash">-</span>'],
-    ['레플리카', repCell(d)],
+    ['레플리카', repCell(d)]
+  /* 헬스는 4.1 범위(SCOPE_41) */
+  ].concat(SCOPE_41? [
     ['헬스'+tip('메트릭을 종합해 산출한 건강도입니다. 상태가 떠 있는지를 말한다면 헬스는 잘 도는지를 말합니다.'),
       '<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>']
-  ]), 'spec'));
+  ] : [])), 'spec'));
 
   b.push(sec('접근 설정', dl([
     ['외부 접근', d.gw? '사용' : '사용 안 함'],
@@ -2817,10 +2855,15 @@ function dcard(t,v,cls){ return '<div class="dcard"><div class="ct">'+t+'</div><
 /* 진단 — 기술문서 10.5. 원시 메트릭을 가공해 원인과 조치를 문장으로 제안한다.
    상태가 오류일 때만이 아니라 헬스가 주의·위험일 때도 띄운다.
    상태는 떠 있는지를, 헬스는 잘 도는지를 말하는 다른 축이라 정상인데 헬스가 나쁠 수 있다 */
-function needDiag(d){ return d.st==='오류' || d.health==='주의' || d.health==='위험'; }
+/* v0.34: 4.0 은 상태가 오류일 때만 띄우고 상태를 근거로 쓴다. 지표 기반 원인과 헬스 진단은 4.1(SCOPE_41) */
+function needDiag(d){ return d.st==='오류' || (SCOPE_41 && (d.health==='주의' || d.health==='위험')); }
 function diagBox(d){
   const err = d.st==='오류';
-  const t = err
+  const t = (err && !SCOPE_41)
+    ? {t:'요청을 처리하지 못하고 있습니다.',
+       s:'배포는 기동했으나 요청에 응답하지 않습니다. 레플리카 기동 기록은 모니터링 탭의 주요 이벤트에서 확인할 수 있습니다.',
+       r:'설정을 확인한 뒤 재시작해 주세요.'}
+    : err
     ? {t:'요청을 처리하지 못하고 있습니다.',
        s:'가속기 메모리가 부족해 레플리카가 기동 직후 종료되고 있습니다. 최근 10분간 재기동이 6회 발생했습니다.',
        r:'레플리카당 가속기 수를 늘리거나 최대 컨텍스트 길이를 줄여 주세요.'}
@@ -2964,7 +3007,8 @@ function dMonitor(d){
   /* 주요 이벤트 — 배포의 상태가 바뀐 일만 남긴다(정책 8.4).
      기동 시작·완료 · 레플리카 준비·실패 · 설정 변경 반영 · 중지·재시작 · 삭제 요청.
      요청 처리·헬스체크·지표 수집·스택트레이스는 남기지 않는다.
-     오류도 사건으로 기록하고 원인은 전체 로그로 넘긴다 — 원문을 섞으면 두 화면의 구분이 사라진다.
+     오류도 사건으로 기록하고 원문은 섞지 않는다 — 원문을 섞으면 두 화면의 구분이 사라진다.
+     전체 로그로 가는 경로는 4.1 범위라 두지 않는다(v0.34).
      실시간 원문 로그는 웹소켓으로 흘리는 다른 화면이다. API 호출 지점도 다르다 */
   const EV = d.st==='오류'
     ? [['17:40','배포를 기동했습니다.'],
@@ -2982,8 +3026,9 @@ function dMonitor(d){
    + mv('대기 중인 요청','<b>'+(on?'3':'0')+'</b>','실시간')
    + mv('가속기 사용률','<b>'+(on?'74.2':'0.0')+'</b><small> %</small>','최근 1시간 평균')
    + mv('메모리 사용량','<b>'+(on?'62.4':'0.0')+'</b><small> / '+(d.gpu?parseInt(accVram(d.acc)):0)+' GB</small>','실시간')
-   + mv('헬스','<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>','',
-        '메트릭을 종합해 산출한 건강도입니다. 배포 상태와 다른 축이며, 점수와 산출 지표는 모니터링 화면에서 확인합니다.')
+   /* 헬스 카드는 4.1 범위(SCOPE_41) */
+   + (SCOPE_41? mv('헬스','<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>','',
+        '메트릭을 종합해 산출한 건강도입니다. 배포 상태와 다른 축이며, 점수와 산출 지표는 모니터링 화면에서 확인합니다.') : '')
    + '</div>'
    /* 깊은 분석은 모니터링 화면 소관이다(현행 명세 5.2 오버뷰 대시보드).
       거기에는 게이트웨이·엔진·GPU 3계층 차트 9개와 인프라 건전성 점수가 있고
@@ -2993,7 +3038,7 @@ function dMonitor(d){
    + '<div class="secact" style="margin-top:14px">'
    +   '<button class="btn ghost sm" onclick="act(\'모니터링 화면의 오버뷰 대시보드로 이동합니다.\')">상세 지표<span class="ar">→</span></button>'
    + '</div></div>'
-   + '<div class="dsec"><h4>주요 이벤트'+tip('배포에 일어난 일만 모아 보여줍니다. 요청 단위 로그는 전체 로그에서 확인합니다.')+'</h4>'
+   + '<div class="dsec"><h4>주요 이벤트'+tip('배포에 일어난 일만 모아 보여줍니다.')+'</h4>'
    + (on || d.st==='오류'
       ? '<ul class="evlist">'
         + EV.map(function(e){
@@ -3001,12 +3046,9 @@ function dMonitor(d){
           }).join('')
         + '</ul>'
       : '<div class="emptyline">기동 중이 아니라 기록할 이벤트가 없습니다.</div>')
-   + '<div class="secact" style="margin-top:14px">'
    /* 원문 로그·구간별 처리 시간은 모니터링 소관이다(8/19 회의).
-      여기서는 넘어가는 진입점만 둔다 */
-   +   '<button class="btn ghost sm" onclick="act(\'모니터링의 전체 로그로 이동합니다.\')">전체 로그<span class="ar">→</span></button>'
-   +   '<button class="btn ghost sm" onclick="act(\'모니터링의 추론 트레이스로 이동합니다.\')">추론 트레이스<span class="ar">→</span></button>'
-   + '</div></div>';
+      전체 로그·추론 트레이스로 가는 진입점은 4.1 범위라 두지 않는다(v0.34) */
+   + '</div>';
 }
 
 /* 벤치마크 — 개발문서 9.1은 실사용 트래픽 패턴을 그대로 재현하는 것이 목적이라고 한다.
@@ -3406,9 +3448,40 @@ function argCatCount(sec){
 const ACCS=[
   {k:'nvidia-h200',    n:'NVIDIA-H200',     vram:'141GB', kind:'gpu'},
   {k:'nvidia-h200-mig',n:'NVIDIA-H200 MIG', vram:'20GB',  kind:'gpu'},
-  {k:'furiosa-rngd',   n:'Furiosa RNGD',    vram:'48GB',  kind:'npu'}
+  {k:'furiosa-rngd',   n:'Furiosa RNGD',    vram:'48GB',  kind:'npu', noPd:true}
 ];
 function accOf(k){ return ACCS.find(function(a){return a.k===k;}) || ACCS[0]; }
+
+/* 모델 배포 조건(모델 정책 2.9 · 배포 정책 2.3)
+   kind 는 요구 가속기 계열(gpu·npu)이다. 값이 없는 모델은 제한하지 않는다.
+   req 는 모델에 고정된 값. gpu 레플리카당 가속기 수, ctx 최대 컨텍스트 길이 상한(토큰).
+   GPU 용 모델은 GPU, NPU 용 모델은 NPU 만 고를 수 있다(8/19 회의 4.2) */
+const KIND_LABEL={gpu:'GPU', npu:'NPU'};
+function wModelOf(){ return MODELS.find(function(m){ return m.n===WF.model; }); }
+function modelReq(n){ const m=MODELS.find(function(x){ return x.n===n; }); return (m && m.req) || null; }
+function accOk(m,k){ return !m || !m.kind || accOf(k).kind===m.kind; }
+function accReqName(m){
+  const ok=ACCS.filter(function(a){ return a.kind===m.kind; }).map(function(a){ return a.n; });
+  return ok.length? ok.join(' · ') : KIND_LABEL[m.kind];
+}
+/* 가속기마다 지원하는 서빙 방식이 정해져 있다(배포 정책 4.5). 이를 알려 주는 가속기 데이터는 없고,
+   백엔드는 Furiosa 가속기 + 분리를 거절한다(117756). 목업은 noPd 로 같은 판정을 흉내 낸다 */
+function accNoPd(k){ return !!(k && accOf(k).noPd); }
+function ctxTok(v){ const n=parseInt(v)||0; return /K$/.test(v)? n*1024 : n; }
+function ctxK(t){ return Math.round(t/1024)+'K'; }
+/* 토큰 수 표기는 천 단위 쉼표(공통정책 1.4) */
+function ctxN(t){ return Number(t).toLocaleString(); }
+/* 모델을 바꾸거나 가속기를 바꾸면 배포 조건에 맞춰 값을 다시 맞춘다 */
+function wApplyReq(){
+  const m=wModelOf(), q=m && m.req;
+  if(m && m.kind){
+    const ok=ACCS.filter(function(a){ return a.kind===m.kind; });
+    if(!WF.acc || !accOk(m,WF.acc)){ WF.acc = ok.length===1? ok[0].k : ''; if(!WF.acc) wShown.acc=true; }
+  }
+  if(accNoPd(WF.acc) && WF.topo==='pd') WF.topo='single';
+  if(q && q.gpu){ WF.gpu=String(q.gpu); WF.preGpu=String(q.gpu); }
+  if(q && q.ctx && ctxTok(WF.maxLen)>q.ctx) WF.maxLen=ctxK(q.ctx);
+}
 
 /* 총 사용량 — 블록마다 레플리카 수 × 레플리카당 가속기 수를 더한다.
    블록이 셋이 되어도 같은 방식으로 계산된다 */
@@ -3451,6 +3524,15 @@ function dryRun(){
     const need = wTotalGpu(), free = WF.ws? gpuFree(WF.ws) : 0;
     if(need > free) rows.push({t:'warn', m:'요청 가속기 '+need+'장 · 배분 가능 '+free+'장',
       d:'배분 가능한 양을 넘습니다. 워크스페이스 할당량을 조정하거나 수를 줄여 주세요.'});
+    /* 모델 배포 조건. 화면이 이미 막으므로 마지막 확인이다(배포 정책 2.3) */
+    const q=modelReq(WF.model)||{}, wm=wModelOf();
+    /* 계열 불일치는 백엔드 거절 코드가 없어 검사 항목에 두지 않는다. 화면이 02 자원에서 막는다 */
+    if(q.gpu && (String(WF.gpu)!==String(q.gpu) || (WF.topo==='pd' && String(WF.preGpu)!==String(q.gpu))))
+      rows.push({t:'err', m:'레플리카당 가속기 수가 모델 요구 값('+q.gpu+'장)과 다릅니다.'});
+    if(q.ctx && ctxTok(WF.maxLen)>q.ctx)
+      rows.push({t:'err', m:'최대 컨텍스트 길이가 모델 상한('+ctxN(q.ctx)+' 토큰)을 넘습니다.'});
+    if(accNoPd(WF.acc) && WF.topo==='pd')
+      rows.push({t:'err', m:'이 가속기에서는 프리필·디코드 분리를 지원하지 않습니다.'});
     /* 인자 충돌 — 데모로 하나만 둔다 */
     if(WF.maxLen==='4K' || WF.maxLen==='8K')
       rows.push({t:'err', m:'최대 배치 토큰 수는 최대 컨텍스트 길이보다 클 수 없습니다',
@@ -3508,7 +3590,7 @@ function wQuit(){
   backToList();
 }
 
-function wSet(k,v){ WF[k]=v; drawWiz(); }
+function wSet(k,v){ WF[k]=v; if(k==='model'||k==='acc') wApplyReq(); drawWiz(); }
 function wSetQuiet(k,v){ WF[k]=v; wRefreshFoot(); }
 function wBlur(k){ wShown[k]=true; drawWiz(); }
 function wTgAdv(k){ wAdv[k]=!wAdv[k]; drawWiz(); }
@@ -3520,6 +3602,7 @@ function wErrs(){
   const e=[];
   if(!WF.model) e.push({step:0, f:'model', m:'모델을 선택해 주세요.'});
 
+  if(!WF.acc) e.push({step:1, f:'acc', m:'가속기 종류를 선택해 주세요.'});
   const rep=parseInt(WF.rep), gpu=parseInt(WF.gpu);
   if(!(rep>=1)) e.push({step:1, f:'rep', m:'레플리카 수는 1 이상이어야 합니다.'});
   if(!(gpu>=1)) e.push({step:1, f:'gpu', m:'레플리카당 가속기 수는 1 이상이어야 합니다.'});
@@ -3616,7 +3699,7 @@ function selBox(key,opts,val){
   return '<select class="inp" onchange="wSet(\''+key+'\',this.value)">'
    + opts.map(function(o){
        const v=o.v!==undefined?o.v:o, t=o.t!==undefined?o.t:o;
-       return '<option value="'+v+'"'+(val===v?' selected':'')+'>'+t+'</option>';
+       return '<option value="'+v+'"'+(val===v?' selected':'')+(o.dis?' disabled':'')+'>'+t+'</option>';
      }).join('')
    + '</select>';
 }
@@ -3629,12 +3712,17 @@ function selBox(key,opts,val){
 function pick(key,val,opts){
   return '<div class="pick'+(opts.length===2?' row':'')+'">'
    + opts.map(function(o){
-       return '<button class="pk'+(val===o.v?' on':'')+'" onclick="wSet(\''+key+'\',\''+o.v+'\')">'
+       return '<button class="pk'+(val===o.v?' on':'')+'"'+(o.dis?' disabled':'')+' onclick="wSet(\''+key+'\',\''+o.v+'\')">'
         + '<b>'+o.t+(o.rec? '<span class="rec">권장</span>':'')+'</b><span>'+o.d+'</span></button>';
      }).join('')
    + '</div>';
 }
-function step(key,val,unit,min,max,st){
+function step(key,val,unit,min,max,st,lock){
+  /* 모델 요구 값으로 고정된 수량은 잠근다. 사유는 필드 아래 안내가 맡는다 */
+  if(lock) return '<span class="stepper"><button class="stbtn" disabled tabindex="-1">'
+   + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg></button>'
+   + '<span class="stfield"><input class="inp" value="'+val+'" readonly>'+(unit?'<span class="stunit">'+unit+'</span>':'')+'</span>'
+   + '<button class="stbtn" disabled tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></span>';
   function btn(d){
     const nv=(parseFloat(val)||0)+d*(st||1);
     const off=(d<0 && (parseFloat(val)||0)<=min) || (d>0 && (parseFloat(val)||0)>=max);
@@ -3664,6 +3752,17 @@ function adv(key,label,changed,body){
    + '</div>';
 }
 
+function wReqBox(m){
+  if(!m || (!m.kind && !m.req)) return '';
+  const q=m.req||{}, li=[];
+  if(m.kind) li.push('요구 가속기 '+accReqName(m));
+  if(q.gpu) li.push('레플리카당 가속기 '+q.gpu+'장 고정');
+  if(q.ctx) li.push('최대 컨텍스트 길이 '+ctxN(q.ctx)+' 토큰 이하');
+  if(!q.gpu && !q.ctx && !q.note) return '';
+  return '<div style="margin-top:12px">'+alertBox('info','이 모델은 배포 조건이 정해져 있습니다.',
+    li.join(' · ') + (q.note? '<br>'+q.note : ''), '', false)+'</div>';
+}
+
 /* ── 01 모델 ────────────────────────────────────────
    무엇을 어떻게 서비스하나. 서빙 방식이 여기 있는 이유는
    모델을 고르면 뒤의 로직이 결정되기 때문이다(회의 4.2) */
@@ -3691,6 +3790,9 @@ function paneModel(){
       ? '<div class="mcwarn"><b>클러스터에 모델 파일이 없어 배포 후 내려받습니다.</b>'
         + '캐싱된 모델보다 기동이 오래 걸립니다.</div>'
       : '')
+   /* 모델 배포 조건. 자원 단계에서 막히기 전에 여기서 먼저 알린다(REQ-DEP-085).
+      배포 조건이 없는 모델은 두지 않는다 */
+   + wReqBox(mm)
 
    /* 가속기 메모리 사용률·최대 컨텍스트 길이는 고급으로 옮겼다.
       현행도 Advanced Engine Options 안에 두고 있고, 엔진 인자 목록에 같은 값이
@@ -3762,8 +3864,12 @@ function paneModelAdv(){
       현행도 Advanced Engine Options 안에 두고 있다 */
    + '<div class="fgrid" style="margin-bottom:20px">'
    +   fld('최대 컨텍스트 길이','maxLen',
-        selBox('maxLen',['4K','8K','16K','32K','64K','128K','256K','512K'],WF.maxLen),
-        '한 번에 처리할 토큰 수입니다.')
+        selBox('maxLen',['4K','8K','16K','32K','64K','128K','256K','512K'].filter(function(v){
+          const q=modelReq(WF.model); return !(q && q.ctx) || ctxTok(v)<=q.ctx;
+        }),WF.maxLen),
+        (modelReq(WF.model)||{}).ctx
+          ? '이 모델의 최대 컨텍스트 길이는 '+ctxN(modelReq(WF.model).ctx)+' 토큰입니다.'
+          : '한 번에 처리할 토큰 수입니다.')
    +   fld('가속기 메모리 사용률','gpuUtil',
         selBox('gpuUtil',['0.80','0.85','0.90','0.95'],WF.gpuUtil),
         '높이면 더 많은 요청을 담지만 여유가 줄어듭니다.')
@@ -3812,8 +3918,10 @@ function paneRes(){
      + (note? '<p class="pnote">'+note+'</p>' : '')
      + '<div class="fgrid">'
      +   fld('레플리카 수',repKey, step(repKey,WF[repKey],'개',1,16,1), '', true)
-     +   fld('레플리카당 가속기 수',gpuKey, step(gpuKey,WF[gpuKey],'장',1,8,1),
-          '한 장당 '+a.vram, true)
+     +   fld('레플리카당 가속기 수',gpuKey, step(gpuKey,WF[gpuKey],'장',1,8,1,!!(modelReq(WF.model)||{}).gpu),
+          (modelReq(WF.model)||{}).gpu
+            ? '이 모델은 레플리카당 가속기 '+modelReq(WF.model).gpu+'장으로만 배포할 수 있습니다.'
+            : '한 장당 '+a.vram, true)
      + '</div></div>';
   }
 
@@ -3856,7 +3964,14 @@ function paneRes(){
       : '')
    + '<div class="fsec"><h4>가속기 종류</h4>'
    +   '<div style="max-width:340px">'
-   +     selBox('acc', ACCS.map(function(a){return {v:a.k,t:a.n+' · '+a.vram};}), WF.acc)
+   /* 모델 요구 가속기에 맞지 않는 종류는 비활성으로 두고 사유를 안내한다(REQ-DEP-086).
+      option 에는 말풍선을 붙일 수 없어 사유를 선택칸 아래에 둔다 */
+   +     selBox('acc', (WF.acc? [] : [{v:'',t:'가속기 종류를 선택해 주세요',dis:true}]).concat(ACCS.map(function(a){
+           return {v:a.k, t:a.n+' · '+a.vram, dis:!accOk(wModelOf(),a.k)};
+         })), WF.acc)
+   +     (wModelOf() && wModelOf().kind && ACCS.some(function(a){ return !accOk(wModelOf(),a.k); })
+          ? '<div class="hint">이 모델은 '+accReqName(wModelOf())+'용입니다.</div>' : '')
+   +     (wErrOf('acc')? '<p class="ferr">'+wErrOf('acc')+'</p>' : '')
    +   '</div></div>'
 
    /* 순서 — 무엇을 쓰나 → 어떻게 나누나 → 얼마나 쓰나 → 어떻게 놓나 → 결과.
@@ -3868,9 +3983,11 @@ function paneRes(){
    +   pick('topo', WF.topo, [
          {v:'single', t:'단일', rec:true,
           d:'한 곳에서 프롬프트 분석과 토큰 생성을 함께 처리합니다'},
-         {v:'pd',     t:'프리필·디코드 분리',
+         {v:'pd',     t:'프리필·디코드 분리', dis:accNoPd(WF.acc),
           d:'두 작업을 나눠 배치합니다. 풀 사이로 KV 캐시가 오갑니다'}
        ])
+   /* 고른 가속기가 지원하지 않는 서빙 방식은 비활성(REQ-DEP-088 · 배포 정책 4.5) */
+   +   (accNoPd(WF.acc)? '<p class="segnote">이 가속기에서는 프리필·디코드 분리를 지원하지 않습니다.</p>' : '')
    + '</div>'
 
    /* 가속기 할당 방식(DRA / 디바이스 플러그인)은 화면에 두지 않는다(4.4 확정).
@@ -4533,7 +4650,9 @@ function drawCfg(){
 
   h+='<div class="cfggrp"><div class="gh"><h5>엔진 설정</h5><span class="gtag rst">재기동 필요</span></div>'
    + '<div class="gd">저장하면 배포가 다시 기동됩니다.</div>'
-   + cfgRow('maxLen','최대 컨텍스트 길이','inputmode="numeric" placeholder="모델 기본값"','한 번에 처리할 토큰 수입니다. 비우면 모델 기본값을 사용합니다.')
+   + cfgRow('maxLen','최대 컨텍스트 길이','inputmode="numeric" placeholder="모델 기본값"'+(CFG.err? ' id="cfgMaxLen" style="border-color:var(--destructive)"':' id="cfgMaxLen"'),'한 번에 처리할 토큰 수입니다. 비우면 모델 기본값을 사용합니다.')
+   /* 모델 상한을 넘으면 저장 시 인라인 에러(REQ-DEP-089 · DEP-L01 5.3) */
+   + (CFG.err? '<p class="ferr" style="text-align:right">'+CFG.err+'</p>' : '')
    + cfgStep('gpuUtil','가속기 메모리 사용률','',0.1,1.0,0.1,'높이면 더 많은 요청을 담지만 여유가 줄어듭니다. 0.1 ~ 1.0 사이로 지정합니다.')
    + '</div>';
 
@@ -4570,6 +4689,14 @@ function drawCfg(){
 
 function submitCfg(){
   const d=cur.d, chg=cfgChg();
+  const q=modelReq(d.model)||{};
+  if(q.ctx && CFG.maxLen && (parseInt(CFG.maxLen)||0)>q.ctx){
+    CFG.err='이 모델의 최대 컨텍스트 길이는 '+ctxN(q.ctx)+' 토큰입니다. '+ctxN(q.ctx)+' 이하로 입력해 주세요.';
+    drawCfg();
+    const el=document.getElementById('cfgMaxLen'); if(el) el.focus();
+    return;
+  }
+  CFG.err='';
   closeCfg();
 
   /* 인증은 재기동과 무관하게 반영한다 */
