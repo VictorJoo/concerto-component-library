@@ -1,6 +1,29 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.14 (2026-10-07)
+  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.15 (2026-10-12)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.15 (CON-610·CON-612·CON-732·CON-733) ──
+  · 연결 확인 실패 문구를 사유별로 갈랐다(기획서 5.2 `연결 확인 실패 사유` 표, 안건 18).
+    스토리지·모델 저장소·단일 로그인 세 자리가 같은 표를 쓴다. 응답 코드별 문구이고 목록에 없는
+    사유는 공통 문구 `연결하지 못했습니다. 주소와 인증 정보를 확인해 주세요.` 로 낸다.
+    · 그 탭에서 고칠 수 있는 값이면 확인할 필드를 화면 라벨 그대로 붙였다. 설정 없음·버킷 없음·
+      인증 기관 접근 불가는 이 화면에서 고칠 값이 없어 상태만 적는다(UI 문구 규칙 2).
+    · 데모는 누를 때마다 성공 → 사유 1 → 사유 2 … → 공통 문구 순으로 돌린다. 사유를 다 보이려는
+      검토용 처리라 실제 화면에는 없다. 실제로는 응답 코드 하나에 문구 하나다.
+  · 단일 로그인 `연결 확인` 결과를 토스트에서 폼 위 알림으로 바꿨다(기획서 5.1 · REQ-034).
+    스토리지·모델 저장소와 같은 `connBox` 자리다. 실패하면 사유를 읽고 값을 고쳐야 하는데
+    토스트는 사라진다(공통정책 7.6). 성공 문구는 다른 두 탭과 같다.
+  · 인증 기관 수정 화면에서 저장된 발급자 주소와 같은 값은 다시 검사하지 않는다(기획서 7.6 · CON-733).
+    끝의 `/` 만 다른 주소는 같은 주소로 본다. 저장된 주소가 `http://` 여도 클라이언트 ID·시크릿만
+    고쳐 저장할 수 있어야 한다 — 형식 규칙이 생기기 전에 저장된 값이 남아 있을 수 있다.
+    · 형식 검사를 `https://` 만 통과하게 고쳤다. 종전 정규식이 `http://` 도 통과시켜 주석·기획서
+      7.6 과 어긋났다.
+    · 저장할 때 서버가 형식으로 거절해도 같은 인라인 에러 `올바른 주소 형식이 아닙니다.` 를 쓴다
+      (기획서 7.6). 같은 조건을 두 문구로 안내하지 않는다. 목업은 서버 응답을 재현하지 않는다.
+  · 인증 기관 연결 해제와 발급자 주소 변경의 결과를 주석에 적었다 — 모든 계정의 연결이 함께 풀린다
+    (기획서 5.1 · 계정정책 4.3, CON-732·CON-733). 차단 조건·화면은 그대로다.
+  · 계정별 SSO 연결 해제는 넣지 않았다. 지금 이 탭의 `연결 해제` 와 이름이 겹치고 확인 모달이
+    정해지지 않아 보류 중이다(안건 42-d).
 
   ── v0.14 (CON-614) ──
   · 인증 기관 수정 화면에서 발급자 주소를 바꿀 수 없는 조건을 넣었다. SSO 로그인만 쓰는 계정이
@@ -2742,9 +2765,12 @@ function drawSso(){
 }
 
 /* 연결 확인 결과는 폼 위 알림으로 남긴다. 값을 고쳐야 하는 결과라 토스트로 두지 않는다
-   (기획서 5.1 · REQ-SET-INTEG-004). 스토리지·모델 저장소와 같은 규격이다 */
-function ssoVerify(){ act('인증 기관에 연결했습니다.'); }
-function ssoRelease(){ act('연결을 해제했습니다.'); }
+   (기획서 5.1 · REQ-034). 스토리지·모델 저장소와 같은 connBox 자리이고,
+   실패 문구는 기획서 5.2 `연결 확인 실패 사유` 표의 단일 로그인 행이다 */
+function ssoVerify(){ testConn('sso'); }
+/* 해제하면 모든 계정의 연결이 함께 풀린다(계정정책 4.3 · 기획서 5.1). 비밀번호가 없는 계정이
+   있으면 버튼이 비활성이라 여기 닿지 않는다. 남은 연결 확인 결과도 지운다 */
+function ssoRelease(){ delete connRes.sso; act('연결을 해제했습니다.'); }
 
 /* ── 인증 기관 등록·수정 SET-INTEG-SSO-F01 ── */
 /* 등록 전 값. 수정 화면은 이 값과 비교해 변경 여부를 본다(공통정책 7.1) */
@@ -2769,8 +2795,8 @@ function drawSsoForm(){
     +   '<div class="credbox"><span class="dv">OIDC</span></div>'
     +   '<div class="hint">OIDC 만 지원합니다.</div></div>'
     /* 발급자 주소는 수정 화면에서 SSO 로그인만 쓰는 계정이 있으면 바꿀 수 없다.
-       계정 연결 키가 이 주소에 묶여 있어 주소가 바뀌면 그 계정들이 로그인하지 못한다
-       (CON-614 2026-10-07). 등록 화면은 연결된 계정이 없어 대상이 아니다.
+       주소를 바꿔 저장하면 모든 계정의 연결이 풀려 비밀번호가 없는 계정은 로그인하지 못한다
+       (기획서 5.1 · CON-614 2026-10-07 · CON-733). 등록 화면은 연결된 계정이 없어 대상이 아니다.
        권한이 아니라 상태 때문에 막히므로 미노출이 아니라 비활성으로 둔다(공통정책 7.10·7.11).
        사유는 hint 자리에 둔다 — 비활성 요소는 마우스 이벤트를 받지 않아 툴팁이 뜨지 않는다 */
     + '<div class="fld full"><label>발급자 주소<span class="req">*</span>'
@@ -2829,12 +2855,18 @@ function ssoShow(id, msg){
 function ssoSecInput(){ const f=$('ssoForm'); return f? f.querySelector('input[type=password]') : null; }
 
 /* 필드별 검증 문구. 값이 맞으면 빈 문자열을 돌려준다 */
+/* 끝의 `/` 만 다른 주소는 같은 주소로 본다(기획서 7.6) */
+function issSame(a,b){ return String(a||'').replace(/\/+$/,'')===String(b||'').replace(/\/+$/,''); }
 function ssoIssMsg(){
   const el=$('ssoIss'); if(!el) return '';
   const v=(el.value||'').trim();
   if(!v) return '발급자 주소를 입력해 주세요.';
-  /* 형식은 `https://` 로 시작하고 호스트가 있는지만 본다. 실제 도달 여부는 연결 확인이 본다 */
-  if(!/^https?:\/\/[^\s/]+/.test(v)) return '올바른 주소 형식이 아닙니다.';
+  /* 수정 화면에서 저장된 값과 같은 주소는 다시 검사하지 않는다(기획서 7.6 · CON-733).
+     형식 규칙 전에 저장된 `http://` 주소가 남아 있어도 클라이언트 ID·시크릿만 고쳐 저장할 수 있다 */
+  if(SSO.on && issSame(v, SSO_VAL.iss)) return '';
+  /* 형식은 `https://` 로 시작하고 호스트가 있는지만 본다. 실제 도달 여부는 연결 확인이 본다.
+     저장할 때 서버가 형식으로 거절해도 이 문구를 쓴다(기획서 7.6) */
+  if(!/^https:\/\/[^\s/]+/.test(v)) return '올바른 주소 형식이 아닙니다.';
   return '';
 }
 function ssoCidMsg(){
@@ -2873,7 +2905,8 @@ function ssoChk(){
   if(!SSO.on){ b.disabled = !filled; return; }
   /* 발급자 주소가 잠긴 경우 값이 그대로라 변경에서 자동으로 빠진다.
      클라이언트 ID·시크릿만 고쳐도 저장 버튼이 열린다(CON-614 2026-10-07) */
-  const changed = iss!==SSO_VAL.iss || cid!==SSO_VAL.cid || !!(sec && sec.value);
+  /* 끝의 `/` 만 다른 발급자 주소는 변경으로 세지 않는다(기획서 7.6) */
+  const changed = !issSame(iss, SSO_VAL.iss) || cid!==SSO_VAL.cid || !!(sec && sec.value);
   b.disabled = !(filled && changed);
 }
 function ssoSave(){
@@ -3407,12 +3440,15 @@ function notiPane(){ setTimeout(drawChans,0); return '<div id="notArea"></div>';
 /* SSO 도 탭 안에서 그린다. 컨테이너를 만들어 두고 기존 렌더를 그대로 쓴다 */
 function ssoPane(){
   setTimeout(drawSso,0);
-  return '<div class="ssec"><div class="ssechd"><div><h4>단일 로그인 (SSO)</h4></div>'
+  /* 연결 확인 결과는 카드 위 알림이다. 스토리지·모델 저장소와 같은 자리다(기획서 5.1 · REQ-034) */
+  return (SSO.on? connBox('sso') : '')
+   + '<div class="ssec"><div class="ssechd"><div><h4>단일 로그인 (SSO)</h4></div>'
    + (SSO.on
       /* 연결 해제는 비밀번호가 없는 계정이 있으면 막는다. 삭제 불가 사전 감지와 같은 처리다
          (공통정책 7.5 — `연결된 하위 데이터가 있어 삭제 불가한 경우 사전 감지하여 선제 안내`).
          영향이 가는 작업을 경고하고 실행시키는 것보다 선행 조건을 알려주는 쪽이 7.5 가 정한 순서다.
-         0 명이면 영향이 없어 이름 재입력 대상이 아니다 */
+         0 명이면 영향이 없어 이름 재입력 대상이 아니다.
+         해제하면 모든 계정의 연결이 함께 풀린다(계정정책 4.3 · 기획서 5.1) */
       ? '<div class="secbtns">'
         /* 가는 화면이 `인증 기관 수정` 이므로 같은 말로 둔다. 다른 섹션의 카드 안 편집도 `수정` 이다 */
         + '<button class="btn ghost sm" onclick="return go(\'sso\')">수정</button>'
@@ -3639,13 +3675,43 @@ function secActs(key, title, done){
         + ' onclick="testConn(\''+key+'\')">연결 확인</button>'
         + '<button class="btn ghost sm" onclick="tgEdit(\''+key+'\')">수정</button>');
 }
-/* 연결 확인 결과 — 성공·실패를 폼 위에 남긴다. 데모는 번갈아 보인다 */
-let connRes={};
+/* 연결 확인 실패 사유 — 기획서 5.2 `연결 확인 실패 사유` 표(CON-610·CON-612·CON-733).
+   응답 코드별 문구다. 그 탭에서 고칠 수 있는 값이면 확인할 필드를 화면 라벨 그대로 붙이고,
+   고칠 값이 없으면 상태만 적는다(UI 문구 규칙 2). 표에 없는 코드는 CONN_FAIL_ETC 다 */
+const CONN_FAIL={
+  s3:[
+    ['INFRA_PLATFORM_S3_NOT_CONFIGURED','전역 저장소 설정이 없습니다.'],
+    ['INFRA_PLATFORM_S3_UNREACHABLE','엔드포인트 URL에 접근할 수 없습니다. 주소를 확인해 주세요.'],
+    ['INFRA_PLATFORM_S3_AUTH_FAILED','인증에 실패했습니다. 액세스 키와 시크릿 키를 확인해 주세요.'],
+    ['INFRA_PLATFORM_S3_BUCKET_NOT_FOUND','버킷이 없습니다.']],
+  harbor:[
+    ['INFRA_PLATFORM_HARBOR_NOT_CONFIGURED','모델 저장소 설정이 없습니다.'],
+    ['INFRA_PLATFORM_HARBOR_UNREACHABLE','레지스트리 URL에 접근할 수 없습니다. 주소를 확인해 주세요.'],
+    ['INFRA_PLATFORM_HARBOR_AUTH_FAILED','인증에 실패했습니다. 로봇 계정과 계정 비밀번호를 확인해 주세요.'],
+    ['INFRA_PLATFORM_HARBOR_MODELS_PROJECT_NOT_FOUND','모델 저장 위치를 찾을 수 없습니다. 모델 저장 위치를 확인해 주세요.'],
+    ['INFRA_PLATFORM_HARBOR_ENGINES_PROJECT_NOT_FOUND','엔진 저장 위치를 찾을 수 없습니다. 엔진 저장 위치를 확인해 주세요.']],
+  sso:[
+    ['IAM_SSO_NOT_CONFIGURED','연결된 인증 기관이 없습니다.'],
+    ['IAM_SSO_PROVIDER_UNREACHABLE','인증 기관에 연결할 수 없습니다.'],
+    ['IAM_SSO_DISCOVERY_INVALID','인증 기관 정보를 읽을 수 없습니다. 발급자 주소를 확인해 주세요.'],
+    ['IAM_SSO_CLIENT_AUTH_FAILED','클라이언트 인증에 실패했습니다. 클라이언트 시크릿을 확인해 주세요.']]
+};
+const CONN_FAIL_ETC='연결하지 못했습니다. 주소와 인증 정보를 확인해 주세요.';
+function connFailMsg(key, code){
+  const hit=(CONN_FAIL[key]||[]).filter(function(r){ return r[0]===code; })[0];
+  return hit? hit[1] : CONN_FAIL_ETC;
+}
+/* 연결 확인 결과 — 성공·실패를 폼 위에 남긴다.
+   데모는 누를 때마다 성공 → 표의 사유 차례대로 → 목록에 없는 사유(공통 문구) → 성공 … 으로 돈다.
+   사유별 문구를 다 보이려는 검토용 처리이고 실제 화면에는 없다 */
+let connRes={}, connSeq={};
 function testConn(key){
-  const ok = !(connRes[key] && connRes[key].ok);
-  connRes[key] = ok
+  const codes=(CONN_FAIL[key]||[]).map(function(r){ return r[0]; }).concat(['ETC']);
+  const i=connSeq[key]||0;
+  connSeq[key]=(i+1)%(codes.length+1);
+  connRes[key] = i===0
     ? {ok:true, msg:'연결에 성공했습니다.'}
-    : {ok:false, msg:'연결하지 못했습니다. 주소와 인증 정보를 확인해 주세요.'};
+    : {ok:false, msg:connFailMsg(key, codes[i-1])};
   render();
 }
 function connBox(key){
