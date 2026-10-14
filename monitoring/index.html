@@ -1,7 +1,60 @@
 <!--
-  콘체르토 매니저 — 모니터링 목업 v0.22 (2026-09-29)
+  콘체르토 매니저 — 모니터링 목업 v0.23 (2026-10-14)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다 —
   필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
+
+  ── v0.23 추가 (2026-10-14) ──────────────────────
+  MON-L01 v0.23 · 모니터링 정책 v0.14 와 같은 날 판이다. 근거는 안건 35 결정(2026-10-14,
+  1차/2차 → 4.0/4.1, 건전성 4.1 범위) · 모니터링 정책 5.1·5.2 · MON-L01 탭 구성 · REQ-MON-044.
+  · 하단 데모 바 `범위` 를 `1차`·`2차` 에서 `4.0`·`4.1` 로 바꿨다. 기본은 4.0 이다.
+    숫자만 쓰면 절 번호와 헷갈려 문서에서는 `4.0 범위`·`4.1 범위` 로 쓴다.
+  · 건전성 점수·라벨·하위 지표와 건전성 진단(원인·조치 권고)을 4.1 범위에서만 그린다
+    (모니터링 정책 5.2 · REQ-MON-044). 4.0 에서는 배포 상세 카드에 건전성 블록이 없다.
+  · 배포 오류·중지 진단 박스는 4.0 에도 그린다. 점수가 아니라 배포 상태로 판정하기
+    때문이다(모니터링 정책 5.1). 4.0 에서는 점수가 없는 배포 중 오류·중지됨만 박스가 뜬다.
+    유휴는 5.1 진단 대상이 아니라 4.0 에서는 박스를 두지 않는다.
+  · 확인 필요 항목의 배포 기준을 범위에 따라 가른다. 4.0 은 배포 상태 `오류` 를 `위험` 으로,
+    4.1 은 종전대로 건전성 라벨(주의·위험)로 센다. 노드 항목은 두 범위 모두 같다.
+  · 개요 `배포` 카드의 `N건 확인 필요` 도 같은 기준이다.
+  · 배포 현황 요약 막대도 4.0 은 배포 상태(정상·오류·유휴·중지됨)로, 4.1 은 건전성 라벨로 나눈다.
+  · 지표 카드의 항목 도움말(TTFT·TPOT·KV 캐시 등)은 4.0 범위라 그대로 둔다.
+  · 트레이스·진단 로그 탭은 종전처럼 4.1 에서만 보인다.
+  · `이 화면이 답하는 것` 1행을 `확인 필요 항목 · 건전성 점수(4.1 범위)` 로 고쳤다.
+  · 남는 확인 대상 — 4.0 배포 성능 탭에 남길 지표 목록, 게이트웨이 지표를 연결 전까지
+    감출지(모니터링 정책 5.3). 답이 오기 전이라 지표 카드는 그대로 둔다.
+
+  ── v0.23 변경 (2026-10-12) ──────────────────────
+  MON-L01 v0.23 과 같은 버전이다. 근거는 구분안 #6(pageId 3451060356) · CON-709 ·
+  모니터링 정책 4.5(신설) · CON-657.
+  · 노드 상태를 다섯 값으로 — 정상·점검·연결 불가·사라짐·중지(모니터링 정책 4.5 ·
+    REQ-MON-034 · CON-709 서버 상태 5종). 종전에는 `정상` 외 값이 모두 오류색이었다.
+    배지 색은 연결 불가·사라짐 `cr`, 정상 `ok`, 점검·중지 중립 `mu` 다. 점검·중지는
+    의도된 상태라 경고색을 쓰지 않는다.
+    ⚠ 배포 목업은 `연결 불가` 를 `mu` 로 둔다. 화면 간 색이 갈려 확인 대상이다.
+  · 배지 옆에 그 상태가 시작된 시각을 `YYYY-MM-DD HH:mm부터` 로 둔다(CON-709 state_since).
+    값별 의미는 노드 그룹 제목 도움말에 한 번 둔다(공통정책 2.3). 카드마다 되풀이하지 않는다.
+  · 가속기가 없는 노드도 카드로 둔다(REQ-MON-035). 부제 `가속기 없음`, 가속기 칸 `0 / 0`,
+    펼치면 표 대신 안내 한 줄. 최고 관리자 조회 범위에서만 보인다 — 일반 사용자와
+    워크스페이스로 좁힌 조회는 배정된 슬롯으로 자르므로 빠진다.
+  · 연결 불가·사라짐 노드는 가속기·CPU 할당·메모리 할당을 `-` 로 두고 부제에 마지막으로
+    확인된 구성과 `(마지막 확인)` 을 둔다(REQ-MON-036 · CON-709 last_known_accelerators).
+    펼치면 표 대신 상태 안내 한 줄이다.
+    ⚠ 마지막 구성은 전체 가속기 집계(층 1)에 넣지 않았다. 지금 읽은 슬롯만 센다.
+      `확인 불가` 슬롯을 분모에 넣는 USEHELP 기준과 맞출지 확인 대상이다.
+  · 확인 필요 항목에 연결 불가·사라짐 노드를 `위험` 으로 올린다(REQ-MON-037).
+    같은 사건이 최고 관리자에게 오류 알림으로 간다(알림 정책 3.2). 점검·중지는 올리지 않는다.
+    누르면 가속기 탭으로 옮기되 슬롯 상태 필터는 걸지 않는다 — 볼 슬롯이 없다.
+  · 노드 카드 `CPU`·`메모리` 를 `CPU 할당`·`메모리 할당` 으로(REQ-MON-024 · CON-657).
+    사용량이 아니라 파드가 요청해 잡아 둔 양의 합이다.
+  · 데모 노드 — gpu-svr-02 점검, npu-svr-01 중지, gpu-svr-03 연결 불가(H200 4장 마지막 확인),
+    cpu-svr-01 가속기 없음을 더했다. 다섯 상태가 화면에 보이게 하려는 검토용 값이다.
+    사라짐은 연결 불가와 표시가 같아 데이터로 따로 두지 않았다.
+  · 확인 필요 항목 정렬을 고쳤다. `위험` 의 순위 값이 0 이라 `||9` 에 걸려 맨 뒤로 갔다
+    (v0.22 에서도 배포 `위험` 이 `주의` 아래였다). 급한 순 정렬이 원래 의도다.
+  · 주석의 사람 언급을 확인 날짜로 바꿨다.
+  · 건전성 점수·구성 지표의 범위 이동은 이 판에서 넣지 않았다. 2026-10-14 추가분에서 4.1 범위로 묶었다.
+  · 확인 대상 — 중지된 노드에서 돌던 배포·개발룸이 어떻게 되는지.
+  · 노드 이상 판정의 지속 시간은 구현 기준값이라 화면에 두지 않는다.
 
   ── v0.22 변경 ──────────────────────────────────
   · 알림 규칙에 심각도를 넣었다. 알림 정책 7.2 가 `규칙 생성 시 지정` 으로 두었으나
@@ -35,7 +88,7 @@
   ── 화면 구성 ───────────────────────────────────
   MON-L01              모니터링 (탭 3)
   ㄴ 가속기            노드·슬롯 단위 하드웨어 상태
-  ㄴ 배포 성능          게이트웨이·서빙 엔진·인프라 지표와 건전성
+  ㄴ 배포 성능          게이트웨이·서빙 엔진·인프라 지표. 건전성은 4.1 범위
   ㄴ 알림 규칙          임계값 감시 규칙
   MON-L01.P01      슬롯 상세 패널
   MON-L01.M01      알림 규칙 추가·수정 모달
@@ -44,7 +97,7 @@
   기술문서 10장(관측)·11.1(알람 규칙) · 현행 화면 명세 5장 · 모니터링 정책
 
   ── 이 화면이 답하는 것 ──────────────────────────
-  1  지금 문제가 있는가        건전성 점수 · 확인 필요 항목
+  1  지금 문제가 있는가        확인 필요 항목 · 건전성 점수(4.1 범위)
   2  있다면 어디인가          배포 선택 → 계층 셋
   3  무엇을 하면 되는가        진단 원인·조치 · 대상 화면 링크
 
@@ -63,7 +116,7 @@
   · 동작 확인(요청 보내기) — 배포 상세 소관이다(8/19 회의 5.1). 모니터링은 보는 화면이라
     요청을 만들지 않는다(정책 1장 원칙 1). 배포에서 보내고 여기서 분석한다.
     ⚠ 동작 확인 요청이 트레이스에 남는지 확인 대상(정책 7. 23번)
-  · 트레이스 추적 · 3-Way 뷰어 — 만들었으나 2차 범위다. 하단 바에서 범위를 바꿔 본다.
+  · 트레이스 추적 · 3-Way 뷰어 — 만들었으나 4.1 범위다. 하단 바에서 범위를 바꿔 본다.
     기술문서 10.3·10.4 는 기능으로 서술하나 TUI 문서 2-1 은 Observability 를
     `Grafana 등으로 연동 · 베타 수준` 으로, 3장은 하반기 로드맵으로 둔다.
     두 문서가 어긋나 확인 대상이다(정책 7. 3번)
@@ -75,7 +128,7 @@
 
   ── 확인 대상 ───────────────────────────────────
   · 일반 사용자 조회 범위의 판정 기준(7. 1번)
-  · 진단 원인·조치 텍스트 제공 여부(7. 4번)
+  · 진단 원인·조치 텍스트 제공 여부(7. 4번) — 4.1 범위로 정함(2026-10-14). 4.0 은 배포 상태 진단만
   · 메트릭 카탈로그 조회 API(7. 6번)
   · 건전성 점수 산출 로직(7. 7번)
 
@@ -2005,6 +2058,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .nm-v{margin-left:7px;color:var(--faint);font-size:11px;font-variant-numeric:tabular-nums}
   .ncard-body{margin-top:14px}
   .ncard.closed .ncard-body{display:none}
+  /* 상태 시작 시각 — 배지의 보조값이라 흐린 텍스트로 둔다(--muted-foreground) */
+  .nsince{font-size:11.5px;color:var(--muted-foreground);white-space:nowrap;font-variant-numeric:tabular-nums}
+  /* 슬롯 표 대신 두는 상태 안내 한 줄 */
+  .nnote{font-size:12.5px;color:var(--muted-foreground);padding:4px 2px}
   .ncard.closed .foldbtn svg{transform:rotate(-90deg)}
 
   /* 전체 펼치기·접기 — 켜고 끄는 것이라 체크박스로 둔다. 라벨이 바뀌지 않는다 */
@@ -2290,8 +2347,8 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     <button class="rl" onclick="setRole('admin',this)">워크스페이스 관리자</button>
     <button class="rl" onclick="setRole('viewer',this)">뷰어</button></span>
   <span class="dgrp"><span class="demo-label">범위:</span>
-    <button class="sc on" onclick="setScope(1,this)">1차</button>
-    <button class="sc" onclick="setScope(2,this)">2차</button></span>
+    <button class="sc on" onclick="setScope(1,this)">4.0</button>
+    <button class="sc" onclick="setScope(2,this)">4.1</button></span>
   <span class="dgrp"><span class="demo-label">테마:</span>
     <button onclick="document.body.classList.remove('dark')">라이트</button>
     <button onclick="document.body.classList.add('dark')">다크</button></span>
@@ -2305,7 +2362,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
    ── 화면 구성 ───────────────────────────────────
    MON-L01              모니터링 (탭 3)
    ㄴ 가속기            노드·슬롯 단위 하드웨어 상태
-   ㄴ 배포 성능          게이트웨이·엔진·인프라 지표와 건전성
+   ㄴ 배포 성능          게이트웨이·엔진·인프라 지표. 건전성은 4.1 범위
    ㄴ 알림 규칙          임계값 감시 규칙
    MON-L01.P01      슬롯 상세 패널
    MON-L01.M01      알림 규칙 추가·수정 모달
@@ -2335,10 +2392,16 @@ const isSuper=()=>role==='super';
    ⚠ 데모 값이다. 실제 값은 계측 파이프라인에서 온다(기술문서 10.1) */
 
 /* 노드·슬롯 — 슬롯 하나가 가속기 하나다(정책 4.1) */
-/* kind — GPU 노드인지 NPU 노드인지. 아이콘과 배지로 가른다.
-   st  — 노드가 살아 있는지. 슬롯이 다 확인 불가인 노드와 정상 노드를 가른다 */
+/* kind — GPU 노드인지 NPU 노드인지. 아이콘과 배지로 가른다. 가속기가 없는 노드는 `cpu`.
+   st    — 노드 상태. 정상·점검·연결 불가·사라짐·중지 다섯 값이다(모니터링 정책 4.5 · CON-709).
+           내부 값(ready·cordoned·unreachable·missing·suspended)을 그대로 노출하지 않는다(공통정책 7.9)
+   since — 지금 상태가 시작된 시각(CON-709 state_since). 언제부터인지 알아야 조치 순서를 정한다
+   lastAcc — 연결 불가·사라짐 노드의 마지막으로 확인된 가속기 구성(CON-709 last_known_accelerators).
+           지금 값을 읽지 못해도 어떤 장비가 빠졌는지는 알아야 한다(정책 4.5)
+   ⚠ 상태 값·시각은 데모다. 노드 다섯 상태가 한 화면에 보이게 정상 외에 점검·중지·연결 불가를
+     하나씩 두었다. 사라짐은 연결 불가와 표시가 같아 데이터로 따로 두지 않았다 */
 const NODES=[
-  {n:'gpu-svr-01', ip:'10.10.20.11', kind:'gpu', st:'정상',
+  {n:'gpu-svr-01', ip:'10.10.20.11', kind:'gpu', st:'정상', since:'2026-09-28 10:12',
    cpu:{use:38,cap:128}, mem:{use:414,cap:1007},
    slots:[
      {no:1, dev:'NVIDIA-H200', id:'GPU-0', st:'사용 중', core:74, vram:{use:129.4,cap:140}, temp:71, pw:412, by:['llama-3-2-1b-prod']},
@@ -2355,7 +2418,8 @@ const NODES=[
    ]},
   /* 모델이 여럿일 때 화면이 어떻게 버티는지 보이려고 섞어 둔다.
      한 노드에 두 모델이 꽂히는지는 확인 대상이다(정책 7. 15번) */
-  {n:'gpu-svr-02', ip:'10.10.20.12', kind:'gpu', st:'정상',
+  /* 점검 — 연결되어 있으나 새 작업을 배치하지 않는다. 이미 돌던 배포는 그대로 남는다 */
+  {n:'gpu-svr-02', ip:'10.10.20.12', kind:'gpu', st:'점검', since:'2026-10-12 08:40',
    cpu:{use:96,cap:128}, mem:{use:812,cap:1007},
    slots:[
      {no:1, dev:'NVIDIA-A100', id:'GPU-0', st:'사용 중', core:88, vram:{use:74.2,cap:80}, temp:78, pw:388, by:['gpt-oss-120b-symphony']},
@@ -2365,7 +2429,7 @@ const NODES=[
      {no:5, dev:'NVIDIA-L40S', id:'GPU-4', st:'유휴', core:0, vram:{use:0.2,cap:48}, temp:29, pw:34, by:[]},
      {no:6, dev:'NVIDIA-L40S', id:'GPU-5', st:'유휴', core:0, vram:{use:0.2,cap:48}, temp:30, pw:33, by:[]}
    ]},
-  {n:'npu-svr-02', ip:'10.10.20.22', kind:'npu', st:'정상',
+  {n:'npu-svr-02', ip:'10.10.20.22', kind:'npu', st:'정상', since:'2026-09-28 10:12',
    cpu:{use:22,cap:64}, mem:{use:141,cap:512},
    slots:[
      {no:1, dev:'Furiosa RNGD-S', id:'NPU-0', st:'사용 중', core:62, vram:{use:31.4,cap:48}, temp:54, pw:118, by:['furiosa-qwen3-32b-npu']},
@@ -2373,20 +2437,36 @@ const NODES=[
      {no:3, dev:'Furiosa RNGD-S', id:'NPU-2', st:'유휴', core:0, vram:{use:0.2,cap:48}, temp:30, pw:21, by:[]},
      {no:4, dev:'Furiosa RNGD-S', id:'NPU-3', st:'확인 불가', core:null, vram:{use:null,cap:48}, temp:null, pw:null, by:null},
      /* 사용 중이지만 점유 배포를 모르는 슬롯이다 — 현행은 `Unknown` 으로 표기한다.
-        콘체르토 밖에서 쓰고 있을 수 있어 안의 배포와 같은 것인지 구분할 수 없다(팀장 확인 9/16).
+        콘체르토 밖에서 쓰고 있을 수 있어 안의 배포와 같은 것인지 구분할 수 없다(2026-09-16 확인).
         by 를 null 로 두어 `없음` 과 가른다 — 빈 배열은 점유한 배포가 없다는 뜻이다 */
      {no:5, dev:'Furiosa RNGD-S', id:'NPU-4', st:'사용 중', core:0, vram:{use:0,cap:48}, temp:0, pw:0, by:null,
       pod:'vllm-qwen3-32b-7f4c9d'},
      {no:6, dev:'Furiosa RNGD-S', id:'NPU-5', st:'사용 중', core:0, vram:{use:0,cap:48}, temp:0, pw:0, by:null,
       pod:'vllm-qwen3-32b-7f4c9d'}
    ]},
-  {n:'npu-svr-01', ip:'10.10.20.21', kind:'npu', st:'정상',
+  /* 중지 — 최고 관리자가 플랫폼 설정 > 인프라 자원에서 중지했다(SET-INFRA-L01 REQ-SET-INFRA-014).
+     중지된 노드에서 돌던 배포·개발룸이 어떻게 되는지는 확인 대상이라 점유 배포 없는 노드로 둔다 */
+  {n:'npu-svr-01', ip:'10.10.20.21', kind:'npu', st:'중지', since:'2026-10-11 18:05',
    cpu:{use:12,cap:64}, mem:{use:88,cap:512},
    slots:[1,2,3,4,5,6,7,8].map(function(i){
      return {no:i, dev:'Furiosa RNGD', id:'NPU-'+(i-1), st:'유휴',
              core:0, vram:{use:0.2,cap:48}, temp:31, pw:38, by:[]};
-   })}
+   })},
+  /* 연결 불가 — 계측값을 읽지 못한다. 슬롯·CPU·메모리를 비워 두고(null)
+     마지막으로 확인된 구성만 남긴다(정책 4.5 · MON-L01 REQ-MON-036) */
+  {n:'gpu-svr-03', ip:'10.10.20.13', kind:'gpu', st:'연결 불가', since:'2026-10-12 09:41',
+   cpu:null, mem:null, slots:[],
+   lastAcc:[{dev:'NVIDIA-H200', n:4}]},
+  /* 가속기가 없는 노드 — 빠지면 노드가 있는지조차 알 수 없다(정책 4.5 · REQ-MON-035) */
+  {n:'cpu-svr-01', ip:'10.10.20.31', kind:'cpu', st:'정상', since:'2026-09-28 10:12',
+   cpu:{use:20,cap:64}, mem:{use:96,cap:256}, slots:[]}
 ];
+/* 노드 상태 배지 색 — 연결 불가·사라짐은 조치가 필요해 오류색(cr), 점검·중지는 의도된 상태라
+   중립(mu)이다(정책 4.5 `점검·중지는 의도된 상태`).
+   ⚠ 배포 목업은 `연결 불가` 를 mu 로 둔다. 화면 간 색이 갈려 확인 대상이다 */
+const NODEB={'정상':'ok','점검':'mu','연결 불가':'cr','사라짐':'cr','중지':'mu'};
+/* 계측값을 읽지 못하는 노드 상태 — 값을 `-` 로 두고 마지막 구성을 보인다(정책 4.5) */
+function nodeLost(nd){ return nd.st==='연결 불가' || nd.st==='사라짐'; }
 
 /* 배포 성능 지표 — 계층 셋으로 나눈다(정책 5.1) */
 /* d — 지표가 무엇을 재는지. 이름만으로는 숫자가 의미를 갖지 않는다.
@@ -2497,8 +2577,14 @@ let dep = DEPS[0].n;
 function troubles(){
   const t=[];
   /* 배포 문제는 같은 탭 안이다. 드롭다운을 그 배포로 바꾸면 건전성·지표·진단이 따라 바뀐다 */
+  /* 4.0 범위에는 건전성이 없다. 배포 상태 `오류` 만 위험으로 올린다(모니터링 정책 5.1).
+     4.1 범위에서는 건전성 라벨(주의·위험)로 센다(정책 5.2) */
   depList().forEach(function(d){
     const m = DEPM[d.n];
+    if(!isV41()){
+      if(d.st==='오류' && m && m.why) t.push({sev:'위험', n:d.n, why:m.why, go:"goDep('"+d.n+"')"});
+      return;
+    }
     if(m && (m.label==='주의'||m.label==='위험') && m.why){
       t.push({sev:m.label, n:d.n, why:m.why, go:"goDep('"+d.n+"')"});
     }
@@ -2506,12 +2592,19 @@ function troubles(){
   /* 노드 문제는 가속기 탭이다. 탭만 열면 노드가 여럿이고 접혀 있어 다시 찾게 된다 —
      필터·펼침·스크롤을 함께 걸어야 바로 보인다 */
   NODES.forEach(function(nd){
+    /* 노드 자체를 잃은 경우 — 위험으로 올린다. 같은 사건이 최고 관리자에게 오류 알림으로 간다
+       (모니터링 정책 4.5 · 알림 정책 3.2 · MON-L01 REQ-MON-037).
+       점검·중지는 의도된 상태라 올리지 않는다 — 배포의 유휴·중지됨을 빼는 것과 같은 기준이다 */
+    if(nd.st==='연결 불가'){ t.push({sev:'위험', n:nd.n, why:'노드에 연결할 수 없습니다.', go:"goNode('"+nd.n+"',true)"}); return; }
+    if(nd.st==='사라짐'){ t.push({sev:'위험', n:nd.n, why:'노드가 클러스터에서 확인되지 않습니다.', go:"goNode('"+nd.n+"',true)"}); return; }
     const dead=nd.slots.filter(function(x){ return x.st==='확인 불가'; }).length;
     if(dead) t.push({sev:'주의', n:nd.n, why:'가속기 '+dead+'장의 상태를 읽지 못합니다.', go:"goNode('"+nd.n+"')"});
   });
   /* 급한 순으로 센다. 배포 먼저 노드 나중으로 두면 위험이 주의 아래로 갈 수 있다 */
   const ord={'위험':0,'주의':1};
-  return t.sort(function(a,b){ return (ord[a.sev]||9)-(ord[b.sev]||9); });
+  /* `ord['위험']` 이 0 이라 `||9` 로 두면 위험이 맨 뒤로 갔다. 키가 있는지로 가른다 */
+  const rk=function(v){ return (v in ord)? ord[v] : 9; };
+  return t.sort(function(a,b){ return rk(a.sev)-rk(b.sev); });
 }
 
 /* 확인 필요 항목이 탭과 무관하게 늘 보이면서(기획 판단, 2026-08-28), 이 항목을 다른 탭에서
@@ -2523,10 +2616,11 @@ function goDep(name){
   tab=1; dep=name; render();
   toast('ok', '배포 성능 탭으로 이동했습니다. '+name+' 지표를 표시합니다.');
 }
-/* 가속기 탭으로 옮기고 그 노드가 바로 보이게 조건을 함께 건다 */
-function goNode(name){
+/* 가속기 탭으로 옮기고 그 노드가 바로 보이게 조건을 함께 건다.
+   whole — 노드 자체가 문제인 항목(연결 불가·사라짐). 볼 슬롯이 없어 상태 필터를 걸지 않는다 */
+function goNode(name, whole){
   tab=0;
-  slotSel=['확인 불가'];
+  slotSel = whole ? [] : ['확인 불가'];
   if(nodeOpen.indexOf(name)<0) nodeOpen.push(name);
   render();
   /* 렌더가 끝난 뒤에 자리를 잡는다 */
@@ -2534,7 +2628,9 @@ function goNode(name){
     const el=document.getElementById('nd-'+name.replace(/[^a-z0-9]/gi,''));
     if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
   }, 0);
-  toast('ok','가속기 탭으로 이동했습니다. '+name+'의 확인 불가 가속기만 표시합니다.');
+  toast('ok', whole
+    ? '가속기 탭으로 이동했습니다. '+name+' 노드를 표시합니다.'
+    : '가속기 탭으로 이동했습니다. '+name+'의 확인 불가 가속기만 표시합니다.');
 }
 
 /* 건전성 — 기술문서 10.5 */
@@ -2814,7 +2910,9 @@ function drawOverview(){
     const label = DEPM[d.n]? DEPM[d.n].label : d.st;
     depCounts[label] = (depCounts[label]||0)+1;
   });
-  const bad = depCounts['주의'] + depCounts['위험'];
+  /* 4.0 범위는 건전성이 없어 배포 상태 `오류` 만 센다(확인 필요 항목과 같은 기준) */
+  const bad = isV41()? depCounts['주의'] + depCounts['위험']
+                     : deps.filter(function(d){ return d.st==='오류'; }).length;
 
   const ruleCnt = ruleList().length;
 
@@ -2888,13 +2986,13 @@ function drawPact(){
 function setRange(r){ range=r; render(); }
 /* setDep은 네이티브 select onchange용이었다. 커스텀 드롭다운으로 바뀌며 pickDep이 대신한다 */
 
-/* 1차 범위 */
+/* 4.0 범위 */
 const TABS1=[
   ['가속기','노드에 장착된 가속기별 상태입니다. 어느 배포가 점유하고 있는지 함께 표시합니다.',null],
   ['배포 성능','요청이 지나가는 구간별 지표입니다. 게이트웨이 · 서빙 엔진 · 인프라 순으로 확인합니다.',null],
   ['알림 규칙','임계값을 넘는 상황을 감시합니다. 조건에 해당하면 알림이 발생합니다.','rules']
 ];
-/* 2차 범위 — Observability 고도화(TUI 문서 3장 하반기 로드맵) */
+/* 4.1 범위 — Observability 고도화(TUI 문서 3장 하반기 로드맵) */
 const TABS2=[
   ['트레이스','요청 하나가 어느 구간에서 지연됐는지 따라갑니다. 배포 성능이 평균이라면 여기는 개별 요청입니다.',null],
   ['진단 로그','컨테이너 로그 · 인프라 이벤트 · 시스템 경고를 한 타임라인에 모아 봅니다.',null]
@@ -2941,8 +3039,11 @@ let nodeOpen=[];
 /* 개발 범위 — 트레이스·진단 로그는 Observability 고도화 항목이라 하반기 로드맵이다
    (TUI 문서 3장). 기술문서 10.3·10.4 는 기능을 서술하나 TUI 문서는 Grafana 연동에
    베타 수준으로 두고 있어 두 문서가 어긋난다. 확인 대상(정책 7. 3번).
-   화면은 완성된 모습으로 그리되 범위는 문서에서 말한다 */
+   화면은 완성된 모습으로 그리되 범위는 문서에서 말한다.
+   scope 1 = 4.0 범위, 2 = 4.1 범위. 4.1 범위에는 트레이스·진단 로그 탭과
+   건전성(점수·하위 지표·진단 원인·조치 권고)이 든다(안건 35 · 2026-10-14) */
 let scope=1;
+function isV41(){ return scope===2; }
 function setScope(v,btn){
   scope=v;
   document.querySelectorAll('.demo-bar .sc').forEach(function(b){ b.classList.remove('on'); });
@@ -2991,6 +3092,10 @@ function nodeIcon(kind){
   const p = kind==='npu'
     ? '<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/>'
     : '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/>';
+  /* 가속기가 없는 노드는 서버 모양으로 가른다 */
+  if(kind==='cpu') return '<span class="nico" title="가속기 없는 노드">'
+   + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">'
+   + '<rect x="4" y="4" width="16" height="7" rx="1.5"/><rect x="4" y="13" width="16" height="7" rx="1.5"/><path d="M8 7.5h.01M8 16.5h.01"/></svg></span>';
   return '<span class="nico" title="'+(kind==='npu'?'NPU 노드':'GPU 노드')+'">'
    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">'+p+'</svg></span>';
 }
@@ -3044,7 +3149,9 @@ function drawAcc(el){
   });
 
   /* ── 층 2 · 노드 ──────────────────────────── */
-  h += '<div class="grouph">노드<span class="gcnt">'+nodes.length+'</span>'
+  /* 노드 상태 값별 의미는 그룹 제목에 한 번 둔다. 카드마다 되풀이하지 않는다 —
+     슬롯 상태를 표 헤더 도움말 하나로 밝히는 것과 같은 방식이다(공통정책 2.3) */
+  h += '<div class="grouph">노드<span class="gcnt">'+nodes.length+'</span>'+tip(COLDEF.nst)
     + (nodes.length>1 ? nodeFold() : '')
     + '</div>';
 
@@ -3061,6 +3168,7 @@ function drawAcc(el){
     /* 슬롯 필터가 걸리면 결과가 가려지지 않게 자동으로 펼친다 */
     const closed = !slotSel.length && nodeOpen.indexOf(nd.n)<0;
     const view = nd.slots.filter(function(x){ return !slotSel.length || slotSel.indexOf(x.st)>=0; });
+    const lost = nodeLost(nd);
 
     h += '<div class="ncard'+(closed?' closed':'')+'" id="'+nid+'">'
       /* 이름이 카드의 첫 값이다. 부제에 가속기 모델·주소를 내려 이름이 먼저 읽히게 한다 */
@@ -3068,9 +3176,11 @@ function drawAcc(el){
       +   nodeIcon(nd.kind)
       +   '<div class="ncard-id">'
       +     '<div class="ncard-n mono">'+nd.n+'</div>'
-      +     '<div class="ncard-sub">'+devSummary(nd.slots)+' · <span class="mono">'+nd.ip+'</span></div>'
+      +     '<div class="ncard-sub">'+nodeSub(nd)+' · <span class="mono">'+nd.ip+'</span></div>'
       +   '</div>'
-      +   '<span class="stbadge '+(nd.st==='정상'?'ok':'cr')+'">'+nd.st+'</span>'
+      /* 상태 배지 옆에 그 상태가 시작된 시각을 둔다(정책 4.5 · REQ-MON-034) */
+      +   '<span class="nsince">'+(nd.since? nd.since+'부터' : '')+'</span>'
+      +   '<span class="stbadge '+(NODEB[nd.st]||'mu')+'">'+nd.st+'</span>'
       +   '<span class="foldbtn" title="'+(closed?'펼치기':'접기')+'">'
       +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>'
       +   '</span>'
@@ -3080,16 +3190,28 @@ function drawAcc(el){
          전체 카드와 무게가 같아져 층위가 안 보인다 */
       + '<div class="ncard-m">'
       +   '<div class="nm-i nm-slot">'
-      +     '<div class="nm-t">가속기 <b>'+usedOf(nd.slots)+'</b> / '+nd.slots.length+'</div>'
-      +     barOf(nd.slots, nd.n)
+      +     (lost
+           /* 연결 불가·사라짐 — 지금 값을 읽지 못한다. 0 으로 두면 비어 있는 것으로 읽힌다(정책 1장 원칙 4) */
+           ? '<div class="nm-t">가속기 '+dash()+'</div>'
+           : '<div class="nm-t">가속기 <b>'+usedOf(nd.slots)+'</b> / '+nd.slots.length+'</div>'
+             + barOf(nd.slots, nd.n))
       +   '</div>'
-      +   miniBar('CPU', nd.cpu.use, nd.cpu.cap, 'Cores', 'nodecpu'+nd.n+range)
-      +   miniBar('메모리', nd.mem.use, nd.mem.cap, 'GB', 'nodemem'+nd.n+range)
+      /* `CPU 할당`·`메모리 할당` — 파드가 요청해 잡아 둔 양의 합이다. 실제 사용량이 아니다
+         (MON-L01 REQ-MON-024 · CON-657) */
+      +   miniBar('CPU 할당', nd.cpu, 'Cores', 'nodecpu'+nd.n+range)
+      +   miniBar('메모리 할당', nd.mem, 'GB', 'nodemem'+nd.n+range)
       + '</div>'
 
-      /* 표는 펼쳤을 때만 — 격자가 요약이고 표가 상세다 */
+      /* 표는 펼쳤을 때만 — 격자가 요약이고 표가 상세다.
+         연결 불가·사라짐·가속기 없는 노드는 그릴 슬롯이 없어 표 대신 상태 안내 한 줄을 둔다 */
       + '<div class="ncard-body">'
-      +   '<div class="tblwrap plain"><table class="tbl"><thead><tr>'
+      +   (lost || !nd.slots.length
+           ? '<div class="nnote">'+(lost
+               ? (nd.st==='연결 불가'
+                   ? '노드와 연결되지 않아 가속기 상태를 표시할 수 없습니다.'
+                   : '클러스터에서 노드가 확인되지 않아 가속기 상태를 표시할 수 없습니다.')
+               : '가속기가 없는 노드입니다.')+'</div>'
+           : '<div class="tblwrap plain"><table class="tbl"><thead><tr>'
       +   '<th style="width:74px">슬롯</th><th>가속기</th>'
       +   '<th class="thcell">'+thHelp('core','연산 코어')+'</th>'
       +   '<th class="thcell">'+thHelp('vram','VRAM')+'</th>'
@@ -3115,7 +3237,7 @@ function drawAcc(el){
              + '<td class="mono">'+(dead? dash() : x.temp+'°C')+'</td>'
              + '<td class="mono">'+(dead? dash() : x.pw+'W')+'</td>'
              + '<td><span class="stbadge '+(SLOTB[x.st]||'mu')+'">'+x.st+'</span></td>'
-     /* 장치별 할당이라 슬롯 하나에 배포 하나다(팀장 확인 9/2) */
+     /* 장치별 할당이라 슬롯 하나에 배포 하나다(2026-09-02 확인) */
      /* 모름은 `확인 불가` 로 둔다 — `-` 로 두면 점유한 배포가 없는 것으로 읽힌다 */
      + '<td>'+(byUnknown(x)
          ? '<span class="dash">확인 불가</span>'
@@ -3123,7 +3245,7 @@ function drawAcc(el){
                + (x.pod? '<br>워크로드 '+x.pod : ''))
          : byList(x).length? '<span class="rname">'+x.by[0]+'</span>' : dash())+'</td></tr>';
           }).join('')
-      +   '</tbody></table></div>'
+      +   '</tbody></table></div>')
       + '</div>'
       + '</div>';
   });
@@ -3136,10 +3258,21 @@ function drawAcc(el){
 const USEHELP = '사용 중을 전체로 나눈 값입니다. 확인 불가도 분모에 넣습니다 — '
   + '쓸 수 없는 상태이지 자리가 없어진 것은 아닙니다.';
 
-/* 가속기는 장치별로 할당한다. 하나를 나눠 쓰지 않는다(팀장 확인 9/2) */
+/* 가속기는 장치별로 할당한다. 하나를 나눠 쓰지 않는다(2026-09-02 확인) */
 function usedOf(list){ return list.filter(function(x){ return x.st==='사용 중'; }).length; }
 function pcOf(list){ return list.length? Math.round(usedOf(list)/list.length*100) : 0; }
 
+/* 노드 부제 — 가속기 구성. 연결 불가·사라짐이면 마지막으로 확인된 구성에 `마지막 확인` 을 붙여
+   지금 읽은 값과 가른다(정책 4.5 · REQ-MON-036). 가속기가 없으면 없다고 적는다 */
+function nodeSub(nd){
+  if(nodeLost(nd)){
+    const la = nd.lastAcc||[];
+    return la.length
+      ? la.map(function(a){ return a.dev+' '+a.n+'장'; }).join(' · ')+' (마지막 확인)'
+      : '가속기 구성 확인 불가';
+  }
+  return nd.slots.length ? devSummary(nd.slots) : '가속기 없음';
+}
 /* 가속기 모델별 집계 — 노드 부제에 쓴다 */
 function devSummary(list){
   const by={};
@@ -3234,7 +3367,10 @@ function legend(list){
 /* 노드 자원 — 가속기 막대와 한 줄에 놓이므로 라벨·값을 한 줄로 줄인다.
    막대(지금 값)에서 스파크라인(추세+호버 상세)으로 바꿨다. 임계값 신호는
    값 색으로 옮겼다(가속기 탭 스파크라인 전환, 기획 판단 2026-08-28) */
-function miniBar(label, use, cap, unit, seed){
+function miniBar(label, v, unit, seed){
+  /* 연결 불가·사라짐 노드는 값이 없다(null). 0 이 아니라 `-` 로 둔다(정책 1장 원칙 4) */
+  if(!v) return '<div class="nm-i"><div class="nm-t">'+label+' '+dash()+'</div></div>';
+  const use=v.use, cap=v.cap;
   const pc = Math.round(use/cap*100);
   const cls = pc>=90?'crit':(pc>=70?'warn':'');
   return '<div class="nm-i">'
@@ -3288,9 +3424,12 @@ function wsPerfSummary(){
   const list = depList();
   const total = list.length;
   if(!total) return '';
-  const counts = {'안정':0,'주의':0,'위험':0,'유휴':0,'중지됨':0};
+  /* 4.0 범위는 건전성이 없어 배포 상태로 나눈다. 4.1 범위는 건전성 라벨로 나눈다 */
+  const v41 = isV41();
+  const counts = v41? {'안정':0,'주의':0,'위험':0,'유휴':0,'중지됨':0}
+                    : {'정상':0,'오류':0,'유휴':0,'중지됨':0};
   list.forEach(function(d){
-    const label = DEPM[d.n]? DEPM[d.n].label : d.st;
+    const label = v41? (DEPM[d.n]? DEPM[d.n].label : d.st) : d.st;
     counts[label] = (counts[label]||0)+1;
   });
   const bad = counts['주의'] + counts['위험'];
@@ -3310,7 +3449,8 @@ function wsPerfSummary(){
      v3 — 세그먼트 막대 + 범례로 바꾼다. 이건 새 패턴이 아니라 가속기 탭 점유 막대와
      같은 논리다 — "카테고리 구성비는 막대가 맞는 표현"이라고 이미 정한 적이 있다.
      전체 중 몇 개가 이 상태인지는 막대 비율로, 정확한 수는 범례 옆 숫자로 본다 */
-  const order = [['안정','ok'],['주의','wa'],['위험','cr'],['유휴','mu'],['중지됨','mu']];
+  const order = v41? [['안정','ok'],['주의','wa'],['위험','cr'],['유휴','mu'],['중지됨','mu']]
+                    : [['정상','ok'],['오류','cr'],['유휴','mu'],['중지됨','mu']];
   /* 이 카드가 워크스페이스 범위라는 걸 문구로 설명하는 대신, 헤더 스위처와 같은
      아이콘을 붙였다 — 같은 아이콘 = 같은 개념(워크스페이스)이라는 걸 잇는다.
      스위처가 라벨 없이 아이콘만으로 통하는 것과 같은 방식이다(사용자 지적, 2026-08-28) */
@@ -3323,7 +3463,7 @@ function wsPerfSummary(){
       없었다 — 그래서 "워크스페이스"로 바꾸는 대신 아예 뺐다. `전체`일 때는
       워크스페이스 하나가 아니라 여럿이 섞인 상태라 "워크스페이스"라고 부르면
       부정확해진다(사용자 지적, 2026-08-28) */
-   +   tip('배포 '+total+'개를 건전성·상태별로 나눕니다.')
+   +   tip(v41? '배포 '+total+'개를 건전성·상태별로 나눕니다.' : '배포 '+total+'개를 상태별로 나눕니다.')
    +   '<span class="wssum-tot">배포 '+total+'개</span>'
    + '</div>'
    /* 막대에 호버하면 그 구간의 값을 본다 — 색만 보고 몇 건인지 눈대중해야 했다.
@@ -3425,6 +3565,11 @@ function drawPerf(el){
   const curScore = nom? null : +byRange(m.score);
   const hLabel = nom? m.label : healthLabel(curScore);
 
+  /* 건전성은 4.1 범위다(모니터링 정책 5.2 · REQ-MON-044). 4.0 범위에서는 블록을 두지 않고,
+     점수가 없는 배포 중 오류·중지됨의 상태 진단만 둔다(정책 5.1). 유휴는 진단 대상이 아니다 */
+  if(!isV41()){
+    if(nom && m.why && m.label!=='유휴') h+='<div class="depsub">'+alertBox('crit', m.why, m.todo, goDepBtn())+'</div>';
+  } else
   h+='<div class="depsub"><h4>건전성'
     + tip('아래 지표를 종합해 산출한 점수입니다. 100에 가까울수록 안정적입니다.')+'</h4>'
     + '<div class="hbox">'
@@ -4030,7 +4175,7 @@ function drawRuleForm(){
     +   '<div class="fgrid">'
     /* 규칙은 워크스페이스에 속한다. 스위처가 `전체` 면 어디에 만들지 정해지지 않아
        폼에서 고르게 한다. 고를 수 있는 범위는 역할을 따른다 —
-       최고 관리자는 전체, 그 외에는 자기 소속만이다(팀장 확인 9/17) */
+       최고 관리자는 전체, 그 외에는 자기 소속만이다(2026-09-17 확인) */
     +     (wsCur!=='전체' ? ''
         : ruleIdx>=0
           /* 수정에서는 바꾸지 않는다 — 규칙을 만든 뒤 다른 워크스페이스로 옮기는 것은
@@ -4452,7 +4597,7 @@ function openSlot(nodeName, no){
        + '<div class="dsec"><h4>전력<span class="pnv">'+x.pw+'W</span></h4>'
          + '<div class="lchart sm">'+lineChart('slot'+x.no+'pw')+'</div></div>')
     /* 점유 배포는 링크로만 둔다(공통정책 2.1). 배포 하나를 눌렀으니 그 배포 화면으로 가되,
-       궁금한 것은 지금 어떻게 돌고 있는지라 상세의 모니터링 탭으로 연다(팀장 확인 9/16) */
+       궁금한 것은 지금 어떻게 돌고 있는지라 상세의 모니터링 탭으로 연다(2026-09-16 확인) */
     + '<div class="dsec"><h4>점유 배포</h4>'
     +   (byList(x).length
         ? '<dl class="dl">'
@@ -4462,7 +4607,7 @@ function openSlot(nodeName, no){
           + '</dl>'
         : byUnknown(x)
           /* 모델 이름은 모르지만 워크로드 정보는 온다. 무엇이 점유 중인지 알아야
-             외부 배포로 가져올 대상을 지목할 수 있다(팀장 확인 9/17).
+             외부 배포로 가져올 대상을 지목할 수 있다(2026-09-17 확인).
              원시 표기 대신 워크로드로 쓴다(공통정책 7.9 · 배포 기획서와 같은 기준) */
           ? '<dl class="dl"><dt>배포</dt><dd><span class="dash">확인 불가</span></dd>'
             + (x.pod? '<dt>워크로드</dt><dd>'+x.pod+'</dd>' : '')
@@ -4516,6 +4661,13 @@ function tip(t){
 const COLDEF={
   core:'가속기의 연산 코어 사용률입니다.',
   vram:'모델과 KV 캐시가 사용하는 메모리입니다. 사용량 / 전체 용량으로 표시합니다.',
+  /* 값 뜻은 모니터링 정책 4.5 표를 그대로 옮겼다. 한 문장씩으로 길이를 맞춘다 */
+  nst:'노드의 상태입니다. 배지 옆 시각은 그 상태가 시작된 시각입니다.'
+      +'<dl><dt>정상</dt><dd>연결되어 있고 사용할 수 있습니다.</dd>'
+      +'<dt>점검</dt><dd>연결되어 있으나 새 작업을 배치하지 않습니다.</dd>'
+      +'<dt>연결 불가</dt><dd>노드와 연결되지 않습니다.</dd>'
+      +'<dt>사라짐</dt><dd>클러스터에서 노드가 확인되지 않습니다.</dd>'
+      +'<dt>중지</dt><dd>최고 관리자가 중지했습니다.</dd></dl>',
   sst:'슬롯의 점유 상태입니다.'
       +'<dl><dt>사용 중</dt><dd>배포 하나가 점유하고 있습니다.</dd>'
       +'<dt>유휴</dt><dd>점유한 배포가 없습니다.</dd>'
