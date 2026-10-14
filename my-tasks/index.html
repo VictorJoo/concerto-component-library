@@ -1,6 +1,26 @@
 <!--
-  콘체르토 매니저 — 내 작업함 목업 v0.14 (2026-10-06)
+  콘체르토 매니저 — 내 작업함 목업 v0.15 (2026-10-12)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.15 (CON-734) ──
+  · 만료 예정일이 지난 CDE 신청은 승인을 비활성으로 두고 사유를 안내한다. 반려는 그대로 둔다
+    (REQ-TASK-039 · 5.2 · CDE 정책 3.3). 승인 대기는 보유로 세므로(CDE 정책 6장) 승인자가 반려로
+    닫아야 신청자가 새로 신청할 수 있다.
+    · 사유 문구 `만료 예정일({YYYY-MM-DD})이 지나 승인할 수 없습니다.` (TASK-L01 5.2). 조치(반려)는
+      버튼이 바로 옆에 있어 문구에 넣지 않았다.
+    · 누른 뒤 막지 않고 처음부터 비활성으로 둔다. 만료 예정일은 신청 내용의 값이라 화면이 미리
+      판정할 수 있다. `연장 승인 전 회수됨` 은 신청 뒤 서버 쪽에서 바뀌는 상태라 누른 뒤 막는 그대로 둔다.
+    · 목록 더보기와 상세 헤더 두 자리 모두 같은 처리다. 비활성 버튼은 마우스 이벤트를 받지 않아
+      기존 `.disw` 감싸기로 사유를 띄운다(TASK-L01 7.1 `작업` 행 · 공통정책 7.10).
+    · `approveTask` 에도 같은 검사를 둔다. 목록·상세 밖 경로로 불려도 승인되지 않게 한다.
+    · 대상은 CDE 신청만이다. 연장 승인에도 같은 검사가 걸리는지는 확인 대상이라 넣지 않았다.
+  · CDE 신청 샘플의 `사용 기간` 을 일수에서 만료 예정일 날짜로 바꿨다(CDE 정책 3.2·5.2 · 개발룸 기획서 7.3).
+    `30일`·`14일` 은 신청일시 기준으로 날짜를 셈해 넣었다.
+  · 판정 기준일을 샘플 시점에 맞춘 고정값(DEMO_TODAY)으로 두었다. 샘플 신청이 8월 말이라 실제 오늘로
+    판정하면 모든 신청이 만료로 보인다. 실제 화면에는 없는 검토용 처리다 — 실제로는 서버 날짜로 판정한다.
+  · 만료 예정일이 지난 샘플로 jh-jupyter-03 한 건을 더했다(만료 예정일 2026-08-27). 기존 샘플에 얹으면
+    자원 무효·여유 부족·관리자 없음 분기와 섞여 어느 쪽 처리인지 갈리지 않는다. 워크스페이스 관리자
+    기본 화면에서 보이도록 ai-service-team 에 둔다.
 
   ── v0.14 (CON-596 A-2·A-4) ──
   · 자원 할당량 증액 신청 내용의 가속기를 종류별로 갈랐다. `현재 가속기 4장` · `요청 가속기 6장` 처럼
@@ -1965,15 +1985,18 @@ function toast(t,msg){
 function rowMenu(t,i){
   const id='rm'+i, wait=t.st==='승인 대기';
   const why = '이미 '+t.st+' 처리된 신청입니다.';
-  const mi=function(label,on,fn,danger){
+  const mi=function(label,on,fn,danger,why2){
     return on
       ? '<button'+(danger?' class="d"':'')+' onclick="'+fn+'">'+label+'</button>'
       /* 비활성 버튼은 마우스 이벤트를 받지 않아 제 title 이 뜨지 않는다 — 감싼 요소에 사유를 단다 */
-      : '<span class="disw" title="'+why+'"><button'+(danger?' class="d"':'')+' disabled>'+label+'</button></span>';
+      : '<span class="disw" title="'+(why2||why)+'"><button'+(danger?' class="d"':'')+' disabled>'+label+'</button></span>';
   };
+  /* 만료 예정일이 지난 CDE 신청은 승인만 막고 반려는 둔다(REQ-TASK-039 · TASK-L01 5.2 · CON-734).
+     승인 대기는 보유로 세므로 반려로 닫아야 신청자가 새로 신청할 수 있다(CDE 정책 3.3·6장) */
+  const exp=expired(t);
   let it='';
   if(tab===1 && canApproveType(t.type))
-    it += mi('승인', wait, 'approveTask('+i+')', false)
+    it += mi('승인', wait && !exp, 'approveTask('+i+')', false, exp? expWhy(t) : '')
         + mi('반려', wait, 'rejectTask('+i+')', true);
   if(tab===0)
     it += mi('신청 취소', wait, 'cancelTask('+i+')', true);
@@ -2091,8 +2114,18 @@ const TASKS=[
   tgt:'jh-jupyter-02', st:'승인 대기', by:'', byAt:'',
   mine:false, toMe:true, noAdmin:true,
   body:[['이미지 태그','pytorch-nvidia-v2.5'],['CPU','4 Cores'],['Memory','16 Gi'],
-        ['가속기','NVIDIA-H200 1장'],['개인 볼륨','50 GB'],['사용 기간','30일'],
+        ['가속기','NVIDIA-H200 1장'],['개인 볼륨','50 GB'],['사용 기간','2026-09-24'],
         ['요청 사유','엣지 추론 실험에 쓰려고 합니다.']]},
+
+ /* 만료 예정일이 기준일(DEMO_TODAY)보다 앞선 건 — 승인이 비활성이고 반려만 된다(REQ-TASK-039 · CON-734).
+    다른 분기(자원 무효·여유 부족·관리자 없음)와 섞이지 않게 따로 둔다. 기존 jh-jupyter-01 은 08-24 에
+    만료되어 보유가 아니므로 같은 워크스페이스에 새로 신청할 수 있다(CDE 정책 3.3) */
+ {at:'2026-08-25 10:05:12', type:'CDE 신청', who:'유지현(jh.yu)', ws:'ai-service-team',
+  tgt:'jh-jupyter-03', st:'승인 대기', by:'', byAt:'',
+  mine:false, toMe:true,
+  body:[['이미지 태그','pytorch-nvidia-v2.5'],['CPU','2 Cores'],['Memory','8 Gi'],
+        ['가속기','NVIDIA-H200 MIG 1장'],['개인 볼륨','50 GB'],['사용 기간','2026-08-27'],
+        ['요청 사유','데이터 전처리 결과를 확인하려고 합니다.']]},
 
  /* 할당량 조정이 최고 관리자 전용이라 워크스페이스 관리자는 화면에서 늘릴 수 없다.
     모자랄 때 요청할 경로를 둔다(워크스페이스 정책 2.4) */
@@ -2118,7 +2151,7 @@ const TASKS=[
   tgt:'sj-jupyter-03', st:'승인 대기', by:'', byAt:'',
   mine:false, toMe:true, badDep:true,
   body:[['이미지 태그','pytorch-nvidia-v2.5'],['CPU','4 Cores'],['Memory','16 Gi'],
-        ['가속기','NVIDIA-H200 1장'],['개인 볼륨','50 GB'],['사용 기간','30일'],
+        ['가속기','NVIDIA-H200 1장'],['개인 볼륨','50 GB'],['사용 기간','2026-09-23'],
         ['접근 허용 모델','qwen3-6-35b-a3b-fp8'],
         ['요청 사유','추천 모델 비교 실험에 쓰려고 합니다.']]},
 
@@ -2129,7 +2162,7 @@ const TASKS=[
   mine:true, toMe:true, lowRes:true,
   body:[['이미지 태그','pytorch-nvidia-v2.5'],['CPU','4 Cores'],['Memory','16 Gi'],
         ['가속기','NVIDIA-H200 1장'],['가속기','NVIDIA-H200 MIG 2장'],
-        ['개인 볼륨','100 GB'],['사용 기간','30일'],
+        ['개인 볼륨','100 GB'],['사용 기간','2026-09-24'],
         ['요청 사유','추론 성능 벤치마크에 쓰려고 합니다.']]},
 
  /* 만료된 CDE 의 연장 신청 — 회수 전이면 승인 시 복귀한다(CDE 정책 5.3) */
@@ -2158,7 +2191,7 @@ const TASKS=[
   mine:true, toMe:false,
   reason:'같은 워크스페이스에 이미 CDE가 있습니다. 기존 CDE를 반납한 뒤 다시 신청해 주세요.',
   body:[['이미지 태그','pytorch-furiosa-rngd'],['CPU','8 Cores'],['Memory','32 Gi'],
-        ['가속기','Furiosa RNGD 2장'],['개인 볼륨','200 GB'],['사용 기간','14일'],
+        ['가속기','Furiosa RNGD 2장'],['개인 볼륨','200 GB'],['사용 기간','2026-09-05'],
         ['요청 사유','NPU 벤치마크']]},
 
  {at:'2026-08-20 10:33:08', type:'CDE 연장', who:'성유진(yj.seong)', ws:'ai-service-team',
@@ -2193,11 +2226,29 @@ const TASKS=[
   tgt:'jh-jupyter-01', st:'승인', by:'성유진(yj.seong)', byAt:'2026-08-18 13:40:30',
   mine:false, toMe:true,
   body:[['이미지 태그','pytorch-nvidia-v2.3'],['CPU','2 Cores'],['Memory','8 Gi'],
-        ['가속기','NVIDIA-H200 MIG 1장'],['개인 볼륨','50 GB'],['사용 기간','30일'],
+        ['가속기','NVIDIA-H200 MIG 1장'],['개인 볼륨','50 GB'],['사용 기간','2026-09-17'],
         ['요청 사유','모델 파인튜닝']]}
 ];
 
 const ME='성유진(yj.seong)';
+
+/* 만료 예정일 판정 기준일. 샘플 신청일시(8월 말)에 맞춘 고정값이다 — 실제 오늘로 판정하면
+   모든 샘플이 만료로 보인다. 실제 화면에는 없는 검토용 처리다. 실제로는 서버 날짜로 판정한다 */
+const DEMO_TODAY='2026-08-28';
+/* CDE 신청의 만료 예정일. 신청 내용 `사용 기간` 값이 그 날짜다(CDE 정책 3.2) */
+function expDate(t){
+  if(t.type!=='CDE 신청') return '';
+  const r=(t.body||[]).filter(function(x){ return x[0]==='사용 기간'; })[0];
+  return r? r[1] : '';
+}
+/* 만료 예정일이 오늘보다 앞서면 승인할 수 없다(CDE 정책 3.3 · REQ-TASK-039 · CON-734).
+   당일까지 쓸 수 있어 오늘과 같은 날은 승인할 수 있다(CDE 정책 5.2).
+   CDE 신청만 본다 — 연장 승인에도 같은 검사가 걸리는지는 확인 대상이다 */
+function expired(t){
+  const d=expDate(t);
+  return t.st==='승인 대기' && !!d && d < DEMO_TODAY;
+}
+function expWhy(t){ return '만료 예정일('+expDate(t)+')이 지나 승인할 수 없습니다.'; }
 
 /* 탭은 늘 둘이다. 권한이 없으면 승인 요청 탭이 비어 보인다 —
    권한은 오르내리는데 화면 구조가 함께 바뀌면 더 혼란스럽고,
@@ -2453,7 +2504,11 @@ function drawDetail(){
        ? '<button class="btn danger-line" onclick="cancelTask()">신청 취소</button>'
        : (canApproveType(t.type)
           ? '<button class="btn ghost" onclick="rejectTask()">반려</button>'
-            + '<button class="btn" onclick="approveTask()">승인</button>'
+            /* 만료 예정일이 지났으면 승인을 비활성 + 사유로 둔다. 반려는 그대로다(REQ-TASK-039 · CON-734).
+               비활성 버튼은 사유가 뜨지 않아 .disw 로 감싼다(목록 더보기와 같은 처리) */
+            + (expired(t)
+               ? '<span class="disw" title="'+expWhy(t)+'"><button class="btn" disabled>승인</button></span>'
+               : '<button class="btn" onclick="approveTask()">승인</button>')
           : ''));
 
   let h='';
@@ -2534,6 +2589,8 @@ function setReclaim(on,btn){
 function approveTask(i){
   const t=TASKS[i==null? cur : i];
   if(guardDone(t)) return;
+  /* 버튼이 비활성이라 이 경로로 들어오지 않는다. 다른 호출 경로를 막는 방어다(REQ-TASK-039 · CON-734) */
+  if(expired(t)){ toast('cr', expWhy(t)); return; }
   /* 자원이 나가는 결재라 무엇을 승인하는지 알럿에 담는다 —
      목록에서 눌러도 사유와 요청 자원을 보고 판단한다 */
   /* 다른 확인 알럿과 같은 형식이다 — 제목은 대상 유형 + 동작(반려 모달 `{유형} 반려` 와 짝),
