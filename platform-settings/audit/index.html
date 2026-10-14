@@ -1,11 +1,29 @@
 <!--
-  콘체르토 매니저 · 플랫폼 설정 | 보안 및 감사 목업 v0.15 (2026-10-12)
+  콘체르토 매니저 · 플랫폼 설정 | 보안 및 감사 목업 v0.16 (2026-10-14)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.16 변경 (2026-10-14) ─────────────────────
+  SET-AUDIT-L01 v0.16 과 같은 버전이다. 근거는 감사로그 정책 v0.15 2.2·3.3 WORKSPACE ·
+  BE 흐름 「CDE 배치 작업 · 데이터 반입」(pageId 3462594669, 2026-10-12).
+  · 작업값에 `배치 작업 제출` · `배치 작업 중단` · `데이터 반입` 을 더하고 데모 기록을 하나씩 두었다.
+    갈래는 워크스페이스다. 키는 BE 흐름에 적힌 감사 작업값(SUBMIT_CDE_JOB · CANCEL_CDE_JOB ·
+    IMPORT_CDE_DATA)이다. 라벨은 정책 3.3 행위명 `배치 작업 제출·중단` · `데이터 반입` 을 나눠 옮겼다.
+    화면 말 `중단` 은 CDE 정책 4.5 의 작업 동작 이름이다(백엔드 이름은 cancel).
+  · 배치 작업 완료·실패는 기록하지 않는다(감사로그 정책 2.2). 작업값을 두지 않는다.
+  · 새 데모 기록 세 건의 행위자는 다른 데모 기록에 이미 쓰인 데모 사용자 김병건(bg.kim)으로 두었다.
+  · SSO 4종(`SSO 계정 연결` · `SSO 연결 거절` · `SSO 이메일 동기화` · `SSO 이메일 동기화 건너뜀`)은
+    v0.15 에 이미 있다. 정책 3.3 행위명과 맞아 그대로 둔다.
 
   ── v0.15 변경 ──────────────────────────────────
   · 작업값에 `내 작업함 다운로드` 를 더하고 데모 기록을 두었다. 갈래는 계정이다.
     결재 행위가 아니라 개인정보 접근이고, 내 작업함은 여섯 갈래 어느 메뉴에도 해당하지 않아
     관리 대상 기준으로 둔다(감사 로그 정책 3.1·3.3). 키 이름은 백엔드 구현값을 따랐다.
+  · 작업값에 SSO 4종을 더했다 — `SSO 계정 연결` · `SSO 연결 거절` · `SSO 이메일 동기화` ·
+    `SSO 이메일 동기화 건너뜀`. 갈래는 계정이다(감사 로그 정책 3.3 ACCOUNT · CON-733 B7).
+    계정별 `SSO 연결 해제` 는 동작 이름과 확인 모달이 정해지지 않아 넣지 않았다(안건 42-d 보류).
+  · 작업값에 `배포 시작` · `배포 일시중지` 를 더하고 데모 기록을 하나씩 두었다
+    (감사 로그 정책 3.3 DEPLOYMENT · D-2, CON-596 · CON-604). 라벨은 정책 행위명과
+    기존 `배포 재시작` 꼴을 따랐다.
 
   ── v0.14 변경 ──────────────────────────────────
   · 갈래에 `모니터링` 을 신설했다. 감사 로그 정책 3.1 이 갈래를 GNB 기준으로 두는데
@@ -2302,6 +2320,14 @@ const ACTKO={
   USER_LIST_EXPORTED:'사용자 목록 다운로드',
   /* 내 작업함 다운로드는 결재가 아니라 개인정보 접근이라 계정 갈래로 남는다(감사 로그 정책 3.3) */
   WORKSPACE_APPROVAL_INBOX_EXPORTED:'내 작업함 다운로드',
+  /* SSO — 계정 연결·연결 거절은 로그인 처리 중에 일어나는 인증 행위(감사 로그 정책 3.3 기준 4),
+     이메일 동기화는 계정 수정(기준 2·3)이다. 키와 라벨은 CON-733 B7 그대로다.
+     계정별 SSO 연결 해제(USER_SSO_UNLINKED)는 넣지 않는다 — 동작 이름·확인 모달이 정해지지 않아
+     보류 중이다(안건 42-d) */
+  USER_SSO_ACCOUNT_LINKED:'SSO 계정 연결',
+  USER_SSO_LINK_REFUSED:'SSO 연결 거절',
+  USER_SSO_EMAIL_SYNCED:'SSO 이메일 동기화',
+  USER_SSO_EMAIL_SYNC_SKIPPED:'SSO 이메일 동기화 건너뜀',
   /* 모니터링 — 알림 규칙을 지우면 워크스페이스 관리자와 연결 채널까지 알림이 끊긴다.
      다른 사용자에게 영향을 주는 삭제라 기록한다(감사 로그 정책 2.1 기준 3).
      ⚠ 키 이름은 가안 — 백엔드 확인 대상 */
@@ -2319,11 +2345,17 @@ const ACTKO={
      누가 했는지는 행위자로 가린다(감사 로그 정책 3.3).
      ⚠ 키 이름은 가안 — 백엔드 확인 대상 */
   CDE_EXPIRED:'CDE 만료',
+  /* 배치 작업·데이터 반입 — 감사로그 정책 3.3 WORKSPACE `배치 작업 제출·중단` · `데이터 반입`.
+     키는 BE 흐름(pageId 3462594669)의 감사 작업값이다. 완료·실패는 기록하지 않는다(정책 2.2) */
+  SUBMIT_CDE_JOB:'배치 작업 제출', CANCEL_CDE_JOB:'배치 작업 중단', IMPORT_CDE_DATA:'데이터 반입',
   WORKSPACE_STORAGE_UPDATED:'전용 저장소 변경',
   /* 모델 */
   MODEL_UPDATED:'모델 수정',
-  /* 배포 */
+  /* 배포 — 시작·일시중지는 감사 로그 정책 3.3 DEPLOYMENT `배포 설정 변경·시작·일시중지·재시작` 행(D-2).
+     키는 CON-596(2026-09-29)·CON-604 의 작업값이다. 라벨은 정책 행위명과 기존 `배포 재시작` 꼴을
+     따랐다 */
   DEPLOYMENT_UPDATED:'배포 설정 변경', DEPLOYMENT_RESTARTED:'배포 재시작',
+  DEPLOYMENT_STARTED:'배포 시작', DEPLOYMENT_PAUSED:'배포 일시중지',
   /* 시스템 */
   /* 라이선스·외부 연동 변경은 따로 키를 두지 않는다. 현행 SETTINGS_UPDATED 가 대상으로 갈라
      이미 남기고 있다(데모 기록의 `외부 연동`) */
@@ -2333,11 +2365,18 @@ const ACTKO={
 /* ⚠ 매핑에 없는 값은 원시값이 그대로 나온다. 현행 작업값 전수를 받아야 한다
    — 확인 요청 항목 10번 */
 const AUDIT=[
+  /* 배치 작업 제출·중단, 데이터 반입(감사로그 정책 3.3 WORKSPACE) */
+  {at:'2026-08-20 13:10:44', cat:'WORKSPACE', ip:'192.168.1.10', act:'IMPORT_CDE_DATA', who:'bg.kim', name:'김병건', tgt:'ai-service-team', d:'워크스페이스: ai-service-team\n가져온 곳: Hugging Face\n경로: /shared/datasets/ko-qa'},
+  {at:'2026-08-20 13:32:05', cat:'WORKSPACE', ip:'192.168.1.10', act:'SUBMIT_CDE_JOB', who:'bg.kim', name:'김병건', tgt:'cde-job-3f9a21c7', d:'워크스페이스: ai-service-team\nCDE: bg-jupyter-01\n유형: 학습'},
+  {at:'2026-08-20 13:51:18', cat:'WORKSPACE', ip:'192.168.1.10', act:'CANCEL_CDE_JOB', who:'bg.kim', name:'김병건', tgt:'cde-job-3f9a21c7', d:'워크스페이스: ai-service-team\nCDE: bg-jupyter-01'},
   /* CDE 가 만료되고 3 일 뒤 회수된 기록 — 행위자 `시스템`, 접속 IP 없음(감사 로그 정책 3.3) */
   {at:'2026-08-16 00:00:02', cat:'WORKSPACE', ip:'', act:'CDE_RECLAIMED', who:'시스템', name:'', tgt:'yj-vscode-01', d:'워크스페이스: ai-service-team\n사유: 만료 후 3일 경과'},
   {at:'2026-08-13 00:00:03', cat:'WORKSPACE', ip:'', act:'CDE_EXPIRED', who:'시스템', name:'', tgt:'yj-vscode-01', d:'워크스페이스: ai-service-team\n사유: 사용 기간 종료. 접속이 차단되고 연산 파드가 정지되었습니다.'},
   {at:'2026-08-20 17:23:04', cat:'ACCOUNT', ip:'192.168.1.42', act:'USER_LOGIN_SUCCESS', who:'yj.seong', name:'성유진', tgt:'yj.seong', tuser:'yj.seong', d:'-'},
   {at:'2026-08-20 17:20:41', cat:'DEPLOYMENT', ip:'192.168.1.57', act:'DEPLOYMENT_CREATED', who:'sj.lim', name:'임승주', tgt:'llama-3-2-1b-prod', d:'워크스페이스: ai-service-team'},
+  /* 배포 일시중지·시작(감사 로그 정책 3.3 DEPLOYMENT · D-2) */
+  {at:'2026-08-19 19:05:12', cat:'DEPLOYMENT', ip:'192.168.1.57', act:'DEPLOYMENT_PAUSED', who:'sj.lim', name:'임승주', tgt:'gemma-4-12b-it', d:'워크스페이스: ai-service-team'},
+  {at:'2026-08-20 09:02:47', cat:'DEPLOYMENT', ip:'192.168.1.57', act:'DEPLOYMENT_STARTED', who:'sj.lim', name:'임승주', tgt:'gemma-4-12b-it', d:'워크스페이스: ai-service-team'},
   /* 모니터링 — 알림 규칙. 내용에 심각도·조건을 남긴다(감사 로그 정책 4.2 가리키는 항목) */
   {at:'2026-08-20 16:48:12', cat:'MONITORING', ip:'192.168.1.42', act:'ALERT_RULE_DELETED', who:'yj.seong', name:'성유진', tgt:'응답 지연 급증', d:'워크스페이스: ai-service-team\n심각도: 주의\n조건: P99 응답 지연 2000ms 초과가 60초 지속'},
   {at:'2026-08-20 11:06:41', cat:'MONITORING', ip:'192.168.1.42', act:'ALERT_RULE_CREATED', who:'yj.seong', name:'성유진', tgt:'KV 캐시 포화', d:'워크스페이스: ai-service-team\n심각도: 주의\n조건: KV 캐시 사용률 95% 초과가 60초 지속'},
