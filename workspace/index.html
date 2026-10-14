@@ -1,5 +1,41 @@
 <!--
-  콘체르토 매니저 · 워크스페이스 화면 목업 v0.58 (2026-10-13)
+  콘체르토 매니저 · 워크스페이스 화면 목업 v0.59 (2026-10-14)
+
+  ── v0.59 (2026-10-14) ──
+  · API Key 발급 모달에 사용 한도 두 필드를 넣었다(워크스페이스 정책 7장 · WKSP-L01 REQ-WKSP-102~104 · 7.10).
+    분당 요청 수 한도는 비우면 플랫폼 기본값, 토큰 한도는 비우면 두지 않는다. 둘 다 선택이다.
+    토큰 한도는 토큰 수 · 기준 시간(분당·시간당) · 집계 대상(전체·입력·출력)이고, 토큰 수를 비우면
+    기준 시간·집계 대상을 비활성으로 둔다. 입력값이 1 이상의 정수가 아니면 필드 아래 인라인 에러
+    `1 이상의 정수를 입력해 주세요.` 를 보이고 발급 버튼을 비활성으로 둔다(공통정책 7.8). 에러는 필드를
+    벗어날 때 띄우고, 고쳐지면 입력 중에 바로 거둔다.
+  · 한도는 발급 뒤에도 바꿀 수 있다. 이름·만료일·접근 허용 모델은 종전대로 바꾸지 않는다(정책 7장 수정 행 ·
+    REQ-WKSP-072·106). `발급 후 수정하지 않음` 은 키의 식별과 접근 범위를 지키는 규칙이고, 한도는 공정 분배를
+    위한 운영 값이라 관리자가 남의 키에도 걸 수 있어야 한다(결정 C-4 · CON-710 `생성·수정에 선택 필드`).
+  · API Key 행 작업을 `⋯` 메뉴로 바꿨다. 작업이 `사용 한도 수정` · `폐기` 둘이 되었고 공통정책 3.6 이
+    행 단위 작업을 개수와 무관하게 더보기 메뉴로 통일한다(REQ-WKSP-084). 폐기는 구분선 아래 위험 색이다.
+    두 작업 모두 폐기와 같은 범위에 노출한다. 편집자는 본인 키, 워크스페이스 관리자 이상은 전체.
+  · 사용 한도 수정 모달 `WKSP-L01.D01.T06.M02` 를 신설했다. 발급 모달(M01)을 수정 모드로 쓰지 않는다.
+    받는 값이 두 필드뿐이고 키 값 1회 노출·접근 허용 모델 선택이 없어 화면 목적이 다르다.
+    현재 값으로 채워 열고, 값이 바뀌고 형식이 맞을 때만 `저장` 이 켜진다(공통정책 7.1). 비우고 저장하면
+    분당 요청 수 한도는 플랫폼 기본값, 토큰 한도는 없음으로 돌아간다. 토스트 `사용 한도를 저장했습니다.`
+    모달 하단 경고는 `접근 허용 모델` 만 바꿀 수 없다고 안내한다.
+  · 라벨 도움말에 적용 단위를 적었다. 키가 접근하는 배포마다 따로 세고, API Key 인증을 끈 배포에는
+    걸리지 않는다. 키 없이 호출되어 요청자를 식별하지 못한다(배포 정책 5.5).
+  · API Key 목록에 `한도` 열을 두었다(WKSP-L01 7.9 · REQ-WKSP-105). 키 상세 화면이 없어 발급 뒤 한도를
+    볼 자리가 목록뿐이다. 한 열에 요약한다. `{n}회/분`(비웠으면 `기본값`) 뒤에 토큰 한도가 있으면
+    ` · {집계}{n}토큰/{분·시간}`. 집계는 전체면 생략한다. 호출 수·남은 한도 열은 두지 않는다(정책 7.1).
+    한도 수정 뒤 이 열이 바로 바뀐다.
+  · 운영룸의 상용 API 등록을 `외부 배포` 에서 `외부 모델` 로 바꿨다(워크스페이스 정책 3.6 · WKSP-L01 7.6).
+    섹션 제목 · 등록 버튼 · 등록 모달 제목 · 빈 상태 · 해제 확인 알럿 · 토스트가 같은 말을 쓴다(공통정책 1.1).
+    배포 화면의 `외부 배포`(콘체르토 밖 클러스터 워크로드를 가져온 것, 배포 정책 2.2)와 다른 대상이라
+    이름을 갈랐다. 해제 알럿 제목을 `외부 모델 해제` 로, 토스트를 `외부 모델을 해제했습니다.` 로 맞췄다.
+  · 외부 모델 등록 주석의 `확인 필요` 를 닫았다. 외부 모델은 이 워크스페이스 운영룸 게이트웨이에
+    라우팅 규칙으로 연결되고, 호출도 API Key 인증·사용량 집계 대상이다(정책 3.6 · 2026-09-29 결정 C-5).
+    키 발급 화면의 접근 허용 모델 선택지에 외부 모델을 넣을지는 정해지지 않아 종전대로 배포만 보인다
+    (WKSP-L01 REQ-WKSP-069). 그래서 섹션 도움말에는 키가 필요하다는 문장을 두지 않는다.
+  · 아래 옛 주석 중 운영룸 상용 API를 가리키는 `외부 배포` 는 `외부 모델` 로 고쳤다. 명칭 변경 경위를 적은
+    `외부 배포 섹션 (2026-08-26)` 과 배포 쪽 `외부 배포 가져오기 DEP-F01` 은 그대로 둔다.
+  · 사용 한도 열 도움말을 `이 키에 설정된 사용 한도입니다.` 로 시작하게 바꿨다. 발급 뒤에도 수정할 수 있어서다.
 
   ── v0.58 ──
   · CDE 건수를 개발룸 CDE 목록과 같은 범위로 센다(REQ-WKSP-024·030 · WKSP-L01 5.1·7.2 · CDE 정책 4.1·6장).
@@ -44,7 +80,7 @@
   · 스크린 ID 주석을 기획서·IA 기준으로 맞췄다(WKSP-L01 v0.57). 화면은 바뀌지 않는다.
     멤버 초대 `WKSP-L01.D01.T01.M01` · API Key 발급 `WKSP-L01.D01.T06.M01` ·
     기본 정보 수정 `WKSP-L01.D01.M01` · 외부 배포 가져오기 `DEP-F01`.
-    저장소 설정·외부 배포 등록 모달은 기획서에 화면 행이 없어 ID를 떼었다(스크린 ID 미부여).
+    저장소 설정·외부 모델 등록 모달은 기획서에 화면 행이 없어 ID를 떼었다(스크린 ID 미부여).
 
   ── v0.56 (CON-596 G-1) ──
   · 생성 폼 개발룸 옵션의 `Egress 허용 도메인` 도움말을 설치 값에 따라 가른다.
@@ -59,7 +95,7 @@
     전원이 기동 때마다 자동 등록되어 제거·탈퇴가 성립하지 않고 초대할 대상도 없다.
   · 공용 워크스페이스 관리자는 최고 관리자가 겸한다(정책 6.1 · CON-562). 종전에는 최고
     관리자가 공용 관리자를 지정하고 그 관리자가 속성 운영을 맡는 구조였으나, 구현이
-    최고 관리자 외에는 공용 관리자를 허용하지 않아 지정할 대상이 없다. 연동·외부 배포·룸
+    최고 관리자 외에는 공용 관리자를 허용하지 않아 지정할 대상이 없다. 연동·외부 모델·룸
     진입점을 최고 관리자 기준으로 바꿨다.
   · 공용 워크스페이스 역할 셀렉트 — `관리자` 선택지를 최고 관리자 계정에만 두고, 최고
     관리자 계정의 역할은 관리자로 고정해 셀렉트를 비활성으로 둔다.
@@ -97,7 +133,7 @@
 
   따라서 공용에서 관리자 작업의 기준은 `isWsAdmin()` 이 아니라 `isSuper()` 다.
     연동·전용 저장소  최고 관리자만(정책 6.1·6.2)
-    외부 배포        최고 관리자만 등록·해제(정책 3.6·9장)
+    외부 모델        최고 관리자만 등록·해제(정책 3.6·9장)
     룸              최고 관리자만 생성·설정·삭제(정책 6.2)
     멤버 역할 변경    최고 관리자만. `관리자` 선택지는 최고 관리자 계정에만(정책 6.2)
 
@@ -172,7 +208,7 @@
    여기서는 룸 상태를 보이고 진입만 시킨다 — 개발룸 버튼·환경 섹션·패널 룸 버튼·
    브레드크럼 링크가 모두 `개발룸 화면으로 이동합니다` 안내로 간다.
    생성도 개발룸 화면 소관이다 — `＋ 개발룸 생성` 도 같은 안내로 보낸다.
-   ⚠ 운영룸은 워크스페이스 소관이라 그대로 둔다(자원 현황 · 배포된 모델 · 외부 배포).
+   ⚠ 운영룸은 워크스페이스 소관이라 그대로 둔다(자원 현황 · 배포된 모델 · 외부 모델).
 
   ── 개발룸·CDE 잔여 코드 제거 (2026-09-28) ─────────────
    개발룸 목업 v0.25 와 대조를 마쳐, 진입점이 없어 도달하지 않던 코드를 지웠다 —
@@ -188,7 +224,7 @@
    보고 있어 목록을 그릴 때는 그 행이 아니라 직전에 연 대상을 판정하고 있었다.
    대상을 인자로 받게 고쳤다 — 카드·테이블 모두 행마다 판정한다.
    공용은 기본 정보 수정과 삭제를 노출하지 않는다(정책 6.1·6.2).
-   ⚠ 연동·외부 배포·API Key 는 공용도 일반과 동일하다(6.2). 기본 정보 수정과 권한 축이
+   ⚠ 연동·외부 모델·API Key 는 공용도 일반과 동일하다(6.2). 기본 정보 수정과 권한 축이
      달라 `canManageExt(m)` 로 갈랐다.
 
 ── 탭 배지 (2026-08-26) ──────────────────────
@@ -217,7 +253,7 @@
 
 ── 행 액션 표기 (2026-08-26) ─────────────────
    테이블 행의 액션을 아이콘에서 텍스트 버튼으로 바꿨다 — 멤버 제외·나가기, API Key 폐기,
-   외부 배포 해제, 작업 로그 보기. 아이콘만 두면 무엇을 하는 버튼인지 눌러 봐야 알고,
+   외부 모델 해제, 작업 로그 보기. 아이콘만 두면 무엇을 하는 버튼인지 눌러 봐야 알고,
    같은 성격의 액션이 화면마다 아이콘·텍스트로 갈려 있었다(개발룸은 `로그 보기` 텍스트).
    파괴적 액션 진입은 외곽선(`.btn.danger-line.sm`), 그 외는 흐린 버튼(`.btn.ghost.sm`)이다.
    ⚠ 툴바(열 편집·다운로드·새로 고침)와 폼 입력 행의 제거는 아이콘을 유지한다 —
@@ -1751,15 +1787,63 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <label>만료일</label>
         <select class="inp"><option>30일</option><option>90일</option><option>180일</option><option>만료 없음</option></select>
       </div>
-      <div class="f" id="kScopeWrap" style="margin-bottom:0">
+      <div class="f" id="kScopeWrap">
         <label>접근 허용 모델</label>
         <div class="mselect" id="kScope"></div>
+      </div>
+      <!-- 사용 한도 — 발급할 때만 정한다. 발급 후 바꾸지 않는다(정책 7장).
+           적용 단위는 키가 접근하는 배포마다다. 인증을 끈 배포에는 걸리지 않는다(배포 정책 5.5) -->
+      <div class="f">
+        <label>분당 요청 수 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">키가 접근하는 배포마다 따로 적용됩니다. API Key 인증을 끈 배포에는 적용되지 않습니다.</span></span></label>
+        <input class="inp" id="kRpm" inputmode="numeric" autocomplete="off" oninput="kLimInput('kRpm')" onblur="kLimBlur('kRpm')">
+        <div class="hint">비우면 플랫폼 기본값이 적용됩니다.</div>
+        <div class="errmsg" id="kRpmErr">1 이상의 정수를 입력해 주세요.</div>
+      </div>
+      <div class="f" style="margin-bottom:0">
+        <label>토큰 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">기준 시간 동안 처리할 수 있는 토큰 수입니다. 집계 대상에서 입력·출력 중 하나만 셀 수 있습니다. 키가 접근하는 배포마다 따로 적용됩니다.</span></span></label>
+        <div style="display:flex;gap:8px">
+          <input class="inp" id="kTok" inputmode="numeric" autocomplete="off" style="flex:1;min-width:0" aria-label="토큰 수" oninput="kLimInput('kTok')" onblur="kLimBlur('kTok')">
+          <select class="inp" id="kTokWin" style="width:96px" aria-label="기준 시간" disabled><option value="분">분당</option><option value="시간">시간당</option></select>
+          <select class="inp" id="kTokAgg" style="width:96px" aria-label="집계 대상" disabled><option value="전체">전체</option><option value="입력">입력</option><option value="출력">출력</option></select>
+        </div>
+        <div class="hint">비우면 토큰 한도를 두지 않습니다.</div>
+        <div class="errmsg" id="kTokErr">1 이상의 정수를 입력해 주세요.</div>
       </div>
       <div id="kWarn"></div>
     </div>
     <div class="mdfoot">
       <button class="btn ghost" onclick="closeKey()">취소</button>
       <button class="btn" id="kSubmit" disabled onclick="runSync(this,submitKey)">발급</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- API Key 한도 수정 WKSP-L01.D01.T06.M02. 사용 한도만 바꾼다(정책 7장 수정 행) -->
+<div class="mdbg" id="mdKeyLim">
+  <div class="modal" style="width:480px">
+    <div class="mdhead"><h3>사용 한도 수정</h3><p id="lmDesc"></p></div>
+    <div class="mdbody">
+      <div class="f">
+        <label>분당 요청 수 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">키가 접근하는 배포마다 따로 적용됩니다. API Key 인증을 끈 배포에는 적용되지 않습니다.</span></span></label>
+        <input class="inp" id="lmRpm" inputmode="numeric" autocomplete="off" oninput="lmInput('lmRpm')" onblur="kLimBlur('lmRpm')">
+        <div class="hint">비우면 플랫폼 기본값이 적용됩니다.</div>
+        <div class="errmsg" id="lmRpmErr">1 이상의 정수를 입력해 주세요.</div>
+      </div>
+      <div class="f" style="margin-bottom:0">
+        <label>토큰 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">기준 시간 동안 처리할 수 있는 토큰 수입니다. 집계 대상에서 입력·출력 중 하나만 셀 수 있습니다. 키가 접근하는 배포마다 따로 적용됩니다.</span></span></label>
+        <div style="display:flex;gap:8px">
+          <input class="inp" id="lmTok" inputmode="numeric" autocomplete="off" style="flex:1;min-width:0" aria-label="토큰 수" oninput="lmInput('lmTok')" onblur="kLimBlur('lmTok')">
+          <select class="inp" id="lmTokWin" style="width:96px" aria-label="기준 시간" onchange="lmValid()"><option value="분">분당</option><option value="시간">시간당</option></select>
+          <select class="inp" id="lmTokAgg" style="width:96px" aria-label="집계 대상" onchange="lmValid()"><option value="전체">전체</option><option value="입력">입력</option><option value="출력">출력</option></select>
+        </div>
+        <div class="hint">비우면 토큰 한도를 두지 않습니다.</div>
+        <div class="errmsg" id="lmTokErr">1 이상의 정수를 입력해 주세요.</div>
+      </div>
+    </div>
+    <div class="mdfoot">
+      <button class="btn ghost" onclick="closeKeyLim()">취소</button>
+      <button class="btn" id="lmSubmit" disabled onclick="runSync(this,submitKeyLim)">저장</button>
     </div>
   </div>
 </div>
@@ -1892,11 +1976,11 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 </div>
 
 
-<!-- 외부 배포 등록 — 스크린 ID 미부여 -->
+<!-- 외부 모델 등록 — 스크린 ID 미부여 -->
 <div class="mdbg" id="mdExt">
   <div class="modal" style="width:520px">
     <div class="mdhead">
-      <h3>외부 배포 등록</h3>
+      <h3>외부 모델 등록</h3>
       <p>외부 상용 AI API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.</p>
     </div>
     <div class="mdbody">
@@ -2030,9 +2114,10 @@ const WS=[
         {u:'kh.oh',env:'VS Code',fw:'PyTorch (CUDA)',acc:'NVIDIA-H200 4장',mode:'대화형',
          start:'-',exp:'-',st:'반려',ip:'-',rsn:'대규모 학습',rej:'가속기 잔여량 부족. 2장 이하로 다시 신청해 주세요.'}],
   keys:[{n:'lang-chain-agent-prod',type:'일반',exp:'2026-08-28',by:'성유진(yj.seong)',
-    scope:['llama-3-2-1b-prod','gemma-4-12b-it-idle'], last:'2026-08-20 14:32:08'},
+    scope:['llama-3-2-1b-prod','gemma-4-12b-it-idle'], last:'2026-08-20 14:32:08',
+    rpm:600, tok:{n:50000,win:'시간',agg:'출력'}},
    {n:'batch-infer-key',type:'일반',exp:'2026-09-30',by:'임승주(sj.lim)',
-    scope:['llama-3-2-1b-prod'], last:null}],
+    scope:['llama-3-2-1b-prod'], last:null, rpm:null, tok:null}],
   jobs:[{id:'job-8f2a',u:'yj.seong',t:'학습',fw:'PyTorch',dur:'1시간 24분',st:'완료'},
         {id:'job-3c91',u:'yj.seong',t:'전처리',fw:'PyTorch',dur:'12분',st:'실행 중'},
         {id:'job-b04e',u:'sj.lim',t:'학습',fw:'PyTorch',dur:'3분',st:'실패',err:'CUDA out of memory. 배치 크기를 줄이거나 가속기를 늘려 주세요.'},
@@ -2170,7 +2255,7 @@ const cdeCnt=(m)=>m.cdes.filter(c=>CDE_LIVE.indexOf(c.st)>=0 && (isWsAdmin() || 
    설명은 설치 시 고정 문구로 둔다 — 전 사용자가 참조하는 문구다.
    진입점을 두지 않는다(공통정책 7.10) */
 const canEditInfo =(m)=>!isSysWs(m) && isWsAdmin();
-/* 연동·외부 배포·룸은 일반은 Workspace Admin, 공용은 최고 관리자가 한다(정책 6.1·3.6).
+/* 연동·외부 모델·룸은 일반은 Workspace Admin, 공용은 최고 관리자가 한다(정책 6.1·3.6).
    기본 정보 수정(6.1 미노출)과 권한 축이 다르므로 함수를 가른다.
    ⚠ v0.54 까지 `공용도 일반과 동일` 이었으나 정책 6.1 개정으로 바뀌었다 */
 const canManageExt=(m)=>canAdminWs(m);
@@ -3243,25 +3328,39 @@ function drawDetail(){
      + (canIssueKey()?'<span class="secbtns"><button class="btn sm" onclick="openKey()">API Key 발급</button></span>':'')
      + '</h4>'
      + (m.keys.length
-       ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>API Key명</th><th>유형</th><th>접근 허용 모델</th><th>마지막 사용</th><th>만료일</th><th>소유 계정</th><th style="width:72px">작업</th></tr></thead><tbody>'
-         + m.keys.map(k=>'<tr><td><span class="rname">'+k.n+'</span></td><td>'+k.type+'</td>'
+       ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>API Key명</th><th>유형</th><th>접근 허용 모델</th><th>한도'+tip('이 키에 설정된 사용 한도입니다. 키가 접근하는 배포마다 따로 적용됩니다. 기본값은 플랫폼에 설정된 분당 요청 수 한도입니다.')+'</th><th>마지막 사용</th><th>만료일</th><th>소유 계정</th><th style="width:72px">작업</th></tr></thead><tbody>'
+         + m.keys.map((k,i)=>'<tr><td><span class="rname">'+k.n+'</span></td><td>'+k.type+'</td>'
            /* 어떤 모델에 쓰이고 있는지가 사용 현황이다(정책 7.1).
               여럿이면 첫 건 외 N건으로 줄인다(공통정책 1.2) */
            +'<td>'+(k.scope && k.scope.length
                ? k.scope[0]+(k.scope.length>1? ' <span class="dash">외 '+(k.scope.length-1)+'건</span>' : '')
                : '<span class="dash">-</span>')+'</td>'
+           /* 사용 한도 — 키 상세가 없어 발급 뒤 한도를 볼 자리가 여기뿐이다(WKSP-L01 7.9) */
+           +'<td style="white-space:nowrap">'+keyLimitLabel(k)+'</td>'
            /* 쓰고 있는 키인지 알아야 폐기 대상을 가릴 수 있다.
               인증 시점에 기록되는 값이라 인증·인가 도메인이 갖고 있다 */
            +'<td>'+(k.last? k.last : '<span class="dash">-</span>')+'</td>'
            +'<td>'+k.exp+'</td><td>'+userRef(k.by)+'</td>'
            /* 본인 키만 지운다. 남의 키는 사용 현황만 본다(정책 7.1) */
-       +'<td>'+(canRevoke(k)?'<button class="btn danger-line sm" onclick="revokeKey(\''+k.n+'\')">폐기</button>':'')+'</td></tr>').join('')
+       /* 작업이 둘이라 더보기 메뉴로 둔다(공통정책 3.6). 한도 수정은 폐기와 같은 범위에 노출한다(정책 7장) */
+       +'<td onclick="event.stopPropagation()">'+(canRevoke(k)
+           ?'<div class="more" id="km'+i+'"><button class="morebtn" aria-label="작업" onclick="tgMore(event,\'km'+i+'\')">⋯</button><div class="rowmenu">'
+             +'<button onclick="openKeyLim(\''+k.n+'\')">사용 한도 수정</button><hr>'
+             +'<button class="d" onclick="revokeKey(\''+k.n+'\')">폐기</button></div></div>'
+           :'')+'</td></tr>').join('')
          + '</tbody></table></div>'
        : '<div class="emptyline">발급된 API Key가 없습니다. 외부 앱에서 배포 모델을 호출하려면 키를 발급해 주세요.</div>')
      + '</div>';
   }
 
   document.getElementById('detailBody').innerHTML=h;
+}
+/* 사용 한도 요약 — `{n}회/분`(비웠으면 `기본값`) + 토큰 한도가 있으면 ` · {집계}{n}토큰/{분·시간}`.
+   집계가 전체면 접두를 생략한다. 토큰 수는 천 단위 쉼표 */
+function keyLimitLabel(k){
+  let t = k.rpm ? k.rpm.toLocaleString('en-US')+'회/분' : '<span class="dash">기본값</span>';
+  if(k.tok) t += ' · '+(k.tok.agg==='전체'?'':k.tok.agg+' ')+k.tok.n.toLocaleString('en-US')+'토큰/'+k.tok.win;
+  return t;
 }
 /* 배포에 연결된 API Key — 키와 배포는 N:M이므로 여러 개가 걸릴 수 있다.
    목록 셀에는 첫 항목과 건수만 표기하고 전체는 API Key 탭에서 확인한다 */
@@ -3410,13 +3509,15 @@ function roomTab(m){
      : '<div class="emptyline">배포된 모델이 없습니다. 배포 화면에서 배포를 만들면 여기에 표시됩니다.</div>')
    + '</div>';
 
-  /* 외부 상용 AI API를 등록하면 자체 배포 모델과 같은 게이트웨이로 호출한다(기술문서 4장).
-     운영룸이 '이 워크스페이스에서 호출할 수 있는 모델 전부'를 다루는 자리가 된다 */
+  /* 외부 상용 AI API를 외부 모델로 등록하면 이 운영룸 게이트웨이에 라우팅 규칙으로 연결되어
+     자체 배포 모델과 같은 방식으로 호출한다. 호출은 API Key 인증·사용량 집계 대상이다(정책 3.6 · C-5).
+     운영룸이 '이 워크스페이스에서 호출할 수 있는 모델 전부'를 다루는 자리가 된다.
+     배포 화면의 `외부 배포`(클러스터 워크로드 가져오기)와 다른 대상이다 */
   const ext=m.ext||[];
-  h+='<div class="dsec"><h4>외부 배포'
-   +   tip('외부 상용 AI API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다. API Key도 동일하게 적용됩니다.')
+  h+='<div class="dsec"><h4>외부 모델'
+   +   tip('외부 상용 AI API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.')
    +   ' <span style="font-weight:400;color:var(--muted-foreground)">'+ext.length+'건</span>'
-   + (canManageExt(m)?'<button class="btn sm" style="margin-left:auto" onclick="openExt()">외부 배포 등록</button>':'')+'</h4>'
+   + (canManageExt(m)?'<button class="btn sm" style="margin-left:auto" onclick="openExt()">외부 모델 등록</button>':'')+'</h4>'
    + (ext.length
      ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>모델명</th><th>제공자</th><th>상태</th><th style="width:72px">작업</th></tr></thead><tbody>'
        + ext.map(function(x){ return '<tr style="cursor:default"><td><span class="rname">'+x.n+'</span></td>'
@@ -3425,7 +3526,7 @@ function roomTab(m){
               아이콘만 두면 무엇을 지우는 것인지 눌러 봐야 안다 */
            +'<td>'+(canManageExt(m)?'<button class="btn danger-line sm" onclick="rmExt(\''+x.n+'\')">해제</button>':'')+'</td></tr>'; }).join('')
        + '</tbody></table></div>'
-     : '<div class="emptyline">등록된 외부 배포가 없습니다.'+(canManageExt(m)?' OpenAI·Anthropic 같은 상용 API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.':'')+'</div>')
+     : '<div class="emptyline">등록된 외부 모델이 없습니다.'+(canManageExt(m)?' OpenAI·Anthropic 같은 상용 API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.':'')+'</div>')
    + '</div>';
   return h;
 }
@@ -4371,28 +4472,96 @@ function openKey(){
   kSel=[]; kQ='';
   document.getElementById('kName').value='';
   document.getElementById('kNameErr').classList.remove('show');
+  ['kRpm','kTok'].forEach(function(id){ document.getElementById(id).value=''; kLimShow(id,false); });
+  document.getElementById('kTokWin').value='분'; document.getElementById('kTokAgg').value='전체';
+  document.getElementById('kTokWin').disabled=true; document.getElementById('kTokAgg').disabled=true;
   setKeyType(); drawKScope(); kValid(); document.getElementById('mdKey').classList.add('on');
 }
 function closeKey(){ document.getElementById('mdKey').classList.remove('on'); }
 /* 여기서는 일반 키만 발급한다. 에이전트 키는 CDE 신청 화면 소관이다(CDE 정책 2.4) */
 function setKeyType(){
   const w=document.getElementById('kWarn');
-  if(w) w.innerHTML = alertBox('warn','','발급 후에는 접근 허용 모델을 변경할 수 없습니다. 권한을 바꾸려면 키를 폐기하고 다시 발급해야 합니다.','',false);
+  if(w) w.innerHTML = alertBox('warn','','발급 후에는 접근 허용 모델을 변경할 수 없습니다. 바꾸려면 키를 폐기하고 다시 발급해야 합니다. 사용 한도는 발급 후에도 수정할 수 있습니다.','',false);
+  kValid();
+}
+/* 사용 한도 — 비어 있으면 통과(선택 입력). 값이 있으면 1 이상의 정수만 받는다(공통정책 7.8).
+   에러는 필드를 벗어날 때 띄우고, 고쳐지면 입력 중에 바로 거둔다 */
+function kLimBad(id){
+  const v=document.getElementById(id).value.trim();
+  return v!=='' && !/^[1-9][0-9]*$/.test(v);
+}
+function kLimShow(id,on){
+  document.getElementById(id+'Err').classList.toggle('show',on);
+  document.getElementById(id).classList.toggle('err',on);
+}
+function kLimBlur(id){ kLimShow(id,kLimBad(id)); }
+function kLimInput(id){
+  if(!kLimBad(id)) kLimShow(id,false);
+  if(id==='kTok'){
+    /* 토큰 수를 비우면 기준 시간·집계 대상은 의미가 없어 비활성으로 둔다 */
+    const off=document.getElementById('kTok').value.trim()==='';
+    document.getElementById('kTokWin').disabled=off;
+    document.getElementById('kTokAgg').disabled=off;
+  }
   kValid();
 }
 function kValid(){
   const v=document.getElementById('kName').value.trim();
-  /* 접근 허용 배포를 1건 이상 골라야 한다 */
-  document.getElementById('kSubmit').disabled = !v || !kSel.length;
+  /* 접근 허용 배포를 1건 이상 골라야 하고, 한도 입력값이 형식에 맞아야 한다 */
+  document.getElementById('kSubmit').disabled = !v || !kSel.length || kLimBad('kRpm') || kLimBad('kTok');
   if(v) document.getElementById('kNameErr').classList.remove('show');
 }
 function kBlur(){ if(!document.getElementById('kName').value.trim()) document.getElementById('kNameErr').classList.add('show'); }
 function submitKey(){
   const v=document.getElementById('kName').value.trim();
+  const rpm=document.getElementById('kRpm').value.trim(), tk=document.getElementById('kTok').value.trim();
   cur.m.keys.push({n:v,type:'일반',exp:'2026-08-28',by:'성유진(yj.seong)',
-    scope: kSel.slice()});
+    scope: kSel.slice(),
+    rpm: rpm? Number(rpm) : null,
+    tok: tk? {n:Number(tk), win:document.getElementById('kTokWin').value, agg:document.getElementById('kTokAgg').value} : null});
   document.getElementById('mdKey').classList.remove('on');
   refresh(); toast('ok','API Key를 발급했습니다.');
+}
+/* ═══════════ 한도 수정 WKSP-L01.D01.T06.M02 ═══════════
+   사용 한도만 바꾼다. 이름·만료일·접근 허용 모델은 바꾸지 않는다(정책 7장 수정 행).
+   권한은 폐기와 같다. 편집자는 본인 키, 워크스페이스 관리자 이상은 전체(canRevoke).
+   현재 값으로 채워 열고, 바뀐 값이 있고 형식이 맞을 때만 저장을 켠다(공통정책 7.1) */
+let lmKey=null, lmInit='';
+function lmSnap(){
+  return ['lmRpm','lmTok','lmTokWin','lmTokAgg'].map(function(id){ return document.getElementById(id).value.trim(); }).join('|');
+}
+function openKeyLim(name){
+  document.querySelectorAll('.more').forEach(function(m){ m.classList.remove('open','up'); });
+  lmKey=(cur.m.keys||[]).filter(function(k){ return k.n===name; })[0]; if(!lmKey) return;
+  document.getElementById('lmDesc').textContent=name+'의 사용 한도를 수정합니다. 접근 허용 모델과 만료일은 바뀌지 않습니다.';
+  document.getElementById('lmRpm').value = lmKey.rpm? String(lmKey.rpm) : '';
+  document.getElementById('lmTok').value = lmKey.tok? String(lmKey.tok.n) : '';
+  document.getElementById('lmTokWin').value = lmKey.tok? lmKey.tok.win : '분';
+  document.getElementById('lmTokAgg').value = lmKey.tok? lmKey.tok.agg : '전체';
+  ['lmRpm','lmTok'].forEach(function(id){ kLimShow(id,false); });
+  lmToggleTok();
+  lmInit=lmSnap(); lmValid();
+  document.getElementById('mdKeyLim').classList.add('on');
+}
+function closeKeyLim(){ document.getElementById('mdKeyLim').classList.remove('on'); }
+function lmToggleTok(){
+  const off=document.getElementById('lmTok').value.trim()==='';
+  document.getElementById('lmTokWin').disabled=off;
+  document.getElementById('lmTokAgg').disabled=off;
+}
+function lmInput(id){
+  if(!kLimBad(id)) kLimShow(id,false);
+  if(id==='lmTok') lmToggleTok();
+  lmValid();
+}
+function lmValid(){
+  document.getElementById('lmSubmit').disabled = kLimBad('lmRpm') || kLimBad('lmTok') || lmSnap()===lmInit;
+}
+function submitKeyLim(){
+  const rpm=document.getElementById('lmRpm').value.trim(), tk=document.getElementById('lmTok').value.trim();
+  lmKey.rpm = rpm? Number(rpm) : null;
+  lmKey.tok = tk? {n:Number(tk), win:document.getElementById('lmTokWin').value, agg:document.getElementById('lmTokAgg').value} : null;
+  closeKeyLim(); refresh(); toast('ok','사용 한도를 저장했습니다.');
 }
 function revokeKey(name){
   openConfirm('API Key 폐기','<b>'+name+'</b>을(를) 폐기하면 이 키를 사용하는 외부 앱이 즉시 호출할 수 없게 됩니다. 폐기한 키는 복구할 수 없습니다.',
@@ -4514,7 +4683,9 @@ function refresh(){
 /* ═══════════ 외부 모델 등록 ═══════════
    기술문서 8.4 — 외부 상용 AI API의 엔드포인트와 인증 토큰을 등록하면
    워크스페이스 내 단일 게이트웨이로 자체 배포 모델과 같게 호출한다.
-   등록 후 이 모델도 API Key 접근 범위에 포함되는지는 확인 필요 */
+   게이트웨이는 워크스페이스마다 있고 외부 모델은 라우팅 규칙으로 연결한다. 플랫폼 공용 진입 주소는 없다.
+   호출은 API Key 인증·사용량 집계 대상이다(정책 3.6 · 2026-09-29 결정 C-5).
+   ⚠ 키 발급의 접근 허용 모델 선택지에 외부 모델을 넣을지는 정해지지 않았다(REQ-WKSP-069 · 확인 대상) */
 const XPROV={'OpenAI':'https://api.openai.com/v1','Anthropic':'https://api.anthropic.com/v1','직접 입력':''};
 function openExt(){
   ['xName','xUrl','xTok'].forEach(function(id){ document.getElementById(id).value=''; document.getElementById(id+'Err').classList.remove('show'); });
@@ -4549,17 +4720,17 @@ function xValid(){
   ['xName','xUrl','xTok'].forEach(function(id){ if(!xErr(id)) document.getElementById(id+'Err').classList.remove('show'); });
   document.getElementById('xSubmit').disabled = ['xName','xUrl','xTok'].some(xErr);
 }
-/* 섹션 제목·등록 버튼과 같은 말을 쓴다. 한 화면에서 `외부 배포` 와 `연동` 을 섞으면
-   같은 것을 가리키는지 알 수 없다(공통정책 1.1) */
+/* 섹션 제목·등록 버튼과 같은 말을 쓴다. 한 화면에서 `외부 모델` 과 `연동` 을 섞으면
+   같은 것을 가리키는지 알 수 없다(공통정책 1.1). 배포 화면의 `외부 배포` 와도 섞지 않는다(정책 3.6) */
 function rmExt(name){
-  openConfirm('등록 해제','<b>'+name+'</b> 등록을 해제하면 이 모델을 호출하던 앱이 더 이상 사용할 수 없게 됩니다.',
-    function(){ cur.m.ext=cur.m.ext.filter(function(x){return x.n!==name;}); refresh(); toast('ok','등록을 해제했습니다.'); },'해제');
+  openConfirm('외부 모델 해제','<b>'+name+'</b>을(를) 해제하면 이 모델을 호출하던 앱이 더 이상 사용할 수 없게 됩니다.',
+    function(){ cur.m.ext=cur.m.ext.filter(function(x){return x.n!==name;}); refresh(); toast('ok','외부 모델을 해제했습니다.'); },'해제');
 }
 function submitExt(){
   const prov=document.querySelector('#xProv input:checked').value;
   cur.m.ext=cur.m.ext||[];
   cur.m.ext.push({n:document.getElementById('xName').value.trim(), prov:prov==='직접 입력'?'사내 API':prov, st:'정상'});
-  closeExt(); refresh(); toast('ok','외부 배포를 등록했습니다.');
+  closeExt(); refresh(); toast('ok','외부 모델을 등록했습니다.');
 }
 
 /* ═══════════ 연동 설정 ═══════════
