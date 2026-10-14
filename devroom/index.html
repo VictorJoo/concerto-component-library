@@ -1,6 +1,29 @@
 <!--
-  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.28 (2026-10-13)
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.29 (2026-10-14)
   CDE 정책 기준.
+
+  ── v0.29 (2026-10-14) ──
+  · 개발룸을 삭제하고 다시 만들면 새 개발룸에는 생성 뒤 제출된 작업만 보인다(CDE 정책 4.5 · 기획서 7.6).
+    작업 기록·학습 지표·평가 결과는 개발룸을 삭제해도 남지만 새 개발룸의 작업 이력에 섞지 않는다.
+    · 목업에서는 개발룸 생성일시(ROOM_INFO.at) 이후 제출된 작업만 작업 이력에 둔다(inRoom).
+      표본 작업은 모두 2026-08 제출이고 개발룸 생성일시가 2026-07-01 이라 지금 보이는 것과 어긋나지 않는다.
+    · 데모 바 `개발룸` 미생성에서 개발룸을 새로 만들면 생성일시가 지금 시각이 되어 이전 작업과 CDE 가
+      보이지 않는다. CDE 도 개발룸 삭제 때 함께 제거되므로(워크스페이스 정책 3.4) 같은 기준으로 거른다.
+      사용량도 0 에서 시작한다. 데모 바 `생성됨` 을 누르면 원래 표본으로 돌아간다.
+    · 작업 이력 탭 배지 건수를 조회 범위 안의 건수로 고쳤다. 전체 건수를 세어 목록과 숫자가 어긋났다.
+  · 뷰어도 본인 CDE·작업을 본다(CDE 정책 4.1·4.5·7.1). 편집자였다가 뷰어로 바뀌어도 쓰던 CDE 는 남고
+    접속·데이터 반입·반납은 된다. 종전에는 뷰어에게 목록을 비워 강등된 사용자가 자기 CDE 에 들어갈 수 없었다.
+    데모 바 권한을 뷰어로 바꾸면 이 경우가 보인다. 연장은 막히고 사유가 뜬다(정책 7.1).
+  · 빈 목록의 신청 유도는 신청할 수 있을 때만 둔다(REQ-CDE-020·021 · 공통정책 7.10). 본인 신청이 승인 대기면
+    보유 중이라 신청 버튼을 두지 않고 `승인 대기 중인 신청은 내 작업함에서 확인할 수 있습니다.` 를 둔다
+    (CDE 정책 6장). 뷰어 문구는 종전 그대로다. 문구 `CDE가 없습니다.` 는 이미 맞게 쓰여 있어 고치지 않았다.
+    데모 바 `내 CDE` 에 `승인 대기` 를 두었다. 편집자로 두고 누르면 이 경우가 보인다(관리자는 다른 CDE가 보여 목록이 비지 않는다).
+  · 표 머리 도움말(상태 등)이 표 영역 안에서 잘리던 것을 고쳤다. 마우스를 올려도 화면 기준으로 띄우고, 아래 공간이 모자라면 위로 연다.
+  · 조회 범위 주석 두 곳(화면 요약 · 원칙 4 인용)을 정책 원칙 4 정정에 맞췄다. 관리자 이상은 전체, 그 외에는 본인 것만이다.
+  · 주석의 없는 참조(정책 9. 22번 · 9. 29번)를 정책 조항으로 바꿨다. 작업 산출물·학습 지표 주석을 기획서 5.3
+    C-12·C-13 종결에 맞췄다. 산출물 경로 표본은 표시 형식이 확인 대상이라 값을 바꾸지 않았다.
+  · 상태 도움말에서 절전을 뺐다. 들어가는 동작이 없어 목록에 나올 수 없는 값이다(CDE 정책 5.1).
+  · 작업 이력 상태 필터 선택지에 중단됨이 빠져 있던 것을 넣었다(기획서 7.6 · CDE 정책 6.1).
 
   ── v0.28 (CON-732 · CON-734 · CON-527) ──
   · 작업 유형을 화면 문구로 바꿨다. 종전에는 원천값 `train` 을 그대로 보였다(공통정책 7.9).
@@ -404,7 +427,7 @@
     알릴 내용이 아니었다(라이브러리 툴팁 기준).
 
   ── 화면 ────────────────────────────────────────
-  · CDE 목록 WKSP-CDE-D01 — 워크스페이스 전체를 조회하고 조작은 본인 것만(정책 4.1)
+  · CDE 목록 WKSP-CDE-D01 — 관리자 이상은 워크스페이스 전체, 그 외에는 본인 것만 조회. 접속·연장·반납은 본인 것만(정책 4.1)
   · CDE 신청 WKSP-CDE-F01 — 결재 잠금형. 승인 시점에 개발룸 몫에서 차감(정책 3.1)
        · 작업 상세 WKSP-CDE-D01.D02 — 작업 이력 행에서 진입. 사전 진단·학습 지표·산출물(명세 16·18)
 
@@ -820,6 +843,12 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 #quotaBox .tip-anchor .tip,
 #jobBox .tip-anchor .tip,
 #formBody .tip-anchor .tip{left:0;transform:translateX(0) translateY(4px);max-width:260px}
+/* v0.29 — 표 안 도움말이 표 영역(.tblwrap, overflow-x:auto)에 잘리던 것을 고쳤다.
+   가로 스크롤 때문에 세로도 잘린다. 열 때 화면 기준(fixed)으로 띄워 영역 밖으로 나오게 한다 */
+.tip-anchor .tip.fx{position:fixed;bottom:auto;transform:none;z-index:1000}
+.tip-anchor:hover .tip.fx,.tip-anchor:focus-within .tip.fx{transform:none}
+.tip-anchor .tip.fx::after{top:auto;bottom:100%;left:var(--ax,14px);transform:none;border-top-color:transparent;border-bottom-color:var(--flyout)}
+.tip-anchor .tip.fx.up::after{top:calc(100% - 1px);bottom:auto;border-bottom-color:transparent;border-top-color:var(--flyout)}
 /* 기본 정보·자원은 화면 상단이라 위로 열면 잘린다. 아래로 연다 */
 #infoBox .tip-anchor .tip,
 #quotaBox .tip-anchor .tip{top:calc(100% + 8px);bottom:auto;transform:translateX(0) translateY(-4px)}
@@ -2070,7 +2099,8 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
     <button class="ms" onclick="setMyState('절전',this)">절전 (2차 범위)</button>
     <button class="ms" onclick="setMyState('실패',this)">실패</button>
     <button class="ms" onclick="setMyState('만료',this)">만료</button>
-    <button class="ms" onclick="setMyState('회수',this)">회수</button></span>
+    <button class="ms" onclick="setMyState('회수',this)">회수</button>
+    <button class="ms" onclick="setMyState('승인 대기',this)">승인 대기</button></span>
   <span class="dgrp"><span class="demo-label">권한:</span>
     <button class="rl on" onclick="setRole('super',this)">최고 관리자</button>
     <button class="rl" onclick="setRole('admin',this)">WS 관리자</button>
@@ -2127,6 +2157,22 @@ const ROOM = { cpu:{q:32, use:20}, ram:{q:128, use:80},
                get gpu(){ return {q:accSum('q'), use:accSum('use')}; } };
 /* 개발룸 기본 정보 — 생성 시 정한 값이다. 화면에서 바꾸려면 개발룸 설정으로 간다 */
 const ROOM_INFO = { cls:'remote-cluster-main', egress:'', at:'2026-07-01 09:00:00', by:'성유진(yj.seong)' };
+/* 개발룸을 다시 만들면 그 개발룸이 생성된 뒤의 CDE·작업만 보인다(CDE 정책 4.5 · 워크스페이스 정책 3.4).
+   데모 바 `생성됨` 으로 원래 표본에 돌아오도록 처음 값을 남겨 둔다 */
+const ROOM_AT0 = ROOM_INFO.at;
+const ROOM_USE0 = { cpu:ROOM.cpu.use, ram:ROOM.ram.use, acc:ACC.map(function(g){ return g.use; }) };
+function resetRoomUse(fresh){
+  ROOM.cpu.use = fresh? 0 : ROOM_USE0.cpu;
+  ROOM.ram.use = fresh? 0 : ROOM_USE0.ram;
+  ACC.forEach(function(g,i){ g.use = fresh? 0 : ROOM_USE0.acc[i]; });
+}
+function inRoom(x){ return String(x.at||'') >= ROOM_INFO.at; }
+function nowStr(){
+  const d=new Date(), p=function(n){ return String(n).padStart(2,'0'); };
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
+}
+/* 새 개발룸에서 신청한 건은 생성일시 뒤의 시각을 쓴다. 원래 표본에서는 종전 값 그대로다 */
+function stamp(fixed){ return ROOM_INFO.at > fixed ? nowStr() : fixed; }
 
 /* 외부 통신 기본 차단 — 설치 시 설정 파일로 정하고 화면에서 바꾸지 않는다
    (워크스페이스 정책 1.1·3.3 · CON-596 G-1). 기본값은 현행인 기본 허용이다.
@@ -2198,7 +2244,9 @@ const ME = 'yj.seong';
      본문 서술이라 실제 인자 값인지 모른다 — 확인 대상.
    ⚠ 실행 시간도 근거가 없다 — 확인 대상 */
 /* 상세 필드 — chk 사전 진단(명세 16) · mt 학습 지표(명세 18) · out 산출물(명세 18).
-   셋 다 백엔드 제공 여부가 확인 대상이라 값이 없으면 해당 섹션을 비운다 */
+   mt·out 은 작업 결과 조회와 산출물 업로드 경로가 있어 종결했다(기획서 5.3 C-12·C-13).
+   chk 는 제출 시점 판정을 작업에 남기는지 확인 대상이다(기획서 5.3 C-11). 값이 없으면 섹션을 비운다.
+   out.path 표본은 CDE 경로 모양이다. 산출물은 S3 에 올라가며 화면에 보일 경로 형식은 확인 대상이라 값을 바꾸지 않았다 */
 /* acc — 작업이 쓴 가속기 종류다. 한 작업은 한 종류만 쓰고, CDE 에 할당된 종류 중에서 고른다
    (CON-596 A-3 · CDE 정책 4.5). CDE 에 종류가 하나면 고르지 않아도 그 종류로 정해진다.
    가속기 없이 돌리는 작업은 빈 값이다 */
@@ -2328,7 +2376,7 @@ const isMine=(m)=>m.id===ME;
    막힌 작업은 미노출이 아니라 비활성으로 두고 사유를 안내한다.
    강등된 사용자는 접속·반입·반납만 되고 연장은 막힌다(정책 7.1) */
 /* 조작은 본인 것만 된다. 다만 항목을 없애지 않고 비활성으로 두어 사유를 알린다
-   (정책 원칙 4 — 조회는 워크스페이스 전체, 조작은 본인 것만) */
+   (정책 원칙 4 · 4.1 — 조회는 관리자 이상 워크스페이스 전체·그 외 본인 것만, 접속·연장·반납은 본인 것만) */
 function usable(m){ return isMine(m); }
 function canAccess(m){ return usable(m) && m.st==='구동 중'; }
 /* 만료된 CDE 도 회수 전까지는 연장할 수 있다(정책 5.3). 승인되면 그대로 복귀한다.
@@ -2393,11 +2441,22 @@ function userRef(txt){
 
 function visible(m){
   if(LIVE.indexOf(m.st) < 0) return false;
+  /* 삭제 전 개발룸의 CDE 는 개발룸과 함께 제거됐다(워크스페이스 정책 3.4) */
+  if(!inRoom(m)) return false;
   if(isAdmin()) return true;
-  /* 뷰어는 신청할 수 없어 본인 CDE 가 생길 수 없다.
-     ⚠ 편집자였다가 강등되면 남아 있을 수 있다 — 처리 미정(정책 9. 22번) */
-  if(!canApply()) return false;
+  /* 관리자가 아니면 본인 것만 본다(CDE 정책 4.1). 뷰어도 같다. 편집자였다가 뷰어로 바뀌어도
+     쓰던 CDE 는 남고 접속·데이터 반입·반납은 된다(CDE 정책 7.1) */
   return isMine(m);
+}
+/* 빈 목록 안내. 신청 유도는 신청할 수 있을 때만 둔다(REQ-CDE-020·021 · 공통정책 7.10).
+   본인 신청이 승인 대기면 보유 중이라 신청 진입점을 두지 않는다. 승인 대기 건은 이 목록에 두지 않고
+   내 작업함에서 본다(CDE 정책 6장) */
+function emptyCde(){
+  if(!canApply())
+    return '<h3>사용 중인 CDE가 없습니다.</h3><p>워크스페이스 관리자에게 편집자 역할을 요청해 주세요.</p>';
+  if(myCde())
+    return '<h3>CDE가 없습니다.</h3><p>승인 대기 중인 신청은 내 작업함에서 확인할 수 있습니다.</p>';
+  return '<h3>CDE가 없습니다.</h3><p>신청하면 관리자 승인 후 만들어집니다.</p><button class="btn" onclick="openForm()">CDE 신청</button>';
 }
 function base(){
   return CDE.filter(visible)
@@ -2440,10 +2499,7 @@ function render(){
      제목을 상황에 맞게 바꾸고 본문은 요청 문장으로 둔다 */
   if(state==='empty'){ pg.style.display='none';
     el.innerHTML='<div class="state">'
-      +'<h3>'+(canApply()?'CDE가 없습니다.':'사용 중인 CDE가 없습니다.')+'</h3>'
-      +(canApply()
-        ? '<p>신청하면 관리자 승인 후 만들어집니다.</p><button class="btn" onclick="openForm()">CDE 신청</button>'
-        : '<p>워크스페이스 관리자에게 편집자 역할을 요청해 주세요.</p>')
+      +emptyCde()
       +'</div>'; return; }
 
   const d=base();
@@ -2455,10 +2511,7 @@ function render(){
       +(sq
         ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><h3>검색 결과가 없습니다.</h3><p>다른 조건으로 검색해 주세요.</p>'
           +'<button class="btn ghost" onclick="clearQ()">조건 초기화</button>'
-        : '<h3>'+(canApply()?'CDE가 없습니다.':'사용 중인 CDE가 없습니다.')+'</h3>'
-          +(canApply()
-            ? '<p>신청하면 관리자 승인 후 만들어집니다.</p><button class="btn" onclick="openForm()">CDE 신청</button>'
-            : '<p>워크스페이스 관리자에게 편집자 역할을 요청해 주세요.</p>'))
+        : emptyCde())
       +'</div>'; return; }
   pg.style.display='flex';
   document.getElementById('pgtxt').textContent='총 '+d.length+'건';
@@ -2698,7 +2751,7 @@ function drawQuota(){
    GNB 내 작업함 배지는 모든 결재 건의 합이라 이 개발룸 몫을 따로 알 수 없다.
    라이브러리 알림 박스 `조치 필요` 규격 — 닫을 수 없고 실행 경로를 붙인다. 0건이면 두지 않는다 */
 function drawPend(){
-  const n = CDE.filter(m=>m.st==='승인 대기').length;
+  const n = CDE.filter(m=>m.st==='승인 대기' && inRoom(m)).length;
   document.getElementById('pendBox').innerHTML = (isAdmin() && n)
     ? alertBox('warn','승인 대기 중인 CDE 신청이 '+n+'건 있습니다.','승인·반려 처리는 내 작업함에서 합니다.',
         '<button class="btn ghost sm" onclick="act(\'내 작업함으로 이동합니다.\')">내 작업함으로<span class="ar">→</span></button>')
@@ -2723,7 +2776,7 @@ function drawRoomAct(){
    워크스페이스 상세 환경 섹션이 맡는다(REQ-CDE-075 · WKSP-L01 5.2). CDE와 공유 볼륨이 함께 사라진다.
    요청 즉시 미생성으로 돌리지 않는다 — 삭제는 접수형이고(공통정책 7.7) 실패할 수 있다(워크스페이스 정책 2.6) */
 function askDelRoom(){
-  const n=CDE.filter(function(m){ return m.st!=='종료'; }).length;
+  const n=CDE.filter(function(m){ return m.st!=='종료' && inRoom(m); }).length;
   const target=WS_NAME+' 개발룸';
   openConfirm('개발룸 삭제',
     '<b>'+target+'</b>을 삭제합니다. CDE '+n+'건과 공유 볼륨이 함께 제거되고 배정된 자원은 운영룸으로 반환됩니다.',
@@ -2757,7 +2810,7 @@ function drawDelRoom(){
    실패·만료도 보유가 아니다 — 쓸 수 없는 CDE 때문에 새 신청을 막지 않는다(정책 3.3) */
 const CDE_HELD = ['승인 대기','준비 중','구동 중','절전'];
 function myCde(){
-  return CDE.find(m=>isMine(m) && CDE_HELD.indexOf(m.st) >= 0);
+  return CDE.find(m=>isMine(m) && inRoom(m) && CDE_HELD.indexOf(m.st) >= 0);
 }
 function drawTabs(){
   /* 탭 라벨 옆에 설명을 둔다. 섹션 제목을 없앴으므로 여기가 유일한 자리다 */
@@ -2765,7 +2818,8 @@ function drawTabs(){
            ['작업 이력','CDE 터미널에서 제출한 학습·전처리 작업입니다. 편집기와 별도로 백그라운드에서 실행됩니다.']];
   /* 탭 배지 — 그 건수가 탭을 열기 전 판단에 쓰인다. CDE 는 자원을 얼마나 쓰고 있는지,
      작업 이력은 돌고 있는 것이 있는지가 재료다 */
-  const cnt=[CDE.filter(visible).length, JOBS.length];
+  /* 조회 범위 안의 건수다. 전체를 세면 목록과 숫자가 어긋난다 */
+  const cnt=[CDE.filter(visible).length, jobsFor().length];
   document.getElementById('cdeTabs').innerHTML =
     t.map(function(x,i){
       return '<button class="'+(cdeTab===i?'on':'')+'" onclick="setCdeTab('+i+')">'+x[0]
@@ -2790,10 +2844,12 @@ function drawAct(){
    (기술문서 2.1~2.3) */
 /* 작업 이력도 CDE 목록과 같은 범위다 */
 function jobsFor(){
-  if(isAdmin()) return JOBS;
-  /* 뷰어는 배치 작업을 제출할 수 없어 본인 건이 생길 수 없다 */
-  if(!canApply()) return [];
-  return JOBS.filter(function(j){ return j.uid===ME; });
+  /* 개발룸을 삭제하고 다시 만들면 새 개발룸이 생성된 뒤 제출된 작업만 보인다(CDE 정책 4.5 · 기획서 7.6).
+     이전 개발룸의 작업 기록·결과는 남지만 여기에 섞지 않는다 */
+  const J = JOBS.filter(inRoom);
+  if(isAdmin()) return J;
+  /* 관리자가 아니면 본인 것만 본다(CDE 정책 4.5). 뷰어로 바뀐 사용자도 편집자일 때 제출한 작업은 본다 */
+  return J.filter(function(j){ return j.uid===ME; });
 }
 /* 헤더 필터 — 배포 목업과 같은 규격. 임시 선택(jTmp)을 두고 적용 시 반영한다 */
 /* 필터 옵션·건수는 검색 결과 안에서 센다. 전체를 기준으로 하면
@@ -2808,7 +2864,7 @@ function jBase(){
 }
 function jFilter(){
   const all=jBase();
-  const opts=['대기','실행 중','완료','실패'].filter(function(o){
+  const opts=['대기','실행 중','완료','실패','중단됨'].filter(function(o){
     return all.some(function(j){ return j.st===o; });
   });
   const on=jSel;
@@ -2886,7 +2942,7 @@ function jPickAll(){
 }
 function jApply(){
   const all=jBase();
-  const opts=['대기','실행 중','완료','실패'].filter(function(o){
+  const opts=['대기','실행 중','완료','실패','중단됨'].filter(function(o){
     return all.some(function(j){ return j.st===o; });
   });
   let v=jTmp.slice();
@@ -2968,8 +3024,8 @@ function drawJobs(){
               + '<td>'+(j.dur!=='-'? j.dur : '<span class="dash">-</span>')+'</td>'
               /* 할 수 있는 작업이 하나뿐이라 더보기 메뉴로 감싸지 않는다. 감싸면 두 번 눌러야 한다.
                  끝난 작업에만 로그가 남는다 — 끝나기 전에는 비활성 + 사유(logWhy).
-                 ⚠ 기술문서 6.2 의 강제 취소를 넣으면 액션이 둘이 되어 더보기 메뉴로 바꾼다
-                   — 확인 대상(정책 9. 29번). 행 클릭이 상세로 가므로 버튼은 전파를 막는다 */
+                 작업 중단은 작업 상세 헤더에 둔다(기획서 7.4 · CDE 정책 4.5). 행에도 두면 액션이 둘이 되어
+                 더보기 메뉴로 바꾼다. 행 클릭이 상세로 가므로 버튼은 전파를 막는다 */
               + '<td>'+logBtn(j,'btn ghost sm',true)+'</td></tr>';
            }).join('')
          + '</tbody></table></div>'
@@ -3173,7 +3229,9 @@ function submitRoomCfg(){
   doSubmitRoomCfg();
 }
 function doSubmitRoomCfg(){
-  if(rcNew){ roomExists=true; }
+  /* 새로 만든 개발룸은 생성일시가 지금이다. 이전 개발룸의 CDE·작업은 보이지 않고 사용량은 0 에서 시작한다
+     (CDE 정책 4.5 · 워크스페이스 정책 3.4) */
+  if(rcNew){ roomExists=true; ROOM_INFO.at=nowStr(); resetRoomUse(true); }
   ROOM.cpu.q=parseFloat(RC.cpu)||ROOM.cpu.q;
   ROOM.ram.q=parseFloat(RC.ram)||ROOM.ram.q;
   ACC.forEach(function(g){ g.q=parseFloat(RC['acc_'+g.k]); if(isNaN(g.q)) g.q=0; });
@@ -3828,7 +3886,8 @@ const NF={ accRows:[], ip:'', exp:'', keyModels:[], mq:'',ide:'JupyterLab', fw:'
    이어받는 볼륨은 크기가 이미 정해져 있어 신청 폼에서 조정할 수 없다 */
 function keptVol(){
   /* 여러 건이면 가장 최근에 회수된 것을 이어받는다(CDE 정책 5.5). 만료 예정일이 늦을수록 최근이다 */
-  const ms = CDE.filter(function(x){ return isMine(x) && x.st==='회수'; })
+  /* 같은 개발룸에서 회수된 것만 이어받는다(CDE 정책 5.5). 삭제 전 개발룸의 볼륨은 남지 않는다 */
+  const ms = CDE.filter(function(x){ return isMine(x) && x.st==='회수' && inRoom(x); })
                 .sort(function(a,b){ return String(b.until).localeCompare(String(a.until)); });
   return ms.length ? ms[0].vol : 0;
 }
@@ -4168,7 +4227,7 @@ function submitForm(){
   CDE.unshift({n:ME.split('.')[0]+'-new-01', by:'성유진', id:ME, st:'승인 대기',
     ide:NF.ide, fw:NF.fw, mode:NF.mode, cpu:+NF.cpu, ram:+NF.ram, accs:accWant(),
     vol:+NF.vol,
-    at:'2026-08-12 10:00:00', until:'2026-09-11', reason:NF.reason});
+    at:stamp('2026-08-12 10:00:00'), until:'2026-09-11', reason:NF.reason});
   closeForm(); render();
   toast('ok','CDE 신청을 접수했습니다. 승인 결과는 알림으로 안내됩니다.');
 }
@@ -4290,11 +4349,11 @@ const COLDEF={
      +'<dt>중단됨</dt><dd>사용자가 중단했습니다.</dd></dl>',
   /* 항목 설명에 쓴다. 공유 정책은 사용자에게 알릴 내용이 아니다(라이브러리 툴팁 기준) */
   own:'CDE 를 구분하는 이름입니다. 신청할 때 정하며 만든 뒤에는 바꿀 수 없습니다.',
-  /* 이 목록에 나오는 값만 설명한다. 승인 대기·반려·종료는 목록에서 빠져 있다 */
+  /* 이 목록에 나오는 값만 설명한다. 승인 대기·반려·종료는 목록에서 빠져 있다.
+     절전은 상태값만 정의돼 있고 들어가는 동작이 없어 목록에 나오지 않는다(CDE 정책 5.1). 도움말에 두지 않는다 */
   st:'이 개발룸에서 자원을 쓰고 있는 CDE의 상태입니다.'
     +'<dl><dt>준비 중</dt><dd>승인 후 환경을 만들고 있습니다.</dd>'
     +'<dt>구동 중</dt><dd>접속해 사용할 수 있습니다.</dd>'
-    +'<dt>절전</dt><dd>연산 자원을 내린 상태입니다. 접속과 복원은 아직 제공하지 않습니다.</dd>'
     +'<dt>실패</dt><dd>기동에 실패했습니다.</dd>'
     +'<dt>만료</dt><dd>사용 기간이 만료되어 정지되었습니다. 회수되기 전까지 연장할 수 있습니다.</dd>'
       +'<dt>회수</dt><dd>만료 3일 뒤 연산 자원이 회수되었습니다. 개인 볼륨은 7일 동안 보존되며, 그 안에 새로 신청하면 이어서 사용할 수 있습니다.</dd>'
@@ -4395,6 +4454,8 @@ function demoView(v,btn){
 }
 function setRoom(v,btn){
   roomExists=v; roomDeleting=false;
+  /* `생성됨` 은 원래 표본 개발룸이다. 새로 만든 개발룸에서 돌아올 때 생성일시·사용량을 되돌린다 */
+  if(v){ ROOM_INFO.at=ROOM_AT0; resetRoomUse(false); }
   document.querySelectorAll('#demoBar .rm').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
   closePanel(); render();
@@ -4412,6 +4473,33 @@ function setRole(r,btn){
   closePanel(); render();
 }
 
+
+/* 표 안 도움말은 표 영역에 잘리지 않게 화면 기준으로 띄운다. 아래 공간이 모자라면 위로 연다 */
+function placeTip(a){
+  const t=a.querySelector('.tip'); if(!t || !a.closest('.tblwrap')) return;
+  t.classList.add('fx'); t.classList.remove('up');
+  const r=a.getBoundingClientRect(), w=t.offsetWidth, h=t.offsetHeight, vw=window.innerWidth, vh=window.innerHeight;
+  let left=Math.max(8, Math.min(r.left-8, vw-w-8));
+  let top=r.bottom+8;
+  if(top+h > vh-56){ top=r.top-8-h; t.classList.add('up'); }
+  t.style.left=left+'px'; t.style.top=top+'px';
+  t.style.setProperty('--ax', Math.max(8, r.left+r.width/2-left-5)+'px');
+}
+document.addEventListener('mouseover', function(e){ const a=e.target.closest && e.target.closest('.tip-anchor'); if(a) placeTip(a); });
+document.addEventListener('focusin', function(e){ const a=e.target.closest && e.target.closest('.tip-anchor'); if(a) placeTip(a); });
+/* 표 머리 도움말(thpop)도 마우스를 올리거나 초점이 오면 화면 기준으로 띄운다.
+   종전에는 클릭(pop-on)일 때만 띄워 마우스만 올리면 표 영역에 잘렸다 */
+function placeThPop(th){
+  const pop=th.querySelector('.thpop'); if(!pop || !th.closest('.tblwrap')) return;
+  pop.style.display='block';
+  const r=th.getBoundingClientRect(), w=pop.offsetWidth, h=pop.offsetHeight, vw=window.innerWidth, vh=window.innerHeight;
+  let top=r.bottom+6; if(top+h > vh-56) top=Math.max(8, r.top-6-h);
+  pop.style.position='fixed'; pop.style.top=top+'px'; pop.style.bottom='auto';
+  pop.style.left=Math.max(8, Math.min(r.left, vw-w-8))+'px'; pop.style.right='auto';
+  pop.style.display='';
+}
+document.addEventListener('mouseover', function(e){ const th=e.target.closest && e.target.closest('th.thcell'); if(th) placeThPop(th); });
+document.addEventListener('focusin', function(e){ const th=e.target.closest && e.target.closest('th.thcell'); if(th) placeThPop(th); });
 setRole('super'); render();
 </script>
 
@@ -4471,7 +4559,7 @@ setRole('super'); render();
   function sync(){
     document.querySelectorAll('.tblwrap th.thcell').forEach(function(th){
       const pop=th.querySelector('.thpop'); if(!pop) return;
-      th.classList.contains('pop-on') ? place(pop, th, 'left') : clear(pop);
+      if(th.classList.contains('pop-on') || th.matches(':hover') || th.matches(':focus-within')){ if(typeof placeThPop==='function') placeThPop(th); else place(pop, th, 'left'); } else clear(pop);
     });
     document.querySelectorAll('.tblwrap .more').forEach(function(m){
       const pop=m.querySelector('.rowmenu'); if(!pop) return;
