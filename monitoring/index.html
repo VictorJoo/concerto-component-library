@@ -1,7 +1,41 @@
 <!--
-  콘체르토 매니저 — 모니터링 목업 v0.23 (2026-10-14)
+  콘체르토 매니저 — 모니터링 목업 v0.24 (2026-10-16)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다 —
   필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
+
+  ── v0.24 (2026-10-16) ──────────────────────
+  MON-L01 v0.24 · 모니터링 정책 v0.15 · 알림 정책 v0.15 와 같은 날 판이다. 알림 규칙 요건 변경(안건 59).
+  · 메트릭 프리셋을 없애고 카탈로그 하나로 고른다(모니터링 정책 6.3 · REQ-MON-068).
+    GPU · GPU 건전성 · NPU · 엔진 · 게이트웨이 · 노드 순으로 묶고 묶음마다 제목을 둔다.
+    배포 선택과 같은 팝업 규격(.depwrap · .depdd)이다. 네이티브 select 는 배지를 넣지 못한다.
+  · 수집되지 않는 메트릭은 목록에 두고 `수집되지 않음` 배지를 붙여 고를 수 없게 한다.
+    골라도 알림이 오지 않는다.
+  · 메트릭을 고르면 표준 심각도·연산자·임계값을 채운다. 바꿀 수 있다(REQ-MON-073).
+    다른 메트릭으로 바꾸면 새 메트릭 값으로 다시 채운다. 단위가 달라 이전 값이 맞지 않는다.
+  · 심각도에 `정보` 를 더했다(알림 정책 4.1). 목록 배지는 정보 = .ok 다.
+  · GPU Xid 오류를 고르면 조건 대신 코드 선택과 심각도 방식이 나온다(REQ-MON-074).
+    코드는 다중 선택 목록(라이브러리 .mselect)으로 고른다. 판정표 코드가 수십 개라 체크박스를
+    늘어놓으면 찾을 수 없다. 검색·전체 선택·선택 수를 두고 목록만 스크롤한다. 등급(오류·주의·정보) 묶음
+    제목 줄(라이브러리 v0.24 .msgrp)을 체크하면 그 등급 전체를 고르고, 일부만 골랐으면 중간 상태다.
+    행에는 등급 배지를 두지 않는다. 묶음 제목과 같은 말이고, 배지는 상태에만 쓴다(공통정책 1.9).
+    심각도 방식은 표준 등급 · 직접 지정 둘이다. 세그먼트는 내용 폭으로 둔다(라이브러리 .segmented).
+    표준 등급은 코드마다 판정표 등급으로 알리고, 그 등급이 규칙 심각도보다 낮으면 규칙 심각도로 알린다.
+    직접 지정은 고른 코드를 모두 규칙 심각도로 알린다.
+    목록의 감시 대상은 `GPU Xid 오류 · 코드 N개`, 조건은 `고른 코드 발생` 이다.
+  · 지속 시간을 분으로 받는다. 1분마다 평가해 그 횟수만큼 연속으로 넘으면 발생한다(알림 정책 7.3).
+    서버는 초로 받는다. 보낼 때 분 × 60 이다(MON-L01 7.3).
+  · 알림 채널 도움말의 받는 사람과 발송 채널을 알림 정책 7.2·7.3 에 맞췄다. 채널을 고르지 않으면
+    등록된 채널 모두로 보낸다(CON-759).
+  · 카탈로그 항목·표준 심각도·기본값과 Xid 코드 목록은 데모 값이다. 실제 값은 카탈로그 응답을 따른다.
+  같은 판에 모니터링 4.0 범위 정정(안건 35)을 함께 넣었다. 근거는 MON-L01 댓글(2026-10-14 · 10-15)과 CON-759.
+  · 건전성 라벨(안정·주의·위험)을 4.0 범위로 되돌렸다(모니터링 정책 5.2 · REQ-MON-044).
+    4.0 범위의 배포 성능 탭은 라벨과 값별 설명만 두고, 점수·하위 지표·진단 권고는 4.1 범위에서만 그린다.
+    라벨은 서버 판정값을 그대로 쓴다. 점수 구간으로 다시 뽑는 것은 4.1 범위의 링 표시뿐이다.
+  · 확인 필요 항목·개요 배포 카드·배포 현황 막대를 두 범위 모두 건전성 라벨로 센다.
+    배포 상태 오류는 라벨 위험으로 들어온다. 4.0 범위에서 돌고 있는 배포의 사유는 지표 기반 진단이라
+    `건전성이 {라벨} 상태입니다.` 로만 밝힌다.
+  · 게이트웨이 계층에 요청 건수(최근 1시간)·누적 요청 건수 카드를 더했다(모니터링 정책 5.1 · REQ-MON-045).
+    조회 구간과 무관한 값이라 구간을 바꿔도 그대로다.
 
   ── v0.23 추가 (2026-10-14) ──────────────────────
   MON-L01 v0.23 · 모니터링 정책 v0.14 와 같은 날 판이다. 근거는 안건 35 결정(2026-10-14,
@@ -88,7 +122,7 @@
   ── 화면 구성 ───────────────────────────────────
   MON-L01              모니터링 (탭 3)
   ㄴ 가속기            노드·슬롯 단위 하드웨어 상태
-  ㄴ 배포 성능          게이트웨이·서빙 엔진·인프라 지표. 건전성은 4.1 범위
+  ㄴ 배포 성능          게이트웨이·서빙 엔진·인프라 지표와 건전성 라벨. 건전성 점수는 4.1 범위
   ㄴ 알림 규칙          임계값 감시 규칙
   MON-L01.P01      슬롯 상세 패널
   MON-L01.M01      알림 규칙 추가·수정 모달
@@ -97,7 +131,7 @@
   기술문서 10장(관측)·11.1(알람 규칙) · 현행 화면 명세 5장 · 모니터링 정책
 
   ── 이 화면이 답하는 것 ──────────────────────────
-  1  지금 문제가 있는가        확인 필요 항목 · 건전성 점수(4.1 범위)
+  1  지금 문제가 있는가        확인 필요 항목 · 건전성 라벨 · 건전성 점수(4.1 범위)
   2  있다면 어디인가          배포 선택 → 계층 셋
   3  무엇을 하면 되는가        진단 원인·조치 · 대상 화면 링크
 
@@ -445,6 +479,8 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 
 /* 스크린 ID 표기 (목업 전용 · 핸드오프용) */
 
+.hline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hdesc{font-size:12.5px;color:var(--muted-foreground)}
 .secnote{font-size:11.5px;color:var(--muted-foreground);line-height:1.6;margin-top:9px;padding:9px 11px;background:var(--muted);border:1px solid var(--border);border-radius:8px}
 
 /* 검색 (공통정책 3.3) */
@@ -2102,6 +2138,17 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .depitem:hover{background:var(--hover)}
   .depitem.on{background:var(--selected);font-weight:600}
   .depitem .wck{color:var(--accent);flex:0 0 auto}
+  /* 수집되지 않는 메트릭: 고를 수 없다. 흐린 글자 + 배지(정책 6.3) */
+  .depitem:disabled{color:var(--muted-foreground);cursor:not-allowed;background:transparent}
+  /* 입력 묶음(.fld)은 자식을 칸 폭으로 늘린다. 세그먼트는 내용 폭 규격이라(라이브러리 .segmented) 되돌린다 */
+  .fld > .segmented{align-self:flex-start}
+  /* 다중 선택 목록의 묶음 제목 줄(라이브러리 v0.24 .msgrp). 체크하면 그 묶음 전체를 고르고,
+     일부만 골랐으면 중간 상태다. 스크롤해도 어느 묶음인지 보이게 위에 붙인다 */
+  .mselect .msgrp{display:flex;align-items:center;gap:9px;padding:7px 11px;background:var(--muted);
+    border-bottom:1px solid var(--border);font-size:11.5px;font-weight:600;color:var(--muted-foreground);
+    position:sticky;top:0;z-index:1;cursor:pointer}
+  .mselect .msgrp input{width:15px;height:15px;flex:0 0 auto;accent-color:var(--primary);margin:0}
+  .mselect .msgrp .msgn{font-weight:400}
   .depitem-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   /* 워크스페이스 그룹 헤더 — v2의 optgroup 라벨을 그대로 이 형태로 옮겼다 */
   .depgrp-lbl{padding:8px 9px 4px;font-size:11px;font-weight:600;color:var(--muted-foreground)}
@@ -2362,7 +2409,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
    ── 화면 구성 ───────────────────────────────────
    MON-L01              모니터링 (탭 3)
    ㄴ 가속기            노드·슬롯 단위 하드웨어 상태
-   ㄴ 배포 성능          게이트웨이·엔진·인프라 지표. 건전성은 4.1 범위
+   ㄴ 배포 성능          게이트웨이·엔진·인프라 지표와 건전성 라벨. 건전성 점수는 4.1 범위
    ㄴ 알림 규칙          임계값 감시 규칙
    MON-L01.P01      슬롯 상세 패널
    MON-L01.M01      알림 규칙 추가·수정 모달
@@ -2483,7 +2530,13 @@ const PERF={
     {t:'토큰 처리량',    u:'tok/s',
      d:'초당 오간 토큰 수입니다. 들어온 것과 나간 것을 함께 셉니다.'},
     {t:'에러율',        u:'%', dir:'low', th:{good:1, warn:5},
-     d:'실패한 요청의 비율입니다. 서버 오류와 잘못된 요청을 함께 셉니다.'}
+     d:'실패한 요청의 비율입니다. 서버 오류와 잘못된 요청을 함께 셉니다.'},
+    /* 요청 건수 둘. 4.0 범위(모니터링 정책 5.1). 최근 1시간 건수와 누적 건수다(CON-759 A-2).
+       조회 구간과 무관한 값이라 구간 계수(byRange)를 걸지 않는다(fixed) */
+    {t:'요청 건수',      u:'건 · 최근 1시간', fixed:true,
+     d:'최근 1시간 동안 들어온 요청 수입니다.'},
+    {t:'누적 요청 건수',  u:'건 · 누적', fixed:true,
+     d:'게이트웨이가 시작된 뒤 들어온 요청 수입니다. 게이트웨이가 다시 시작되면 0부터 셉니다.'}
   ],
   eng:[
     {t:'처리량',        v:'1,284', u:'tok/s · 평균',
@@ -2533,13 +2586,13 @@ const DEPM={
     why:'KV 캐시 사용률이 60%를 넘긴 상태로 20분 이어졌습니다.',
     todo:'요청이 늘어나면 대기 큐가 증가합니다. 레플리카를 늘리거나 최대 컨텍스트 길이를 줄여 주세요.',
     items:['12','74','61','48','3'],
-    gw:['842','2,150','0.3'],
+    gw:['842','2,150','0.3','3,031,200','48,215,730'],
     eng:['1,284','39','10','62'], infra:['58','407','64','1,386']
   },
   'gpt-oss-120b-symphony': {
     score:91, label:'안정', why:'', todo:'',
     items:['4','88','79','52','0'],
-    gw:['1,920','4,480','0.1'],
+    gw:['1,920','4,480','0.1','6,912,000','120,446,918'],
     eng:['2,410','24','8','41'], infra:['71','512','67','1,540']
   },
   'gemma-4-12b-it-idle': {
@@ -2577,17 +2630,14 @@ let dep = DEPS[0].n;
 function troubles(){
   const t=[];
   /* 배포 문제는 같은 탭 안이다. 드롭다운을 그 배포로 바꾸면 건전성·지표·진단이 따라 바뀐다 */
-  /* 4.0 범위에는 건전성이 없다. 배포 상태 `오류` 만 위험으로 올린다(모니터링 정책 5.1).
-     4.1 범위에서는 건전성 라벨(주의·위험)로 센다(정책 5.2) */
+  /* 건전성 라벨(주의·위험)로 센다. 라벨은 두 범위 모두 있다(모니터링 정책 5.2).
+     배포 상태가 오류인 배포는 라벨이 위험이고, 사유는 상태 진단이라 두 범위 모두 쓴다(정책 5.1).
+     돌고 있는 배포의 사유(m.why)는 지표 기반 진단이라 4.1 범위다. 4.0 범위에서는 라벨만 밝힌다 */
   depList().forEach(function(d){
     const m = DEPM[d.n];
-    if(!isV41()){
-      if(d.st==='오류' && m && m.why) t.push({sev:'위험', n:d.n, why:m.why, go:"goDep('"+d.n+"')"});
-      return;
-    }
-    if(m && (m.label==='주의'||m.label==='위험') && m.why){
-      t.push({sev:m.label, n:d.n, why:m.why, go:"goDep('"+d.n+"')"});
-    }
+    if(!m || (m.label!=='주의' && m.label!=='위험')) return;
+    const why = (isV41() || m.score===null)? m.why : '건전성이 '+m.label+' 상태입니다.';
+    if(why) t.push({sev:m.label, n:d.n, why:why, go:"goDep('"+d.n+"')"});
   });
   /* 노드 문제는 가속기 탭이다. 탭만 열면 노드가 여럿이고 접혀 있어 다시 찾게 된다 —
      필터·펼침·스크롤을 함께 걸어야 바로 보인다 */
@@ -2669,37 +2719,73 @@ const HEALTH={
 /* 발생 이력 — 규칙이 실제로 알림을 울린 시각. 최신순, 최대 5건만 담는다(확정 문서 4장 #2).
    ⚠ 데모 값이다. 실제로는 알림 발생 로그에서 규칙 ID로 조회해야 한다(알림정책 9장 #2) */
 let RULES=[
-  {n:'가속기 온도 이상', metric:'gpu_temp',        op:'초과', th:85,  dur:60, sev:'오류',
+  {n:'가속기 온도 이상', metric:'gpu_temp',        op:'초과', th:85,  dur:1, sev:'오류',
    ws:'ai-service-team', scope:'전체', ch:['slack-ai-alert'], by:'성유진(yj.seong)', at:'2026-08-20 11:04:22',
    fires:['2026-08-27 03:14:02','2026-08-25 22:40:11']},
-  {n:'KV 캐시 포화',    metric:'kv_cache_usage',  op:'초과', th:95,  dur:60, sev:'주의',
+  {n:'KV 캐시 포화',    metric:'kv_cache_usage',  op:'초과', th:95,  dur:1, sev:'주의',
    ws:'ai-service-team', scope:'전체', ch:['slack-ai-alert'], by:'성유진(yj.seong)', at:'2026-08-20 11:06:41',
    fires:[]},
-  {n:'응답 지연 급증',   metric:'latency_p99_ms',  op:'초과', th:2000, dur:60, sev:'주의',
+  {n:'응답 지연 급증',   metric:'latency_p99_ms',  op:'초과', th:2000, dur:1, sev:'주의',
    ws:'ai-service-team', scope:'llama-3-2-1b-prod', ch:[], by:'임승주(sj.lim)', at:'2026-08-22 15:31:08',
    fires:['2026-08-27 14:02:11','2026-08-27 09:18:47','2026-08-26 20:03:29','2026-08-26 11:55:00','2026-08-25 07:41:18']},
   /* 다른 워크스페이스 규칙 — 스위처가 `전체` 일 때 섞이는 것을 보인다 */
-  {n:'VRAM 포화', metric:'vram_usage', op:'초과', th:92, dur:120, sev:'주의',
+  /* GPU Xid 오류 규칙: 임계값 대신 코드를 고른다(정책 6.3) */
+  {n:'GPU 하드웨어 오류', metric:'gpu_xid', xids:[48,64,74,79,95,119], xmode:'표준 등급', dur:1, sev:'정보',
+   ws:'ai-service-team', scope:'전체', ch:['slack-infra'], by:'성유진(yj.seong)', at:'2026-10-15 10:12:40',
+   fires:[]},
+  {n:'VRAM 포화', metric:'vram_usage', op:'초과', th:92, dur:2, sev:'주의',
    ws:'ml-research', scope:'전체', ch:['slack-infra'], by:'유지현(jh.yu)',
    at:'2026-08-24 09:12:33', fires:[]}
 ];
 
-/* 프리셋 — 자주 쓰는 메트릭을 미리 둔다(정책 6.3) */
-const PRESETS=[
-  {k:'gpu_temp',        t:'가속기 온도',      u:'°C'},
-  {k:'vram_usage',      t:'VRAM 점유율',     u:'%'},
-  {k:'kv_cache_usage',  t:'KV 캐시 사용률',   u:'%'},
-  {k:'latency_p99_ms',  t:'P99 응답 지연',   u:'ms'},
-  {k:'queue_depth',     t:'대기 요청 큐',     u:'건'}
+/* 메트릭 카탈로그: 백엔드가 가진다. 프로파일 순서로 묶는다(정책 6.3).
+   sev·op·th 는 메트릭을 고를 때 채우는 표준값이다. on:false 는 수집되지 않는 메트릭이다.
+   ⚠ 항목과 값은 데모다. 실제로는 카탈로그 응답을 따른다 */
+const PROFILES=['GPU','GPU 건전성','NPU','엔진','게이트웨이','노드'];
+const CATALOG=[
+  {k:'gpu_util',       p:'GPU',      t:'가속기 사용률',   u:'%',  sev:'주의', op:'초과', th:95,   on:true},
+  {k:'vram_usage',     p:'GPU',      t:'VRAM 점유율',    u:'%',  sev:'주의', op:'초과', th:90,   on:true},
+  {k:'gpu_temp',       p:'GPU',      t:'가속기 온도',     u:'°C', sev:'오류', op:'초과', th:85,   on:true},
+  {k:'gpu_power',      p:'GPU',      t:'가속기 전력',     u:'W',  sev:'정보', op:'초과', th:600,  on:true},
+  {k:'gpu_xid',        p:'GPU 건전성', t:'GPU Xid 오류',   u:'',   sev:'정보', xid:true,            on:true},
+  {k:'gpu_ecc',        p:'GPU 건전성', t:'ECC 오류',       u:'건', sev:'오류', op:'초과', th:0,    on:false},
+  {k:'gpu_throttle',   p:'GPU 건전성', t:'클럭 제한',      u:'건', sev:'주의', op:'초과', th:0,    on:false},
+  {k:'npu_util',       p:'NPU',      t:'NPU 사용률',     u:'%',  sev:'주의', op:'초과', th:95,   on:true},
+  {k:'npu_temp',       p:'NPU',      t:'NPU 온도',       u:'°C', sev:'오류', op:'초과', th:85,   on:true},
+  {k:'kv_cache_usage', p:'엔진',      t:'KV 캐시 사용률',  u:'%',  sev:'주의', op:'초과', th:95,   on:true},
+  {k:'latency_p99_ms', p:'엔진',      t:'P99 응답 지연',  u:'ms', sev:'주의', op:'초과', th:2000, on:true},
+  {k:'queue_depth',    p:'엔진',      t:'대기 요청 큐',    u:'건', sev:'주의', op:'초과', th:50,   on:true},
+  {k:'gw_error_rate',  p:'게이트웨이',  t:'에러율',         u:'%',  sev:'오류', op:'초과', th:5,    on:true},
+  {k:'node_mem',       p:'노드',      t:'노드 메모리 사용률', u:'%', sev:'주의', op:'초과', th:90,   on:true}
 ];
-const metricName=(k)=>{ const p=PRESETS.find(x=>x.k===k); return p? p.t : k; };
-const metricUnit=(k)=>{ const p=PRESETS.find(x=>x.k===k); return p? p.u : ''; };
+/* Xid 코드: 판정표(즉시 조치 기준 등급)를 오류·주의·정보로 바꿔 쓴다(정책 6.3).
+   ⚠ 일부만 실은 데모다. 실제로는 카탈로그의 Xid 코드 표를 따른다 */
+const XIDS=[
+  {c:48,  d:'ECC 이중 비트 오류',        g:'오류'},
+  {c:64,  d:'메모리 행 재배치 실패',      g:'오류'},
+  {c:74,  d:'NVLink 오류',             g:'오류'},
+  {c:79,  d:'GPU 버스 이탈',            g:'오류'},
+  {c:95,  d:'격리되지 않은 메모리 오류',   g:'오류'},
+  {c:119, d:'GSP 응답 시간 초과',        g:'오류'},
+  {c:13,  d:'그래픽 엔진 예외',          g:'주의'},
+  {c:31,  d:'GPU 메모리 페이지 폴트',     g:'주의'},
+  {c:94,  d:'격리된 메모리 오류',         g:'주의'},
+  {c:43,  d:'앱 오류로 처리 중단',        g:'정보'},
+  {c:63,  d:'메모리 행 재배치',          g:'정보'},
+  {c:92,  d:'단일 비트 ECC 오류율 높음',  g:'정보'}
+];
+const catItem=(k)=>CATALOG.find(x=>x.k===k);
+const metricName=(k)=>{ const p=catItem(k); return p? p.t : k; };
+const metricUnit=(k)=>{ const p=catItem(k); return p? p.u : ''; };
+const isXid=(k)=>{ const p=catItem(k); return !!(p && p.xid); };
 
 const CHANNELS=['slack-ai-alert','slack-infra','ops-webhook'];
 
 /* 상태 배지 색 — 시스템 용어집 5.3 */
 const SLOTB={'사용 중':'ok','유휴':'mu','확인 불가':'wa'};
 const HB={'안정':'ok','주의':'wa','위험':'cr'};
+/* 4.0 범위 건전성 라벨 설명. 배포 정책 3.4 헬스 의미를 옮겼다 */
+const HDESC={'안정':'지표가 기준 범위 안에 있습니다.','주의':'지표가 기준을 벗어나기 시작했습니다.','위험':'지표가 기준을 크게 벗어났습니다.'};
 /* 배포 상태 색 — 배포정책 3.1 상태값과 같은 축 */
 const DST={'정상':'ok','유휴':'mu','오류':'cr','중지됨':'mu'};
 
@@ -2910,9 +2996,8 @@ function drawOverview(){
     const label = DEPM[d.n]? DEPM[d.n].label : d.st;
     depCounts[label] = (depCounts[label]||0)+1;
   });
-  /* 4.0 범위는 건전성이 없어 배포 상태 `오류` 만 센다(확인 필요 항목과 같은 기준) */
-  const bad = isV41()? depCounts['주의'] + depCounts['위험']
-                     : deps.filter(function(d){ return d.st==='오류'; }).length;
+  /* 건전성 주의·위험을 센다. 배포 상태 오류는 라벨 위험으로 들어온다(확인 필요 항목과 같은 기준) */
+  const bad = depCounts['주의'] + depCounts['위험'];
 
   const ruleCnt = ruleList().length;
 
@@ -3424,12 +3509,10 @@ function wsPerfSummary(){
   const list = depList();
   const total = list.length;
   if(!total) return '';
-  /* 4.0 범위는 건전성이 없어 배포 상태로 나눈다. 4.1 범위는 건전성 라벨로 나눈다 */
-  const v41 = isV41();
-  const counts = v41? {'안정':0,'주의':0,'위험':0,'유휴':0,'중지됨':0}
-                    : {'정상':0,'오류':0,'유휴':0,'중지됨':0};
+  /* 건전성 라벨로 나눈다. 라벨은 두 범위 모두 있다(모니터링 정책 5.2) */
+  const counts = {'안정':0,'주의':0,'위험':0,'유휴':0,'중지됨':0};
   list.forEach(function(d){
-    const label = v41? (DEPM[d.n]? DEPM[d.n].label : d.st) : d.st;
+    const label = DEPM[d.n]? DEPM[d.n].label : d.st;
     counts[label] = (counts[label]||0)+1;
   });
   const bad = counts['주의'] + counts['위험'];
@@ -3449,8 +3532,7 @@ function wsPerfSummary(){
      v3 — 세그먼트 막대 + 범례로 바꾼다. 이건 새 패턴이 아니라 가속기 탭 점유 막대와
      같은 논리다 — "카테고리 구성비는 막대가 맞는 표현"이라고 이미 정한 적이 있다.
      전체 중 몇 개가 이 상태인지는 막대 비율로, 정확한 수는 범례 옆 숫자로 본다 */
-  const order = v41? [['안정','ok'],['주의','wa'],['위험','cr'],['유휴','mu'],['중지됨','mu']]
-                    : [['정상','ok'],['오류','cr'],['유휴','mu'],['중지됨','mu']];
+  const order = [['안정','ok'],['주의','wa'],['위험','cr'],['유휴','mu'],['중지됨','mu']];
   /* 이 카드가 워크스페이스 범위라는 걸 문구로 설명하는 대신, 헤더 스위처와 같은
      아이콘을 붙였다 — 같은 아이콘 = 같은 개념(워크스페이스)이라는 걸 잇는다.
      스위처가 라벨 없이 아이콘만으로 통하는 것과 같은 방식이다(사용자 지적, 2026-08-28) */
@@ -3463,7 +3545,7 @@ function wsPerfSummary(){
       없었다 — 그래서 "워크스페이스"로 바꾸는 대신 아예 뺐다. `전체`일 때는
       워크스페이스 하나가 아니라 여럿이 섞인 상태라 "워크스페이스"라고 부르면
       부정확해진다(사용자 지적, 2026-08-28) */
-   +   tip(v41? '배포 '+total+'개를 건전성·상태별로 나눕니다.' : '배포 '+total+'개를 상태별로 나눕니다.')
+   +   tip('배포 '+total+'개를 건전성·상태별로 나눕니다.')
    +   '<span class="wssum-tot">배포 '+total+'개</span>'
    + '</div>'
    /* 막대에 호버하면 그 구간의 값을 본다 — 색만 보고 몇 건인지 눈대중해야 했다.
@@ -3565,10 +3647,18 @@ function drawPerf(el){
   const curScore = nom? null : +byRange(m.score);
   const hLabel = nom? m.label : healthLabel(curScore);
 
-  /* 건전성은 4.1 범위다(모니터링 정책 5.2 · REQ-MON-044). 4.0 범위에서는 블록을 두지 않고,
-     점수가 없는 배포 중 오류·중지됨의 상태 진단만 둔다(정책 5.1). 유휴는 진단 대상이 아니다 */
+  /* 4.0 범위는 건전성 라벨만 둔다(모니터링 정책 5.2 · REQ-MON-044). 점수·하위 지표·진단 권고는 4.1 범위다.
+     라벨은 서버가 판정한 값(m.label)을 그대로 쓴다. 점수 구간(HEALTH_TH)으로 다시 뽑지 않는다.
+     값별 설명은 배포 정책 3.4 의 헬스 의미를 옮긴 것이다.
+     점수가 없는 배포 중 오류·중지됨은 상태 진단을 둔다(정책 5.1). 유휴는 진단 대상이 아니다 */
   if(!isV41()){
-    if(nom && m.why && m.label!=='유휴') h+='<div class="depsub">'+alertBox('crit', m.why, m.todo, goDepBtn())+'</div>';
+    if(nom){
+      if(m.why && m.label!=='유휴') h+='<div class="depsub">'+alertBox('crit', m.why, m.todo, goDepBtn())+'</div>';
+    } else {
+      h+='<div class="depsub"><h4>건전성'+tip('배포가 잘 돌고 있는지 지표로 판정한 결과입니다.')+'</h4>'
+        + '<div class="hline"><span class="stbadge '+(HB[m.label]||'mu')+'">'+m.label+'</span>'
+        + '<span class="hdesc">'+(HDESC[m.label]||'')+'</span></div></div>';
+    }
   } else
   h+='<div class="depsub"><h4>건전성'
     + tip('아래 지표를 종합해 산출한 점수입니다. 100에 가까울수록 안정적입니다.')+'</h4>'
@@ -3631,7 +3721,7 @@ function drawPerf(el){
       return Object.assign({}, x, {v: v===null? '-' : v, nodata: v===null || x.nodata});
     });
   };
-  h+=perfSec('게이트웨이','요청이 들어오는 지점입니다.',bind(PERF.gw, m.gw||[null,null,null]))
+  h+=perfSec('게이트웨이','요청이 들어오는 지점입니다.',bind(PERF.gw, m.gw||[null,null,null,null,null]))
    + perfSec('서빙 엔진','모델이 실행되는 지점입니다.',bind(PERF.eng, m.eng))
    + perfSec('인프라','자원을 사용하는 지점입니다.',bind(PERF.infra, m.infra));
   h += '</div>'; /* depshell 닫기 */
@@ -3854,10 +3944,11 @@ function perfSec(title, note, items){
           /* 건전성 카드와 같은 인사이트 칩을 쓴다(healthInsight 재사용) — 방향(dir)과
              임계값(th)이 있는 지표만 판정한다(사용자 요청, 2026-08-28) */
           const ins = (x.nodata || !x.th) ? null : healthInsight(+byRange(x.v), x.dir, x.th);
+          const val = x.fixed? x.v : byRange(x.v);
           return '<div class="mcard"><div class="mt">'+x.t
             + (ins? '<span class="hflag '+ins.cls+'">'+ins.label+'</span>' : '')
             + (x.d? tip(x.d) : '')+'</div>'
-            + '<div class="mv">'+(x.nodata? '<span class="dash">-</span>' : byRange(x.v))+'</div>'
+            + '<div class="mv">'+(x.nodata? '<span class="dash">-</span>' : val)+'</div>'
             + '<div class="mu">'+x.u+'</div></div>';
         }).join('')
     + '</div>'
@@ -3901,7 +3992,7 @@ function toggleRuleFire(i){ ruleOpen = ruleOpen===i? null : i; render(); }
    공통정책 1.9 의 상태 배지 규격(배경 없음 + 상태색 테두리)을 쓴다 */
 function sevBadge(s){
   const v = s || '주의';
-  return '<span class="stbadge '+(v==='오류'?'cr':'wa')+'">'+v+'</span>';
+  return '<span class="stbadge '+(v==='오류'?'cr':v==='정보'?'ok':'wa')+'">'+v+'</span>';
 }
 
 /* 대상 범위 — 그 워크스페이스 안에서의 범위다. `워크스페이스 전체` 로 적으면
@@ -4000,9 +4091,10 @@ function drawRules(el){
         return '<tr'+(hasFire?' style="cursor:pointer" onclick="toggleRuleFire('+i+')"':'')+'>'
           + '<td><span class="rname">'+r.n+'</span></td>'
           + '<td>'+sevBadge(r.sev)+'</td>'
-          + '<td>'+metricName(r.metric)+'</td>'
+          /* Xid 규칙은 임계값이 없다. 고른 코드 수와 `고른 코드 발생` 으로 적는다(정책 6.3) */
+          + '<td>'+metricName(r.metric)+(isXid(r.metric)? ' · 코드 '+(r.xids||[]).length+'개' : '')+'</td>'
           /* 조건을 한 문장으로 읽히게 둔다. 컬럼을 셋으로 나누면 눈이 오간다 */
-          + '<td>'+r.th+metricUnit(r.metric)+' '+r.op+'가 '+r.dur+'초 지속</td>'
+          + '<td>'+(isXid(r.metric)? '고른 코드 발생' : r.th+metricUnit(r.metric)+' '+r.op+'가 '+r.dur+'분 지속')+'</td>'
           + (wsCur==='전체' ? '<td><span class="mver">'+(r.ws||dash())+'</span></td>' : '')
     + '<td>'+r.scope+'</td>'
           + '<td>'+(r.ch.length? r.ch.join(' · ') : dash())+'</td>'
@@ -4082,11 +4174,12 @@ function rulePager(tot,pages){
 let RF={};
 function openRule(i){
   ruleIdx=i;
-  const r = i<0 ? {n:'',metric:'gpu_temp',op:'초과',th:'',dur:'60',scope:'전체',ch:[],sev:'주의'} : RULES[i];
+  /* 새 규칙은 메트릭을 고르기 전이다. 고르면 표준 심각도·연산자·임계값을 채운다(정책 6.3) */
+  const r = i<0 ? {n:'',metric:'',op:'초과',th:'',dur:'1',scope:'전체',ch:[],sev:'주의'} : RULES[i];
   /* 스위처가 `전체` 면 폼에서 고른다. 개별이면 그 워크스페이스로 고정된다 */
   const opts=ruleWsOpts();
-  RF={n:r.n, metric:r.metric, op:r.op, th:String(r.th), dur:String(r.dur), scope:r.scope, ch:r.ch.slice(),
-      sev: r.sev || '주의',
+  RF={n:r.n, metric:r.metric, op:r.op||'초과', th:r.th==null?'':String(r.th), dur:String(r.dur), scope:r.scope, ch:r.ch.slice(),
+      sev: r.sev || '주의', xids:(r.xids||[]).slice(), xmode:r.xmode||'표준 등급',
       ws: r.ws || (wsCur==='전체'? (opts[0]||'') : wsCur)};
   document.getElementById('ruleTitle').textContent = i<0? '알림 규칙 추가' : '알림 규칙 수정';
   drawRuleForm();
@@ -4100,14 +4193,135 @@ function rfSet(k,v){
   if(k==='ws') RF.scope='전체';
   drawRuleForm();
 }
+/* 메트릭을 고르면 표준 심각도·연산자·임계값을 채운다(정책 6.3 · REQ-MON-073).
+   다른 메트릭으로 바꾸면 다시 채운다. 단위가 달라 이전 값이 맞지 않는다 */
+function pickMetric(k){
+  const c=catItem(k); if(!c || !c.on) return;
+  RF.metric=k; RF.sev=c.sev;
+  if(c.xid){ RF.op=''; RF.th=''; RF.xids=[]; RF.xq=''; RF.xmode='표준 등급'; }
+  else { RF.op=c.op; RF.th=String(c.th); }
+  closeMet(); drawRuleForm();
+}
+function tgMet(e){
+  e.stopPropagation();
+  const w=document.getElementById('metWrap'), o=w.classList.contains('open');
+  if(o){ w.classList.remove('open'); return; }
+  w.classList.add('open');
+}
+function closeMet(){ const w=document.getElementById('metWrap'); if(w) w.classList.remove('open'); }
+document.addEventListener('click', closeMet);
+/* 메트릭 팝업: 배포 선택과 같은 규격이다. 묶음 제목은 .depgrp-lbl,
+   수집되지 않는 메트릭은 비활성 + `수집되지 않음` 배지 */
+function metPick(){
+  const cur=catItem(RF.metric);
+  const list = PROFILES.map(function(p,i){
+    const items=CATALOG.filter(function(c){ return c.p===p; });
+    if(!items.length) return '';
+    return (i>0?'<hr>':'')+'<div class="depgrp-lbl">'+p+'</div>'
+      + items.map(function(c){
+          return '<button type="button" class="depitem'+(c.k===RF.metric?' on':'')+'"'
+            + (c.on? ' onclick="pickMetric(\''+c.k+'\')"' : ' disabled')+'>'
+            + '<span class="depitem-n">'+c.t+'</span>'
+            + (c.on? '' : '<span class="stbadge mu">수집되지 않음</span>')
+            + (c.k===RF.metric? '<span class="wck">✓</span>' : '')+'</button>';
+        }).join('');
+  }).join('');
+  return '<div class="depwrap" id="metWrap">'
+    + '<button type="button" class="depbtn" style="width:100%" onclick="tgMet(event)">'
+    +   '<span class="depbtn-n">'+(cur? cur.t : '<span style="color:var(--muted-foreground)">메트릭을 선택해 주세요.</span>')+'</span>'
+    +   '<span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span>'
+    + '</button>'
+    + '<div class="depdd" onclick="event.stopPropagation()"><div class="deplist">'+list+'</div></div>'
+    + '</div>';
+}
+function rfToggleXid(c){
+  const i=RF.xids.indexOf(c);
+  if(i>=0) RF.xids.splice(i,1); else RF.xids.push(c);
+  drawXidList();
+}
+/* Xid 코드: 다중 선택 목록(라이브러리 .mselect)으로 고른다(정책 6.3 · REQ-MON-074).
+   판정표 코드가 수십 개라 체크박스를 늘어놓으면 찾을 수 없다. 검색·전체 선택·선택 수를 두고
+   목록만 스크롤한다. 등급(오류·주의·정보) 묶음 제목 줄을 체크하면 그 등급 전체를 고른다.
+   행에는 등급 배지를 두지 않는다. 묶음 제목과 같은 말이다. 배지는 상태에만 쓴다(공통정책 1.9) */
+const XGRADES=['오류','주의','정보'];
+function xidMatch(x){
+  const q=(RF.xq||'').trim().toLowerCase();
+  return !q || (String(x.c)+' '+x.d).toLowerCase().indexOf(q)>=0;
+}
+function xidRows(){
+  return XGRADES.map(function(g){
+    const all=XIDS.filter(function(x){ return x.g===g; });
+    const vis=all.filter(xidMatch);
+    if(!vis.length) return '';
+    const n=all.filter(function(x){ return RF.xids.indexOf(x.c)>=0; }).length;
+    return '<label class="msgrp"><input type="checkbox" data-grp="'+g+'"'+(n===all.length?' checked':'')
+      + ' onchange="xidGrp(\''+g+'\',this.checked)">'+g+'<span class="msgn">· '+all.length+'개</span></label>'
+      + vis.map(function(x){
+          return '<label class="msitem"><input type="checkbox"'+(RF.xids.indexOf(x.c)>=0?' checked':'')
+            + ' onchange="rfToggleXid('+x.c+')"><span class="mnm">'+x.c+' · '+x.d+'</span></label>';
+        }).join('');
+  }).join('') || '<div class="msempty">검색 결과가 없습니다.</div>';
+}
+/* 목록만 다시 그린다. 폼 전체를 다시 그리면 검색 입력의 한글 조합이 끊긴다(라이브러리 폼 요소) */
+function drawXidList(){
+  const el=document.getElementById('xidList'); if(!el) return;
+  el.innerHTML=xidRows();
+  [].forEach.call(el.querySelectorAll('input[data-grp]'),function(cb){
+    const all=XIDS.filter(function(x){ return x.g===cb.dataset.grp; });
+    const n=all.filter(function(x){ return RF.xids.indexOf(x.c)>=0; }).length;
+    cb.indeterminate = n>0 && n<all.length;
+  });
+  const f=document.getElementById('xidFoot');
+  if(f) f.innerHTML='<b>'+RF.xids.length+'</b>개 선택 · 전체 '+XIDS.length+'개';
+  const b=document.getElementById('xidAllBtn');
+  if(b) b.textContent = RF.xids.length===XIDS.length ? '전체 해제' : '전체 선택';
+  const sv=document.getElementById('ruleSave'); if(sv) sv.disabled=!ruleValid();
+}
+function xidGrp(g,on){
+  XIDS.forEach(function(x){
+    if(x.g!==g) return;
+    const i=RF.xids.indexOf(x.c);
+    if(on && i<0) RF.xids.push(x.c);
+    if(!on && i>=0) RF.xids.splice(i,1);
+  });
+  drawXidList();
+}
+function xidAll(){
+  RF.xids = RF.xids.length===XIDS.length ? [] : XIDS.map(function(x){ return x.c; });
+  drawXidList();
+}
+function xidPick(){
+  return '<div class="mselect">'
+    + '<div class="mshead"><span class="mssearch">'
+    +   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
+    +   '<input placeholder="코드 또는 설명을 입력해 주세요." value="'+(RF.xq||'')+'"'
+    +   ' oncompositionend="RF.xq=this.value;drawXidList()" oninput="if(!event.isComposing){RF.xq=this.value;drawXidList()}">'
+    + '</span><button type="button" class="msall" id="xidAllBtn" onclick="xidAll()">전체 선택</button></div>'
+    + '<div class="mslist" id="xidList"></div>'
+    + '<div class="msfoot" id="xidFoot"></div>'
+    + '</div>';
+}
 function rfToggleCh(c){
   const i=RF.ch.indexOf(c);
   if(i>=0) RF.ch.splice(i,1); else RF.ch.push(c);
   drawRuleForm();
 }
+function durBad(){
+  const v=String(RF.dur).trim();
+  return v!=='' && !/^[1-9][0-9]*$/.test(v);
+}
+function rfDur(el){
+  RF.dur=el.value;
+  const bad=durBad();
+  el.classList.toggle('err', bad);
+  document.getElementById('durErr').style.display = bad? '' : 'none';
+  document.getElementById('ruleSave').disabled=!ruleValid();
+}
 function ruleValid(){
   if(wsCur==='전체' && !RF.ws) return false;
-  return RF.n.trim().length>=2 && String(RF.th).trim()!=='' && String(RF.dur).trim()!=='';
+  if(!RF.metric) return false;
+  const cond = isXid(RF.metric) ? RF.xids.length>0 : String(RF.th).trim()!=='';
+  return RF.n.trim().length>=2 && cond && String(RF.dur).trim()!=='' && !durBad();
 }
 /* 대상 범위 배포는 규칙이 속할 워크스페이스 것만이다 — 스위처가 아니라
    폼에서 고른 값을 따른다. 스위처 기준으로 두면 다른 워크스페이스 배포를 고를 수 있다 */
@@ -4131,7 +4345,7 @@ function ruleWsOpts(){
 }
 
 function drawRuleForm(){
-  const u=metricUnit(RF.metric);
+  const u=metricUnit(RF.metric), xid=isXid(RF.metric);
   document.getElementById('ruleBody').innerHTML =
       /* 이름은 2~30자다(공통정책 1.1). 초과 입력을 막고 실시간 카운터를 둔다(7.1) */
       '<div class="fld"><label>규칙 이름<span class="req">*</span></label>'
@@ -4140,34 +4354,48 @@ function drawRuleForm(){
     +   'document.getElementById(\'ruleSave\').disabled=!ruleValid()">'
     +   '<div class="hint" id="rnCnt">'+RF.n.length+'/30</div></div>'
 
-    /* 심각도 — 알림 정책 4.1 의 값을 쓴다. 규칙이 울렸을 때 그 알림이 어느 등급인지다.
-       정책 4.1 은 `오류`·`주의`·`정보` 셋이나 백엔드가 WARNING·CRITICAL 두 값만 받는다
-       — `정보` 는 지원되면 선택지에 더한다(CON-588).
-       기본값을 `주의` 로 둔다. 고르지 않은 규칙이 곧바로 `오류` 등급을 갖지 않게 한다 */
+    /* 심각도: 알림 정책 4.1 의 세 값을 쓴다. 메트릭을 고르면 그 메트릭의 표준 심각도로
+       채우고 바꿀 수 있다(정책 6.3). Xid 규칙은 심각도 방식에 따라 뜻이 달라 힌트를 가른다 */
     + '<div class="fld"><label>심각도<span class="req">*</span></label>'
-    +   selBox('sev', [{v:'주의',t:'주의'},{v:'오류',t:'오류'}], RF.sev)
-    +   '<div class="hint">오류는 조치가 필요한 것, 주의는 두면 문제가 되는 것입니다.</div></div>'
+    +   selBox('sev', [{v:'오류',t:'오류'},{v:'주의',t:'주의'},{v:'정보',t:'정보'}], RF.sev)
+    +   '<div class="hint">'+(!xid ? '오류는 조치가 필요한 것, 주의는 두면 문제가 되는 것, 정보는 알아 두면 되는 것입니다.'
+          : RF.xmode==='직접 지정' ? '고른 코드를 모두 이 등급으로 알립니다.'
+          : '코드별 표준 등급으로 알립니다. 표준 등급이 이 값보다 낮은 코드는 이 값으로 알립니다.')+'</div></div>'
 
-    /* 프리셋과 카탈로그 검색 둘을 둔다(정책 6.3).
-       ⚠ 카탈로그 조회 API 제공 여부 확인 대상(7. 6번) */
+    /* 메트릭은 카탈로그 하나에서 고른다. 프리셋은 두지 않는다(정책 6.3 · REQ-MON-068) */
     + '<div class="fsec"><h4>감시 대상</h4>'
     +   '<div class="fgrid">'
     +     '<div class="fld"><label>메트릭<span class="req">*</span></label>'
-    +       selBox('metric', PRESETS.map(function(p){ return {v:p.k, t:p.t}; }), RF.metric)
-    +       '<div class="hint">찾는 값이 없으면 전체 메트릭에서 검색할 수 있습니다.</div></div>'
-    +     '<div class="fld"><label>조건<span class="req">*</span></label>'
-    +       '<div class="inline">'
-    +         selBox('op', [{v:'초과',t:'초과'},{v:'미만',t:'미만'}], RF.op)
-    +         '<input class="inp" style="width:110px" value="'+RF.th+'" placeholder="임계값"'
-    +         ' oninput="RF.th=this.value;document.getElementById(\'ruleSave\').disabled=!ruleValid()">'
-    +         (u? '<span class="unit">'+u+'</span>' : '')
-    +       '</div></div>'
+    +       metPick()
+    +       '<div class="hint">고르면 심각도·조건이 표준값으로 채워집니다. 바꿀 수 있습니다.</div></div>'
+    +     (xid
+          /* Xid 규칙은 임계값이 없다. 조건 자리에 심각도 방식 토글 하나를 둔다 */
+          ? '<div class="fld"><label>심각도 방식<span class="req">*</span></label>'
+            + '<div class="segmented">'
+            +   ['표준 등급','직접 지정'].map(function(m){
+                  return '<button type="button" class="'+(RF.xmode===m?'on':'')+'" onclick="rfSet(\'xmode\',\''+m+'\')">'+m+'</button>';
+                }).join('')
+            + '</div></div>'
+          : '<div class="fld"><label>조건<span class="req">*</span></label>'
+            + '<div class="inline">'
+            +   selBox('op', [{v:'초과',t:'초과'},{v:'미만',t:'미만'}], RF.op)
+            +   '<input class="inp" style="width:110px" value="'+RF.th+'" placeholder="임계값"'
+            +   ' oninput="RF.th=this.value;document.getElementById(\'ruleSave\').disabled=!ruleValid()">'
+            +   (u? '<span class="unit">'+u+'</span>' : '')
+            + '</div></div>')
+    /* 1분마다 평가한다. 분으로 받아 그 횟수만큼 연속으로 넘으면 발생한다(알림 정책 7.3) */
     +     '<div class="fld"><label>지속 시간<span class="req">*</span></label>'
-    +       '<div class="inline"><input class="inp" style="width:110px" value="'+RF.dur+'"'
-    +       ' oninput="RF.dur=this.value;document.getElementById(\'ruleSave\').disabled=!ruleValid()">'
-    +       '<span class="unit">초</span></div>'
-    +       '<div class="hint">조건이 이 시간만큼 이어질 때만 알립니다. 순간값으로 알리지 않습니다.</div></div>'
-    +   '</div></div>'
+    /* 1 이상의 정수만 받는다. 형식이 틀리면 입력 중에 인라인 에러를 두고 저장을 막는다(공통정책 7.8).
+       상한은 문서에 없어 두지 않는다 */
+    +       '<div class="inline"><input class="inp'+(durBad()?' err':'')+'" id="rfDur" style="width:110px" value="'+RF.dur+'"'
+    +       ' inputmode="numeric" oninput="rfDur(this)">'
+    +       '<span class="unit">분</span></div>'
+    +       '<p class="ferr" id="durErr"'+(durBad()?'':' style="display:none"')+'>1 이상의 정수를 입력해 주세요.</p>'
+    +       '<div class="hint">조건이 이 시간만큼 이어질 때만 알립니다. 1분마다 확인합니다.</div></div>'
+    +   '</div>'
+    +   (xid ? '<div class="fld" style="margin-top:14px"><label>코드<span class="req">*</span></label>'+xidPick()
+          +   '<div class="hint">등급 제목을 체크하면 그 등급의 코드를 모두 고릅니다. 이후 추가되는 코드는 포함되지 않습니다.</div></div>' : '')
+    + '</div>'
 
     /* 무엇을 재는지와 어디에 거는지는 다른 질문이다. 한 섹션에 섞으면
        메트릭 옆에 워크스페이스가 놓여 무엇을 정하는 자리인지 흐려진다 */
@@ -4198,7 +4426,7 @@ function drawRuleForm(){
 
     + '<div class="fsec"><h4>알림 채널'
     /* 수신자를 밝힌다 — 채널만 두면 누가 받는지 알 수 없다(알림 정책 7.2) */
-    +   tip('조건에 해당하면 워크스페이스 관리자와 대상 배포 담당자에게 인앱 알림이 발생합니다. 채널을 고르면 그 채널로도 함께 전송됩니다.')+'</h4>'
+    +   tip('조건에 해당하면 워크스페이스 관리자와 그 리소스의 담당자에게 인앱 알림이 발생합니다. 담당자가 없는 노드·가속기 알림은 워크스페이스 관리자만 받습니다. 채널을 고르면 그 채널로, 고르지 않으면 등록된 채널 모두로 함께 전송됩니다.')+'</h4>'
     /* 등록된 채널만 고를 수 있다. 없으면 그 자리에서 등록 화면을 가리킨다 —
        목록 아래 안내문으로 두면 정작 고르는 자리에서는 보이지 않는다 */
     +   (CHANNELS.length ? '' : '<div class="emptyline">등록된 채널이 없습니다. 플랫폼 설정 &gt; 연동 및 알림에서 먼저 등록해 주세요.</div>')
@@ -4210,11 +4438,14 @@ function drawRuleForm(){
           }).join('')
     +   '</div></div>';
   document.getElementById('ruleSave').disabled = !ruleValid();
+  drawXidList();
 }
 function saveRule(){
   /* 스위처가 `전체` 면 폼에서 고른 값을, 아니면 지금 보고 있는 워크스페이스를 쓴다.
      수정이면 원래 소속을 지킨다 — 만든 뒤에는 옮기지 않는다 */
-  const r={n:RF.n.trim(), metric:RF.metric, op:RF.op, th:+RF.th, dur:+RF.dur, sev:RF.sev,
+  const xr=isXid(RF.metric);
+  const r={n:RF.n.trim(), metric:RF.metric, op:xr?'':RF.op, th:xr?null:+RF.th, dur:+RF.dur, sev:RF.sev,
+           xids:xr? RF.xids.slice() : undefined, xmode:xr? RF.xmode : undefined,
            ws:(ruleIdx<0 ? (wsCur==='전체'? RF.ws : wsCur) : RULES[ruleIdx].ws),
            scope:RF.scope, ch:RF.ch.slice(), fires:[],
            by:'성유진(yj.seong)', at:'2026-08-27 09:20:11'};
@@ -4678,7 +4909,8 @@ const COLDEF={
      임계값 초과를 감지하는 규칙 알림에는 맞지 않는다 */
   sev:'규칙이 발생시키는 알림의 등급입니다.'
       +'<dl><dt>오류</dt><dd>조치가 필요합니다.</dd>'
-      +'<dt>주의</dt><dd>지금은 동작하나 두면 문제가 됩니다.</dd></dl>',
+      +'<dt>주의</dt><dd>지금은 동작하나 두면 문제가 됩니다.</dd>'
+      +'<dt>정보</dt><dd>알아 두면 됩니다. 조치가 필요 없습니다.</dd></dl>',
   cond:'임계값을 넘은 상태가 지속 시간만큼 이어지면 알림이 발생합니다.',
   fire:'이 규칙이 알림을 발생시킨 가장 최근 시각입니다. 누르면 최근 5건을 표시합니다.'
 };
