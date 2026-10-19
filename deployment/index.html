@@ -3,7 +3,33 @@
   색·컴포넌트 규격은 워크스페이스 목업 v0.33 를 그대로 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
 
   ── 변경 ────────────────────────────────────────
-  v0.35 (2026-10-19) · 모니터링 4.0 범위 정정에 맞췄다(배포 정책 3.4 · DEP-L01 v0.35 2장·REQ-DEP-081·5.2·7.6 ·
+  v0.35 (2026-10-19) · 모니터링 4.0 범위 정정 · 모니터링 값 표시 규약(안건 63) · 운영룸 공용 엔드포인트(안건 65)를 한 판에 담는다.
+        · 모니터링 값 표시 규약에 맞췄다(배포 정책 3.4 · DEP-L01 v0.35 7.6 · 모니터링 정책 5.1·5.3 ·
+          MON-L01 댓글 2026-10-15 백엔드 응답).
+        · 정상이 아닌 배포의 지표를 - 로 둔다. 앞서 유휴는 - 라고 적었으나 running() 이 유휴·오류를 포함해 값이 나오고
+          있었다. 오류는 응답하지 않아 지표가 없다(모니터링 정책 5.1). running() 은 일시중지 가능 여부에도 쓰여 그대로 둔다.
+          주요 이벤트는 레플리카가 있는 배포(정상·오류)에 남는다(hasPods).
+        · 패널 헬스 행도 모니터링 탭과 같은 값(healthBadge)을 쓴다. 지표를 받지 못하면 두 곳 모두 소스 상태 배지다.
+        · 기동 중이 아닌 배포의 처리량 추이는 막대를 낮게 그리지 않고 `아직 값이 들어오지 않습니다.` 로 둔다.
+          낮은 막대는 값이 작았던 것으로 읽힌다(모니터링 목업 차트 자리 문구와 같다).
+        · 지표를 조회하지 못하거나 수집이 설정되지 않으면 헬스 카드에 `수집 불가` · `미설정` 배지와 사유를 두고
+          지표 값은 - 로 둔다(모니터링 정책 5.3). 하단 데모 바 `지표 소스` 로 분기를 본다. 데모 바는 검토용이다.
+        · P99 지연 부제를 `최근 1시간 최대` 로 고쳤다(모니터링 정책 5.1).
+        · 쓰이지 않는 헬스 도움말(COLDEF.health)의 값 뜻을 배포 정책 3.4 표와 같은 문장으로 맞췄다.
+        · 가속기에 원래 없는 지표는 카드를 두지 않는다(모니터링 정책 5.3). 이 화면의 카드는 NVIDIA·Furiosa 에 모두 있어
+          데모에서 숨는 카드는 없다. Rebellions 배포는 엔진·장치 지표 카드가 빠진다(4.1 도입 환경에서 확인 대상).
+        · 엔드포인트를 운영룸 게이트웨이 주소로 고쳤다(배포 정책 2.5 · DEP-L01 v0.35 REQ-DEP-033 · 7.3).
+          운영룸마다 게이트웨이가 하나이고 그 룸의 배포가 `https://{운영룸 호스트}/v1` 을 함께 쓴다. 배포는 요청 본문의
+          모델명으로 구분한다. 경로에 워크스페이스·배포명을 붙이던 샘플 주소와 03 게이트웨이 미리보기를 고쳤다.
+          ai-service-team 은 워크스페이스 목업의 운영룸 호스트(gw.ai-service.concerto.io), 호스트를 비운 룸은
+          기본 도메인 gw.concerto.okestro.io 로 둔다. 둘 다 검토용 값이다.
+        · 03 게이트웨이의 HTTPS 선택과 패널·개요의 HTTPS 행을 뺐다. 운영룸 배포는 마법사의 호스트·TLS 값을 쓰지 않고
+          리스너는 운영룸 게이트웨이가 정한다(릴리즈 노트 v4.0.0 4장). 검수 요약도 호출 주소로 바꿨다.
+        · 배포명 힌트를 `나중에 바꿀 수 없습니다.` 로 줄였다. 배포명은 주소에 들어가지 않는다.
+        · 엔드포인트는 운영룸 주소라 생성 중·생성 실패 배포에도 같은 값을 둔다(샘플 ep 를 채웠다).
+        · 종료 확인 알럿을 `이 배포로 가는 호출이 중단되고` 로 고쳤다. 엔드포인트는 운영룸 공용이라
+          `엔드포인트 호출이 중단` 은 룸 전체가 끊기는 것으로 읽힌다(배포 정책 2.7).
+        · 모니터링 4.0 범위 정정에 맞췄다(배포 정책 3.4 · DEP-L01 v0.35 2장·REQ-DEP-081·5.2·7.6 ·
           MON-L01 댓글 2026-10-14·10-15).
         · 헬스(안정·주의·위험)를 4.0 범위로 되돌렸다. 패널 모델·자원의 헬스 행과 모니터링 탭의 헬스 카드다.
           헬스 점수와 지표를 근거로 한 진단은 4.1 범위라 SCOPE_41 에 그대로 걸어 둔다.
@@ -2166,6 +2192,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <button class="rl" onclick="setRole('admin',this)">WS 관리자</button>
   <button class="rl" onclick="setRole('editor',this)">편집자</button>
   <button class="rl" onclick="setRole('viewer',this)">뷰어</button>
+  <span class="demo-label" style="margin-left:12px;">지표 소스:</span>
+  <button class="sr on" onclick="setSrc('ok',this)">정상</button>
+  <button class="sr" onclick="setSrc('unavailable',this)">수집 불가</button>
+  <button class="sr" onclick="setSrc('not_configured',this)">미설정</button>
   <span class="demo-label" style="margin-left:12px;">테마:</span>
   <button onclick="document.body.classList.remove('dark')">라이트</button>
   <button onclick="document.body.classList.add('dark')">다크</button>
@@ -2267,42 +2297,42 @@ const DEPS=[
  {n:'llama-3-2-1b-prod', ws:'ai-service-team', model:'llama-3.2-1b-instruct', mver:'latest',
   type:'자체 배포', st:'정상', rep:2, tgt:2, acc:'nvidia-h200', gpu:1, topo:'단일',
   owner:'성유진(yj.seong)', at:'2026-08-12 14:20', upd:'2026-08-12 17:20', health:'주의',
-  ep:'https://gw.concerto.okestro.cloud/ai-service-team/llama-3-2-1b-prod/v1',
-  gw:true, host:'api.concerto.io', tls:true, auth:true, obs:true, keys:['lang-chain-agent-prod','batch-infer-key']},
+  ep:'https://gw.ai-service.concerto.io/v1',
+  gw:true, host:'gw.ai-service.concerto.io', tls:true, auth:true, obs:true, keys:['lang-chain-agent-prod','batch-infer-key']},
 
  {n:'gpt-oss-120b-symphony', ws:'ai-service-team', model:'gpt-oss-120b', mver:'latest',
   type:'자체 배포', st:'정상', rep:4, tgt:4, acc:'nvidia-h200', gpu:4, topo:'프리필·디코드 분리',
   owner:'임승주(sj.lim)', at:'2026-08-09 10:02', upd:'2026-08-09 13:02', health:'안정',
-  ep:'https://gw.concerto.okestro.cloud/ml-research/gpt-oss-120b-symphony/v1',
-  gw:true, host:'', tls:false, auth:true, obs:true, keys:[]},
+  ep:'https://gw.ai-service.concerto.io/v1',
+  gw:true, host:'gw.ai-service.concerto.io', tls:true, auth:true, obs:true, keys:[]},
 
  {n:'qwen3-6-35b-a3b-fp8-bench', ws:'ml-research', model:'qwen3-6-35b-a3b-fp8', mver:'1.0.0',
   type:'자체 배포', st:'생성 중', rep:0, tgt:2, acc:'nvidia-h200-mig', gpu:2, topo:'단일',
   owner:'유지현(jh.yu)', at:'2026-08-18 09:41', upd:'2026-08-18 12:41', health:'-',
-  ep:'', gw:true, host:'', tls:false, auth:true, obs:true, keys:[]},
+  ep:'https://gw.concerto.okestro.io/v1', gw:true, host:'', tls:false, auth:true, obs:true, keys:[]},
 
  {n:'furiosa-qwen3-32b-npu', ws:'test-npu', model:'furiosa-qwen3-32b-fp8', mver:'latest',
   type:'자체 배포', st:'오류', rep:0, tgt:2, acc:'furiosa-rngd', gpu:8, topo:'단일',
   owner:'김병건(bg.kim)', at:'2026-08-15 17:33', upd:'2026-08-15 20:33', health:'위험',
-  ep:'https://gw.concerto.okestro.cloud/test-npu/furiosa-qwen3-32b-npu/v1',
+  ep:'https://gw.concerto.okestro.io/v1',
   gw:true, host:'', tls:false, auth:true, obs:true, keys:[]},
 
  {n:'gemma-4-12b-it-idle', ws:'ai-service-team', model:'gemma-4-12b-it', mver:'1.0.0',
   type:'자체 배포', st:'유휴', rep:0, tgt:2, acc:'nvidia-h200-mig', gpu:1, topo:'단일',
   owner:'성유진(yj.seong)', at:'2026-07-30 11:15', upd:'2026-07-30 14:15', health:'-',
-  ep:'https://gw.concerto.okestro.cloud/ai-service-team/gemma-4-12b-it-idle/v1',
-  gw:true, host:'', tls:false, auth:true, obs:true, keys:['lang-chain-agent-prod']},
+  ep:'https://gw.ai-service.concerto.io/v1',
+  gw:true, host:'gw.ai-service.concerto.io', tls:true, auth:true, obs:true, keys:['lang-chain-agent-prod']},
 
  {n:'solar-open-100b-paused', ws:'ai-service-team', model:'solar-open-100b-nvfp4a16', mver:'1.0.0',
   type:'자체 배포', st:'중지됨', rep:0, tgt:1, acc:'nvidia-h200', gpu:2, topo:'단일',
   owner:'오경환(kh.oh)', at:'2026-07-22 16:48', upd:'2026-07-22 19:48', health:'-',
-  ep:'https://gw.concerto.okestro.cloud/ai-service-team/solar-open-100b-paused/v1',
-  gw:true, host:'', tls:false, auth:true, obs:false, keys:[]},
+  ep:'https://gw.ai-service.concerto.io/v1',
+  gw:true, host:'gw.ai-service.concerto.io', tls:true, auth:true, obs:false, keys:[]},
 
  {n:'gemma-4-31b-fp8-failed', ws:'test-npu', model:'gemma-4-31b-it-fp8-block', mver:'1.0.0',
   type:'자체 배포', st:'생성 실패', rep:0, tgt:1, acc:'nvidia-h200', gpu:4, topo:'단일',
   owner:'유지현(jh.yu)', at:'2026-08-17 13:07', upd:'2026-08-17 16:07', health:'-',
-  ep:'', gw:true, host:'', tls:false, auth:true, obs:true, keys:[]}
+  ep:'https://gw.concerto.okestro.io/v1', gw:true, host:'', tls:false, auth:true, obs:true, keys:[]}
 ,
 
  /* 외부 배포 — 콘체르토 밖에서 돌던 워크로드를 목록에 등록한 것.
@@ -2409,7 +2439,8 @@ const COLDEF={
     +'<dt>실패</dt><dd>-로 표시합니다. 행을 누르면 사유를 확인합니다.</dd></dl>',
   impmatch:'어떤 모델을 서비스하는 워크로드인지 연결합니다. 자동으로 연결된 것도 바꿀 수 있으며, 연결하지 않으면 가져오지 않습니다.',
   imploc:'워크로드가 실행되고 있는 클러스터 내 구획입니다. 콘체르토가 만든 것이 아니라 이미 있던 이름이며, 어느 워크로드인지 대조할 때 씁니다.',
-  health:'메트릭을 종합해 산출한 건강도입니다. 상태가 떠 있는지를 말한다면 헬스는 잘 도는지를 말합니다.<dl><dt>안정</dt><dd>문제없이 처리하고 있습니다.</dd><dt>주의</dt><dd>요청은 처리하고 있으나 여유가 줄고 있습니다.</dd><dt>위험</dt><dd>응답 지연이 크거나 처리하지 못하는 요청이 있습니다.</dd></dl>'
+  /* 지금 화면에서 쓰지 않는 도움말이다(헬스는 목록에 두지 않는다). 남겨 두되 값 뜻은 배포 정책 3.4 표와 같은 문장으로 맞춘다 */
+  health:'배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 배포 상태와 다른 축입니다.<dl><dt>안정</dt><dd>지표가 기준 범위 안입니다.</dd><dt>주의</dt><dd>지표가 기준을 벗어나기 시작했습니다.</dd><dt>위험</dt><dd>지표가 기준을 크게 벗어났습니다.</dd></dl>'
 };
 let fsel={}, ftmp={};
 function axis(k){ return FDEF.find(function(f){return f.k===k;}); }
@@ -2655,7 +2686,7 @@ function openPanel(i){
   const d=DEPS[i]; cur={d:d,i:i};
   document.getElementById('pnName').textContent=d.n;
   /* 설명을 두지 않는다. 마법사 4단계에서 받지 않는 값이라 화면에 자리만 남는다.
-     배포는 이름이 엔드포인트 주소에 들어가 이름 자체가 식별이다(배포정책 2.5) */
+     배포는 이름 자체가 식별이다. 엔드포인트는 운영룸 배포가 함께 쓰는 주소라 식별이 되지 않는다(배포 정책 2.5) */
   const de=document.getElementById('pnDesc');
   if(de) de.style.display='none';
   document.getElementById('pnTags').innerHTML = stBadge(d.st, true)+'<span class="vtag">'+d.type+'</span>';
@@ -2704,14 +2735,14 @@ function openPanel(i){
   /* 헬스(안정·주의·위험)는 4.0 범위다(v0.35 · 배포 정책 3.4). 점수는 4.1 범위라 두지 않는다 */
   ].concat([
     ['헬스'+tip('배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 상태가 떠 있는지를 말한다면 헬스는 잘 도는지를 말합니다.'),
-      '<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>']
+      healthBadge(d)]
   ])), 'spec'));
 
   b.push(sec('접근 설정', dl([
     ['외부 접근', d.gw? '사용' : '사용 안 함'],
-    /* 운영룸 게이트웨이에서 정한 값이다. 배포에서 바꾸지 않는다 */
+    /* 운영룸 게이트웨이에서 정한 값이다. 배포에서 바꾸지 않는다.
+       v0.35 · HTTPS 행을 뺐다. 호출 주소는 운영룸 게이트웨이의 https 주소이고 배포에서 정하지 않는다(배포 정책 2.5) */
     ['호스트명', d.host? d.host : '<span class="dash">기본 도메인</span>'],
-    ['HTTPS', d.tls? '사용' : '사용 안 함'],
     ['API Key 인증', d.auth? '사용' : '사용 안 함'],
     ['지표·추적 수집', d.obs? '사용' : '사용 안 함']
   ]), 'cfg'));
@@ -2940,7 +2971,6 @@ function dOverview(d){
    + dl([
        ['외부 접근', d.gw? '사용' : '사용 안 함'],
        ['호스트명', d.host? d.host : '<span class="dash">기본 도메인</span>'],
-       ['HTTPS', d.tls? '사용' : '사용 안 함'],
        ['API Key 인증', d.auth? '사용' : '사용 안 함']
      ])
    + '</div>'
@@ -3016,8 +3046,24 @@ function resBlock(title,cnt,go,body){
    + body + '</div>';
 }
 
+/* 주요 이벤트를 남기는 배포(정상·오류). 기동 중이 아닌 배포(생성 중·유휴·중지됨·생성 실패)는 헬스·지표가 - 다(배포 정책 3.4) */
+function hasPods(d){ return d.st==='정상'||d.st==='오류'; }
+/* 지표 소스 상태 배지와 사유 — 모니터링 목업과 같은 문구다(모니터링 정책 5.3) */
+const SRC={unavailable:['수집 불가','지표를 일시적으로 불러오지 못하고 있습니다.'],
+           not_configured:['미설정','이 배포는 지표 수집이 설정되어 있지 않습니다.']};
+/* 지표를 받는 배포는 정상뿐이다. 오류는 응답하지 않아 지표가 없고(모니터링 정책 5.1), 헬스는 서버가 배포 상태로 준 값(위험)이다.
+   소스 상태 배지는 지표를 받아야 할 배포(정상)에만 쓴다 */
+function srcBadge(d){ return d.st==='정상' && src!=='ok' ? SRC[src] : null; }
+/* 헬스 표시 — 패널·모니터링 탭이 같은 값을 쓴다(배포 정책 3.4) */
+function healthBadge(d){
+  const sb = srcBadge(d);
+  return sb ? '<span class="stbadge mu">'+sb[0]+'</span>'
+            : '<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>';
+}
 function dMonitor(d){
-  const on = running(d);
+  const pods = hasPods(d);
+  const sb = srcBadge(d);
+  const on = d.st==='정상' && !sb;
   const mv=function(t,v,u,help){ return '<div class="mcard"><div class="mt">'+t+(help?tip(help):'')+'</div><div class="mv">'+v+'</div>'+(u?'<div class="mu">'+u+'</div>':'')+'</div>'; };
   const bars=Array.from({length:34},function(){ return '<div class="bar" style="height:'+(on? 18+Math.round(Math.random()*70) : 2)+'%"></div>'; }).join('');
   /* 주요 이벤트 — 배포의 상태가 바뀐 일만 남긴다(정책 8.4).
@@ -3040,24 +3086,31 @@ function dMonitor(d){
    /* 4.0 범위 지표는 지금 수집되는 것만 싣는다(DEP-L01 7.6 · 모니터링 정책 5.1).
       처리량은 초당 요청 수와 초당 처리 토큰 수 두 값이다. 값이 없으면 0 이 아니라 - 로 둔다 */
    + mv('처리량', on? '<b>4.2</b><small> req/s · </small><b>182</b><small> tok/s</small>' : '<b>-</b>','최근 1시간 평균')
-   + mv('P99 지연 시간','<b>'+(on?'640':'-')+'</b>'+(on?'<small> ms</small>':''),'최근 1시간 최댓값')
+   + mv('P99 지연 시간','<b>'+(on?'640':'-')+'</b>'+(on?'<small> ms</small>':''),'최근 1시간 최대')
    + mv('대기 중인 요청','<b>'+(on?'3':'-')+'</b>','실시간')
    + mv('가속기 사용률','<b>'+(on?'74.2':'-')+'</b>'+(on?'<small> %</small>':''),'최근 1시간 평균')
    + mv('메모리 사용량','<b>'+(on?'62.4':'-')+'</b>'+(on?'<small> / '+(d.gpu?parseInt(accVram(d.acc)):0)+' GB</small>':''),'실시간')
-   /* 헬스 카드는 4.0 범위다(v0.35 · 배포 정책 3.4). 점수·구성 지표는 4.1 범위라 안내하지 않는다 */
-   + mv('헬스','<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>','',
-        '배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 배포 상태와 다른 축입니다.')
+   /* 헬스 카드는 4.0 범위다(v0.35 · 배포 정책 3.4). 점수·구성 지표는 4.1 범위라 안내하지 않는다.
+      지표를 받지 못하면 헬스도 판정되지 않는다. 그 자리에 소스 상태 배지와 사유를 둔다 — 값이 왜 - 인지가
+      이 카드 한 곳에서 읽힌다(모니터링 정책 5.3) */
+   + (sb
+      ? mv('헬스','<span class="stbadge mu">'+sb[0]+'</span>',sb[1],
+           '배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 배포 상태와 다른 축입니다.')
+      : mv('헬스','<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>','',
+           '배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 배포 상태와 다른 축입니다.'))
    + '</div>'
    /* 깊은 분석은 모니터링 화면 소관이다(현행 명세 5.2 오버뷰 대시보드).
       거기에는 게이트웨이·엔진·GPU 3계층 차트 9개와 인프라 건전성 점수가 있고
       배포를 골라 보는 드롭다운이 있다. 여기서는 이 배포가 지금 어떤지만 보여주고 넘긴다 */
    + '<div class="dsec"><h4>처리량 추이'+tip('최근 1시간입니다. 시간 범위를 바꾸거나 게이트웨이·엔진·가속기 지표를 나눠 보려면 모니터링 화면에서 확인합니다.')+'</h4>'
-   + '<div class="chart">'+bars+'</div>'
+   /* 값이 없으면 낮은 막대로 채우지 않는다. 작았던 값으로 읽힌다 */
+   + (on ? '<div class="chart">'+bars+'</div>' : '<div class="emptyline">아직 값이 들어오지 않습니다.</div>')
    + '<div class="secact" style="margin-top:14px">'
    +   '<button class="btn ghost sm" onclick="act(\'모니터링 화면의 오버뷰 대시보드로 이동합니다.\')">상세 지표<span class="ar">→</span></button>'
    + '</div></div>'
    + '<div class="dsec"><h4>주요 이벤트'+tip('배포에 일어난 일만 모아 보여줍니다.')+'</h4>'
-   + (on || d.st==='오류'
+   /* 주요 이벤트는 지표가 아니라 배포에 일어난 일이라 소스 상태와 무관하게 보인다 */
+   + (pods
       ? '<ul class="evlist">'
         + EV.map(function(e){
             return '<li'+(e[2]==='bad'?' class="bad"':'')+'><span class="tm">'+e[0]+'</span><span class="msg">'+e[1]+'</span></li>';
@@ -4082,7 +4135,7 @@ function prodHost(){ return PROD_HOST[WF.ws] || ''; }
 
 function paneGw(){
   const nm=WF.name.trim();
-  return wHead('게이트웨이','외부에서 이 배포를 호출할 주소와 제한을 정합니다.')
+  return wHead('게이트웨이','이 배포의 이름과 호출 조건을 정합니다.')
 
    + '<div class="fgrid">'
    +   fld('배포명','name',
@@ -4093,7 +4146,7 @@ function paneGw(){
         + '<button class="btn ghost sm"'+(nm?'':' disabled')
         +   ' onclick="WF.nameChecked=true;wBlur(\'name\');toast(\'ok\',\'사용할 수 있는 배포명입니다.\')">중복 확인</button>'
         + '</div>',
-        WF.nameChecked? '사용할 수 있는 배포명입니다.' : '엔드포인트 주소에 포함되며 나중에 바꿀 수 없습니다.', true)
+        WF.nameChecked? '사용할 수 있는 배포명입니다.' : '나중에 바꿀 수 없습니다.', true)
    + '</div>'
 
    + '<div class="fsec"><h4>호출 주소</h4>'
@@ -4104,8 +4157,8 @@ function paneGw(){
    +     fld('호스트명','host',
           '<div class="ro">'+(prodHost()||'gw.concerto.okestro.io')+'</div>',
           '운영룸에서 정합니다. 배포마다 바꿀 수 없습니다.')
-   +     fld('HTTPS','tls',
-          selBox('tls',[{v:'true',t:'사용'},{v:'false',t:'사용 안 함'}], String(WF.tls)), '')
+   /* v0.35 · HTTPS 선택을 뺐다. 운영룸 배포는 마법사의 호스트·TLS 값을 쓰지 않고(거절 없이 무시)
+      리스너는 운영룸 게이트웨이가 정한다(릴리즈 노트 v4.0.0 4장 · 배포 정책 2.5) */
    /* API Key 인증 — 키 목록·발급은 워크스페이스 소관이고(8/19 회의 3.4)
       요구 여부만 배포에서 정한다(2026-09-02 확인). 기본값은 켬이다.
       인증은 게이트웨이가 처리하므로 호출 주소와 같은 섹션에 둔다 */
@@ -4115,10 +4168,12 @@ function paneGw(){
             ? '키 없이 호출할 수 있습니다. 요청자를 식별하지 못해 사용량을 셀 수 없습니다.'
             : '호출 시 API Key 를 요구합니다. 키 발급은 워크스페이스에서 합니다.')
    +   '</div>'
-   +   '<div class="epprev"><span class="el">발급될 주소</span>'
-   +     '<span class="ev">'+(WF.tls==='true'||WF.tls===true?'https':'http')+'://'
-   +       (prodHost() || 'gw.concerto.okestro.cloud')+'/'
-   +       (WF.ws||'{워크스페이스}')+'/'+(nm||'{배포명}')+'/v1</span></div>'
+   /* v0.35 · 운영룸마다 게이트웨이가 하나이고 그 룸의 배포가 같은 주소를 쓴다. 배포는 요청 본문의
+      모델명으로 구분한다(배포 정책 2.5). 경로에 워크스페이스·배포명을 붙이던 미리보기를 고쳤다.
+      기본 도메인 값은 워크스페이스 목업과 같은 검토용 값이다 */
+   +   '<div class="epprev"><span class="el">호출 주소</span>'
+   +     '<span class="ev">https://'+(prodHost() || 'gw.concerto.okestro.io')+'/v1</span></div>'
+   +   '<div class="hint">이 운영룸의 배포가 함께 쓰는 주소입니다. 요청 본문의 모델명으로 배포를 구분합니다.</div>'
    + '</div>'
 
    + '<div class="fsec"><h4>호출 제한</h4>'
@@ -4265,9 +4320,9 @@ function paneReview(){
           : row('서빙 풀', WF.rep+'개 · 레플리카당 '+WF.gpu+'장'))
        + row('총 사용량', '<b>'+wTotalGpu()+'장</b>'))
    +   sec(2,'게이트웨이',
-         (WF.name||'배포명 없음')+' · HTTPS '+((WF.tls==='true'||WF.tls===true)?'사용':'사용 안 함'),
+         (WF.name||'배포명 없음')+' · https://'+(prodHost() || 'gw.concerto.okestro.io')+'/v1',
          row('배포명', nm[0], nm[1])
-       + row('HTTPS', (WF.tls==='true'||WF.tls===true)?'사용':'사용 안 함')
+       + row('호출 주소', 'https://'+(prodHost() || 'gw.concerto.okestro.io')+'/v1')
        + row('API Key 인증', (WF.auth==='true'||WF.auth===true)?'사용':'사용 안 함')
        + row('토큰 사용량 제한', (WF.limit==='true'||WF.limit===true)
           ? WF.limitReq+' / '+WF.limitUnit : '사용 안 함'))
@@ -4364,7 +4419,7 @@ function delDep(i){
      종료해도 키가 사라지지 않고 이 배포로 가던 호출만 끊긴다 */
   const extra = '';
   openConfirm('배포 종료',
-    '<b>'+d.n+'</b>'+jo(d.n,'을')+' 종료하면 엔드포인트 호출이 중단되고 복구할 수 없습니다. '+extra+'모델과 가중치는 남습니다.',
+    '<b>'+d.n+'</b>'+jo(d.n,'을')+' 종료하면 이 배포로 가는 호출이 중단되고 복구할 수 없습니다. '+extra+'모델과 가중치는 남습니다.',
     function(){ toast('ok','배포 종료를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.'); }, '종료', null, d.n);
 }
 
@@ -4390,6 +4445,14 @@ function goDemo(kind,btn){
   if(kind==='detail'){ openDetailAt(0); }
   else if(kind==='new'){ if(!canDeploy()){ toast('cr','배포 생성 권한이 없습니다.'); vwBtn(0); return; } openWiz(); }
   else if(kind==='imp'){ if(!canImport()){ toast('cr','외부 배포 가져오기 권한이 없습니다.'); vwBtn(0); return; } openImport(); }
+}
+/* 지표 소스 상태 — 검토용 장치다. 실제 값은 배포 지표 응답의 소스 상태를 따른다(모니터링 정책 5.3) */
+let src='ok';
+function setSrc(k,btn){
+  src=k;
+  document.querySelectorAll('#demoBar .sr').forEach(function(b){b.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  if(view==='detail') drawDetail(); else render(true);
 }
 function setState(s,btn){
   state=s;
