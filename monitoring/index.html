@@ -1,7 +1,41 @@
 <!--
-  콘체르토 매니저 — 모니터링 목업 v0.24 (2026-10-16)
+  콘체르토 매니저 — 모니터링 목업 v0.25 (2026-10-19)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다 —
   필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
+
+  ── v0.25 (2026-10-19) ──────────────────────
+  MON-L01 v0.25 · 모니터링 정책 v0.16 과 같은 날 판이다. 모니터링 4.0 백엔드 응답 규약(MON-L01 댓글 2026-10-15)을 반영했다.
+  · 4.0 범위 배포 상세에 건전성 자리를 늘 둔다. 값은 하나만 놓인다 — 레플리카가 떠 있지 않은 배포(유휴·중지됨)는 - ,
+    지표를 받지 못하면 `수집 불가` · `미설정` 배지와 사유, 그 밖에는 서버가 판정한 라벨이다(모니터링 정책 5.2·5.3).
+    - 는 배포 목업 헬스 카드와 같은 배지(.mu)로 그린다. 두 화면이 같은 배포의 헬스를 보인다.
+    오류·중지됨 진단 박스는 그대로 둔다(정책 5.1). 오류 배포의 라벨(위험)은 배포 상태로 준 값이라 값별 설명을 붙이지 않는다.
+  · 지표를 받지 못하면 세 계층 값을 - 로 두고, 차트 아래 사유를 소스 상태 사유로 둔다. 하단 데모 바 `지표 소스` 로
+    분기를 본다. 데모 바는 검토용이다.
+  · 지표 카드 부제를 집계 구간으로 바꿨다(모니터링 정책 5.1). 카드 값은 시간 범위를 바꿔도 그대로다 — 범위는
+    차트에만 건다(정책 2.3). 이전엔 카드 값이 범위에 따라 바뀌었고 부제가 `평균`·`합계` 뿐이라 어느 구간인지 알 수 없었다.
+    합계·평균 여부는 각 지표 도움말에 둔다.
+  · 시계열에서 값이 없는 구간은 선을 끊어 그린다(정책 5.3). 이으면 값이 있었던 것처럼 읽힌다. llama-3-2-1b-prod
+    서빙 엔진 차트에 빈 구간을 넣어 두었다. 검토용 값이다. 호버하면 - 로 보인다.
+  · 가속기에 원래 없는 지표는 카드·차트를 두지 않는다(정책 5.3). 4.0 범위 화면 지표는 NVIDIA·Furiosa 에 모두 있어
+    데모에서 숨는 카드는 없다. Rebellions 배포는 엔진·장치 지표가 4.1 도입 환경에서 확인 대상이라 게이트웨이 계층만 남는다.
+  · 여러 배포를 합치지 않는다는 기존 판단(2026-08-28)은 그대로다. 합산 시계열은 이 화면이 쓰지 않는다.
+  · 알림 규칙 중지·재개를 더했다(모니터링 정책 6.4 · REQ-MON-075). 행 더보기 메뉴에 `중지` 또는 `재개`, 확인 알럿 뒤 토스트.
+    중지된 규칙은 이름 아래 배지를 둔다. 직접 중지는 `중지`, 채널 삭제로 꺼진 것은 `중지 · 채널 삭제` 다(릴리즈 노트 v4.0.0 4장 inactive_reason).
+    알림 채널 도움말의 `등록된 채널 모두` 를 알림 정책 7.3 문장 `워크스페이스 채널과 전역 채널 모두` 로 맞췄다.
+    직접 중지에 사유를 붙이면 `중지 · 직접 중지` 로 같은 말이 되풀이된다. 시스템이 끈 경우만 까닭을 밝힌다.
+    배지 밖 흐린 글자로 두면 표 칸에서 글자 단위로 줄이 꺾여 배지 안에 함께 둔다(.stbadge 는 줄을 꺾지 않는다).
+    인프라 자원 노드 중지·재개, 배포 일시중지와 같은 형식이다. 데모: `KV 캐시 포화` 직접 중지, `VRAM 포화` 채널 삭제.
+    조치를 글로만 말하던 세 곳에 이동 버튼을 붙였다(정책 1장 원칙 5 · MON-L01 5.2). 최고 관리자에게만 보인다(공통정책 7.10) —
+    확인 불가 슬롯 알림과 오류 등급 Xid 조치 안내에 `인프라 자원에서 보기 →`, 등록되지 않은 워크로드 안내에 `외부 배포 가져오기 →`.
+    채널 삭제로 꺼진 규칙의 재개 알럿에 채널을 고르려면 수정에서 지정한 뒤 재개하라는 문장을 더했다.
+    최근 발생 펼침 행 colspan 을 열 수(11·10)에 맞췄다. 9·10 으로 하나 모자랐다(MON-L01 8장).
+  · GPU Xid 상태를 가속기 탭에 붙였다(모니터링 정책 4.3 · REQ-MON-038·039). API 는 릴리즈 노트 v4.0.0 4장 `xid` 다.
+    NVIDIA 노드 슬롯 표에 Xid 오류 열(5분 동안 가장 급한 코드와 등급, 전체 발생 건수), 슬롯 패널에 Xid 섹션
+    (5분 동안 코드별 등급·건수·설명, 서버가 준 조치 안내)을 둔다. NPU 노드는 열·섹션을 두지 않는다(정책 5.3).
+    값이 셋으로 갈린다 — 발생 있음, 발생 없음 -, 수집하지 못함 `수집 불가`. 코드 미상(`*`)은 `코드 미상` 으로 쓴다.
+    오류 등급은 확인 필요 항목에 위험으로, 주의 등급은 주의로 올린다. 노드의 확인 불가 슬롯을 올리는 것과 같은 자리다.
+    이름은 알림 규칙 카탈로그의 `GPU Xid 오류`(정책 6.3)에 맞춰 `Xid 오류` 로 쓴다. Xid 는 NVIDIA 문서의 이름이라 옮기지 않는다.
+    데모: gpu-svr-01 슬롯 1 오류(79), gpu-svr-02 슬롯 1 코드 미상, 슬롯 2 수집 불가. 조치 문구는 검토용이다.
 
   ── v0.24 (2026-10-16) ──────────────────────
   MON-L01 v0.24 · 모니터링 정책 v0.15 · 알림 정책 v0.15 와 같은 날 판이다. 알림 규칙 요건 변경(안건 59).
@@ -2396,6 +2430,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <span class="dgrp"><span class="demo-label">범위:</span>
     <button class="sc on" onclick="setScope(1,this)">4.0</button>
     <button class="sc" onclick="setScope(2,this)">4.1</button></span>
+  <span class="dgrp"><span class="demo-label">지표 소스:</span>
+    <button class="sr on" onclick="setSrc('ok',this)">정상</button>
+    <button class="sr" onclick="setSrc('unavailable',this)">수집 불가</button>
+    <button class="sr" onclick="setSrc('not_configured',this)">미설정</button></span>
   <span class="dgrp"><span class="demo-label">테마:</span>
     <button onclick="document.body.classList.remove('dark')">라이트</button>
     <button onclick="document.body.classList.add('dark')">다크</button></span>
@@ -2451,7 +2489,10 @@ const NODES=[
   {n:'gpu-svr-01', ip:'10.10.20.11', kind:'gpu', st:'정상', since:'2026-09-28 10:12',
    cpu:{use:38,cap:128}, mem:{use:414,cap:1007},
    slots:[
-     {no:1, dev:'NVIDIA-H200', id:'GPU-0', st:'사용 중', core:74, vram:{use:129.4,cap:140}, temp:71, pw:412, by:['llama-3-2-1b-prod']},
+     /* xid — 최근 5분 Xid(릴리즈 노트 v4.0.0 4장 `xid`). last 가장 최근 코드, g 그 코드의 등급, cnt 코드별 건수, act 조치 안내.
+        속성이 없으면 발생 없음(빈 블록), null 이면 수집하지 못함이다. ⚠ 값·조치 문구는 검토용 데모다 */
+     {no:1, dev:'NVIDIA-H200', id:'GPU-0', st:'사용 중', core:74, vram:{use:129.4,cap:140}, temp:71, pw:412, by:['llama-3-2-1b-prod'],
+      xid:{last:79, g:'오류', cnt:{79:2, 45:1}, act:'노드를 다시 시작해 주세요. 반복되면 GPU 교체를 검토해 주세요.'}},
      {no:2, dev:'NVIDIA-H200', id:'GPU-1', st:'사용 중', core:68, vram:{use:118.2,cap:140}, temp:69, pw:398, by:['gpt-oss-120b-symphony']},
      {no:3, dev:'NVIDIA-H200', id:'GPU-2', st:'사용 중', core:41, vram:{use:62.0,cap:140},  temp:58, pw:245,
       by:['gemma-4-12b-it-idle']},
@@ -2469,8 +2510,10 @@ const NODES=[
   {n:'gpu-svr-02', ip:'10.10.20.12', kind:'gpu', st:'점검', since:'2026-10-12 08:40',
    cpu:{use:96,cap:128}, mem:{use:812,cap:1007},
    slots:[
-     {no:1, dev:'NVIDIA-A100', id:'GPU-0', st:'사용 중', core:88, vram:{use:74.2,cap:80}, temp:78, pw:388, by:['gpt-oss-120b-symphony']},
-     {no:2, dev:'NVIDIA-A100', id:'GPU-1', st:'사용 중', core:81, vram:{use:69.1,cap:80}, temp:75, pw:361, by:['gpt-oss-120b-symphony']},
+     {no:1, dev:'NVIDIA-A100', id:'GPU-0', st:'사용 중', core:88, vram:{use:74.2,cap:80}, temp:78, pw:388, by:['gpt-oss-120b-symphony'],
+      xid:{last:'*', g:'주의', cnt:{'*':1}, act:''}},
+     /* Xid 를 수집하지 못한 슬롯 — 발생 없음과 가른다. 검토용 값이다 */
+     {no:2, dev:'NVIDIA-A100', id:'GPU-1', st:'사용 중', core:81, vram:{use:69.1,cap:80}, temp:75, pw:361, by:['gpt-oss-120b-symphony'], xid:null},
      {no:3, dev:'NVIDIA-A100', id:'GPU-2', st:'유휴', core:0, vram:{use:0.3,cap:80}, temp:31, pw:48, by:[]},
      {no:4, dev:'NVIDIA-A100', id:'GPU-3', st:'유휴', core:0, vram:{use:0.3,cap:80}, temp:32, pw:47, by:[]},
      {no:5, dev:'NVIDIA-L40S', id:'GPU-4', st:'유휴', core:0, vram:{use:0.2,cap:48}, temp:29, pw:34, by:[]},
@@ -2518,6 +2561,8 @@ function nodeLost(nd){ return nd.st==='연결 불가' || nd.st==='사라짐'; }
 /* 배포 성능 지표 — 계층 셋으로 나눈다(정책 5.1) */
 /* d — 지표가 무엇을 재는지. 이름만으로는 숫자가 의미를 갖지 않는다.
    TTFT·TPOT·KV 캐시는 이 제품을 처음 쓰는 사람에게 낯선 말이다 */
+/* 부제는 그 값의 집계 구간이다(모니터링 정책 5.1). 카드 값은 시간 범위와 무관해 모두 fixed 다 —
+   범위는 차트에만 건다(정책 2.3). 합계·평균 여부는 도움말(d)에 둔다 */
 const PERF={
   /* ⚠ 이전엔 이 셋 다 nodata:true 고정이라 어느 배포를 골라도 게이트웨이 섹션이
      항상 비어 있었다 — "계측 파이프라인이 아직 안 붙었다"는 문구도 모든 배포에 매번
@@ -2525,11 +2570,11 @@ const PERF={
      바꾼다. 값이 없는 배포는 여전히 비워 두되, 그 이유는 "이 배포가 안 돈다"는
      공통 사유이지 게이트웨이만의 특별한 사유가 아니다(사용자 지적, 2026-08-28) */
   gw:[
-    {t:'처리량',        u:'req/s',
+    {t:'처리량',        u:'req/s · 최근 1분 평균', fixed:true,
      d:'초당 들어온 요청 수입니다.'},
-    {t:'토큰 처리량',    u:'tok/s',
+    {t:'토큰 처리량',    u:'tok/s · 최근 1분 평균', fixed:true,
      d:'초당 오간 토큰 수입니다. 들어온 것과 나간 것을 함께 셉니다.'},
-    {t:'에러율',        u:'%', dir:'low', th:{good:1, warn:5},
+    {t:'에러율',        u:'% · 최근 1분', fixed:true, dir:'low', th:{good:1, warn:5},
      d:'실패한 요청의 비율입니다. 서버 오류와 잘못된 요청을 함께 셉니다.'},
     /* 요청 건수 둘. 4.0 범위(모니터링 정책 5.1). 최근 1시간 건수와 누적 건수다(CON-759 A-2).
        조회 구간과 무관한 값이라 구간 계수(byRange)를 걸지 않는다(fixed) */
@@ -2539,23 +2584,23 @@ const PERF={
      d:'게이트웨이가 시작된 뒤 들어온 요청 수입니다. 게이트웨이가 다시 시작되면 0부터 셉니다.'}
   ],
   eng:[
-    {t:'처리량',        v:'1,284', u:'tok/s · 평균',
+    {t:'처리량',        v:'1,284', u:'tok/s · 최근 1시간 평균', fixed:true,
      d:'서빙 엔진이 초당 만들어 낸 토큰 수입니다.'},
-    {t:'TTFT',         v:'39',   u:'ms · 평균', dir:'low', th:{good:50, warn:150},
+    {t:'TTFT',         v:'39',   u:'ms · p95 · 실시간', fixed:true, dir:'low', th:{good:50, warn:150},
      d:'요청을 받고 첫 토큰이 나오기까지 걸린 시간입니다. 사용자가 기다렸다고 느끼는 구간입니다.'},
-    {t:'TPOT',         v:'10',   u:'ms · 평균', dir:'low', th:{good:15, warn:40},
+    {t:'TPOT',         v:'10',   u:'ms · p99 · 실시간', fixed:true, dir:'low', th:{good:15, warn:40},
      d:'첫 토큰 뒤로 토큰 하나를 더 만드는 데 걸린 시간입니다. 답이 이어지는 속도를 좌우합니다.'},
-    {t:'KV 캐시 사용률', v:'62',   u:'% · 평균', dir:'low', th:{good:40, warn:70},
+    {t:'KV 캐시 사용률', v:'62',   u:'% · 실시간', fixed:true, dir:'low', th:{good:40, warn:70},
      d:'대화 맥락을 담아 두는 가속기 메모리의 사용 비율입니다. 가득 차면 요청이 대기로 밀립니다.'}
   ],
   infra:[
-    {t:'가속기 사용률',  v:'58',   u:'% · 평균',
+    {t:'가속기 사용률',  v:'58',   u:'% · 최근 1시간 평균', fixed:true,
      d:'가속기의 연산 코어가 쓰인 비율입니다.'},
-    {t:'VRAM 사용량',   v:'407',  u:'GB · 합계',
+    {t:'VRAM 사용량',   v:'407',  u:'GB · 실시간', fixed:true,
      d:'이 배포가 쓰는 가속기 메모리의 합입니다.'},
-    {t:'온도',          v:'64',   u:'°C · 평균', dir:'low', th:{good:75, warn:85},
+    {t:'온도',          v:'64',   u:'°C · 실시간', fixed:true, dir:'low', th:{good:75, warn:85},
      d:'이 배포가 쓰는 가속기의 평균 온도입니다.'},
-    {t:'전력',          v:'1,386',u:'W · 합계',
+    {t:'전력',          v:'1,386',u:'W · 실시간', fixed:true,
      d:'이 배포가 쓰는 가속기의 소모 전력 합입니다.'}
   ]
 };
@@ -2618,6 +2663,16 @@ const DEPM={
   }
 };
 function dm(){ return DEPM[dep] || DEPM['llama-3-2-1b-prod']; }
+/* 지표 소스 상태 — 검토용 장치다. 실제 값은 배포 지표 응답의 소스 상태를 따른다(모니터링 정책 5.3).
+   레플리카가 떠 있지 않은 배포는 지표를 조회하지 않으므로 소스 상태와 무관하게 - 다 */
+let src='ok';
+const SRC={unavailable:['수집 불가','지표를 일시적으로 불러오지 못하고 있습니다.'],
+           not_configured:['미설정','이 배포는 지표 수집이 설정되어 있지 않습니다.']};
+/* 소스 상태 배지는 지표를 받아야 할 배포(정상)에만 쓴다. 오류는 응답하지 않아 원래 지표가 없고(정책 5.1)
+   건전성은 서버가 배포 상태로 준 값이다. 배포 목업 srcBadge() 와 같은 기준이다 */
+function srcBad(){ return src!=='ok' && curDep().st==='정상'; }
+/* 가속기에 원래 없는 지표는 카드·차트를 두지 않는다(모니터링 정책 5.3). 백엔드가 가속기별 지표 목록을 내려준다.
+   4.0 범위 화면 지표는 NVIDIA·Furiosa 에 모두 있다. Rebellions 는 게이트웨이 계층만 남는다. 데모 배포에는 Rebellions 가 없다 */
 let dep = DEPS[0].n;
 
 /* 지금 이상한 것 — 건전성 점수가 낮으면 `왜` 를 눌러 갈 곳이 있어야 한다.
@@ -2649,6 +2704,15 @@ function troubles(){
     if(nd.st==='사라짐'){ t.push({sev:'위험', n:nd.n, why:'노드가 클러스터에서 확인되지 않습니다.', go:"goNode('"+nd.n+"',true)"}); return; }
     const dead=nd.slots.filter(function(x){ return x.st==='확인 불가'; }).length;
     if(dead) t.push({sev:'주의', n:nd.n, why:'가속기 '+dead+'장의 상태를 읽지 못합니다.', go:"goNode('"+nd.n+"')"});
+    /* 최근 5분 Xid — 오류 등급은 위험, 주의 등급은 주의로 올린다. 정보는 조치가 필요 없어 올리지 않는다
+       (규칙 심각도 도움말과 같은 기준 · 모니터링 정책 4.3) */
+    if(xidNode(nd)){
+      /* 슬롯마다 5분 동안 가장 급한 등급으로 센다. 가장 최근 코드 등급만 보면 뒤에 난 정보 코드가 앞선 오류를 가린다(표와 같은 기준) */
+      const xs=nd.slots.map(xidOf).filter(function(v){ return v && v.last!==undefined; }).map(function(v){ return xidGrade(v, xidOrder(v)[0]); });
+      const er=xs.filter(function(g){ return g==='오류'; }).length, wa=xs.filter(function(g){ return g==='주의'; }).length;
+      if(er) t.push({sev:'위험', n:nd.n, why:'GPU '+er+'장에서 오류 등급 Xid 오류가 발생했습니다.', go:"goNode('"+nd.n+"',true)"});
+      else if(wa) t.push({sev:'주의', n:nd.n, why:'GPU '+wa+'장에서 주의 등급 Xid 오류가 발생했습니다.', go:"goNode('"+nd.n+"',true)"});
+    }
   });
   /* 급한 순으로 센다. 배포 먼저 노드 나중으로 두면 위험이 주의 아래로 갈 수 있다 */
   const ord={'위험':0,'주의':1};
@@ -2722,9 +2786,11 @@ let RULES=[
   {n:'가속기 온도 이상', metric:'gpu_temp',        op:'초과', th:85,  dur:1, sev:'오류',
    ws:'ai-service-team', scope:'전체', ch:['slack-ai-alert'], by:'성유진(yj.seong)', at:'2026-08-20 11:04:22',
    fires:['2026-08-27 03:14:02','2026-08-25 22:40:11']},
+  /* off — 중지 사유. 직접 중지 · 채널 삭제(릴리즈 노트 v4.0.0 4장 inactive_reason MANUAL · CHANNEL_DELETED).
+     속성이 없으면 사용 중이다. ⚠ 검토용 값이다 */
   {n:'KV 캐시 포화',    metric:'kv_cache_usage',  op:'초과', th:95,  dur:1, sev:'주의',
    ws:'ai-service-team', scope:'전체', ch:['slack-ai-alert'], by:'성유진(yj.seong)', at:'2026-08-20 11:06:41',
-   fires:[]},
+   fires:[], off:'직접 중지', offAt:'2026-10-17 09:12:40'},
   {n:'응답 지연 급증',   metric:'latency_p99_ms',  op:'초과', th:2000, dur:1, sev:'주의',
    ws:'ai-service-team', scope:'llama-3-2-1b-prod', ch:[], by:'임승주(sj.lim)', at:'2026-08-22 15:31:08',
    fires:['2026-08-27 14:02:11','2026-08-27 09:18:47','2026-08-26 20:03:29','2026-08-26 11:55:00','2026-08-25 07:41:18']},
@@ -2733,9 +2799,10 @@ let RULES=[
   {n:'GPU 하드웨어 오류', metric:'gpu_xid', xids:[48,64,74,79,95,119], xmode:'표준 등급', dur:1, sev:'정보',
    ws:'ai-service-team', scope:'전체', ch:['slack-infra'], by:'성유진(yj.seong)', at:'2026-10-15 10:12:40',
    fires:[]},
+  /* 지정한 채널(slack-infra 이전 채널)이 삭제되어 채널이 0개가 되면서 시스템이 중지했다(정책 6.4) */
   {n:'VRAM 포화', metric:'vram_usage', op:'초과', th:92, dur:2, sev:'주의',
-   ws:'ml-research', scope:'전체', ch:['slack-infra'], by:'유지현(jh.yu)',
-   at:'2026-08-24 09:12:33', fires:[]}
+   ws:'ml-research', scope:'전체', ch:[], by:'유지현(jh.yu)',
+   at:'2026-08-24 09:12:33', fires:[], off:'채널 삭제', offAt:'2026-10-16 14:20:05'}
 ];
 
 /* 메트릭 카탈로그: 백엔드가 가진다. 프로파일 순서로 묶는다(정책 6.3).
@@ -2771,6 +2838,7 @@ const XIDS=[
   {c:31,  d:'GPU 메모리 페이지 폴트',     g:'주의'},
   {c:94,  d:'격리된 메모리 오류',         g:'주의'},
   {c:43,  d:'앱 오류로 처리 중단',        g:'정보'},
+  {c:45,  d:'이전 오류의 후속 정리',      g:'정보'},
   {c:63,  d:'메모리 행 재배치',          g:'정보'},
   {c:92,  d:'단일 비트 ECC 오류율 높음',  g:'정보'}
 ];
@@ -2783,6 +2851,37 @@ const CHANNELS=['slack-ai-alert','slack-infra','ops-webhook'];
 
 /* 상태 배지 색 — 시스템 용어집 5.3 */
 const SLOTB={'사용 중':'ok','유휴':'mu','확인 불가':'wa'};
+/* Xid — NVIDIA GPU 슬롯만 대상이다. NPU 노드는 지표 목록에 Xid 가 없어 열·섹션을 두지 않는다(모니터링 정책 1장 원칙 4 · 4.3).
+   MIG 로 나눈 슬롯도 대상이 아니다(릴리즈 노트 v4.0.0 4장) */
+function xidNode(nd){ return nd.kind==='gpu'; }
+function xidOf(x){ return x.xid===undefined ? {} : x.xid; }
+function xidName(c){ return c==='*' ? '코드 미상' : 'Xid '+c; }
+function xidDesc(c){ const r=XIDS.find(function(v){ return v.c===c; }); return r? r.d : ''; }
+/* 코드 등급 — 가장 최근 코드는 응답의 등급, 나머지는 판정표(카탈로그 Xid 코드 표)의 등급이다. 코드 미상은 주의 */
+function xidGrade(v,c){ if(String(c)===String(v.last)) return v.g; if(c==='*') return '주의';
+  const r=XIDS.find(function(z){ return z.c===+c; }); return r? r.g : '주의'; }
+const XRANK={'오류':0,'주의':1,'정보':2};
+/* 5분 동안 난 코드를 급한 순(등급), 같은 등급이면 가장 최근 코드 먼저로 늘어놓는다 */
+function xidOrder(v){
+  return Object.keys(v.cnt||{}).sort(function(a,b){
+    const d=XRANK[xidGrade(v,a)]-XRANK[xidGrade(v,b)]; if(d) return d;
+    return (String(b)===String(v.last)) - (String(a)===String(v.last));
+  });
+}
+/* 표 칸 — 5분 동안 가장 급한 코드와 등급, 그리고 5분 동안의 전체 발생 건수.
+   가장 최근 코드만 두면 정보 등급 코드가 앞서 난 오류 등급 코드를 가린다. 표는 어느 GPU가 문제인지 훑는 자리라 급한 것을 앞에 둔다.
+   `외 N건` 으로 두면 다른 코드 수인지 발생 수인지 갈리지 않아 전체 발생 건수로 적는다 */
+function xidCell(x){
+  if(x.st==='확인 불가' || /MIG/.test(x.dev)) return dash();
+  const v=xidOf(x);
+  if(v===null) return '<span class="dash">수집 불가</span>';
+  if(v.last===undefined) return dash();
+  const top=xidOrder(v)[0];
+  const tot=Object.keys(v.cnt).reduce(function(a,c){ return a+v.cnt[c]; },0);
+  return (top==='*'? '코드 미상' : '<span class="mono">'+top+'</span>')+' '+sevBadge(xidGrade(v,top))
+    +' <span class="mver">'+tot+'건</span>';
+}
+
 const HB={'안정':'ok','주의':'wa','위험':'cr'};
 /* 4.0 범위 건전성 라벨 설명. 배포 정책 3.4 헬스 의미를 옮겼다 */
 const HDESC={'안정':'지표가 기준 범위 안에 있습니다.','주의':'지표가 기준을 벗어나기 시작했습니다.','위험':'지표가 기준을 크게 벗어났습니다.'};
@@ -3301,6 +3400,7 @@ function drawAcc(el){
       +   '<th class="thcell">'+thHelp('core','연산 코어')+'</th>'
       +   '<th class="thcell">'+thHelp('vram','VRAM')+'</th>'
       +   '<th>온도</th><th>전력</th>'
+      +   (xidNode(nd)? '<th class="thcell">'+thHelp('xid','Xid 오류')+'</th>' : '')
       +   '<th class="thcell">'+thFilterSt()+'</th>'
       +   '<th class="thcell">'+thHelp('dep','점유 배포')+'</th></tr></thead><tbody>'
       +   view.map(function(x){
@@ -3321,6 +3421,7 @@ function drawAcc(el){
                    })())+'</td>'
              + '<td class="mono">'+(dead? dash() : x.temp+'°C')+'</td>'
              + '<td class="mono">'+(dead? dash() : x.pw+'W')+'</td>'
+             + (xidNode(nd)? '<td>'+xidCell(x)+'</td>' : '')
              + '<td><span class="stbadge '+(SLOTB[x.st]||'mu')+'">'+x.st+'</span></td>'
      /* 장치별 할당이라 슬롯 하나에 배포 하나다(2026-09-02 확인) */
      /* 모름은 `확인 불가` 로 둔다 — `-` 로 두면 점유한 배포가 없는 것으로 읽힌다 */
@@ -3652,13 +3753,20 @@ function drawPerf(el){
      값별 설명은 배포 정책 3.4 의 헬스 의미를 옮긴 것이다.
      점수가 없는 배포 중 오류·중지됨은 상태 진단을 둔다(정책 5.1). 유휴는 진단 대상이 아니다 */
   if(!isV41()){
-    if(nom){
-      if(m.why && m.label!=='유휴') h+='<div class="depsub">'+alertBox('crit', m.why, m.todo, goDepBtn())+'</div>';
-    } else {
-      h+='<div class="depsub"><h4>건전성'+tip('배포가 잘 돌고 있는지 지표로 판정한 결과입니다.')+'</h4>'
-        + '<div class="hline"><span class="stbadge '+(HB[m.label]||'mu')+'">'+m.label+'</span>'
-        + '<span class="hdesc">'+(HDESC[m.label]||'')+'</span></div></div>';
-    }
+    /* 건전성 자리는 늘 둔다. 값은 하나만 놓인다(모니터링 정책 5.2·5.3).
+       레플리카가 떠 있지 않으면 - (배포 목업 헬스 카드와 같은 .mu 배지), 지표를 받지 못하면 소스 상태 배지와 사유,
+       그 밖에는 서버 판정 라벨. 오류는 레플리카가 있어 서버가 라벨을 준다 */
+    /* 기동 중이 아닌 배포(생성 중·유휴·중지됨·생성 실패)는 - (정책 5.2). 데모 배포에는 유휴·중지됨만 있다 */
+    const noPods = ['생성 중','유휴','중지됨','생성 실패'].indexOf(curDep().st)>=0;
+    let hb, hd;
+    if(noPods){ hb='<span class="stbadge mu">-</span>'; hd=''; }
+    else if(srcBad()){ hb='<span class="stbadge mu">'+SRC[src][0]+'</span>'; hd=SRC[src][1]; }
+    /* 오류 배포는 서버가 배포 상태로 위험을 준다. 지표로 판정한 것이 아니라 값별 설명(지표가 기준을 …)을 붙이지 않는다 —
+       붙이면 아래 진단 박스의 「지표를 수집하지 못하고 있습니다」와 어긋난다. 사유는 진단 박스가 밝힌다 */
+    else { hb='<span class="stbadge '+(HB[m.label]||'mu')+'">'+m.label+'</span>'; hd= nom? '' : (HDESC[m.label]||''); }
+    h+='<div class="depsub"><h4>건전성'+tip('배포가 잘 돌고 있는지 지표로 판정한 결과입니다.')+'</h4>'
+      + '<div class="hline">'+hb+(hd? '<span class="hdesc">'+hd+'</span>' : '')+'</div></div>';
+    if(nom && m.why && m.label!=='유휴') h+='<div class="depsub">'+alertBox('crit', m.why, m.todo, goDepBtn())+'</div>';
   } else
   h+='<div class="depsub"><h4>건전성'
     + tip('아래 지표를 종합해 산출한 점수입니다. 100에 가까울수록 안정적입니다.')+'</h4>'
@@ -3717,7 +3825,7 @@ function drawPerf(el){
   /* 계층별 지표도 고른 배포의 값이다. 값이 없으면 `-` 로 두고 사유를 밝힌다 */
   const bind=function(items, vals){
     return items.map(function(x,ix){
-      const v = vals[ix];
+      const v = srcBad()? null : vals[ix];
       return Object.assign({}, x, {v: v===null? '-' : v, nodata: v===null || x.nodata});
     });
   };
@@ -3751,11 +3859,30 @@ function wave(str, n){
   }
   return out;
 }
+/* 값이 없는 점(null)에서 선을 끊는다. 이으면 값이 있었던 것처럼 읽힌다(모니터링 정책 5.3) */
 function pathOf(vals, w, hgt){
   const step = w/(vals.length-1);
+  let up = true;
   return vals.map(function(v,i){
-    return (i?'L':'M') + (i*step).toFixed(1) + ' ' + (hgt - v/100*hgt).toFixed(1);
-  }).join(' ');
+    if(v===null){ up=true; return ''; }
+    const c = (up?'M':'L') + (i*step).toFixed(1) + ' ' + (hgt - v/100*hgt).toFixed(1);
+    up=false; return c;
+  }).filter(Boolean).join(' ');
+}
+/* 면 채우기도 끊긴 구간마다 따로 닫는다 */
+function areaOf(vals, w, hgt){
+  const step = w/(vals.length-1);
+  let out='', seg=[];
+  const flush=function(){
+    if(!seg.length) return;
+    out += 'M'+(seg[0][0]*step).toFixed(1)+' '+hgt+' '
+         + seg.map(function(p){ return 'L'+(p[0]*step).toFixed(1)+' '+(hgt - p[1]/100*hgt).toFixed(1); }).join(' ')
+         + ' L'+(seg[seg.length-1][0]*step).toFixed(1)+' '+hgt+' Z ';
+    seg=[];
+  };
+  vals.forEach(function(v,i){ if(v===null) flush(); else seg.push([i,v]); });
+  flush();
+  return out.trim();
 }
 /* 건전성 하위 지표용 미니 스파크라인 — 값만 보이던 것에 호버 상세를 더한다.
    lineChart와 같은 방식(data-chart + chartHover)을 쓰되, 계열이 하나뿐이고
@@ -3846,13 +3973,16 @@ function lineChart(title, seedExtra){
      무엇이 달라졌는지 알 수 없다 */
   const sd = title + range + (seedExtra||'');
   const a=wave(sd+'a', N), b=wave(sd+'b', N);
+  /* 빈 구간 검토용 — 이 배포의 서빙 엔진 차트에만 넣는다. 실제 값이 아니다 */
+  if(seedExtra==='llama-3-2-1b-prod' && title==='서빙 엔진'){ for(let k=12;k<16;k++){ a[k]=null; b[k]=null; } }
   const two = !!SERIES2[title];
   const lg = SERIES2[title]||[];
   const xt = XTICK[range]||XTICK['1h'];
   const ymax = YMAX[title]||'100%';
   /* 호버 좌표를 계산하려면 값이 필요하다. 요소에 담아 두고 이벤트에서 읽는다 */
-  const data = JSON.stringify({a:a.map(function(v){return Math.round(v);}),
-                               b:two? b.map(function(v){return Math.round(v);}) : null,
+  const rnd = function(v){ return v===null? null : Math.round(v); };
+  const data = JSON.stringify({a:a.map(rnd),
+                               b:two? b.map(rnd) : null,
                                lg:lg, x:xt.min, n:N});
   return '<div class="lcbody" data-chart=\''+data.replace(/'/g,'&#39;')+'\''
    +   ' onmousemove="chartHover(event,this)" onmouseleave="chartOut(this)">'
@@ -3861,7 +3991,7 @@ function lineChart(title, seedExtra){
    + [25,50,75].map(function(y){
        return '<line class="grid" x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" vector-effect="non-scaling-stroke"/>';
      }).join('')
-   + '<path class="ar" d="'+pathOf(a,W,H)+' L'+W+' '+H+' L0 '+H+' Z"/>'
+   + '<path class="ar" d="'+areaOf(a,W,H)+'"/>'
    + '<path class="ln" d="'+pathOf(a,W,H)+'" vector-effect="non-scaling-stroke"/>'
    + (two ? '<path class="ln2" d="'+pathOf(b,W,H)+'" vector-effect="non-scaling-stroke"/>' : '')
    /* 호버 지시선 — 어느 시점을 읽고 있는지 표시한다 */
@@ -3892,8 +4022,8 @@ function chartHover(e, el){
 
   const tp = el.querySelector('.ctip');
   tp.innerHTML = '<b>'+relTime(i, d.n, d.x)+'</b>'
-   + '<span><i class="s1"></i>'+(d.lg[0]||'값')+' '+d.a[i]+'</span>'
-   + (d.b ? '<span><i class="s2"></i>'+(d.lg[1]||'')+' '+d.b[i]+'</span>' : '');
+   + '<span><i class="s1"></i>'+(d.lg[0]||'값')+' '+(d.a[i]===null? '-' : d.a[i])+'</span>'
+   + (d.b ? '<span><i class="s2"></i>'+(d.lg[1]||'')+' '+(d.b[i]===null? '-' : d.b[i])+'</span>' : '');
   tp.style.display = '';
   /* 오른쪽 끝에서는 왼쪽으로 뒤집는다. 화면 밖으로 나가면 읽을 수 없다 */
   tp.style.left = ratio > .6 ? 'auto' : (ratio*100)+'%';
@@ -3943,8 +4073,8 @@ function perfSec(title, note, items){
     +   items.map(function(x){
           /* 건전성 카드와 같은 인사이트 칩을 쓴다(healthInsight 재사용) — 방향(dir)과
              임계값(th)이 있는 지표만 판정한다(사용자 요청, 2026-08-28) */
-          const ins = (x.nodata || !x.th) ? null : healthInsight(+byRange(x.v), x.dir, x.th);
           const val = x.fixed? x.v : byRange(x.v);
+          const ins = (x.nodata || !x.th) ? null : healthInsight(+String(val).replace(/,/g,''), x.dir, x.th);
           return '<div class="mcard"><div class="mt">'+x.t
             + (ins? '<span class="hflag '+ins.cls+'">'+ins.label+'</span>' : '')
             + (x.d? tip(x.d) : '')+'</div>'
@@ -3964,7 +4094,7 @@ function perfSec(title, note, items){
        게이트웨이도 이제 배포별 값을 갖게 돼(gw) 그 배포가 안 도는 게 진짜 이유다
        (기획 판단, 2026-08-28) */
     + (nodata
-       ? '<p class="secnote">'+(dm().why || '값이 수집되지 않았습니다.')+'</p>'
+       ? '<p class="secnote">'+(srcBad()? SRC[src][1] : (dm().why || '값이 수집되지 않았습니다.'))+'</p>'
        : '')
     + '</div>';
 }
@@ -4089,7 +4219,10 @@ function drawRules(el){
         const hasFire = r.fires && r.fires.length;
         const open = ruleOpen===i;
         return '<tr'+(hasFire?' style="cursor:pointer" onclick="toggleRuleFire('+i+')"':'')+'>'
-          + '<td><span class="rname">'+r.n+'</span></td>'
+          /* 중지된 규칙은 이름 아래 배지를 둔다. 직접 중지(사유 없음 포함)는 `중지`, 채널 삭제로 꺼진 것은 `중지 · 채널 삭제`. 툴팁에 숨기지 않는다.
+             배지 이름은 노드 상태 `중지`(정책 4.5)와 같은 말이다 */
+          + '<td><span class="rname">'+r.n+'</span>'
+          +   (r.off? '<br><span class="stbadge mu">'+(r.off==='채널 삭제'? '중지 · 채널 삭제' : '중지')+'</span>' : '')+'</td>'
           + '<td>'+sevBadge(r.sev)+'</td>'
           /* Xid 규칙은 임계값이 없다. 고른 코드 수와 `고른 코드 발생` 으로 적는다(정책 6.3) */
           + '<td>'+metricName(r.metric)+(isXid(r.metric)? ' · 코드 '+(r.xids||[]).length+'개' : '')+'</td>'
@@ -4112,12 +4245,14 @@ function drawRules(el){
                ? '<div class="more" id="rm'+i+'"><button class="morebtn" onclick="tgMore(event,\'rm'+i+'\')">\u22ef</button>'
                  + '<div class="rowmenu">'
                  +   '<button onclick="openRule('+i+')">수정</button>'
+                 /* 중지·재개 — 인프라 자원 노드 중지·재개와 같은 자리·같은 말이다(SET-INFRA-L01 REQ-SET-INFRA-014) */
+                 +   (r.off? '<button onclick="resumeRule('+i+')">재개</button>' : '<button onclick="stopRule('+i+')">중지</button>')
                  +   '<hr><button class="d" onclick="delRule('+i+')">삭제</button>'
                  + '</div></div>'
                : '')
           + '</td></tr>'
           + (open
-             ? '<tr class="ruleexp"><td colspan="'+(wsCur==='전체'?10:9)+'"><div class="rfirelist">'
+             ? '<tr class="ruleexp"><td colspan="'+(wsCur==='전체'?11:10)+'"><div class="rfirelist">'
                + '<div class="rfire-h">최근 발생 '+r.fires.length+'건</div>'
                + r.fires.map(function(t){ return '<div class="rfirerow">'+t+'</div>'; }).join('')
                + '</div></td></tr>'
@@ -4426,7 +4561,7 @@ function drawRuleForm(){
 
     + '<div class="fsec"><h4>알림 채널'
     /* 수신자를 밝힌다 — 채널만 두면 누가 받는지 알 수 없다(알림 정책 7.2) */
-    +   tip('조건에 해당하면 워크스페이스 관리자와 그 리소스의 담당자에게 인앱 알림이 발생합니다. 담당자가 없는 노드·가속기 알림은 워크스페이스 관리자만 받습니다. 채널을 고르면 그 채널로, 고르지 않으면 등록된 채널 모두로 함께 전송됩니다.')+'</h4>'
+    +   tip('조건에 해당하면 워크스페이스 관리자와 그 리소스의 담당자에게 인앱 알림이 발생합니다. 담당자가 없는 노드·가속기 알림은 워크스페이스 관리자만 받습니다. 채널을 고르면 그 채널로, 고르지 않으면 워크스페이스 채널과 전역 채널 모두로 함께 전송됩니다.')+'</h4>'
     /* 등록된 채널만 고를 수 있다. 없으면 그 자리에서 등록 화면을 가리킨다 —
        목록 아래 안내문으로 두면 정작 고르는 자리에서는 보이지 않는다 */
     +   (CHANNELS.length ? '' : '<div class="emptyline">등록된 채널이 없습니다. 플랫폼 설정 &gt; 연동 및 알림에서 먼저 등록해 주세요.</div>')
@@ -4454,6 +4589,22 @@ function saveRule(){
   toast('ok', ruleIdx<0? '알림 규칙을 추가했습니다.' : '알림 규칙을 수정했습니다.');
 }
 /* 규칙을 지우면 그 상황을 더 이상 알리지 않는다. 확인 알럿을 거친다(공통정책 7.5) */
+/* 규칙 중지·재개 — 되돌릴 수 있어 이름을 다시 받지 않는다(공통정책 7.5).
+   받는 사람이 알림을 못 받게 되므로 확인 알럿은 둔다. 배포 일시중지와 같은 형식이다 */
+function stopRule(i){
+  const r=RULES[i];
+  openConfirm('알림 규칙 중지',
+    '<b>'+r.n+'</b>'+jo(r.n,'을')+' 중지하면 조건을 평가하지 않고 알림을 보내지 않습니다. 다시 재개할 수 있습니다.',
+    function(){ r.off='직접 중지'; render(); toast('ok','알림 규칙을 중지했습니다.'); }, '중지');
+}
+function resumeRule(i){
+  const r=RULES[i];
+  /* 채널이 지워져 중지된 규칙은 지정 채널이 없다. 재개하면 워크스페이스 채널과 전역 채널 모두로 보낸다(알림 정책 7.3) */
+  const chTxt = r.off==='채널 삭제'? ' 지정한 알림 채널이 없어 워크스페이스 채널과 전역 채널 모두로 보냅니다. 채널을 골라 보내려면 먼저 수정에서 채널을 지정한 뒤 재개해 주세요.' : '';
+  openConfirm('알림 규칙 재개',
+    '<b>'+r.n+'</b>'+jo(r.n,'을')+' 재개하면 다시 조건을 평가하고 알림을 보냅니다.'+chTxt,
+    function(){ delete r.off; delete r.offAt; render(); toast('ok','알림 규칙을 재개했습니다.'); }, '재개');
+}
 function delRule(i){
   const r=RULES[i];
   /* 규칙을 지우면 등록자만이 아니라 워크스페이스 관리자와 연결된 채널까지
@@ -4813,6 +4964,36 @@ function openSlot(nodeName, no){
       '<div class="pnsum">'+vendorBadge(x.dev)+x.dev
     +   '<span class="mver">'+x.id+'</span>'
     +   '<span class="stbadge '+(SLOTB[x.st]||'mu')+'">'+x.st+'</span></div>'
+    /* Xid — 이상 신호라 추이 차트보다 위에 둔다. 시간 범위와 무관한 최근 5분 값이라 범위 선택 위에 둔다.
+       표는 5분 동안 가장 급한 코드·등급과 전체 건수만, 패널은 코드별 등급·건수(급한 순)와 조치 안내까지 둔다.
+       조치 안내는 서버가 판정표에서 내려준 문장이다(릴리즈 노트 v4.0.0 4장) */
+    + (xidNode(nd) && !dead && !/MIG/.test(x.dev)
+       ? '<div class="dsec"><h4>Xid 오류'+tip('이 GPU에서 최근 5분 동안 발생한 Xid 오류의 코드별 등급과 건수입니다.')+'</h4>'
+         + (function(){
+             const v=xidOf(x);
+             if(v===null) return '<div class="emptyline">Xid 오류를 수집하지 못했습니다.</div>';
+             if(v.last===undefined) return '<div class="emptyline">최근 5분 동안 발생한 Xid 오류가 없습니다.</div>';
+             /* 조치 안내는 조건부 상태 알림이라 라이브러리 알림 박스(.alertbox)에 둔다. 진단 박스·확인 불가 슬롯 안내와 같은 규격이다.
+                회색 안내문(.secnote)은 영역 설명용이라 쓰지 않는다. 등급이 오류면 crit, 주의면 warn, 정보는 조치가 없어 두지 않는다.
+                닫을 수 없다(라이브러리 `조치 필요` 알림). 노드 재시작·GPU 교체는 콘체르토 화면에서 하는 일이 아니라 이동 버튼은 두지 않는다.
+                조치 안내는 응답이 가장 최근 코드에 대해 준다. 제목에 그 코드를 밝혀 어느 코드의 안내인지 가린다 */
+             const box = (v.act && v.g!=='정보')
+               /* 노드 재시작·GPU 리셋은 콘체르토에서 하지 않는다. 새 작업이 이 노드에 배치되지 않게 중지하는 것은 인프라 자원에서 한다
+                  (SET-INFRA-L01 REQ-SET-INFRA-014). 오류 등급일 때만 그 길을 붙인다 */
+               ? alertBox(v.g==='오류'? 'crit' : 'warn', xidName(v.last)+' 오류가 발생했습니다.', v.act, v.g==='오류'? infraBtn(nd.n) : '')
+               : '';
+             return box + '<dl class="dl">'
+               /* 표와 같은 순서 — 급한 등급 먼저, 같은 등급이면 가장 최근 코드 먼저 */
+               + xidOrder(v).map(function(c){
+                   const k = c==='*'? '*' : +c;
+                   const g = xidGrade(v,c);
+                   return '<dt>'+xidName(k)+'</dt><dd>'+sevBadge(g)+' '+v.cnt[c]+'건'
+                     + (xidDesc(k)? ' <span class="mver">'+xidDesc(k)+'</span>' : '')+'</dd>';
+                 }).join('')
+               + '</dl>';
+           })()
+         + '</div>'
+       : '')
     /* 표는 지금 값이고 패널은 추이다. 같은 71°C 라도 원래 그랬는지 방금 올랐는지에 따라
        판단이 갈린다 — 그것이 패널에 오는 이유다.
        ⚠ 슬롯 단위 시계열 조회 API 는 확인 대상(정책 7. 13번) */
@@ -4843,7 +5024,11 @@ function openSlot(nodeName, no){
           ? '<dl class="dl"><dt>배포</dt><dd><span class="dash">확인 불가</span></dd>'
             + (x.pod? '<dt>워크로드</dt><dd>'+x.pod+'</dd>' : '')
             + '</dl>'
-            + '<div class="secnote">등록되지 않은 워크로드가 점유하고 있습니다. 배포 화면에서 외부 배포로 가져오면 이름이 표시됩니다.</div>'
+            /* 슬롯 상태를 읽지 못한 경우(확인 불가)는 점유 배포도 모르는 것일 뿐 등록되지 않은 워크로드라는 뜻이 아니다.
+               안내와 가져오기 버튼은 사용 중인데 점유 배포를 모르는 슬롯에만 둔다 */
+            + (dead ? '' : '<div class="secnote">등록되지 않은 워크로드가 점유하고 있습니다. 배포 화면에서 외부 배포로 가져오면 이름이 표시됩니다.'
+            /* 가져오기는 최고 관리자 작업이다(배포 정책 9장). 다른 역할에게는 안내 문장만 남긴다 */
+            +   (isSuper()? goBtn('외부 배포 가져오기','배포 > 외부 배포 가져오기로 이동합니다.') : '')+'</div>')
           : '<div class="emptyline">이 슬롯을 쓰는 배포가 없습니다.</div>')
     + '</div>'
     /* 배포가 여러 장을 쓰면 나머지도 함께 봐야 한다 — 한 장만 보고는 판단이 안 선다 */
@@ -4856,7 +5041,7 @@ function openSlot(nodeName, no){
          + '</div>'
        : '')
     + (dead
-       ? alertBox('warn','상태를 읽지 못했습니다.','가속기가 응답하지 않거나 수집 에이전트가 끊긴 상태입니다. 노드를 확인해 주세요.')
+       ? alertBox('warn','상태를 읽지 못했습니다.','가속기가 응답하지 않거나 수집 에이전트가 끊긴 상태입니다. 노드를 확인해 주세요.', infraBtn(nd.n))
        : '');
   document.getElementById('slotPanel').classList.add('on');
 }
@@ -4904,6 +5089,13 @@ const COLDEF={
       +'<dt>유휴</dt><dd>점유한 배포가 없습니다.</dd>'
       +'<dt>확인 불가</dt><dd>상태를 읽지 못했습니다.</dd></dl>',
   dep:'이 슬롯을 쓰고 있는 배포입니다. 누르면 그 배포의 모니터링으로 이동합니다.',
+  /* 다른 열 도움말과 같은 꼴이다 — 첫 문장 `{대상}의 {무엇}입니다.`, 둘째 문장 표시 방식, 값별 뜻 한 문장씩.
+     등급 배지는 같은 화면 알림 규칙 심각도(sev)와 같은 값이라 뜻도 같은 문장을 쓴다(알림 정책 4.1).
+     무엇을 하면 되는지는 슬롯 패널의 조치 안내가 코드마다 따로 준다. 도움말에서 다시 풀지 않는다 */
+  xid:'NVIDIA GPU 드라이버가 보고한 오류의 코드와 등급입니다. 최근 5분 동안 발생한 것 중 가장 급한 코드와 전체 건수를 표시합니다.'
+      +'<dl><dt>오류</dt><dd>조치가 필요합니다.</dd>'
+      +'<dt>주의</dt><dd>지금은 동작하나 두면 문제가 됩니다.</dd>'
+      +'<dt>정보</dt><dd>알아 두면 됩니다. 조치가 필요 없습니다.</dd></dl>',
   /* 값 설명은 알림 정책 4.1 의 조치 필요 여부만 쓴다.
      4.1 의 `실패했거나 동작하지 않는다` 는 완료·실패 사건 기준이라
      임계값 초과를 감지하는 규칙 알림에는 맞지 않는다 */
@@ -4951,6 +5143,13 @@ function alertBox(kind,title,body,act){
 }
 
 /* 배포 상세로 가는 버튼 — 조치가 그 화면에서 이뤄지는 경우에 붙인다 */
+/* 다른 화면으로 가는 버튼 — 조치를 말했으면 갈 길을 준다(정책 1장 원칙 5). 라이브러리 `.aact` 규격.
+   인프라 자원·외부 배포 가져오기는 최고 관리자 화면이라 다른 역할에게는 두지 않는다(공통정책 7.10) */
+function goBtn(label,msg){
+  return '<div class="aact"><button class="btn ghost sm" onclick="act(\''+msg+'\')">'
+   + label+'<span class="ar">\u2192</span></button></div>';
+}
+function infraBtn(node){ return isSuper()? goBtn('인프라 자원에서 보기','플랫폼 설정 > 인프라 자원의 '+node+' 노드로 이동합니다.') : ''; }
 function goDepBtn(label){
   return '<div class="aact"><button class="btn ghost sm" onclick="act(\'' + dep + ' 상세로 이동합니다.\')">'
    + (label||'배포 상세로')+'<span class="ar">\u2192</span></button></div>';
@@ -5027,6 +5226,12 @@ function act(msg){ toast('ok',msg); }
 function setState(s,btn){
   state=s;
   if(btn){ document.querySelectorAll('#demoBar .st').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); }
+  render();
+}
+function setSrc(k,btn){
+  src=k;
+  document.querySelectorAll('#demoBar .sr').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
   render();
 }
 function setRole(r,btn){
