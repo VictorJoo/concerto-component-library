@@ -5,7 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>콘체르토 매니저 · 마이페이지 — 비밀번호 변경 모달</title>
 <!--
-  콘체르토 매니저 — 비밀번호 변경 모달 목업 v0.13 (2026-10-02)
+  콘체르토 매니저 · 비밀번호 변경 모달 목업 v0.14 (2026-10-20)
+
+  ── v0.14 (2026-10-20) ──
+  · 플랫폼 설정 플라이아웃을 5메뉴로 맞췄다(사용자 및 역할 · 보안 및 감사 · 인프라 자원 · 카탈로그 ·
+    연동 및 알림). 종전 4메뉴(외부 연동 · 알림 채널)가 남아 있었다(공통 레이아웃 REQ-CM-LAYOUT-013 ·
+    스크린 ID 규칙서 3.2). `RBAC` 배지와 플랫폼 설정 본문의 `사용자 및 역할(RBAC)` 표기는 내부 용어라 뺐다(공통정책 7.9). 플랫폼 설정 본문 설명도 5메뉴에 맞췄다. 공통 레이아웃 목업 v0.4와 같다.
+
   공통 레이아웃 v0.2 위에 '비밀번호 변경 모달'을 얹은 화면.
 
   ── v0.13 (CON-614) ──
@@ -254,10 +260,11 @@
       <div class="flywrap">
         <a href="#" class="has-fly" data-page="settings" onclick="return nav('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 00-1.7-1L15 3H9l-.4 2.6a7.6 7.6 0 00-1.7 1l-2.3-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 001.7 1L9 21h6l.4-2.6a7.6 7.6 0 001.7-1l2.3 1 2-3.4z"/></svg>플랫폼 설정</a>
         <div class="flyout">
-          <a href="#" class="on" onclick="return navSub('settings','사용자 및 역할')">사용자 및 역할 <span class="tb">RBAC</span></a>
+          <a href="#" class="on" onclick="return navSub('settings','사용자 및 역할')">사용자 및 역할</a>
           <a href="#" onclick="return navSub('settings','보안 및 감사')">보안 및 감사</a>
-          <a href="#" onclick="return navSub('settings','외부 연동')">외부 연동</a>
-          <a href="#" onclick="return navSub('settings','알림 채널')">알림 채널</a>
+          <a href="#" onclick="return navSub('settings','인프라 자원')">인프라 자원</a>
+          <a href="#" onclick="return navSub('settings','카탈로그')">카탈로그</a>
+          <a href="#" onclick="return navSub('settings','연동 및 알림')">연동 및 알림</a>
         </div>
       </div>
     </div>
@@ -384,8 +391,8 @@ var PAGES = {
     <div class="tabs"><span class="tab on">가속기 모니터링</span><span class="tab">오버뷰 대시보드</span><span class="tab">알림 규칙 탐색기</span></div>
     <div class="body-ph"><div><b>글로벌 모니터링</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
   settings: {crumb:'플랫폼 설정', sub:'사용자 및 역할', html:`
-    <div class="ph"><h1>플랫폼 설정</h1><p>글로벌 인프라 연결 및 시스템 전체 역할을 관리합니다.</p></div>
-    <div class="body-ph"><div><b>사용자 및 역할(RBAC)</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
+    <div class="ph"><h1>플랫폼 설정</h1><p>계정·권한·인프라 자원·카탈로그·연동을 관리합니다.</p></div>
+    <div class="body-ph"><div><b>사용자 및 역할</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
   mypage: {crumb:'마이페이지', sub:'기본 정보 수정', html:`
     <div class="ph"><h1>기본 정보 수정</h1><p>본인 계정 정보를 확인하고 수정합니다.</p></div>
     <div class="mp-form">
