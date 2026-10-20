@@ -5,7 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>콘체르토 매니저 · 마이페이지</title>
 <!--
-  콘체르토 매니저 · 마이페이지 화면 목업 v0.24 (2026-10-12)
+  콘체르토 매니저 · 마이페이지 화면 목업 v0.25 (2026-10-20)
+
+  ── v0.25 (2026-10-20) ──
+  · 플랫폼 설정 플라이아웃을 5메뉴로 맞췄다(사용자 및 역할 · 보안 및 감사 · 인프라 자원 · 카탈로그 ·
+    연동 및 알림). 종전 4메뉴(외부 연동 · 알림 채널)가 남아 있었다(공통 레이아웃 REQ-CM-LAYOUT-013 ·
+    스크린 ID 규칙서 3.2). `RBAC` 배지와 플랫폼 설정 본문의 `사용자 및 역할(RBAC)` 표기는 내부 용어라 뺐다(공통정책 7.9). 플랫폼 설정 제목 툴팁도 5메뉴에 맞췄다. 공통 레이아웃 목업 v0.4와 같다.
+
   · 컴포넌트 라이브러리 v0.2 색상 토큰에 맞춤. (: 라이브러리에 없던 레이아웃 전용 색 sidebar·flyout·border-soft·faint·active를 기존 라이브러리 토큰으로 치환 — 모든 색이 라이브러리 역할 토큰만 참조)
   · 치환 매핑: sidebar·header(크롬)→card(흰 크롬), flyout→card, border-soft→border, faint→muted-foreground, active(선택)→border, 메뉴 hover·칩→card-2(muted). 본문 캔버스만 background. 라이브러리 밖 색 제거.
   · 언어·테마 위치: 1안(프로필 팝오버) 확정 반영.
@@ -373,10 +379,11 @@
       <div class="flywrap">
         <a href="#" class="has-fly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 000-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 00-1.7-1L15 3H9l-.4 2.6a7.6 7.6 0 00-1.7 1l-2.3-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 001.7 1L9 21h6l.4-2.6a7.6 7.6 0 001.7-1l2.3 1 2-3.4z"/></svg>플랫폼 설정</a>
         <div class="flyout">
-          <a href="#" class="on">사용자 및 역할 <span class="tb">RBAC</span></a>
+          <a href="#" class="on">사용자 및 역할</a>
           <a href="#">보안 및 감사</a>
-          <a href="#">외부 연동</a>
-          <a href="#">알림 채널</a>
+          <a href="#">인프라 자원</a>
+          <a href="#">카탈로그</a>
+          <a href="#">연동 및 알림</a>
         </div>
       </div>
     </div>
@@ -457,8 +464,8 @@ var PAGES = {
     <div class="tabs"><span class="tab on">가속기 모니터링</span><span class="tab">오버뷰 대시보드</span><span class="tab">알림 규칙 탐색기</span></div>
     <div class="body-ph"><div><b>글로벌 모니터링</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
   settings: {crumb:'플랫폼 설정', sub:'사용자 및 역할', html:`
-    <div class="ph"><h1>플랫폼 설정${mpTip('플랫폼 전체에 적용되는 설정입니다. 저장소 연결, 계정과 역할, 알림 채널을 관리합니다.', true)}</h1></div>
-    <div class="body-ph"><div><b>사용자 및 역할(RBAC)</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
+    <div class="ph"><h1>플랫폼 설정${mpTip('플랫폼 전체에 적용되는 설정입니다. 계정·권한·인프라 자원·카탈로그·연동을 관리합니다.', true)}</h1></div>
+    <div class="body-ph"><div><b>사용자 및 역할</b>화면 구성은 화면정의서에서 정의합니다.<br>이 문서는 공통 레이아웃 전달용입니다.</div></div>`},
   mypage: {crumb:'마이페이지', html:`
     <div class="ph"><h1>마이페이지${mpTip('본인 계정 정보와 소속 워크스페이스를 확인합니다.', true)}</h1></div>
     <div class="mp-form">
