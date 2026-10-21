@@ -1,5 +1,17 @@
 <!--
-  콘체르토 매니저 · 워크스페이스 화면 목업 v0.60 (2026-10-19)
+  콘체르토 매니저 · 워크스페이스 화면 목업 v0.61 (2026-10-21)
+
+  ── v0.61 (2026-10-21) ──
+  · 분당 요청 수 한도 도움말(발급 모달 M01 · 한도 수정 모달 M02)에 인증을 끈 배포의 한도를 적었다.
+    `API Key 인증을 끈 배포에는 적용되지 않고, 그 배포에 정한 키 없는 요청 분당 한도가 적용됩니다.`
+    인증을 끈 배포는 키로 요청자를 식별하지 못해 키 한도 대신 배포 단위 한도로 막는다
+    (배포 정책 5.5 · 워크스페이스 정책 7장 · CON-866 9항). `적용되지 않습니다` 로 끝나면 한도가 아예 없는 것으로 읽힌다.
+  · 운영룸 배포 표의 키 열 머리글을 `접근 키` 에서 `API Key` 로 고쳤다(WKSP-L01 7.6 항목명 · 공통정책 1.1).
+  · 같은 열 값 규칙을 기획서 7.6 에 맞췄다. 배포의 API Key 인증이 꺼져 있으면 `인증 사용 안 함`,
+    켜져 있고 연결된 키가 없으면 `미등록`, 있으면 종전대로 첫 키 이름 + `외 N건`(WKSP-L01 7.6).
+    종전 목업은 키가 없을 때 `-` 를 보였다. `-` 는 인증을 끈 배포와 키를 아직 안 건 배포를 가르지 못한다(WKSP-L01 5.1).
+  · 데모 데이터에서 ai-service-team 의 `gpt-oss-120b-symphony` 를 인증 끔(auth:false)으로 두어(배포 목업 v0.36 과 같은 배포) 두 값이 함께 보이게 했다.
+    인증 켜짐/꺼짐 설정과 키 없는 요청 한도 입력은 배포 화면 소관이라 여기서는 표시만 한다(WKSP-L01 7.10).
 
   ── v0.60 (2026-10-19) ──
   · 운영룸 호출 주소를 `https://{호스트}/v1` 로 고쳤다(배포 정책 2.5 · WKSP-L01 v0.60 7.6).
@@ -1797,10 +1809,11 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <label>접근 허용 모델</label>
         <div class="mselect" id="kScope"></div>
       </div>
-      <!-- 사용 한도 — 발급할 때만 정한다. 발급 후 바꾸지 않는다(정책 7장).
-           적용 단위는 키가 접근하는 배포마다다. 인증을 끈 배포에는 걸리지 않는다(배포 정책 5.5) -->
+      <!-- 사용 한도 — 발급 시 정하고 발급 후에도 수정할 수 있다(정책 7장 수정 행 · 한도 수정 모달 M02).
+           적용 단위는 키가 접근하는 배포마다다. 인증을 끈 배포에는 걸리지 않고, 그 배포에 정한
+           키 없는 요청 분당 한도가 대신 적용된다(배포 정책 5.5 · CON-866 9항) -->
       <div class="f">
-        <label>분당 요청 수 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">키가 접근하는 배포마다 따로 적용됩니다. API Key 인증을 끈 배포에는 적용되지 않습니다.</span></span></label>
+        <label>분당 요청 수 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">키가 접근하는 배포마다 따로 적용됩니다. API Key 인증을 끈 배포에는 적용되지 않고, 그 배포에 정한 키 없는 요청 분당 한도가 적용됩니다.</span></span></label>
         <input class="inp" id="kRpm" inputmode="numeric" autocomplete="off" oninput="kLimInput('kRpm')" onblur="kLimBlur('kRpm')">
         <div class="hint">비우면 플랫폼 기본값이 적용됩니다.</div>
         <div class="errmsg" id="kRpmErr">1 이상의 정수를 입력해 주세요.</div>
@@ -1831,7 +1844,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     <div class="mdhead"><h3>사용 한도 수정</h3><p id="lmDesc"></p></div>
     <div class="mdbody">
       <div class="f">
-        <label>분당 요청 수 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">키가 접근하는 배포마다 따로 적용됩니다. API Key 인증을 끈 배포에는 적용되지 않습니다.</span></span></label>
+        <label>분당 요청 수 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">키가 접근하는 배포마다 따로 적용됩니다. API Key 인증을 끈 배포에는 적용되지 않고, 그 배포에 정한 키 없는 요청 분당 한도가 적용됩니다.</span></span></label>
         <input class="inp" id="lmRpm" inputmode="numeric" autocomplete="off" oninput="lmInput('lmRpm')" onblur="kLimBlur('lmRpm')">
         <div class="hint">비우면 플랫폼 기본값이 적용됩니다.</div>
         <div class="errmsg" id="lmRpmErr">1 이상의 정수를 입력해 주세요.</div>
@@ -2108,7 +2121,7 @@ const WS=[
   use:{cpu:44,ram:176,gpu:3},
   members:[{n:'성유진',id:'yj.seong',role:'관리자'},{n:'임승주',id:'sj.lim',role:'편집자'},{n:'유지현',id:'jh.yu',role:'뷰어'}],
   models:[{n:'llama-3.2-1b-instruct',st:'캐싱됨',use:'배포 중'},{n:'gemma-4-12b-it',st:'미캐싱',use:'배포 중'}],
-  deps:[{n:'llama-3-2-1b-prod',st:'정상',rep:'2 / 2',by:'성유진(yj.seong)'},{n:'gpt-oss-120b-symphony',st:'정상',rep:'4 / 4',by:'임승주(sj.lim)'},{n:'gemma-4-12b-it-idle',st:'유휴',rep:'0 / 2',by:'성유진(yj.seong)'},{n:'solar-open-100b-paused',st:'중지됨',rep:'0 / 1',by:'유지현(jh.yu)'}],
+  deps:[{n:'llama-3-2-1b-prod',st:'정상',rep:'2 / 2',by:'성유진(yj.seong)'},{n:'gpt-oss-120b-symphony',st:'정상',rep:'4 / 4',by:'임승주(sj.lim)',auth:false},{n:'gemma-4-12b-it-idle',st:'유휴',rep:'0 / 2',by:'성유진(yj.seong)'},{n:'solar-open-100b-paused',st:'중지됨',rep:'0 / 1',by:'유지현(jh.yu)'}],
   ext:[{n:'gpt-4o',prov:'OpenAI',st:'정상'},{n:'claude-sonnet-4-6',prov:'Anthropic',st:'정상'}],
   hfToken:true, hfTokenAt:'2026-07-14 10:20',
   cdes:[{u:'yj.seong',env:'Jupyter Lab',fw:'PyTorch (Furiosa)',acc:'Furiosa RNGD 2장',mode:'비동기 위임',
@@ -3370,9 +3383,12 @@ function keyLimitLabel(k){
 }
 /* 배포에 연결된 API Key — 키와 배포는 N:M이므로 여러 개가 걸릴 수 있다.
    목록 셀에는 첫 항목과 건수만 표기하고 전체는 API Key 탭에서 확인한다 */
+/* 값 규칙은 WKSP-L01 7.6 을 따른다. 인증을 끈 배포(auth:false)는 키를 받지 않으므로 `인증 사용 안 함`,
+   인증이 켜져 있고 연결된 키가 없으면 `미등록`. `-` 로는 두 경우를 가르지 못한다(WKSP-L01 5.1) */
 function keyLabel(m,d){
+  if(d.auth===false) return '<span class="dash">인증 사용 안 함</span>';
   const ks=(m.keys||[]).filter(function(k){ return !k.scope || k.scope.indexOf(d.n)>=0; });
-  if(!ks.length) return '<span class="dash">-</span>';
+  if(!ks.length) return '<span class="dash">미등록</span>';
   return ks[0].n + (ks.length>1? ' <span class="mver" style="margin:0">외 '+(ks.length-1)+'건</span>' : '');
 }
 
@@ -3499,11 +3515,12 @@ function roomTab(m){
           false)
       : '');
 
-  /* 배포 액션은 배포 화면 소관. 여기서는 상태만 보여준다 */
+  /* 배포 액션은 배포 화면 소관. 여기서는 상태만 보여준다
+     키 열 머리글은 WKSP-L01 7.6 항목명 `API Key` 를 쓴다(공통정책 1.1) */
   h+='<div class="dsec"><h4>배포 <span style="font-weight:400;color:var(--muted-foreground)">'+m.deps.length+'건</span>'
    + (m.deps.length?'<button class="btn ghost sm" style="margin-left:auto" onclick="act(\'배포 화면으로 이동합니다.\')">배포 화면으로 이동<span class="ar">→</span></button>':'')+'</h4>'
    + (m.deps.length
-     ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>모델</th><th>배포</th><th>상태</th><th>레플리카</th><th class="thcell">'+thHelp('dkey','접근 키')+'</th></tr></thead><tbody>'
+     ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>모델</th><th>배포</th><th>상태</th><th>레플리카</th><th class="thcell">'+thHelp('dkey','API Key')+'</th></tr></thead><tbody>'
        + m.deps.map(function(d){
            const md=(m.models.find(function(x){ return d.n.indexOf(x.n)===0; })||{}).n || '-';
            return '<tr><td>'+md+'</td><td><span class="rname">'+d.n+'</span></td>'
