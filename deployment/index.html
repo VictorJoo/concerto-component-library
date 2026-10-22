@@ -1,8 +1,17 @@
 <!--
-  콘체르토 매니저 · 배포 화면 목업 v0.36 (2026-10-21)
+  콘체르토 매니저 · 배포 화면 목업 v0.37 (2026-10-22)
   색·컴포넌트 규격은 워크스페이스 목업 v0.33 를 그대로 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
 
   ── 변경 ────────────────────────────────────────
+  ── v0.37 (2026-10-22) ──
+        · 판정 사유가 여럿일 때의 표시를 정했다(배포 정책 3.4 · DEP-L01 v0.37 7.2 · 7.6 · 모니터링 정책 5.2). 값은 백엔드 판정값이 정본이다.
+          패널 헬스 행은 한 줄 자리라 가장 심각한 사유와 `외 N건` 만 두고, 마우스를 올리면 전체를 보인다.
+          모니터링 탭은 헬스 카드 아래 전체 폭에 안내 박스를 둔다(주의 · 위험만). 박스 머리 줄 오른쪽 `사유 N건 모두 보기` 로
+          심각도 · 지표 · 현재 값 · 기준 · 집계(방식 · 창) 표를 그 자리에서 펼친다. 측정하지 못한 지표는 구분선 아래 한 줄.
+          순서는 백엔드가 보낸 순서(심각도 높은 순)다. 사유가 없으면(안정) 두지 않는다.
+          샘플 llama-3-2-1b-prod 를 위험 · 사유 셋 · 측정 못 한 지표 둘로, gpt-oss-120b-symphony 는 저활용 하나로 두었다.
+          모니터링 목업 v0.27 과 같은 배포 · 같은 값이다(검토용).
+
   ── v0.36 (2026-10-21) ──
         · 토큰 사용량 제한의 구분 헤더 기본값을 `X-Concerto-User-Id` 로, 최대 요청 크기 기본값을 50MB 로 정정했다
           (DEP-L01 7.3 · CON-866 3항 · 운영 가이드 v4.0 부록1 1.5).
@@ -1749,6 +1758,12 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .alertbox{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;margin-bottom:14px;
   border:1px solid var(--border);background:var(--muted)}
 .alertbox.info{border-color:color-mix(in srgb,var(--accent) 30%,transparent);background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.alertbox.rsbox{display:block;padding:14px 16px;margin-bottom:0}
+.rshead{display:flex;align-items:center;gap:8px;margin-bottom:10px}.rshead b{display:inline;margin:0}.rsbtn{margin-left:auto}
+.rsone{color:var(--foreground)} .rscnt{color:var(--muted-foreground);margin-left:4px}
+.rsmiss{margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;color:var(--muted-foreground)}
+.rstbl{border-collapse:collapse;font-size:12.5px}.rstbl th{text-align:left;font-weight:600;color:var(--muted-foreground);padding:5px 18px 5px 0;border-bottom:1px solid var(--border)}.rstbl td{padding:6px 18px 6px 0;color:var(--foreground)}.rstbl td.rsag{color:var(--muted-foreground)}
+.rssv{font-size:11.5px;font-weight:700}.rssv.cr{color:var(--destructive)}.rssv.wa{color:var(--warning)}
 .alertbox.warn{border-color:color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 8%,transparent)}
 .alertbox.crit{border-color:color-mix(in srgb,var(--destructive) 30%,transparent);background:color-mix(in srgb,var(--destructive) 7%,transparent)}
 .alertbox .aic{width:17px;height:17px;flex:0 0 auto;margin-top:1px}
@@ -2040,6 +2055,8 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   vertical-align:-2px;margin-right:7px}
 .btn.ghost .spin,.btn.danger-line .spin{border-color:var(--border);border-top-color:var(--muted-foreground)}
 @keyframes sp{to{transform:rotate(360deg)}}
+.rsmore{border-bottom:1px dotted currentColor;cursor:default;white-space:nowrap}
+.tip-anchor:hover .tip,.tip-anchor:focus-within .tip{display:block}
 </style><body class="dark">
 <div class="app">
 
@@ -2329,9 +2346,8 @@ const MODELS=[
 const DEPS=[
  {n:'llama-3-2-1b-prod', ws:'ai-service-team', model:'llama-3.2-1b-instruct', mver:'latest',
   type:'자체 배포', st:'정상', rep:2, tgt:2, acc:'nvidia-h200', gpu:1, topo:'단일',
-  owner:'성유진(yj.seong)', at:'2026-08-12 14:20', upd:'2026-08-12 17:20', health:'주의',
-  /* v0.36 · 판정 사유 검토용 값(모니터링 목업 v0.27 과 같은 배포) */
-  reasonText:'첫 토큰 지연 2.4초(기준 2초)',
+  owner:'성유진(yj.seong)', at:'2026-08-12 14:20', upd:'2026-08-12 17:20', health:'위험',
+  reasons:[{sv:'위험',k:'첫 토큰 지연',v:'6.1초',th:'5초',ag:'레플리카별 p95 중 최댓값 · 최근 5분',t:'첫 토큰 지연 6.1초(위험 기준 5초)'},{sv:'위험',k:'가속기 사용률',v:'97%',th:'95%',ag:'최근 5분 평균',t:'가속기 사용률 97%(위험 기준 95%)'},{sv:'주의',k:'토큰당 지연',v:'240ms',th:'200ms',ag:'p99 · 최근 5분',t:'토큰당 지연 240ms(주의 기준 200ms)'}], missing:['KV 캐시 사용률','가속기 온도'],
   ep:'https://gw.ai-service.concerto.io/v1',
   gw:true, host:'gw.ai-service.concerto.io', tls:true, auth:true, obs:true, keys:['lang-chain-agent-prod','batch-infer-key']},
 
@@ -2339,7 +2355,7 @@ const DEPS=[
   type:'자체 배포', st:'정상', rep:4, tgt:4, acc:'nvidia-h200', gpu:4, topo:'프리필·디코드 분리',
   owner:'임승주(sj.lim)', at:'2026-08-09 10:02', upd:'2026-08-09 13:02', health:'주의',
   /* v0.36 · 저활용 주의(모니터링 정책 5.2). 모니터링 목업과 같은 배포를 저활용 주의로 둔 검토용 값이다 */
-  hreason:'UNDER_UTILIZATION', reasonText:'저활용 — 건전성 점수 12(기준 70), 가속기 사용률 3%',
+  hreason:'UNDER_UTILIZATION', reasonText:'저활용 · 가속기 사용률 3%',
   ep:'https://gw.ai-service.concerto.io/v1',
   /* v0.36 · 인증 끔 분기를 보이기 위한 검토용 값이다. anon 은 키 없는 요청 분당 한도(배포 정책 5.5 · CON-866 9항) */
   gw:true, host:'gw.ai-service.concerto.io', tls:true, auth:false, anon:300, obs:true, keys:[]},
@@ -2406,7 +2422,30 @@ const SCOPE_41=false;
 const HB={'안정':'ok','주의':'wa','위험':'cr','-':'mu'};
 /* v0.36 · 판정 사유 한 줄 — 어떤 지표가 기준을 넘었는지를 실측값과 기준값으로 알린다(배포 정책 3.4 · DEP-L01 7.6).
    사유가 없으면(안정) 두지 않는다. 헬스 값의 뜻은 도움말(COLDEF.health)이 밝힌다 */
-function healthDesc(d){ return d.reasonText || ''; }
+/* 판정 사유 박스 — 주의 · 위험이면 헬스 카드 아래 전체 폭에 둔다(DEP-L01 7.6 · 모니터링 정책 5.2).
+   첫 줄은 가장 심각한 사유와 외 N건, 머리 줄 오른쪽 버튼으로 그 자리에서 표를 펼친다. 모달을 쓰지 않는다.
+   순서는 백엔드가 보낸 순서(심각도 높은 순), 값은 백엔드 판정값을 그대로 쓴다 */
+let rsOpen=false;
+function reasonBox(d){
+  const a=d.reasons||[];
+  if(!a.length || (d.health!=='주의' && d.health!=='위험')) return '';
+  const multi=a.length>1, sev=d.health==='위험'?'crit':'warn';
+  const miss=(d.missing&&d.missing.length)? '<div class="rsmiss">측정하지 못한 지표: '+d.missing.join(' · ')+'</div>' : '';
+  const body=(rsOpen&&multi)
+    ? '<table class="rstbl"><thead><tr><th>심각도</th><th>지표</th><th>현재 값</th><th>기준</th><th>집계</th></tr></thead><tbody>'
+      + a.map(function(r){ return '<tr><td><span class="rssv '+(r.sv==='위험'?'cr':'wa')+'">'+r.sv+'</span></td><td>'+r.k+'</td><td>'+r.v+'</td><td>'+r.th+' 초과</td><td class="rsag">'+(r.ag||'')+'</td></tr>'; }).join('')+'</tbody></table>'
+    : '<div class="rsone">'+a[0].t+(multi? ' <span class="rscnt">외 '+(a.length-1)+'건</span>' : '')+'</div>';
+  const btn=multi? '<button class="btn sm ghost rsbtn" onclick="rsOpen=!rsOpen;drawDetail()">'+(rsOpen?'접기':'사유 '+a.length+'건 모두 보기')+'</button>' : '';
+  return '<div class="alertbox '+sev+' rsbox"><div class="atx"><div class="rshead"><span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span><b>지표가 '+d.health+' 기준을 넘었습니다.</b>'+btn+'</div>'+body+miss+'</div></div>';
+}
+function healthDesc(d){
+  if(d.reasons && d.reasons.length){
+    const a=d.reasons;
+    if(a.length===1) return a[0].t;
+    return a[0].t+' <span class="tip-anchor" style="margin-left:2px"><span class="rsmore" tabindex="0">외 '+(a.length-1)+'건</span><span class="tip" style="left:auto;right:0;transform:none;width:280px;white-space:normal">'+a.map(function(r){return r.sv+' · '+r.t;}).join('<br>')+'</span></span>';
+  }
+  return d.reasonText || '';
+}
 /* v0.36 · 키 없는 요청 분당 한도(배포 정책 5.5 · CON-866 9항). 값이 없으면 기본 600 이다 */
 function anonOf(d){ return (d.anon===undefined||d.anon===null||d.anon==='') ? 600 : d.anon; }
 /* 1~1,000,000 사이 정수만 받는다. 소수·음수·문자는 오류다 */
@@ -2891,8 +2930,8 @@ function syncWsCtx(){
   if(cur && cur.d && wsBack===null) wsBack=wsCur;
   if(cur && cur.d && wsCur!==cur.d.ws){ wsCur=cur.d.ws; drawWsBtn(); }
 }
-function openDetailAt(i){ cur={d:DEPS[i],i:i}; view='detail'; dTab=0; closePanel(); syncWsCtx(); syncView(); drawDetail(); vwBtn(1); }
-function openDetail(){ if(!cur) return; view='detail'; dTab=0; closePanel(); syncWsCtx(); syncView(); drawDetail(); vwBtn(1); }
+function openDetailAt(i){ rsOpen=false; cur={d:DEPS[i],i:i}; view='detail'; dTab=0; closePanel(); syncWsCtx(); syncView(); drawDetail(); vwBtn(1); }
+function openDetail(){ if(!cur) return; rsOpen=false; view='detail'; dTab=0; closePanel(); syncWsCtx(); syncView(); drawDetail(); vwBtn(1); }
 /* 생성 완료·가져오기 완료·작성 취소 뒤 목록으로 — 스위처는 그대로 둔다(종전 동작) */
 function backToList(){ wsBack=null; view='list'; cur=null; syncView(); render(); vwBtn(0); }
 /* 상세에서 뒤로가기·브레드크럼으로 목록에 돌아올 때만 진입 전 범위로 되돌린다 */
@@ -3175,9 +3214,12 @@ function dMonitor(d){
       ? mv('헬스','<span class="stbadge mu">'+sb[0]+'</span>',sb[1],
            '배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 배포 상태와 다른 축입니다.')
       /* v0.36 · 부제 자리에 설명 문장을 둔다. 주의는 사유 코드가 있으면 사유 문장이다(모니터링 정책 5.2) */
-      : mv('헬스','<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>',healthDesc(d),
+      /* 아래 사유 박스가 있으면 카드에는 라벨만 둔다 — 같은 사유가 두 번 나오지 않게 */
+      : mv('헬스','<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>',(on && reasonBox(d))? '' : healthDesc(d),
            '배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 배포 상태와 다른 축입니다.'))
    + '</div>'
+   /* 주의 · 위험이면 카드 아래 전체 폭에 판정 사유 박스(모니터링 정책 5.2) */
+   + ((!sb && on)? '<div style="margin-top:12px">'+reasonBox(d)+'</div>' : '')
    /* 깊은 분석은 모니터링 화면 소관이다(현행 명세 5.2 오버뷰 대시보드).
       거기에는 게이트웨이·엔진·GPU 3계층 차트 9개와 인프라 건전성 점수가 있고
       배포를 골라 보는 드롭다운이 있다. 여기서는 이 배포가 지금 어떤지만 보여주고 넘긴다 */
