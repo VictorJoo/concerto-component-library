@@ -1,6 +1,23 @@
 <!--
-  콘체르토 매니저 — 모델 화면 목업 v0.35 (2026-10-14)
+  콘체르토 매니저 — 모델 화면 목업 v0.36 (2026-10-23)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다.
+
+  ── v0.36 (2026-10-23) ──
+  · 토크나이저 경로 힌트를 `입력하지 않으면 AIPerf 벤치마크 실행이 제한됩니다.` 로 정정했다(등록 · 버전 추가 두 곳).
+    LLMPerf는 토크나이저를 쓰지 않아 제한되지 않는다(MODEL-L01 REQ-MODEL-043 · 배포 정책 7.1 · CON-884 2026-10-22).
+  · 실패 사유 모달에 `실패한 노드` 행을 두었다. 캐싱 작업에만 둔다. 값은 작업 이력의 대상 노드(실패 행이면 실패한 노드)다
+    (MODEL-L01 5.3 `캐싱 일부 노드 실패` · 7.4 · CON-885 2026-10-22). 노드 이름은 쉼표로 잇는다.
+  · 작업 이력 표에 `대상 노드` 열을 버전 다음에 두었다. 캐싱 행만 노드 이름을 쉼표로 잇고 넘치면 말줄임 + 호버 전체(공통정책 1.2).
+    등록 · 빌드 · 캐시 삭제 행은 `-`. 사용자가 고르는 값이 아니라 기록이다(MODEL-L01 7.4 · REQ-MODEL-067 · CON-899 2026-10-23).
+    기존 캐싱 샘플은 노드 수에 맞춰 대상 노드를 채웠다(검토용 값).
+  · 캐싱 다시 시도는 실패한 노드를 대상으로 한다. 캐싱 단위는 노드 그룹이다(모델 정책 4.1 · 4.4).
+    전에는 이력의 노드 수만 남겨 캐싱되지 않은 노드를 앞에서부터 채웠다.
+  · 다시 시도 요청이 거절되면(이미 다시 시도했거나 다시 시도할 수 없는 작업) 실패 토스트를 띄우고 작업 이력을 다시 불러온다.
+    새 행은 쌓지 않는다(MODEL-L01 5.3 · CON-885).
+  · 샘플: qwen3-32b v3.1 에 실패한 캐싱 1건(gpu-group-01 의 두 노드)을 두었다. 검토용 값이다.
+    데모 바 `바로 보기 › 실패한 캐싱` 으로 실패 사유 모달을 바로 열고, `다시 시도 요청: 접수 / 거절` 을 누르면 그 작업 이력으로 바로 가
+    실패 행의 `다시 시도` 로 접수 · 거절 분기를 본다. 데이터 상태 · 목록 행 단위와 무관하게 보이고, 뷰어면 편집자로 바꿔 보인다.
+    둘 다 실제 화면에는 없는 검토용 처리다.
 
   ── v0.35 (2026-10-14) ──
   · 평가 탭에 결과를 만든 개발룸이 삭제된 표본 1건을 두었다(qwen3-32b · code · v3.1 · 실패).
@@ -90,7 +107,7 @@
     빌드 중·캐싱 중에 정한 기준과 같다.
     기획서 7.3 실행 액션 비고와 8장 점검 항목도 `비활성 + 사유` 로 맞췄다(MODEL-L01 v0.34).
   · 상세에 세 번째 탭 `작업 이력`(MODEL-L01.D01.T03)을 두었다. 등록·빌드·캐싱 작업을 쌓는다(모델 정책 4.4).
-    열: 종류 · 상태 · 버전 · 시작일시 · 종료일시 · 실패 사유 · 경로·출처 · 작업(기획서 7.4 · 공통정책 2.2).
+    열: 종류 · 상태 · 버전 · 대상 노드 · 시작일시 · 종료일시 · 실패 사유 · 경로·출처 · 작업(기획서 7.4 · 공통정책 2.2). 대상 노드는 v0.36.
     - 상태는 진행 중 · 완료 · 실패 배지다. 작업 결과 원천값은 아직 없다 — 이력 API 통지 후 맞춘다.
     - 실패 사유는 말줄임으로 두고 툴팁에 두지 않는다. 실패 행을 누르면 실패 사유 모달
       (MODEL-L01.D01.T03.M01)이 열린다. 배포 실행 이력과 같은 규격이다(배포 정책 7.2).
@@ -1044,7 +1061,7 @@ td.regcell .prog{min-width:220px}
       <div class="f" id="rTokRow">
         <label>토크나이저 경로</label>
         <input class="inp" id="rTok" placeholder="llama-3.2-1b/tokenizer.json">
-        <div class="hint">입력하지 않으면 벤치마크 실행이 제한됩니다.</div>
+        <div class="hint">입력하지 않으면 AIPerf 벤치마크 실행이 제한됩니다.</div>
       </div>
       <div class="f">
         <label>설명</label>
@@ -1106,7 +1123,7 @@ td.regcell .prog{min-width:220px}
       <div class="f" id="vTokRow" style="margin-bottom:0">
         <label>토크나이저 경로</label>
         <input class="inp" id="vTok" placeholder="llama-3.2-1b/tokenizer.json">
-        <div class="hint">입력하지 않으면 벤치마크 실행이 제한됩니다.</div>
+        <div class="hint">입력하지 않으면 AIPerf 벤치마크 실행이 제한됩니다.</div>
       </div>
       <details class="adv" id="vLin"></details>
     </div>
@@ -1266,7 +1283,12 @@ td.regcell .prog{min-width:220px}
     <button onclick="demoGo('evalfail')">실패한 평가</button>
     <button onclick="demoGo('evalgone')">개발룸 삭제된 평가</button>
     <button onclick="demoGo('jobs')">작업 이력·다시 시도</button>
+    <button onclick="demoGo('cachefail')">실패한 캐싱</button>
     <button onclick="demoGo('cmp')">이전 버전 비교</button></span>
+  <!-- 검토용: 다시 시도 요청 거절 분기. 실제 화면에는 없다 -->
+  <span class="dgrp"><span class="demo-label">다시 시도 요청:</span>
+    <button class="rj on" onclick="setRetryRej(false,this)">접수</button>
+    <button class="rj" onclick="setRetryRej(true,this)">거절</button></span>
   <span class="dgrp"><span class="demo-label">등록 진입:</span>
     <button class="rg on" onclick="demoReg('direct',this)">직접 등록</button>
     <button class="rg" onclick="demoReg('job',this)">작업 산출물</button></span>
@@ -1383,10 +1405,11 @@ const WGT=[
   arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'}}
 ];
 /* 작업 이력(모델 정책 4.4). 모델 단위로 쌓는다. 키는 `탭:모델명`.
-   kind 등록·빌드·캐싱 / res 진행 중·완료·실패 / src 는 등록 작업의 소스 경로만 / np 는 캐싱한 노드 수(다시 시도 입력).
+   kind 등록·빌드·캐싱 / res 진행 중·완료·실패 / src 는 등록 작업의 소스 경로만 / np 는 캐싱한 노드 수 / nodes 는 캐싱 대상 노드(v0.36).
    등록됨인 가중치는 버전마다 등록 완료가 한 건 이상 있다. 빌드됨이면 빌드 완료가, 캐싱된 이미지는 캐싱 완료가 있다.
    Official Base 이미지는 등록 작업을 거치지 않아 캐싱 이력만 쌓인다 */
-const J=function(kind,v,st,et,res,why,src,np){ return {kind:kind,v:v,st:st,et:et,res:res,why:why||'',src:src||'',np:np||0}; };
+/* nodes 는 캐싱 작업의 대상 노드다. 실패 행이면 실패한 노드, 진행·완료 행이면 캐싱 노드(CON-885 target_nodes) */
+const J=function(kind,v,st,et,res,why,src,np,nodes){ return {kind:kind,v:v,st:st,et:et,res:res,why:why||'',src:src||'',np:np||0,nodes:nodes||null}; };
 const JOBS={
  'B:gpt-oss-20b':[
    J('등록','1.0.0','2026-04-15 10:58:00','2026-04-15 11:01:12','완료','','s3://concerto-models/gpt-oss-20b'),
@@ -1425,7 +1448,9 @@ const JOBS={
    J('캐싱','1.0.0','2026-06-01 13:15:00','2026-06-01 13:26:44','완료','','',3)],
  'A:qwen3-32b':[
    J('캐싱','v3.6','2026-08-01 09:20:00','2026-08-01 09:33:15','완료','','',3),
-   J('캐싱','v3.2','2026-06-11 15:50:00','2026-06-11 16:02:48','완료','','',3)]
+   J('캐싱','v3.2','2026-06-11 15:50:00','2026-06-11 16:02:48','완료','','',3),
+   /* v0.36 · 실패한 캐싱 검토용 샘플. 노드 그룹 gpu-group-01 의 두 노드에서 실패했다(모델 정책 4.1). v3.1 은 미캐싱이다 */
+   J('캐싱','v3.1','2026-10-20 14:05:12','2026-10-20 14:11:40','실패','이미지를 노드에 내려받지 못했습니다.','',2,['gpu-svr','gpu-svr-02'])]
 };
 const NODES=[
  {n:'furiosa',acc:'rngd',cpu:'128',mem:'1,007 GB',cached:true,grp:'npu-group-01'},
@@ -2088,11 +2113,34 @@ function closeDetail(){
 function setDTab(i){ dTab=i; drawDetail(); }
 /* 데모 바 `바로 보기` — 검토용. 평가 탭은 qwen3-32b(ko-general v3.6·v3.2·v3.1과 long-context 실행 중·실패),
    작업 이력은 원천 가중치 solar-open-100b(빌드 실패 → 다시 시도)를 연다 */
+/* 검토용: 다시 시도 요청 거절 분기(기획서 5.3). 실제 화면에는 없다 */
+let RETRY_REJ=false;
+function setRetryRej(on,btn){
+  RETRY_REJ=on;
+  document.querySelectorAll('#demoBar .rj').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  /* 검토용: 누르면 다시 시도할 수 있는 실패 행이 있는 작업 이력(qwen3-32b)으로 바로 간다. 실제 화면에는 없는 검토용 처리다 */
+  /* 뷰어에게는 다시 시도가 없어(7.10) 분기를 볼 수 없다. 편집자로 바꿔 보인다 */
+  if(role==='viewer') setRole('editor');
+  if(tab!=='A') setTab('A');
+  if(state!=='default') setState('default');
+  const i=IMG.findIndex(function(x){ return x.n==='qwen3-32b'; }); if(i<0) return;
+  openDetail(i); setDTab(2);
+  const b=[...document.querySelectorAll('.tbl button')].find(function(x){ return x.textContent.trim()==='다시 시도'; });
+  if(b) b.scrollIntoView({block:'center'});
+}
 function demoGo(k){
   const isA = k!=='jobs', name = isA? 'qwen3-32b' : 'solar-open-100b';
   if(tab!==(isA?'A':'B')) setTab(isA?'A':'B');
   if(state!=='default') setState('default');
   const i=(isA?IMG:WGT).findIndex(function(x){ return x.n===name; }); if(i<0) return;
+  /* 실패한 캐싱 — qwen3-32b 작업 이력에서 v3.1 실패 행의 실패 사유를 연다 */
+  if(k==='cachefail'){
+    openDetail(i); setDTab(2);
+    const jj=JOBS['A:qwen3-32b'].findIndex(function(j){ return j.kind==='캐싱' && j.res==='실패'; });
+    if(jj>=0) openJobFail('A:qwen3-32b', jj);
+    return;
+  }
   openDetail(i); setDTab(isA?3:2);
   /* 이전 버전 비교가 보이는 결과(ko-general v3.6, 직전 v3.2) */
   if(k==='cmp'){ openEval('A:qwen3-32b', EVALS['A:qwen3-32b'].findIndex(function(e){ return e.suite==='ko-general' && e.v==='v3.6'; })); return; }
@@ -2271,6 +2319,14 @@ function canRetry(j, list, m){
 /* 이력 표다. 행 작업은 더보기 메뉴가 아니라 버튼으로 둔다. 배포 실행 이력·감사 로그와 같은 규격(기획서 7.4).
    실패 사유는 툴팁에 두지 않는다. 툴팁은 항목 설명에 쓰고, 그 건에 무슨 일이 있었는지는
    실패 행을 눌러 모달로 본다(배포 정책 7.2 · 라이브러리 구분 기준) */
+/* 캐싱 작업의 대상 노드 이름(v0.36 · 기획서 7.4). 이력에 대상 노드가 없는 샘플은 노드 수로 채운다(검토용 값).
+   노드 그룹 단위라 2대는 gpu-group-01, 1대는 npu-group-01 로 둔다(모델 정책 4.1) */
+function jobNodes(j){
+  if(j.kind!=='캐싱') return null;
+  if(j.nodes&&j.nodes.length) return j.nodes;
+  const by={1:['furiosa'],2:['gpu-svr','gpu-svr-02'],3:['furiosa','gpu-svr','gpu-svr-02']};
+  return by[j.np]||null;
+}
 function jobTab(m, isA, jobs){
   /* 로딩은 영역 크기를 유지한다(기획서 6장) */
   if(state==='loading' || jobLoading)
@@ -2284,7 +2340,7 @@ function jobTab(m, isA, jobs){
     .sort(function(a,b){ return String(b.j.st).localeCompare(String(a.j.st)); });
   const key=jobKey(m,isA);
   return '<div class="tblwrap"><table class="tbl"><thead><tr>'
-    + '<th>종류</th><th class="thcell">'+thHelp('jres','상태')+'</th><th>버전</th><th>시작일시</th><th>종료일시</th>'
+    + '<th>종류</th><th class="thcell">'+thHelp('jres','상태')+'</th><th>버전</th><th>대상 노드</th><th>시작일시</th><th>종료일시</th>'
     + '<th>실패 사유</th><th>경로·출처</th><th style="width:96px">작업</th>'
     + '</tr></thead><tbody>'
     + order.map(function(o){
@@ -2292,7 +2348,10 @@ function jobTab(m, isA, jobs){
         return '<tr'+(fail? ' onclick="openJobFail(\''+key+'\','+o.i+')" style="cursor:pointer"' : ' style="cursor:default"')+'>'
          + '<td>'+j.kind+'</td>'
          + '<td><span class="stbadge '+JOBB[j.res]+'"><span class="d"></span>'+j.res+'</span></td>'
-         + '<td>'+j.v+'</td><td>'+j.st+'</td><td>'+dv(j.et)+'</td>'
+         + '<td>'+j.v+'</td>'
+         /* 대상 노드는 캐싱 행만. 넘치면 말줄임 + 호버 전체(공통정책 1.2). 그 외 `-` */
+         + (function(){ const ns=jobNodes(j); return '<td>'+(ns? '<span class="usecell" style="max-width:200px" title="'+ns.join(', ')+'">'+ns.join(', ')+'</span>' : '<span class="dash">-</span>')+'</td>'; })()
+         + '<td>'+j.st+'</td><td>'+dv(j.et)+'</td>'
          /* 장문은 말줄임(공통정책 1.2). 전체는 실패 사유 모달에서 본다 */
          + '<td>'+(j.why? '<span class="usecell" style="max-width:240px">'+j.why+'</span>' : '<span class="dash">-</span>')+'</td>'
          /* 경로·출처는 등록 작업의 소스 경로만. 빌드·캐싱은 `-`. 목록의 같은 이름 열과 같은 처리(1.2) */
@@ -2315,7 +2374,10 @@ function openJobFail(key, i){
   document.getElementById('jfBody').innerHTML='<div class="sec"><dl class="dl">'
     + '<dt>종류</dt><dd>'+j.kind+'</dd><dt>버전</dt><dd>'+j.v+'</dd>'
     + '<dt>시작일시</dt><dd>'+j.st+'</dd><dt>종료일시</dt><dd>'+dv(j.et)+'</dd>'
-    + '<dt>실패 사유</dt><dd>'+dv(j.why)+'</dd></dl></div>';
+    + '<dt>실패 사유</dt><dd>'+dv(j.why)+'</dd>'
+    /* 캐싱 작업에만 둔다. 어느 노드에서 실패했는지 보여야 다시 시도 대상을 안다(기획서 5.3 · 7.4) */
+    + (j.kind==='캐싱'? '<dt>실패한 노드</dt><dd>'+(jobNodes(j)? jobNodes(j).join(', ') : '<span class="dash">-</span>')+'</dd>' : '')
+    + '</dl></div>';
   const can=canRetry(j, JOBS[key], jobOwner(key));
   document.getElementById('jfFoot').innerHTML='<button class="btn ghost" onclick="closeJobFail()">닫기</button>'
     + (can? '<button class="btn" onclick="closeJobFail();retryJob(\''+key+'\','+i+')">다시 시도</button>' : '');
@@ -2328,15 +2390,24 @@ function retryJob(key, i){
   const isA=key.indexOf('A:')===0, name=key.slice(2);
   const m=(isA?IMG:WGT).find(function(x){ return x.n===name && x.v===j.v; }) || (isA?IMG:WGT).find(function(x){ return x.n===name; });
   if(!m) return;
+  /* 거절 — 목록이 오래된 사이 다른 사용자가 다시 시도했거나 실패 상태가 아니다. 새 행 없이 이력을 다시 불러온다(기획서 5.3) */
+  if(RETRY_REJ){
+    toast('cr','이미 다시 시도했거나 다시 시도할 수 없는 작업입니다. 작업 이력을 다시 불러왔습니다.');
+    jobLoading=true; drawDetail();
+    setTimeout(function(){ jobLoading=false; refresh(); }, 600);
+    return;
+  }
   toast('ok','다시 시도를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.');
   jobLoading=true; drawDetail();
   setTimeout(function(){
     jobLoading=false;
-    /* 처음과 같은 입력으로 다시 실행한다(모델 정책 4.4). 버전과 캐싱 노드 수를 이력에서 가져온다 */
+    /* 처음과 같은 입력으로 다시 실행한다(모델 정책 4.4). 캐싱은 실패한 노드를 대상으로 한다 */
     if(j.kind==='등록') startImport(m);
     else if(j.kind==='빌드') build(m.n, true, j.v);
     else if(j.kind==='캐시 삭제') runCdel(m);
-    else runCache(m, j.np||1);
+    else runCache(m, j.nodes&&j.nodes.length
+      ? NODES.map(function(nd,i){ return j.nodes.indexOf(nd.n)>=0? i : -1; }).filter(function(i){ return i>=0; })
+      : (j.np||1));
     refresh();
   }, 600);
 }
@@ -3122,7 +3193,8 @@ function submitCache(){
   runCache(m, picked);
 }
 /* 캐싱 실행 — 작업 이력에 쌓는다(모델 정책 4.4). 다시 시도에서도 부른다 */
-/* picked 는 고른 노드 번호 목록이다. 다시 시도에서는 이력의 노드 수만 있어 캐싱되지 않은 노드부터 채운다 */
+/* picked 는 고른 노드 번호 목록이다. 다시 시도는 이력의 대상 노드(실패한 노드)를 넘긴다(v0.36).
+   대상 노드가 없는 이력은 노드 수만 있어 캐싱되지 않은 노드부터 채운다 */
 function runCache(m, picked){
   if(typeof picked==='number'){
     const n=picked, rest=NODES.map(function(nd,i){ return i; }).filter(function(i){ return !nodeCached(m,i); });
@@ -3130,6 +3202,7 @@ function runCache(m, picked){
   }
   m.ready='캐싱 중';
   const j=logJob(m, true, '캐싱', m.v, '', picked.length);
+  j.nodes=picked.map(function(i){ return NODES[i].n; });  /* 대상 노드 기록(v0.36) */
   refresh();
   setTimeout(function(){
     endJob(j);
