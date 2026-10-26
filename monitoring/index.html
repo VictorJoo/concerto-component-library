@@ -1,7 +1,95 @@
 <!--
-  콘체르토 매니저 — 모니터링 목업 v0.27 (2026-10-22)
+  콘체르토 매니저 — 모니터링 목업 v0.28 (2026-10-23)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다 —
   필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
+
+  ── v0.28 (2026-10-23) ──────────────────────
+  노드 그룹 검토 문서(3493134511) 시안 2 를 반영했다. 회신 2026-10-22 · 2026-10-23 기준이다.
+  · 이름은 `노드 그룹` 이다(2026-10-23 회신). 배포 생성 위저드에 서빙 풀 · 프리필 풀 · 디코드 풀이 있어 `풀` 을 쓰지 않는다.
+    라벨이 없는 노드는 묶음 제목 `노드 그룹 미지정`, 표 열 값 `미지정` 으로 두고 맨 뒤에 둔다(노드 그룹 검토 문서 4.5 · 회신 3492806946 ③).
+    이 화면에는 노드 그룹 열이 있는 표가 없어 `미지정` 은 쓰이지 않는다.
+  · 전체 가속기 카드 안 분해를 `가속기 모델별` / `노드 그룹별` 로 전환한다. 기본은 가속기 모델별이다(v0.28 검토에서 바꿈).
+    노드 그룹별은 그룹마다 카드(이름 · 설명 · 사용률 · 사용 / 전체 · 막대 · 노드 수 · 이상)다. 카드 폭 200px 고정,
+    한 줄에 들어가는 만큼(영역 폭으로 계산) 보이고 나머지는 `N개 노드 그룹 더 보기`. 정렬은 사용률 내림차순, 미지정은 맨 뒤.
+    막대 행 형식과 형식 전환은 두지 않는다(시안 통합본 검토, 카드형으로 결정).
+  · 그룹 카드를 누를 때마다 그 그룹을 더하고 뺀다. 여러 개 고르면 고른 그룹 노드가 모두 나온다(OR · 공통정책 3.2).
+    노드 제목 줄 `전체 노드 보기` 로 한 번에 푼다. 가속기 모델별 막대도 같다.
+  · 노드 카드를 그룹별 구획으로 묶는다. 구획 머리는 펼침 화살표 · 이름 · 노드 수 · 이상 · `펼치기` / `접기`(노드가 둘을 넘을 때).
+    구획 머리를 누르면 그 구획을 접고 편다(노드 그룹 검토 문서 4.2 `풀별 접이 구획` · 4.4 `풀 단위로 접음`). 기본은 구획 펼침이다(4.5).
+    노드 제목 줄 `모두 접기` / `모두 펼치기` 는 그룹 층이 있으면 구획에 건다. 모두 접으면 구획 머리만 남아 노드 그룹이 한눈에 보인다.
+    구획 머리 `펼치기` / `접기` 는 그 구획 노드의 슬롯 표에 건다.
+  · 이상 N 은 상태값이 아니라 개수라 상태 배지를 쓰지 않는다. 경고 아이콘 + 오류 색 글자로 노드 수 옆에 두고 0건이면 숨긴다
+    (노드 그룹 검토 문서 4.5 · 공통정책 5.1). 연결 불가 · 사라짐만 센다. 점검 · 중지는 의도된 상태라 넣지 않는다(모니터링 정책 4.5).
+  · 노드 그룹이 0~1개면 그룹 층 없이 v0.27 화면 그대로다. 미지정을 뺀 노드 그룹이 둘 이상일 때만 층을 둔다.
+  · 기본 상태는 구획 펼침 · 노드 접힘이다. 가속기 탭에 다시 들어오면(탭 이동 · 역할 전환) 그룹 선택 · 펼친 노드 · 분해 전환 · 더 보기가 기본으로 돌아간다.
+  · 최고 관리자 외 역할은 전체 가속기 카드가 없어 `노드 그룹별` 카드가 없다. 구획 머리에 사용률 대신 `가속기 N장 사용` 을 두고 이상은 두지 않는다(모니터링 정책 4.4).
+  · 샘플은 노드 그룹 3개(serving-gpu · dev-gpu · serving-npu) · 가속기 노드 10대다. v0.27 노드 5대에 5대를 더했다. 검토용 값이며
+    클러스터 장 수가 v0.27 · 홈 목업보다 늘었다.
+  · 하단 데모 바 `노드 그룹` 으로 3개 · 노드 10대 / 12개 · 노드 46대(미지정 2대 포함) / 없음(0~1개)을 바꾼다. 누르면 가속기 탭으로 옮기고
+    최고 관리자가 아니면 역할을 최고 관리자로 바꾼다. 검토용 처리이며 실제 화면에는 없다.
+  · 개요 확인 필요 항목을 셋까지 보이고 나머지는 `더 보기` 로 둔다. 개요 높이를 숫자 카드 기준으로 두어 확인 필요 항목이 길어질 때
+    숫자 카드가 같이 늘어나 아래가 비던 문제를 줄인다(노드 그룹 검토 문서 5장 별건 제안, 이 판에서 정식 반영).
+  · 구획 `노드 모두 펼침` 을 묶음의 노드가 둘을 넘을 때만 둔다. 노드 제목 줄 `모두 펼침` 도 같은 기준으로 고쳤다(REQ-MON-026 · REQ-MON-079).
+    전에는 둘 이상에서 보였다.
+  · 건전성 판정 사유를 모니터링 정책 5.2 새 기준으로 바꿨다. 기준값은 알림 규칙 임계값(배포 · 워크스페이스 · 전역 순)이고 없으면 기본 임계다.
+    샘플 사유에서 건전성 점수 사유와 이전 기준값을 뺐다. llama-3-2-1b-prod 사유 넷(위험 하나 · 주의 셋)은 기준표로 만든 검토용 값이다.
+    펼친 사유 표 끝에 `기준 출처` 열(배포 규칙 · 워크스페이스 규칙 · 전역 규칙 · 기본값)을 더했다. 기준 열은 `{기준값} 이상` 으로 쓴다(REQ-MON-044).
+    안정 배포도 측정하지 못한 지표가 있으면 라벨 아래 한 줄로 둔다(REQ-MON-044).
+  · MIG 배포 llama-3-8b-mig(안정, 측정하지 못한 지표 하나)를 더했다. 인프라 계층 제목 줄에 `부모 GPU 전체(MIG 개별 아님)` 를 한 번 둔다.
+    카드마다 두지 않는다. 다른 배포에는 없다(모니터링 정책 5.1 · REQ-MON-052).
+  · gpu-svr-05 슬롯 3 을 MIG 로 나눈 GPU 로 바꿨다. 부모 GPU 행(왼쪽 펼침 화살표, 기본 접힘)에 가속기 이름 · `MIG 인스턴스 3개` · 전체 VRAM ·
+    온도 · 전력을 두고, 펼치면 인스턴스 행 3-1 · 3-2 · 3-3(`NVIDIA-H200 MIG`)이 나온다. 인스턴스 행 온도 · 전력 · Xid 칸은 `-` 가 아니라 비운다.
+    장 수 집계(요약 · 모델별 · 노드 막대)는 부모를 빼고 인스턴스를 센다. 분할 크기는 쓰지 않는다(모니터링 정책 4.1 · 4.3 · MON-L01 7.1 · REQ-MON-080).
+    슬롯 패널은 인스턴스의 온도 · 전력 차트를 두지 않는다.
+  · 알림 규칙 목록에서 전역에 연결된 시스템 기본 규칙 복제본에 `전역 기본` 배지를 둔다(REQ-MON-084). 샘플은 ml-research 복제본 넷 중
+    셋이 연결, `가속기 온도 주의` 하나가 임계값을 고쳐 연결이 풀린 상태다. 건전성 기준 출처 샘플에 맞춰 배포 · 워크스페이스 · 전역 규칙 하나씩을 더했다.
+  · 메트릭 목록에 `건전성 반영` 분류 배지를 둔다(REQ-MON-081). 건전성 반영 메트릭의 표준 임계값을 기본 임계로 맞추고 빠진 메트릭을 더했다.
+    조건 아래에 주의 기준 · 위험 기준 안내를 두고 임계값을 바꾸면 다시 계산한다. 초과형은 2배, 여유형은 남은 여유의 절반이다(REQ-MON-082).
+    조건이 초과이고 심각도가 오류 · 주의인 규칙에만 둔다. 정보 · 미만 규칙은 알림만 보낸다(모니터링 정책 6.3).
+  · 같은 워크스페이스 · 대상 범위 · 메트릭 · 심각도의 건전성 반영 규칙이 있으면 저장하지 않고 메트릭 아래 인라인 에러와 포커스를 둔다.
+    메트릭 · 심각도 · 대상 범위를 바꾸면 지운다(REQ-MON-083 · MON-L01 5.2).
+  · 전역 기본 규칙 수정 모달 맨 위와 중지 확인 알럿에 연결이 풀린다는 안내를 둔다. 값을 바꿔 저장하거나 중지하면 배지를 지운다(MON-L01 5.2).
+  · 가속기 모델별 막대를 누르면 슬롯을 그 가속기 모델로 좁힌다. 그 가속기 모델 슬롯이 있는 노드만 남기고 자동으로 펼치며,
+    슬롯 표에는 그 가속기 모델 슬롯만 둔다. 노드 그룹 카드는 노드를 좁히고 접힌 채 두는 것과 다르다 — 노드 그룹은 노드의 속성,
+    가속기 모델은 슬롯의 속성이라서다(노드 하나에 가속기 모델이 섞일 수 있다). 슬롯 상태 필터와 함께 걸리고, 다시 누르거나
+    노드 제목 줄 `전체 노드 보기` 로 푼다. 전환을 바꾸면 고른 노드 그룹 · 가속기 모델을 푼다. 선택 표시는 노드 그룹 카드와 같다.
+  · `모두 펼침` 체크박스를 텍스트 버튼 하나로 바꿨다. 하나라도 접혀 있으면 `모두 펼치기`, 모두 펼쳐져 있으면 `모두 접기`다.
+    체크박스는 고르는 데 쓰는 것이라 노드 카드 위에서 전체 선택으로 읽히고, 체크를 풀면 접힌다는 것이 드러나지 않았다.
+    노드 그룹 묶음 머리는 `펼치기` ↔ `접기` 로 `모두` 를 뺀다. 노드 제목 줄 버튼(전체)과 라벨로 범위를 가른다. 가속기 모델을 고른 동안에는 노드가 모두 펼쳐져 있어 두지 않는다.
+  · 확인 필요 항목 `N건 더 보기` 위 선이 두 줄로 보이던 것을 고쳤다. 마지막 항목 구분선과 더 보기 점선이 겹쳤다.
+  · 하단 데모 바 `v0.28 확인` 으로 MIG 배포 성능 · MIG 슬롯 펼침 · 가속기 모델 선택 · 중복 규칙 저장 · 전역 기본 규칙 수정을 바로 연다. 검토용 처리이며 실제 화면에는 없다.
+  · 점검 결과를 반영했다(2026-10-26).
+    전역 규칙(공용 워크스페이스 규칙)은 최고 관리자만 만들고 고친다. 그 외 역할에는 공용 규칙의 작업 메뉴와 폼의 공용 선택지,
+    스위처로 공용을 고른 상태의 `규칙 추가` 를 두지 않는다. 목록 조회는 그대로다(모니터링 정책 6.1 · 6.4 · REQ-MON-067 · 075 · 공통정책 7.10).
+    뷰어에게는 알림 규칙 표의 작업 열을 두지 않는다(공통정책 7.10).
+    워크스페이스 할당량 데모 값을 사용보다 크게 고치고 `NVIDIA-H200 MIG` 행을 더했다. 사용이 할당을 넘어 잔여가 음수로 나왔다(배포 정책 4.2).
+    ai-service-team 이 8장에서 16장, ml-research 는 종류만 바뀌어 10장 그대로다. 홈 목업 워크스페이스 자원은 다음 갱신 때 맞춘다.
+    배포 성능 지표 카드의 양호 · 주의 칩을 판정 사유에서 가져온다. 화면 자체 기준([가안])으로 판정해 사유와 반대로 나왔다(정책 5.2 사유가 정본).
+    측정하지 못한 지표의 카드는 `-` 로 둔다(정책 1장 원칙 4). llama-3-2-1b-prod 카드 값을 사유와 맞추고, 저활용 배포의 처리량을 0으로 고쳤다.
+    판정 사유 상자 머리를 `지표가 기준을 벗어났습니다.` 로 바꿨다. 저활용(미달)도 같은 문장이다(MON-L01 5.2).
+    범위 4.1 에서도 판정 사유 · 기준 출처를 그대로 두고 점수를 아래에 더한다(REQ-MON-044 · 판정 사유는 4.0 범위).
+    노드 그룹 수에 미지정 묶음을 세지 않는다(용어집 v0.13). 노드 그룹 카드 사용률에 70% 주의 · 90% 위험 색을 입혔다(결정 사항 #19).
+    빈 상태 탭 배지를 숨기고, 최고 관리자 빈 상태 문구를 `클러스터에서 수집된 가속기가 없습니다.` 로 갈랐다(MON-L01 5.2).
+    NPU 스로틀링은 건전성 반영 배지만 두고 위험 기준 계산 안내를 뺐다. 기본 임계는 0 초과다(결정 사항 댓글 3493265556 알림 항목 표).
+    전역 기본 안내를 `임계값 · 조건 · 심각도 · 채널을 바꾸거나 중지하면` 으로 고쳤다. 지속 시간 · 이름은 바꿔도 연결이 풀리지 않는다(정책 6.4).
+    공용 워크스페이스에 시스템 기본 규칙 4종 원본을, ai-service-team 에 복제본을 더했다. 사용자가 만든 샘플 규칙에 등록자를 채웠다.
+    결정 사항 댓글 3493265556 기준표와 대조해 고쳤다. llama 샘플의 `열 제한 이벤트` 사유를 뺐다(기준표에 없는 판정, GPU 배포에 붙어 있었다).
+    NPU 스로틀링은 `0 초과` 주의 · 위험 없음이다. 게이트웨이 오류율 항목은 `서버 오류율(5xx)` · 표준 심각도 주의로 바꿨다.
+    알림 전용 항목 기본값을 기준표에 맞췄다(가속기 전력 650W 주의 · 노드 메모리 85%). 기준표에 없는 `VRAM 점유율(%)` 항목을 뺐다.
+    MIG 인스턴스 행의 연산 코어 칸을 비운다. MIG 단위 사용률은 수집되지 않는다(정책 4.3).
+  · 알림 규칙의 빈 조건을 채웠다(2026-10-26).
+    한 범위에 주의 규칙과 오류 규칙이 함께 있으면 주의 규칙이 건전성 기준이다. 오류 규칙 폼은 같은 범위에 주의 규칙이 있으면
+    알림만 보낸다고, 없으면 이 값이 주의 기준이라고 안내한다(정책 5.2 · 6.3 · REQ-MON-082).
+    판정 사유 표의 기준 출처가 배포 규칙 · 워크스페이스 규칙이면 링크로 알림 규칙 탭을 열고 지표 이름으로 검색한다.
+    전역 규칙 · 기본값은 링크 없이 도움말로 이 워크스페이스에 다른 기준을 두는 방법을 알린다(REQ-MON-086).
+    최고 관리자가 연결된 복제본이 있는 전역 규칙을 고치면 모달 위에 연결 규칙 수를 안내하고, 저장하면 복제본의 임계값 · 연산자 · 심각도 · 채널을
+    같은 값으로 바꾼다. 전역 규칙을 중지 · 삭제하면 복제본은 연결이 풀려 남는다(정책 6.4 · REQ-MON-087).
+    대상 배포가 종료된 규칙 샘플(`첫 토큰 지연 평가`, 대상 qwen3-8b-eval)에 `중지 · 대상 없음` 배지를 둔다. 재개하면 차단 알럿,
+    수정하면 대상 범위 아래 인라인 에러다(정책 6.4 · MON-L01 5.2). 대상 범위 필터 선택지를 규칙에 있는 값으로 만든다.
+    개요 알림 규칙 카드는 사용 중인 규칙만 세고, 중지된 규칙이 있으면 부제에 `중지 N개` 를 둔다(MON-L01 7.4).
+    개요 카드와 탭 배지는 스위처 · 역할 범위로만 센다. 검색어를 넣으면 숫자가 따라 줄던 것을 고쳤다.
+    데모 바: `지표 소스` 와 `4.1` 을 누르면 배포 성능 탭 정상 배포로 옮긴다. 가속기 탭에서 누르면 바뀐 것이 보이지 않았다.
+    `v0.28 확인` 에 전역 규칙 수정(연결 있음) · 대상 없음 규칙 · 오류 규칙 안내 · 기준 출처 바로 가기를 더했다. 검토용 처리다.
 
   ── v0.27 (2026-10-22) ──────────────────────
   MON-L01 v0.27 · 모니터링 정책 v0.18 과 같은 날 판이다.
@@ -61,7 +149,7 @@
     규칙이 바뀔 때마다 툴팁에 옮겨 붙여 세 문장이 되었고 노드 수신자도 틀려 있었다(알림 정책 7.2 · 3.2).
     툴팁은 항목 설명 한 문장으로 두고(공통정책 4.7), 채널을 고르지 않을 때의 발송은 입력 규칙이라 체크박스 아래
     hint 로 옮겼다(라이브러리 툴팁 · hint · 알림 박스 구분). 비워 두면 오히려 넓게 보내는 동작이라 툴팁에 숨기면 놓친다.
-    hint 의 `목록의 채널 모두` 는 서버 동작(운영 가이드 v4.0 부록 1 외부 채널 자동 발송 · 알림 정책 7.3)이다.
+    hint 의 `목록의 채널 모두` 는 서버 동작(알림 정책 7.3)이다.
     규칙 폼에 어떤 채널을 보이는지는 정책에 아직 없다. 목록은 전역 채널과 그 워크스페이스에 등록한 채널이라는 전제다.
   · 알림 규칙 모달의 필드 아래 안내 문구를 다듬었다. 심각도는 정책의 정의를 옮긴 문서체(`…것입니다`)라 고르는 때로 바꿨다.
     `이 값` 은 `이 등급` 으로, 지속 시간 `만큼 … 때만` 은 `동안 … 이어지면` 으로 고쳤다. 새 규칙 워크스페이스 안내는
@@ -170,7 +258,8 @@
     펼치면 표 대신 안내 한 줄. 최고 관리자 조회 범위에서만 보인다 — 일반 사용자와
     워크스페이스로 좁힌 조회는 배정된 슬롯으로 자르므로 빠진다.
   · 연결 불가·사라짐 노드는 가속기·CPU 할당·메모리 할당을 `-` 로 두고 부제에 마지막으로
-    확인된 구성과 `(마지막 확인)` 을 둔다(REQ-MON-036 · CON-709 last_known_accelerators).
+    확인된 구성을 둔다(REQ-MON-036 · CON-709 last_known_accelerators). 보조 표기를 붙이지 않는다.
+    상태 배지와 상태 시작 시각이 지금 읽은 값이 아님을 보인다(2026-10-26).
     펼치면 표 대신 상태 안내 한 줄이다.
     ⚠ 마지막 구성은 전체 가속기 집계(층 1)에 넣지 않았다. 지금 읽은 슬롯만 센다.
       `확인 불가` 슬롯을 분모에 넣는 USEHELP 기준과 맞출지 확인 대상이다.
@@ -179,7 +268,7 @@
     누르면 가속기 탭으로 옮기되 슬롯 상태 필터는 걸지 않는다 — 볼 슬롯이 없다.
   · 노드 카드 `CPU`·`메모리` 를 `CPU 할당`·`메모리 할당` 으로(REQ-MON-024 · CON-657).
     사용량이 아니라 파드가 요청해 잡아 둔 양의 합이다.
-  · 데모 노드 — gpu-svr-02 점검, npu-svr-01 중지, gpu-svr-03 연결 불가(H200 4장 마지막 확인),
+  · 데모 노드 — gpu-svr-02 점검, npu-svr-01 중지, gpu-svr-03 연결 불가(마지막 구성 H200 4장),
     cpu-svr-01 가속기 없음을 더했다. 다섯 상태가 화면에 보이게 하려는 검토용 값이다.
     사라짐은 연결 불가와 표시가 같아 데이터로 따로 두지 않았다.
   · 확인 필요 항목 정렬을 고쳤다. `위험` 의 순위 값이 0 이라 `||9` 에 걸려 맨 뒤로 갔다
@@ -683,7 +772,7 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .tip-anchor .tip::before{content:"";position:absolute;left:0;right:0;height:10px;bottom:-10px}
 .tip-anchor.below .tip::before{bottom:auto;top:-10px}
 
-/* 하단 미리보기 바 (시안 확인용) */
+/* 하단 미리보기 바 (검토용) */
 
 .demo-bar{position:fixed;left:0;right:0;bottom:0;z-index:800;background:#0f1320;color:#c9cfe0;
   display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;font-size:12px;border-top:1px solid #2a2f45;}
@@ -1954,6 +2043,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .hbar-none{height:6px;margin-top:8px}
 
   /* 묶음 제목 — 카드 밖에 둔다. 카드 안 제목(h4)보다 한 단계 위임이 드러난다 */
+  .selchips{margin:-4px 0 12px}
   .grouph{display:flex;align-items:center;gap:8px;margin:22px 0 12px;
     font-size:13px;font-weight:700;color:var(--foreground)}
   .gcnt{font-weight:400;color:var(--muted-foreground);font-size:12.5px}
@@ -2082,6 +2172,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .devlist{margin-top:18px;padding:13px 15px;border-radius:9px;background:var(--muted)}
   .devlist-t{font-size:11.5px;font-weight:600;color:var(--muted-foreground);margin-bottom:11px}
   .devrow{margin-bottom:13px}
+  /* 누를 수 있는 가속기 모델 행 — 노드 그룹 카드(.ngcard)와 같은 선택 표시를 쓴다 */
+  .devrow.pick{cursor:pointer;margin:0 -9px 7px;padding:6px 9px;border:1px solid transparent;border-radius:8px}
+  .devrow.pick:hover{background:var(--hover)}
+  .devrow.pick.on{border-color:var(--primary);background:var(--selected-soft)}
   .devrow:last-child{margin-bottom:0}
   .devrow-t{display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:12px}
   .devrow-n{color:var(--foreground);font-weight:600}
@@ -2214,6 +2308,46 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 
   /* 전체 펼치기·접기 — 켜고 끄는 것이라 체크박스로 둔다. 라벨이 바뀌지 않는다 */
   .foldall{margin-left:auto;font-weight:400;font-size:12px}
+  /* ── 노드 그룹(노드 그룹 검토 문서 · v0.28). 색은 토큰만 쓴다 ── */
+  /* 전체 가속기 안 분해 전환 — 세그먼트. 카드 안 소제목(11.5px)보다 한 단계 크게 두어 전환 대상임이 읽히게 한다 */
+  .brk{display:inline-flex;gap:2px;margin-bottom:12px;padding:3px;border-radius:9px;border:1px solid var(--border)}
+  .brk button{border:0;background:transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted-foreground);padding:6px 14px;border-radius:7px;cursor:pointer}
+  .brk button:hover{color:var(--foreground)}
+  .brk button.on{background:var(--card);color:var(--foreground);box-shadow:0 0 0 1px var(--border-strong)}
+  /* 노드 그룹 카드 — 폭 200px 고정 · 왼쪽 정렬. 그룹이 적어도 카드가 가로로 늘어나지 않는다.
+     바깥 카드(--muted 면) 위라 카드 면(--card)으로 띄운다 */
+  .ngrid{display:grid;grid-template-columns:repeat(auto-fill,200px);justify-content:start;gap:10px}
+  .ngcard{text-align:left;font-family:inherit;color:var(--foreground);background:var(--card);border:1px solid var(--border-strong);
+    border-radius:10px;padding:11px 13px;cursor:pointer;display:flex;flex-direction:column;gap:5px}
+  .ngcard:hover{background:var(--hover)}
+  .ngcard.on{border-color:var(--primary);background:var(--selected-soft)}
+  .ng-n{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ng-d{font-size:11.5px;color:var(--muted-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ng-fig{display:flex;align-items:baseline;gap:8px}
+  .ng-fig b{font-size:20px;font-weight:700;letter-spacing:-.5px}
+  .ng-fig b.warn{color:var(--warning)}
+  .ng-fig b.crit{color:var(--destructive)}
+  .ng-fig span{font-size:11.5px;color:var(--muted-foreground);white-space:nowrap}
+  .ng-dev{font-size:11px;color:var(--muted-foreground);margin-top:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ngcard .ubar{height:6px}
+  .ngrid + .devmore{margin-top:10px}
+  /* 노드 그룹 구획 머리 — 노드 카드보다 한 단계 위, 노드 제목 줄(.grouph)보다 한 단계 아래. 접지 않아 누를 수 없다 */
+  .ngsec-h{display:flex;align-items:center;gap:12px;margin:16px 0 10px;padding:10px 14px;border-radius:10px;
+    background:var(--thead);border:1px solid var(--border-strong);font-size:12.5px;cursor:pointer}
+  /* 노드 그룹 머리 — 누르면 묶음을 접고 편다. 이름을 노드 이름보다 크게 두어 한 단계 위임을 드러낸다 */
+  .ngsec-h:hover{background:var(--hover)}
+  .ngsec-h > b{font-size:14px}
+  .ngsec-h .foldbtn{width:24px;height:24px}
+  .ngsec-h.closed .foldbtn svg{transform:rotate(-90deg)}
+  .ngsec-h.closed{margin-bottom:6px}
+  .ngsec-body[hidden]{display:none}
+  .ngsec-h .pmeta{color:var(--muted-foreground)}
+  .ngsec-h .pmeta b{color:var(--foreground)}
+  .ngsec-body{padding-left:14px;border-left:2px solid var(--border);margin-left:10px}
+  .ngfold{margin-left:auto;font-weight:400;font-size:12px}
+  /* 이상 노드 수 — 상태 배지가 아니라 경고 아이콘 + 오류 색 글자(공통정책 5.1 · 라이브러리) */
+  .badtx{display:inline-flex;align-items:center;gap:3px;color:var(--destructive);font-weight:600;white-space:nowrap}
+  .badtx svg{width:12px;height:12px}
   .txtbtn:disabled{opacity:.4;cursor:default}
   .txtbtn:disabled:hover{text-decoration:none;color:var(--muted-foreground)}
   /* 조회 범위 토글 — 스위처 아래에서 한 번 더 좁힌다 */
@@ -2236,6 +2370,8 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     background:var(--card);border:1px solid var(--border);border-radius:8px;
     color:var(--foreground);font-size:13px;font-family:inherit;cursor:pointer}
   .depbtn:hover{border-color:var(--border-strong)}
+  /* 인라인 에러. .inp.err · .msel.err 와 같은 테두리(공통정책 7.8) */
+  .depbtn.err{border-color:var(--destructive)}
   .depbtn-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
   .depbtn .chev{flex:0 0 auto;width:14px;height:14px;color:var(--muted-foreground)}
   .depdd{display:none;position:absolute;top:calc(100% + 5px);left:0;min-width:280px;
@@ -2308,6 +2444,8 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     width:100%;text-align:left;border-left:0;border-right:0;border-top:0;
     background:transparent;font-family:inherit;cursor:pointer;color:var(--foreground)}
   .trow:last-child{border-bottom:0}
+  /* 더 보기 바로 위 항목은 구분선을 두지 않는다. 더 보기의 점선과 겹쳐 선이 두 줄로 보였다 */
+  .trow:has(+ .trmore){border-bottom:0}
   .trow:hover{background:var(--hover)}
   .trow .tn{font-weight:600;color:var(--foreground)}
   .trow .tw{color:var(--muted-foreground);flex:1;min-width:0;
@@ -2512,6 +2650,22 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     <button class="sr on" onclick="setSrc('ok',this)">정상</button>
     <button class="sr" onclick="setSrc('unavailable',this)">수집 불가</button>
     <button class="sr" onclick="setSrc('not_configured',this)">미설정</button></span>
+  <!-- 노드 그룹 수 — 검토용 처리. 실제 화면에는 없다(노드 그룹 검토 문서) -->
+  <span class="dgrp"><span class="demo-label">노드 그룹:</span>
+    <button class="ng on" onclick="setGrpScale('base',this)">3개 · 노드 10대</button>
+    <button class="ng" onclick="setGrpScale('many',this)">12개 · 노드 46대</button>
+    <button class="ng" onclick="setGrpScale('none',this)">노드 그룹 없음(0~1개)</button></span>
+  <!-- v0.28 새 상태로 바로 가기. 검토용 처리. 실제 화면에는 없다 -->
+  <span class="dgrp"><span class="demo-label">v0.28 확인:</span>
+    <button onclick="demoMigDep()">MIG 배포 성능</button>
+    <button onclick="demoMigSlot()">MIG 슬롯 펼침</button>
+    <button onclick="demoDevSel()">가속기 모델 선택</button>
+    <button onclick="demoDupRule()">중복 규칙 저장</button>
+    <button onclick="demoLinkedRule()">전역 기본 규칙 수정</button>
+    <button onclick="demoGlobalEdit()">전역 규칙 수정(연결 있음)</button>
+    <button onclick="demoGoneRule()">대상 없음 규칙</button>
+    <button onclick="demoErrHint()">오류 규칙 안내</button>
+    <button onclick="demoSrcLink()">기준 출처</button></span>
   <span class="dgrp"><span class="demo-label">테마:</span>
     <button onclick="document.body.classList.remove('dark')">라이트</button>
     <button onclick="document.body.classList.add('dark')">다크</button></span>
@@ -2633,6 +2787,146 @@ const NODES=[
   {n:'cpu-svr-01', ip:'10.10.20.31', kind:'cpu', st:'정상', since:'2026-09-28 10:12',
    cpu:{use:20,cap:64}, mem:{use:96,cap:256}, slots:[]}
 ];
+
+/* ===== 노드 그룹(노드 그룹 검토 문서 · v0.28) =====
+   노드 위 묶음. 노드 하나는 노드 그룹 하나에만 속한다. 운영자가 노드 라벨로 정하고 화면은 조회만 한다.
+   이름은 노드 그룹(2026-10-23 회신). 배포 생성 위저드의 서빙 풀 · 프리필 풀 · 디코드 풀과 겹치지 않게 `풀` 을 쓰지 않는다.
+   그룹 이름 · 설명 · 구성은 검토용 값이다(검토 문서 샘플: 그룹 3개 · 가속기 노드 10대).
+   v0.27 노드 6대(가속기 없는 cpu-svr-01 제외 5대)에 5대를 더했다 */
+const GROUPS=['serving-gpu','dev-gpu','serving-npu'];
+const GRPDESC={'serving-gpu':'서빙용 H200 노드','dev-gpu':'개발·검증용 A100 · L40S 노드','serving-npu':'서빙용 RNGD 노드'};
+function mkSlots(dev, pre, n, used){
+  return Array.from({length:n}, function(_,i){
+    const u = used[i];
+    return {no:i+1, dev:dev, id:pre+'-'+i, st: u? '사용 중' : '유휴',
+      core: u? 40+((i*13)%45) : 0, vram:{use: u? 60+((i*7)%60) : 0.3, cap: dev.indexOf('H200')>=0?140:(dev.indexOf('A100')>=0?80:48)},
+      temp: u? 55+(i%10) : 32, pw: u? 260+(i*11%120) : 55, by: u? [u] : []};
+  });
+}
+NODES.push(
+  {n:'gpu-svr-04', ip:'10.10.20.14', kind:'gpu', st:'정상', since:'2026-09-28 10:12', cpu:{use:52,cap:128}, mem:{use:520,cap:1007},
+   slots:mkSlots('NVIDIA-H200','GPU',8,['llama-3-2-1b-prod','llama-3-2-1b-prod','gpt-oss-120b-symphony','gpt-oss-120b-symphony','gpt-oss-120b-symphony','gpt-oss-120b-symphony'])},
+  {n:'gpu-svr-05', ip:'10.10.20.15', kind:'gpu', st:'정상', since:'2026-09-28 10:12', cpu:{use:20,cap:128}, mem:{use:210,cap:1007},
+   slots:mkSlots('NVIDIA-H200','GPU',8,['solar-open-100b-paused','solar-open-100b-paused'])},
+  {n:'gpu-svr-06', ip:'10.10.20.16', kind:'gpu', st:'정상', since:'2026-10-02 14:30', cpu:{use:30,cap:96}, mem:{use:300,cap:755},
+   slots:mkSlots('NVIDIA-A100','GPU',4,['gemma-4-12b-it-idle'])},
+  {n:'gpu-svr-07', ip:'10.10.20.17', kind:'gpu', st:'정상', since:'2026-10-02 14:30', cpu:{use:8,cap:96}, mem:{use:64,cap:755},
+   slots:mkSlots('NVIDIA-L40S','GPU',4,[])},
+  {n:'npu-svr-03', ip:'10.10.20.23', kind:'npu', st:'정상', since:'2026-09-28 10:12', cpu:{use:18,cap:64}, mem:{use:120,cap:512},
+   slots:mkSlots('Furiosa RNGD','NPU',8,['furiosa-qwen3-32b-npu','furiosa-qwen3-32b-npu'])}
+);
+/* MIG 로 나눈 GPU(모니터링 정책 4.1 · 4.3 · MON-L01 7.1 · REQ-MON-080).
+   인스턴스 하나를 슬롯 하나로 센다. 부모 GPU 는 슬롯으로 세지 않고 인스턴스를 묶는 행으로만 둔다.
+   그래서 nd.slots 에는 인스턴스만 넣고 부모 행 값은 MIGP 에 따로 둔다. 장 수 집계(allSlots · 막대 · 모델별)가 인스턴스를 센다.
+   migOf 는 부모 번호다. 슬롯 번호는 `{부모 번호}-{순번}` 이다.
+   인스턴스 단위로 오지 않는 연산 코어 사용률 · 온도 · 전력은 표에서 칸을 비운다. Xid 도 MIG 는 4.1 범위라 비운다.
+   분할 크기 이름은 화면에 쓰지 않는다(용어집 6장). 값은 검토용이다 */
+const MIGP={'gpu-svr-05':{3:{dev:'NVIDIA-H200', n:3, vram:140, temp:61, pw:286}}};
+(function(){
+  const nd=NODES.find(function(x){ return x.n==='gpu-svr-05'; });
+  const i=nd.slots.findIndex(function(x){ return x.no===3; });
+  const mi=function(k, st, core, use, cap, by){
+    return {no:'3-'+k, migOf:3, dev:'NVIDIA-H200 MIG', id:'', st:st, core:core, vram:{use:use, cap:cap}, temp:null, pw:null, by:by};
+  };
+  nd.slots.splice(i, 1,
+    mi(1,'사용 중',63,58.6,70,['llama-3-8b-mig']),
+    mi(2,'유휴',0,0.2,35,[]),
+    mi(3,'유휴',0,0.2,35,[]));
+})();
+function migParent(nd, p){ return (MIGP[nd.n]||{})[p] || null; }
+/* 부모 GPU 행 펼침. 기본 접힘이다. 키는 `{노드}:{부모 번호}` */
+let migOpen=[];
+function tgMig(n, p){ const k=n+':'+p, i=migOpen.indexOf(k); if(i<0) migOpen.push(k); else migOpen.splice(i,1); render(); }
+const GRPOF={'gpu-svr-01':'serving-gpu','gpu-svr-03':'serving-gpu','gpu-svr-04':'serving-gpu','gpu-svr-05':'serving-gpu',
+  'gpu-svr-02':'dev-gpu','gpu-svr-06':'dev-gpu','gpu-svr-07':'dev-gpu',
+  'npu-svr-01':'serving-npu','npu-svr-02':'serving-npu','npu-svr-03':'serving-npu'};
+NODES.forEach(function(nd){ nd.grp = GRPOF[nd.n] || null; });
+/* 라벨이 없는 노드의 묶음 키. 묶음 제목은 `노드 그룹 미지정`, 표 열 값은 `미지정` 이다(노드 그룹 검토 문서 4.5 · 회신 3492806946 ③) */
+const NOGRP='__none__';
+/* 검토용: 노드 그룹 데모 — base(3개 · 10대) · many(12개 · 46대) · none(라벨 없음). 실제 화면에는 없다 */
+let GRP_DEMO='base';
+function grpKey(nd){ return (GRP_DEMO!=='none' && nd.grp) ? nd.grp : NOGRP; }
+function grpName(k){ return k===NOGRP ? '노드 그룹 미지정' : k; }
+/* 구획 순서 — 받은 그룹 순서, 미지정은 맨 뒤(노드 그룹 검토 문서 4.5) */
+function grpKeys(list){
+  const has={}; list.forEach(function(nd){ has[grpKey(nd)]=1; });
+  return GROUPS.filter(function(g){ return has[g]; }).concat(has[NOGRP]? [NOGRP] : []);
+}
+/* 그룹 층 — 미지정을 뺀 노드 그룹이 둘 이상일 때만 둔다. 0~1개면 v0.27 화면 그대로다(노드 그룹 검토 문서 4.5).
+   보는 범위가 아니라 클러스터 구성으로 정한다. 좁혀 볼 때 층이 생겼다 없어지지 않게 한다 */
+/* 노드 그룹이 둘 이상일 때만 층을 둔다. 미지정 묶음은 노드 그룹으로 세지 않는다(모니터링 정책 4.1 v0.19 · 인프라 자원 목업 v0.13과 같은 기준) */
+function grpLayer(){ return grpKeys(accNodes()).filter(function(k){ return k!==NOGRP; }).length>1; }
+function byGrp(list){
+  const keys=grpKeys(list);
+  return list.slice().sort(function(a,b){
+    const pa=keys.indexOf(grpKey(a)), pb=keys.indexOf(grpKey(b));
+    return pa!==pb ? pa-pb : a.n.localeCompare(b.n);
+  });
+}
+/* 이상 노드 — 조치가 필요한 상태만 센다. 점검·중지는 의도된 상태라 넣지 않는다(정책 4.5) */
+function badNodes(list){ return list.filter(function(nd){ return nodeLost(nd); }).length; }
+/* 그룹 선택 — 전체 가속기 `노드 그룹별` 카드로 고른다. 아래 노드 목록만 좁힌다(노드 그룹 검토 문서 4.2). 여러 개 고를 수 있다(공통정책 3.2) */
+/* 여러 개 고른다(v0.28 피드백). 한 필드 안 여러 값은 OR 이다(공통정책 3.2). 누를 때마다 더하고 뺀다 */
+let GRP_SEL=[];
+function tgGrpSel(k){ const i=GRP_SEL.indexOf(k); i<0? GRP_SEL.push(k) : GRP_SEL.splice(i,1); render(); }
+function grpSelOk(nd){ return !GRP_SEL.length || GRP_SEL.indexOf(grpKey(nd))>=0; }
+/* 노드 그룹 묶음 접기(노드 그룹 검토 문서 4.2 `풀별 접이 구획` · 4.5 기본 `풀 펼침 · 노드 접힘`). 접힌 묶음은 머리만 남는다 */
+let grpClosed=[];
+function tgGrpClosed(k){ const i=grpClosed.indexOf(k); i<0? grpClosed.push(k) : grpClosed.splice(i,1); render(); }
+/* 가속기 모델 선택(v0.28 피드백) — 가속기 모델별 막대를 누르면 슬롯을 그 가속기 모델로 좁힌다.
+   노드 그룹은 노드의 속성이라 노드를 좁히고(접힌 채), 가속기 모델은 슬롯의 속성이라 슬롯을 좁힌다 —
+   노드 하나에 가속기 모델이 섞일 수 있어서다(gpu-svr-02). 슬롯 상태 필터와 같은 방식으로
+   남은 노드를 자동으로 펼치고 슬롯 표에는 그 가속기 모델 슬롯만 둔다(REQ-MON-028). 슬롯 상태 필터와 함께 걸린다 */
+let DEV_SEL=[];
+function tgDevSel(d){ const i=DEV_SEL.indexOf(d); i<0? DEV_SEL.push(d) : DEV_SEL.splice(i,1); render(); }
+function devOk(x){ return !DEV_SEL.length || DEV_SEL.indexOf(x.dev)>=0; }
+function slotOk(x){ return (!slotSel.length || slotSel.indexOf(x.st)>=0) && devOk(x); }
+/* 가속기 탭 기본 상태 — 구획 펼침 · 노드 접힘 · 그룹 선택 없음(노드 그룹 검토 문서 4.5). 다시 들어올 때 돌린다 */
+function resetGrpView(){ GRP_SEL=[]; DEV_SEL=[]; grpClosed=[]; grpMore=false; BRK='dev'; nodeOpen=[]; migOpen=[]; }
+/* 검토용: 노드 그룹 수 전환 — 그룹이 아주 많을 때와 없을 때를 본다. 실제 화면에는 없다.
+   many: 노드 그룹 12개 · 가속기 노드 46대(기본 3개 · 10대에 그룹 9개 · 노드 34대와 미지정 노드 2대를 더함). 값은 검토용이다 */
+const BASE_GROUPS=GROUPS.slice(), BASE_NODES=NODES.slice();
+const MANY=(function(){
+  const groups=[], nodes=[];
+  const devs=['NVIDIA-H200','NVIDIA-A100','NVIDIA-L40S','Furiosa RNGD'];
+  for(let p=4;p<=12;p++){
+    const gn='group-'+(p<10?'0':'')+p, dev=devs[p%4], kind=dev.indexOf('Furiosa')>=0?'npu':'gpu';
+    groups.push(gn); GRPDESC[gn]='검토용 샘플 그룹';
+    const cnt = p>=11 ? 3 : 4;
+    for(let k=1;k<=cnt;k++){
+      const used=Array.from({length:(p*k)%9}, function(){ return 'llama-3-2-1b-prod'; });
+      const lost = (p===7 && k===2);
+      nodes.push({n:'svr-'+(p<10?'0':'')+p+'-'+k, ip:'10.20.'+p+'.'+k, kind:kind, grp:gn,
+        st: lost? '연결 불가' : '정상', since:'2026-10-01 09:00',
+        cpu: lost? null : {use:10+p*k%60, cap:128}, mem: lost? null : {use:100+p*k*7%600, cap:1007},
+        slots: lost? [] : mkSlots(dev, kind==='npu'?'NPU':'GPU', 8, used),
+        lastAcc: lost? [{dev:dev, n:8}] : undefined});
+    }
+  }
+  /* 라벨이 없는 노드 — `노드 그룹 미지정` 묶음으로 맨 뒤에 놓이는 것을 본다 */
+  [1,2].forEach(function(k){
+    nodes.push({n:'svr-nl-'+k, ip:'10.20.99.'+k, kind:'gpu', grp:null, st:'정상', since:'2026-10-01 09:00',
+      cpu:{use:12*k, cap:96}, mem:{use:150*k, cap:755}, slots:mkSlots('NVIDIA-L40S','GPU',4, k===1? ['gemma-4-12b-it-idle'] : [])});
+  });
+  return {groups:groups, nodes:nodes};
+})();
+/* 누르면 가속기 탭으로 옮겨 바로 보이게 한다. 데이터 상태는 기본으로, 그룹 카드가 없는 역할이면 최고 관리자로 바꾼다 */
+function setGrpScale(k,btn){
+  GROUPS.length=0; NODES.length=0;
+  BASE_GROUPS.forEach(function(g){ GROUPS.push(g); }); BASE_NODES.forEach(function(n){ NODES.push(n); });
+  if(k==='many'){ MANY.groups.forEach(function(g){ GROUPS.push(g); }); MANY.nodes.forEach(function(n){ NODES.push(n); }); }
+  GRP_DEMO = k==='none' ? 'none' : 'base';
+  document.querySelectorAll('#demoBar .ng').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  state='default';
+  document.querySelectorAll('#demoBar .st').forEach(function(b){ b.classList.toggle('on', b.textContent==='기본'); });
+  resetGrpView();
+  /* 노드 그룹 데모는 노드 그룹 카드가 바로 보이게 `노드 그룹별` 로 연다. 실제 화면에는 없는 검토용 처리다 */
+  if(k!=='none') BRK='grp';
+  if(!isSuper()) setRole('super', document.querySelector('#demoBar .rl'));
+  else { tab=0; closeSlot(); render(); }
+  const mb=document.getElementById('monBody'); if(mb && mb.scrollIntoView) mb.scrollIntoView({block:'start'});
+}
 /* 노드 상태 배지 색 — 연결 불가·사라짐은 조치가 필요해 오류색(cr), 점검·중지는 의도된 상태라
    중립(mu)이다(정책 4.5 `점검·중지는 의도된 상태`).
    ⚠ 배포 목업은 `연결 불가` 를 mu 로 둔다. 화면 간 색이 갈려 확인 대상이다 */
@@ -2658,7 +2952,7 @@ const PERF={
      d:'초당 배포에 들어온 요청 수입니다. 인증·한도로 거절된 요청은 세지 않습니다.'},
     {t:'토큰 처리량',    u:'tok/s · 최근 1분 평균', fixed:true,
      d:'초당 오간 토큰 수입니다. 들어온 것과 나간 것을 함께 셉니다.'},
-    {t:'에러율',        u:'% · 최근 1분', fixed:true, dir:'low', th:{good:1, warn:5},
+    {t:'에러율',        u:'% · 최근 1분', fixed:true,
      d:'배포에 들어온 요청 중 실패한 비율입니다. 서버 오류와 잘못된 요청을 함께 셉니다. 인증·한도로 거절된 요청은 세지 않습니다.'},
     /* 요청 건수 둘. 4.0 범위(모니터링 정책 5.1). 최근 1시간 건수와 누적 건수다(CON-759 A-2).
        조회 구간과 무관한 값이라 구간 계수(byRange)를 걸지 않는다(fixed) */
@@ -2670,19 +2964,19 @@ const PERF={
   eng:[
     {t:'처리량',        v:'1,284', u:'tok/s · 최근 1시간 평균', fixed:true,
      d:'서빙 엔진이 초당 만들어 낸 토큰 수입니다.'},
-    {t:'TTFT',         v:'39',   u:'ms · p95 · 실시간', fixed:true, dir:'low', th:{good:50, warn:150},
+    {t:'TTFT',         v:'39',   u:'ms · p95 · 실시간', fixed:true, hk:'첫 토큰 지연',
      d:'요청을 받고 첫 토큰이 나오기까지 걸린 시간입니다. 사용자가 기다렸다고 느끼는 구간입니다.'},
-    {t:'TPOT',         v:'10',   u:'ms · p99 · 실시간', fixed:true, dir:'low', th:{good:15, warn:40},
+    {t:'TPOT',         v:'10',   u:'ms · p99 · 실시간', fixed:true, hk:'토큰당 지연',
      d:'첫 토큰 뒤로 토큰 하나를 더 만드는 데 걸린 시간입니다. 답이 이어지는 속도를 좌우합니다.'},
-    {t:'KV 캐시 사용률', v:'62',   u:'% · 실시간', fixed:true, dir:'low', th:{good:40, warn:70},
+    {t:'KV 캐시 사용률', v:'62',   u:'% · 실시간', fixed:true, hk:'KV 캐시 사용률',
      d:'대화 맥락을 담아 두는 가속기 메모리의 사용 비율입니다. 가득 차면 요청이 대기로 밀립니다.'}
   ],
   infra:[
-    {t:'가속기 사용률',  v:'58',   u:'% · 최근 1시간 평균', fixed:true,
+    {t:'가속기 사용률',  v:'58',   u:'% · 최근 1시간 평균', fixed:true, hk:'가속기 사용률',
      d:'가속기의 연산 코어가 쓰인 비율입니다.'},
     {t:'VRAM 사용량',   v:'407',  u:'GB · 실시간', fixed:true,
      d:'이 배포가 쓰는 가속기 메모리의 합입니다.'},
-    {t:'온도',          v:'64',   u:'°C · 실시간', fixed:true, dir:'low', th:{good:75, warn:85},
+    {t:'온도',          v:'64',   u:'°C · 실시간', fixed:true, hk:'가속기 온도',
      d:'이 배포가 쓰는 가속기의 평균 온도입니다.'},
     {t:'전력',          v:'1,386',u:'W · 실시간', fixed:true,
      d:'이 배포가 쓰는 가속기의 소모 전력 합입니다.'}
@@ -2697,6 +2991,8 @@ const PERF={
 const DEPS=[
   {n:'llama-3-2-1b-prod',      ws:'ai-service-team', st:'정상'},
   {n:'gpt-oss-120b-symphony',  ws:'ai-service-team', st:'정상'},
+  /* MIG 인스턴스에 올라간 배포. 인프라 계층 가속기 지표가 부모 GPU 전체 값이다(모니터링 정책 5.1 · REQ-MON-052). 검토용 값이다 */
+  {n:'llama-3-8b-mig',         ws:'ai-service-team', st:'정상', mig:true},
   {n:'gemma-4-12b-it-idle',    ws:'ml-research',     st:'유휴'},
   {n:'furiosa-qwen3-32b-npu',  ws:'test-npu',        st:'오류'},
   {n:'solar-open-100b-paused',  ws:'ml-research',     st:'중지됨'}
@@ -2711,15 +3007,25 @@ function curDep(){ return DEPS.find(function(x){ return x.n===dep; }) || DEPS[0]
    ⚠ 데모 값이다. 실제 값은 계측 파이프라인에서 온다 */
 const DEPM={
   'llama-3-2-1b-prod': {
-    score:35, label:'위험', reasons:[{sv:'위험',k:'첫 토큰 지연',v:'6.1초',th:'5초',ag:'레플리카별 p95 중 최댓값 · 최근 5분',t:'첫 토큰 지연 6.1초(위험 기준 5초)'},{sv:'위험',k:'가속기 사용률',v:'97%',th:'95%',ag:'최근 5분 평균',t:'가속기 사용률 97%(위험 기준 95%)'},{sv:'주의',k:'토큰당 지연',v:'240ms',th:'200ms',ag:'p99 · 최근 5분',t:'토큰당 지연 240ms(주의 기준 200ms)'}], missing:['KV 캐시 사용률','가속기 온도'],
-    /* 판정 사유 한 줄 — 어떤 지표가 기준을 넘었는지를 실측값과 기준값으로 알린다(모니터링 정책 5.2).
-       문장 형식은 결정 사항 문서 댓글 3489267763 의 예시를 따른 검토용 값이다 */
-    reasonText:'첫 토큰 지연 2.4초(기준 2초)',
+    /* 판정 사유. 어떤 지표가 기준에 걸렸는지를 현재 값과 걸린 쪽 기준값으로 알린다(모니터링 정책 5.2).
+       항목마다 등급(sv) · 지표(k) · 현재 값(v) · 기준값(th) · 집계(ag) · 한 줄 문장(t) · 기준 출처(src)가 온다. 화면은 받은 값을 그대로 쓴다.
+       기준값은 알림 규칙 임계값이고, 규칙을 배포 · 워크스페이스 · 전역 순으로 찾아 가장 좁은 것을 쓰며 없으면 기본 임계다.
+       초과형은 기준값의 2배가 위험이다. 첫 토큰 지연은 이 배포에 건 규칙 3,500ms 의 2배(7초), 서버 오류율은 공용 워크스페이스(전역) 규칙,
+       대기 요청은 ai-service-team 규칙에서 왔다. 순서는 백엔드가 보낸 순서(심각도 높은 순)다.
+       값은 정책 5.2 기준표로 만든 검토용이다 */
+    score:35, label:'위험', reasons:[
+      {sv:'위험',k:'첫 토큰 지연',v:'7.2초',th:'7초',ag:'레플리카별 p95 중 최댓값 · 최근 5분',src:'배포 규칙',t:'첫 토큰 지연 7.2초(위험 기준 7초)'},
+      {sv:'주의',k:'토큰당 지연',v:'240ms',th:'200ms',ag:'레플리카별 p99 중 최댓값 · 최근 5분',src:'기본값',t:'토큰당 지연 240ms(주의 기준 200ms)'},
+      {sv:'주의',k:'대기 요청',v:'64건',th:'50건',ag:'레플리카 합 · 현재',src:'워크스페이스 규칙',t:'대기 요청 64건(주의 기준 50건)'},
+      {sv:'주의',k:'서버 오류율',v:'6.2%',th:'5%',ag:'게이트웨이 전체 · 최근 1분',src:'전역 규칙',t:'서버 오류율 6.2%(주의 기준 5%)'}],
+    missing:['KV 캐시 사용률','가속기 온도'],
     why:'KV 캐시 사용률이 60%를 넘긴 상태로 20분 이어졌습니다.',
     todo:'요청이 늘어나면 대기 큐가 증가합니다. 레플리카를 늘리거나 최대 컨텍스트 길이를 줄여 주세요.',
     items:['12','74','61','48','3'],
-    gw:['842','2,150','0.3','3,031,200','48,215,730'],
-    eng:['1,284','39','10','62'], infra:['58','407','64','1,386']
+    /* 카드 값은 사유와 맞춘다. 에러율은 서버 오류(5xx)와 잘못된 요청을 함께 세어 서버 오류율보다 크다(정책 5.1).
+       KV 캐시 사용률 · 가속기 온도는 측정하지 못해 `-` 다(정책 1장 원칙 4) */
+    gw:['842','2,150','6.8','3,031,200','48,215,730'],
+    eng:['1,284','7,180','238',null], infra:['58','407',null,'1,386']
   },
   /* 저활용 — 요청이 적어 가속기를 거의 쓰지 않는다. 서버가 주의로 주고 사유를 reason 에 둔다(모니터링 정책 5.2).
      사용자가 일부러 띄워 둔 배포라 확인 필요 항목에 올리지 않는다(정책 4.4). 점수는 4.1 범위 데모용으로 두되 라벨을 다시 뽑지 않는다.
@@ -2728,8 +3034,18 @@ const DEPM={
     score:12, label:'주의', reason:'UNDER_UTILIZATION', reasonText:'저활용 · 가속기 사용률 3%', why:'', todo:'',
     /* 부하가 없으면 점수가 0 에 가깝다. 점수 조건은 부하가 있을 때만 걸고, 이 배포는 저활용 사유로 주의다(모니터링 정책 5.2) */
     items:['4','88','79','52','0'],
-    gw:['2','6','0.0','7,200','120,446,918'],
-    eng:['38','24','8','3'], infra:['3','261','36','257']
+    /* 저활용 조건(최근 1시간 처리량 0 · 실행 중 요청 0)에 맞춘다(모니터링 정책 5.2). 요청이 없어 지연 값도 없다 */
+    gw:['0','0','0.0','0','120,446,918'],
+    eng:['0',null,null,'3'], infra:['3','261','36','257']
+  },
+  /* MIG 배포. 걸린 사유가 없어 안정이다. 측정하지 못한 지표가 있어 라벨 아래 한 줄로 둔다(모니터링 정책 5.2 · REQ-MON-044).
+     정상이라 안정인 것과 재지 못해 안정인 것을 가른다. 인프라 값은 부모 GPU(gpu-svr-05 슬롯 3) 전체 값이다(정책 5.1).
+     지표는 검토용이다 */
+  'llama-3-8b-mig': {
+    score:86, label:'안정', missing:['열 · 전력 제한 비율'], why:'', todo:'',
+    items:['8','71','55','40','1'],
+    gw:['126','3,410','0.1','453,600','6,120,410'],
+    eng:['3,410','42','12','38'], infra:['71','58.6','61','286']
   },
   'gemma-4-12b-it-idle': {
     score:null, label:'유휴',
@@ -2918,30 +3234,83 @@ let RULES=[
    ws:'ai-service-team', scope:'전체', ch:['slack-infra'], by:'성유진(yj.seong)', at:'2026-10-15 10:12:40',
    fires:[]},
   /* 지정한 채널(slack-infra 이전 채널)이 삭제되어 채널이 0개가 되면서 시스템이 중지했다(정책 6.4) */
-  {n:'VRAM 포화', metric:'vram_usage', op:'초과', th:92, dur:2, sev:'주의',
+  {n:'VRAM 포화', metric:'vram_gb', op:'초과', th:70, dur:2, sev:'주의',
    ws:'ml-research', scope:'전체', ch:[], by:'유지현(jh.yu)',
-   at:'2026-08-24 09:12:33', fires:[], off:'채널 삭제', offAt:'2026-10-16 14:20:05'}
+   at:'2026-08-24 09:12:33', fires:[], off:'채널 삭제', offAt:'2026-10-16 14:20:05'},
+  /* 건전성 기준이 되는 규칙(모니터링 정책 5.2 · 6.1). llama-3-2-1b-prod 판정 사유의 기준 출처와 맞춘 검토용 값이다.
+     배포 규칙(대상 범위가 배포) · 워크스페이스 규칙 · 전역 규칙(공용 워크스페이스 규칙) 하나씩이다. 사용자가 만든 규칙이라 등록자가 있다 */
+  {n:'첫 토큰 지연', metric:'ttft_p95_ms', op:'초과', th:3500, dur:1, sev:'주의',
+   ws:'ai-service-team', scope:'llama-3-2-1b-prod', ch:[], by:'임승주(sj.lim)', at:'2026-10-21 10:02:14', fires:[]},
+  /* 대상 배포(qwen3-8b-eval)가 종료되어 시스템이 중지한 규칙. 지우지 않고 남겨 대상 범위를 바꿔 다시 쓸 수 있다(정책 6.4).
+     ⚠ 중지 사유 값(채널 삭제의 CHANNEL_DELETED 같은 값)은 구현 확인 대상이다. 검토용 값이다 */
+  {n:'첫 토큰 지연 평가', metric:'ttft_p95_ms', op:'초과', th:4000, dur:1, sev:'주의',
+   ws:'ai-service-team', scope:'qwen3-8b-eval', ch:['slack-ai-alert'], by:'임승주(sj.lim)', at:'2026-09-30 14:20:11',
+   fires:[], off:'대상 없음', offAt:'2026-10-19 18:02:40'},
+  {n:'대기 요청 적체', metric:'queue_depth', op:'초과', th:50, dur:1, sev:'주의',
+   ws:'ai-service-team', scope:'전체', ch:['slack-ai-alert'], by:'성유진(yj.seong)', at:'2026-10-21 10:05:40', fires:[]},
+  {n:'서버 오류율', metric:'gw_error_rate', op:'초과', th:5, dur:1, sev:'주의',
+   ws:'공용 워크스페이스', scope:'전체', ch:[], by:'성유진(yj.seong)', at:'2026-10-20 16:40:02', fires:[]},
+  /* 시스템 기본 규칙 4종의 원본. 공용 워크스페이스에 속한 전역 규칙이고 최고 관리자만 고친다(모니터링 정책 6.1 · 6.4). 시스템이 만들어 등록자가 없다.
+     gid 는 원본과 복제본을 잇는 검토용 키다. 연결된 복제본(linked)은 원본의 임계값 · 연산자 · 심각도 · 채널을 따른다(정책 6.4) */
+  {n:'VRAM 초과', metric:'vram_gb', op:'초과', th:75, dur:1, sev:'오류',
+   ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g1'},
+  {n:'응답 지연 증가', metric:'latency_p99_ms', op:'초과', th:2000, dur:1, sev:'주의',
+   ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g2'},
+  {n:'가속기 온도 오류', metric:'gpu_temp', op:'초과', th:85, dur:1, sev:'오류',
+   ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g3'},
+  {n:'가속기 온도 주의', metric:'gpu_temp', op:'초과', th:80, dur:1, sev:'주의',
+   ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g4'},
+  /* ai-service-team 의 복제본. 손대지 않은 셋은 연결되어 있다. `가속기 온도 오류` 복제본은 지웠다 —
+     사용자 규칙 `가속기 온도 이상` 이 같은 범위 · 메트릭 · 심각도라 함께 둘 수 없다(정책 6.3 중복). 지운 복제본의 지표는 전역 규칙으로 판정한다(정책 6.4) */
+  {n:'VRAM 초과', metric:'vram_gb', op:'초과', th:75, dur:1, sev:'오류',
+   ws:'ai-service-team', scope:'전체', ch:[], by:null, at:'2026-08-20 10:00:00', fires:[], linked:true, gid:'g1'},
+  {n:'응답 지연 증가', metric:'latency_p99_ms', op:'초과', th:2000, dur:1, sev:'주의',
+   ws:'ai-service-team', scope:'전체', ch:[], by:null, at:'2026-08-20 10:00:00', fires:[], linked:true, gid:'g2'},
+  {n:'가속기 온도 주의', metric:'gpu_temp', op:'초과', th:80, dur:1, sev:'주의',
+   ws:'ai-service-team', scope:'전체', ch:[], by:null, at:'2026-08-20 10:00:00', fires:[], linked:true, gid:'g4'},
+  /* 시스템 기본 규칙 복제본(모니터링 정책 6.4 · REQ-MON-084). 워크스페이스를 만들 때 복제된다. 시스템이 만들어 등록자가 없다.
+     linked 가 true 면 전역 규칙에 연결된 상태다. 규칙명 아래 `전역 기본` 배지를 둔다.
+     임계값 · 연산자 · 심각도 · 채널 · 사용 여부 중 하나를 바꾸면 연결이 풀려 워크스페이스 규칙이 되고 배지를 지운다. 중지도 사용 여부를 바꾼 것이다.
+     `가속기 온도 주의` 는 워크스페이스에서 임계값을 80°C 에서 78°C 로 고쳐 연결이 풀린 예다. 규칙 이름 · 시각은 검토용이다 */
+  {n:'VRAM 초과', metric:'vram_gb', op:'초과', th:75, dur:1, sev:'오류',
+   ws:'ml-research', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], linked:true, gid:'g1'},
+  {n:'응답 지연 증가', metric:'latency_p99_ms', op:'초과', th:2000, dur:1, sev:'주의',
+   ws:'ml-research', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:['2026-10-21 13:22:05'], linked:true, gid:'g2'},
+  {n:'가속기 온도 오류', metric:'gpu_temp', op:'초과', th:85, dur:1, sev:'오류',
+   ws:'ml-research', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], linked:true, gid:'g3'},
+  {n:'가속기 온도 주의', metric:'gpu_temp', op:'초과', th:78, dur:1, sev:'주의',
+   ws:'ml-research', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g4'}
 ];
 
 /* 메트릭 카탈로그: 백엔드가 가진다. 프로파일 순서로 묶는다(정책 6.3).
    sev·op·th 는 메트릭을 고를 때 채우는 표준값이다. on:false 는 수집되지 않는 메트릭이다.
    ⚠ 항목과 값은 데모다. 실제로는 카탈로그 응답을 따른다 */
 const PROFILES=['GPU','GPU 건전성','NPU','엔진','게이트웨이','노드'];
+/* hb: 건전성 판정 유형(모니터링 정책 5.2 · 6.3). 백엔드가 카탈로그 항목마다 내려준다(결정 사항 댓글 3493658729 결정(안) 3).
+     over 초과형(위험 = 기준값의 2배) · room 여유형(위험 = 기준값 + 상한까지 남은 여유의 절반) · temp 규칙 심각도가 등급.
+   nocrit: 위험이 없어 주의까지만 판정하는 지표다.
+   건전성 반영 메트릭의 표준 임계값은 정책 5.2 기본 임계다. 이름은 화면 표기 검토용이다.
+   NPU 스로틀링 발생은 건전성 반영(열 · 전력 제한, Furiosa) · `0 초과` 주의다(결정 사항 댓글 3493265556 알림 항목 표). 주의까지만 판정한다(모니터링 정책 5.2 표 밖의 판정) */
 const CATALOG=[
-  {k:'gpu_util',       p:'GPU',      t:'가속기 사용률',   u:'%',  sev:'주의', op:'초과', th:95,   on:true},
-  {k:'vram_usage',     p:'GPU',      t:'VRAM 점유율',    u:'%',  sev:'주의', op:'초과', th:90,   on:true},
-  {k:'gpu_temp',       p:'GPU',      t:'가속기 온도',     u:'°C', sev:'오류', op:'초과', th:85,   on:true},
-  {k:'gpu_power',      p:'GPU',      t:'가속기 전력',     u:'W',  sev:'정보', op:'초과', th:600,  on:true},
+  {k:'gpu_util',       p:'GPU',      t:'가속기 사용률',   u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room', nocrit:true},
+  {k:'vram_gb',        p:'GPU',      t:'VRAM 사용량',    u:'GB', sev:'오류', op:'초과', th:75,   on:true},
+  {k:'gpu_temp',       p:'GPU',      t:'가속기 온도',     u:'°C', sev:'오류', op:'초과', th:85,   on:true, hb:'temp'},
+  {k:'gpu_power',      p:'GPU',      t:'가속기 전력',     u:'W',  sev:'주의', op:'초과', th:650,  on:true},
   {k:'gpu_xid',        p:'GPU 건전성', t:'GPU Xid 오류',   u:'',   sev:'정보', xid:true,            on:true},
   {k:'gpu_ecc',        p:'GPU 건전성', t:'ECC 오류',       u:'건', sev:'오류', op:'초과', th:0,    on:false},
   {k:'gpu_throttle',   p:'GPU 건전성', t:'클럭 제한',      u:'건', sev:'주의', op:'초과', th:0,    on:false},
-  {k:'npu_util',       p:'NPU',      t:'NPU 사용률',     u:'%',  sev:'주의', op:'초과', th:95,   on:true},
+  {k:'throttle_ratio', p:'GPU 건전성', t:'열·전력 제한 비율', u:'%', sev:'주의', op:'초과', th:5,    on:true, hb:'over'},
+  {k:'npu_util',       p:'NPU',      t:'NPU 사용률',     u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room', nocrit:true},
   {k:'npu_temp',       p:'NPU',      t:'NPU 온도',       u:'°C', sev:'오류', op:'초과', th:85,   on:true},
-  {k:'kv_cache_usage', p:'엔진',      t:'KV 캐시 사용률',  u:'%',  sev:'주의', op:'초과', th:95,   on:true},
+  {k:'npu_throttle',   p:'NPU',      t:'NPU 스로틀링 발생', u:'회', sev:'주의', op:'초과', th:0,   on:true, hb:'over', nocrit:true},
+  {k:'ttft_p95_ms',    p:'엔진',      t:'첫 토큰 지연 P95', u:'ms', sev:'주의', op:'초과', th:3000, on:true, hb:'over'},
+  {k:'tpot_p99_ms',    p:'엔진',      t:'토큰당 지연 P99', u:'ms', sev:'주의', op:'초과', th:200,  on:true, hb:'over'},
+  {k:'kv_cache_usage', p:'엔진',      t:'KV 캐시 사용률',  u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room'},
   {k:'latency_p99_ms', p:'엔진',      t:'P99 응답 지연',  u:'ms', sev:'주의', op:'초과', th:2000, on:true},
-  {k:'queue_depth',    p:'엔진',      t:'대기 요청 큐',    u:'건', sev:'주의', op:'초과', th:50,   on:true},
-  {k:'gw_error_rate',  p:'게이트웨이',  t:'에러율',         u:'%',  sev:'오류', op:'초과', th:5,    on:true},
-  {k:'node_mem',       p:'노드',      t:'노드 메모리 사용률', u:'%', sev:'주의', op:'초과', th:90,   on:true}
+  {k:'queue_depth',    p:'엔진',      t:'대기 요청 큐',    u:'건', sev:'주의', op:'초과', th:50,   on:true, hb:'over', nocrit:true},
+  {k:'preempt',        p:'엔진',      t:'선점 증가',       u:'회', sev:'주의', op:'초과', th:20,   on:true, hb:'over', nocrit:true},
+  {k:'gw_error_rate',  p:'게이트웨이',  t:'서버 오류율(5xx)', u:'%', sev:'주의', op:'초과', th:5,    on:true, hb:'over'},
+  {k:'node_mem',       p:'노드',      t:'노드 메모리 사용률', u:'%', sev:'주의', op:'초과', th:85,   on:true}
 ];
 /* Xid 코드: 판정표(즉시 조치 기준 등급)를 오류·주의·정보로 바꿔 쓴다(정책 6.3).
    ⚠ 일부만 실은 데모다. 실제로는 카탈로그의 Xid 코드 표를 따른다 */
@@ -2990,6 +3359,8 @@ function xidOrder(v){
    가장 최근 코드만 두면 정보 등급 코드가 앞서 난 오류 등급 코드를 가린다. 표는 어느 GPU가 문제인지 훑는 자리라 급한 것을 앞에 둔다.
    `외 N건` 으로 두면 다른 코드 수인지 발생 수인지 갈리지 않아 전체 발생 건수로 적는다 */
 function xidCell(x){
+  /* MIG 인스턴스의 Xid 는 4.1 범위다. `-` 가 아니라 칸을 비운다(모니터링 정책 4.3) */
+  if(x.migOf) return '';
   if(x.st==='확인 불가' || /MIG/.test(x.dev)) return dash();
   const v=xidOf(x);
   if(v===null) return '<span class="dash">수집 불가</span>';
@@ -3190,10 +3561,12 @@ function scopeWs(){
 }
 /* 워크스페이스 할당량 — 가속기 유형별 장 수(워크스페이스 정책 5.1). 공용 워크스페이스는 할당이 없다(정책 6.1).
    ⚠ 검토용 데모 값이다. 실제 값은 워크스페이스 할당량 응답에서 온다 */
-/* 워크스페이스별 합계는 홈 목업 워크스페이스 자원(가속기 배정 장)과 같게 둔다 — 8 · 10 · 8장. 합이 클러스터 장 수를 넘지 않는다 */
+/* 합이 클러스터 장 수를 넘지 않는다 */
+/* 사용이 할당을 넘지 않게 둔다. 할당 초과 배포는 막힌다(배포 정책 4.2). MIG 는 별도 타입이다(워크스페이스 정책 5.4).
+   ai-service-team 은 16장이다. 홈 목업(8장)은 다음 갱신 때 맞춘다 */
 const QUOTA={
-  'ai-service-team':{'NVIDIA-H200':4,'NVIDIA-A100':4},
-  'ml-research':{'NVIDIA-H200':4,'NVIDIA-L40S':2,'Furiosa RNGD':4},
+  'ai-service-team':{'NVIDIA-H200':10,'NVIDIA-A100':4,'NVIDIA-H200 MIG':2},
+  'ml-research':{'NVIDIA-H200':6,'NVIDIA-A100':2,'NVIDIA-L40S':2},
   'test-npu':{'Furiosa RNGD-S':4,'Furiosa RNGD':4}
 };
 /* 할당 대비 사용 — 유형별 할당 · 사용 · 잔여 장 수(모니터링 정책 4.4 · REQ-MON-020).
@@ -3245,7 +3618,12 @@ function render(){
   const el=document.getElementById('monBody');
   if(state==='loading'){ el.innerHTML=skel(); return; }
   if(state==='error'){ el.innerHTML=errBox(); return; }
-  if(tab===0){ drawAcc(el); syncFoldAll(); }
+  if(tab===0){
+    grpPerRowUsed=0; drawAcc(el);
+    /* 카드 한 줄 개수는 그려진 영역 폭으로 잰다. 처음 그릴 때 잰 값과 다르면 한 번 더 그린다 */
+    if(grpPerRowUsed && grpPerRow()!==grpPerRowUsed) drawAcc(el);
+    syncFoldAll(); syncGrpFold();
+  }
   else if(tab===1) drawPerf(el);
   else if(tab===2) drawRules(el);
   else if(tab===3) drawTrace(el);
@@ -3290,7 +3668,9 @@ function drawOverview(){
      저활용 주의는 사용자가 일부러 띄워 둔 배포라 세지 않는다(모니터링 정책 4.4 · 5.2) */
   const bad = deps.filter(function(d){ return !!depBad(d); }).length;
 
-  const ruleCnt = ruleList().length;
+  /* 감시 중인 규칙만 센다. 중지된 규칙은 조건을 평가하지 않는다. 범위는 알림 규칙 탭 목록과 같다(MON-L01 7.4) */
+  const ruleCnt = ruleBase().filter(function(r){ return !r.off; }).length;
+  const ruleOff = ruleBase().length - ruleCnt;
 
   el.innerHTML = '<div class="ovrow">'
    /* 개요는 훑는 자리다. 링·막대·값이 한 줄에 섞이면 무엇을 견주는지 안 보이고
@@ -3307,16 +3687,18 @@ function drawOverview(){
        })()
    +   ovcard('배포', deps.length+'<small>개</small>',
             bad? bad+'건 확인 필요' : '이상 없음')
-   +   ovcard('알림 규칙', ruleCnt+'<small>개</small>', '감시 중')
+   +   ovcard('알림 규칙', ruleCnt+'<small>개</small>', ruleOff? '중지 '+ruleOff+'개' : '감시 중')
    + '</div>'
    + troubleBar()
    + '</div>';
 }
 /* 확인 필요 항목 배너 — 개요 카드 옆에 절반 크기로 붙는다.
    내용·동작은 그대로다. HTML만 만들어 반환하고 그리기는 drawOverview가 한다 */
-/* 배포가 스무 개면 스무 건이 나온다. 다섯까지 보이고 나머지는 접는다 —
-   알림 팝오버와 같은 방식이다 */
-const TR_SHOWN=5;
+/* 배포가 스무 개면 스무 건이 나온다. 셋까지 보이고 나머지는 접는다 —
+   알림 팝오버와 같은 방식이다.
+   개요 영역 높이는 숫자 카드 기준으로 두고 확인 필요 항목은 그 높이에 들어가는 만큼(지금 크기로 세 건)만 보인다.
+   숫자 카드가 확인 필요 항목 길이에 맞춰 늘어나 아래가 비던 문제를 줄인다(노드 그룹 검토 문서 5장 별건 제안 · v0.28 반영) */
+const TR_SHOWN=3;
 let trMore=false;
 function tgTrMore(e){ if(e) e.stopPropagation(); trMore=!trMore; drawOverview(); }
 
@@ -3358,6 +3740,9 @@ function rangeSeg(){
 }
 /* 규칙을 만들고 고칠 수 있는 역할(정책 6.1) */
 const canEdit=()=>role==='super'||role==='admin';
+/* 전역 규칙(공용 워크스페이스 규칙)은 최고 관리자만 만들고 고친다(모니터링 정책 6.1 · 6.4 · REQ-MON-067 · 075) */
+const canEditRule=(r)=>canEdit() && (isSuper() || r.ws!=='공용 워크스페이스');
+const canAddRule=()=>canEdit() && (isSuper() || wsCur!=='공용 워크스페이스');
 
 /* 화면 헤더 액션 자리 — 이 화면은 탭 5개짜리라 "화면 전체 = 목록 하나"가 아니다.
    규칙 추가는 목록 툴바로 옮겼다(toolbarRule, 기획 판단 2026-08-28).
@@ -3385,7 +3770,8 @@ function drawTabs(){
   /* 탭 배지 — 알림 규칙은 몇 건이 걸려 있는지가 탭을 열기 전 판단 재료다.
      가속기·배포 성능은 건수를 견줄 대상이 아니라 두지 않는다(워크스페이스 정책 10. 5번) */
   const t = (scope===1? TABS1 : TABS1.concat(TABS2)).map(function(x){
-    return [x[0], x[1], x[2]==='rules'? ruleList().length : null];
+    /* 빈 상태 · 오류 · 로딩에는 건수를 두지 않는다. 목록과 배지가 어긋난다 */
+    return [x[0], x[1], (x[2]==='rules' && ['empty','error','loading'].indexOf(state)<0)? ruleBase().length : null];
   });
   document.getElementById('monTabs').innerHTML = t.map(function(x,i){
     return '<button class="'+(tab===i?'on':'')+'" onclick="setTab('+i+')">'+x[0]
@@ -3394,7 +3780,8 @@ function drawTabs(){
       + '<span class="tip">'+x[1]+'</span></span></button>';
   }).join('');
 }
-function setTab(i){ tab=i; closeSlot(); render(); }
+/* 가속기 탭에 다시 들어오면 노드 그룹 선택 · 펼친 노드를 기본으로 돌린다(노드 그룹 검토 문서 4.5) */
+function setTab(i){ if(i===0 && tab!==0) resetGrpView(); tab=i; closeSlot(); render(); }
 
 /* 30초마다 자동으로 갱신한다(모니터링 정책 2.3 · REQ-MON-003). Xid 수집 간격이 30초라 더 자주 불러도 값이 바뀌지 않는다.
    목업은 갱신 시각만 바꾼다 — 실제 화면에는 없는 검토용 처리다. 실제 화면은 값을 다시 부르고
@@ -3436,11 +3823,18 @@ let nodeOpen=[];
    건전성(점수·하위 지표·진단 원인·조치 권고)이 든다(2026-10-14 결정) */
 let scope=1;
 function isV41(){ return scope===2; }
+/* 4.1 은 배포 성능 탭에 건전성 점수가 더해지고 트레이스 · 진단 로그 탭이 생긴다. 4.1 을 누르면 점수가 보이는 배포 성능 탭으로 옮긴다.
+   실제 화면에는 없는 검토용 처리다 */
 function setScope(v,btn){
   scope=v;
   document.querySelectorAll('.demo-bar .sc').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
   if(tab>=TABS1.length && scope===1) tab=0;
+  if(scope===2){
+    demoBase(false);
+    src='ok'; document.querySelectorAll('#demoBar .sr').forEach(function(b){ b.classList.toggle('on', b.textContent==='정상'); });
+    tab=1; dep='llama-3-2-1b-prod'; rsOpen=false;
+  }
   render();
 }
 function tgNode(n2){
@@ -3505,10 +3899,11 @@ function drawAcc(el){
   }
   /* 좁히지 않았는데 비면 종전 빈 상태. 좁혀서 비면 아래에서 체크박스를 남긴 채 따로 안내한다 */
   if(state==='empty' || (!slots.length && !(mineOnly && mineUsable()))){
-    el.innerHTML = emptyBox('표시할 가속기가 없습니다.','소속 워크스페이스에 배정된 가속기가 없습니다.');
+    /* 최고 관리자는 클러스터 전체를 본다. 소속 워크스페이스 문구가 맞지 않는다(MON-L01 5.2) */
+    el.innerHTML = emptyBox('표시할 가속기가 없습니다.', isSuper()? '클러스터에서 수집된 가속기가 없습니다.' : '소속 워크스페이스에 배정된 가속기가 없습니다.');
     return;
   }
-  const nodes=visibleNodes();
+  let nodes=visibleNodes();
 
   /* 조회 범위 토글 — 스위처가 워크스페이스를 골랐을 때만 나온다.
      `전체` 를 보고 있으면 좁힐 대상이 없어 존재할 이유가 없다.
@@ -3530,7 +3925,7 @@ function drawAcc(el){
      값이 먼저 읽히게 왼쪽 위에 둔다. 오른쪽 끝에 붙이면 라벨과 멀어져 시선이 안 이어진다.
      가속기 모델마다 막대를 따로 둔다 — 한 막대에 다 넣으면 어디까지가 어느 모델인지
      가릴 수 없고, 색은 이미 상태(사용 중·유휴)가 쓰고 있어 모델에 또 쓸 수 없다 */
-  const byDev={};
+  const byDev={}, layer=grpLayer();
   slots.forEach(function(x){ (byDev[x.dev]=byDev[x.dev]||[]).push(x); });
 
   /* 최고 관리자가 아니면 전체 층 대신 할당 층(정책 4.4) */
@@ -3549,22 +3944,55 @@ function drawAcc(el){
     +     legend(slots)
     +   '</div>'
     + '</div>'
-    /* 전체를 쪼갠 것이라 카드 안에 들여 넣는다. 밖에 두면 나란한 것으로 읽힌다 */
-    + devList(byDev)
+    /* 전체를 쪼갠 것이라 카드 안에 들여 넣는다. 밖에 두면 나란한 것으로 읽힌다.
+       노드 그룹이 둘 이상이면 `가속기 모델별 / 노드 그룹별` 로 전환한다(노드 그룹 검토 문서 4.2) */
+    + (layer? (BRK==='grp'? grpList(nodes) : devList(byDev, true)) : devList(byDev))
     + '</div>';
 
   /* 필터로 다 걸러지면 노드 제목만 남는다. 조건을 풀 수단을 함께 둔다 */
   const anyLeft = nodes.some(function(nd){
-    return nd.slots.some(function(x){ return !slotSel.length || slotSel.indexOf(x.st)>=0; });
+    return nd.slots.some(slotOk);
   });
+
+  /* 노드 그룹 층 — 그룹 순서로 놓고, 고른 그룹이 있으면 그 그룹만 둔다 */
+  if(layer){
+    nodes = byGrp(nodes);
+    if(GRP_SEL.length) nodes = nodes.filter(grpSelOk);
+  }
+  /* 가속기 모델을 고르면 그 가속기 모델 슬롯이 있는 노드만 남긴다 */
+  if(DEV_SEL.length) nodes = nodes.filter(function(nd){ return nd.slots.some(devOk); });
+  /* v0.28 피드백 — 가속기 모델을 고른 동안에는 노드 그룹 묶음을 두지 않고 노드만 나열한다.
+     고른 가속기 바로 아래에 노드 그룹 머리가 나오면 노드 그룹이 그 가속기에 속한 것처럼 읽힌다.
+     구조는 노드 그룹 > 노드 > 슬롯(정책 4.1)이라, 가속기 모델로 찾은 결과는 `그 가속기가 있는 노드` 이고
+     노드 그룹은 그 노드의 소속 정보로 카드에 붙인다. 노드 그룹 카드로 고를 때만 노드 그룹으로 묶는다 */
+  const sect = layer && !DEV_SEL.length;
 
   /* ── 층 2 · 노드 ──────────────────────────── */
   /* 노드 상태 값별 의미는 그룹 제목에 한 번 둔다. 카드마다 되풀이하지 않는다 —
      슬롯 상태를 표 헤더 도움말 하나로 밝히는 것과 같은 방식이다(공통정책 2.3) */
   /* 노드 상태 도움말은 상태를 보는 최고 관리자에게만 둔다 */
-  h += '<div class="grouph">노드<span class="gcnt">'+nodes.length+'</span>'+(isSuper()? tip(COLDEF.nst) : '')
-    + (nodes.length>1 ? nodeFold() : '')
+  /* v0.28 피드백 — 노드 그룹 묶음으로 나열할 때 제목이 `노드 4` 면 바로 아래 묶음(노드 그룹)과 층이 어긋난다.
+     묶음으로 나열할 때는 제목을 `노드 그룹` 으로 두고 노드 그룹 수 · 노드 수를 함께 쓴다. 노드는 `대` 로 센다(노드 그룹 검토 문서 `노드 10대`) */
+  /* 미지정 묶음은 노드 그룹이 아니라 세지 않는다(용어집 v0.13 · 정책 4.4) */
+  const ngCnt = sect ? grpKeys(nodes).filter(function(k){ return k!==NOGRP; }).length : 0;
+  h += '<div class="grouph">'
+    + (sect? '노드 그룹<span class="gcnt">'+ngCnt+'개 · 노드 '+nodes.length+'대</span>'
+       : '노드<span class="gcnt">'+nodes.length+'대</span>')
+    + (isSuper()? tip(COLDEF.nst) : '')
+    /* 노드가 둘을 넘을 때만 둔다(REQ-MON-026). 둘이면 하나씩 눌러도 된다.
+       가속기 모델을 고른 동안에는 노드가 모두 펼쳐져 있어 두지 않는다 */
+    /* 노드 그룹 층이 있으면 노드 제목 줄 버튼은 묶음을 접고 편다. 모두 접으면 묶음 머리만 남아 노드 그룹이 한눈에 보인다 */
+    + (sect ? grpAllFold(nodes) : (nodes.length>2 && !DEV_SEL.length ? nodeFold() : ''))
     + '</div>';
+  /* 고른 노드 그룹 · 가속기 모델을 검색 조건 칩으로 보인다(공통정책 1장 조작 토큰 · 3.2). 제목은 건수만 둔다.
+     칩의 ✕로 하나씩 풀고 `전체 노드 보기` 로 한 번에 푼다(3.2 전체 초기화) */
+  const selChips = (layer? GRP_SEL.map(function(k){ return ['노드 그룹', grpName(k), 'tgGrpSel(\''+k+'\')']; }) : [])
+    .concat(DEV_SEL.map(function(d){ return ['가속기 모델', d, 'tgDevSel(\''+d+'\')']; }));
+  if(selChips.length){
+    h += '<div class="chips selchips">'
+      + selChips.map(function(c){ return '<span class="schip">'+c[0]+': '+c[1]+'<button title="조건 삭제" onclick="'+c[2]+'">✕</button></span>'; }).join('')
+      + '<button class="txtbtn" onclick="GRP_SEL=[];DEV_SEL=[];render()">전체 노드 보기</button></div>';
+  }
 
   if(!anyLeft){
     h += '<div class="state">'
@@ -3574,11 +4002,31 @@ function drawAcc(el){
     el.innerHTML=h; return;
   }
 
+  let lastGrp, opened=false;
   nodes.forEach(function(nd){
+    /* 그룹이 바뀌는 자리에 구획 머리. 머리를 누르면 그 묶음을 접고 편다(노드 그룹 검토 문서 4.2). 기본은 펼침이다(노드 그룹 검토 문서 4.5) */
+    if(sect && grpKey(nd)!==lastGrp){
+      if(opened) h += '</div>';
+      lastGrp=grpKey(nd); opened=true;
+      const pn=nodes.filter(function(x){ return grpKey(x)===lastGrp; });
+      const ps=pn.reduce(function(a,x){ return a.concat(x.slots); },[]);
+      const sup=isSuper();
+      const gc = grpClosed.indexOf(lastGrp)>=0;
+      h += '<div class="ngsec-h'+(gc?' closed':'')+'" role="button" aria-expanded="'+(!gc)+'" onclick="tgGrpClosed(\''+lastGrp+'\')">'
+        + '<span class="foldbtn" title="'+(gc?'펼치기':'접기')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span>'
+        + '<b>'+grpName(lastGrp)+'</b><span class="pmeta">노드 '+pn.length+'대</span>'
+        /* 그룹 집계(사용 / 전체 · 사용률 · 막대)는 위 `노드 그룹별` 카드가 맡는다. 머리에는 이름 · 노드 수 · 이상만 둔다.
+           카드가 없는 최고 관리자 외 역할은 쓰는 장 수를 두고, 노드 상태를 보지 않아 이상도 두지 않는다(정책 4.4 · 노드 그룹 검토 문서 4.5) */
+        + (sup? badTxt(badNodes(pn)) : '<span class="pmeta">가속기 <b>'+ps.length+'</b>장 사용</span>')
+        /* 묶음의 노드가 둘을 넘을 때만 둔다. 노드 제목 줄 `모두 펼침` 과 같은 기준이다(REQ-MON-026 · REQ-MON-079) */
+        /* 묶음이 펼쳐져 있을 때만 그 묶음 노드의 펼치기 · 접기를 둔다 */
+        + (pn.length>2 && !DEV_SEL.length && !gc? grpFold(lastGrp) : '')
+        + '</div><div class="ngsec-body"'+(gc?' hidden':'')+'>';
+    }
     const nid = 'nd-'+nd.n.replace(/[^a-z0-9]/gi,'');
     /* 슬롯 필터가 걸리면 결과가 가려지지 않게 자동으로 펼친다 */
-    const closed = !slotSel.length && nodeOpen.indexOf(nd.n)<0;
-    const view = nd.slots.filter(function(x){ return !slotSel.length || slotSel.indexOf(x.st)>=0; });
+    const closed = !slotSel.length && !DEV_SEL.length && nodeOpen.indexOf(nd.n)<0;
+    const view = nd.slots.filter(slotOk);
     const lost = nodeLost(nd);
 
     h += '<div class="ncard'+(closed?' closed':'')+'" id="'+nid+'">'
@@ -3586,7 +4034,10 @@ function drawAcc(el){
       + '<div class="ncard-head" onclick="tgNode(\'' + nd.n + '\')">'
       +   nodeIcon(nd.kind)
       +   '<div class="ncard-id">'
-      +     '<div class="ncard-n mono">'+nd.n+'</div>'
+      +     '<div class="ncard-n mono">'+nd.n
+      /* 묶음 없이 나열할 때(가속기 모델 선택) 노드 그룹을 그 노드의 소속으로 이름 옆에 붙인다 */
+      +       (layer && !sect? ' <span class="vbadge" style="margin-left:6px">'+grpName(grpKey(nd))+'</span>' : '')
+      +     '</div>'
       +     '<div class="ncard-sub">'+nodeSub(nd)+' · <span class="mono">'+nd.ip+'</span></div>'
       +   '</div>'
       /* 상태 배지 옆에 그 상태가 시작된 시각을 둔다(정책 4.5 · REQ-MON-034) */
@@ -3633,14 +4084,26 @@ function drawAcc(el){
       +   (xidNode(nd)? '<th class="thcell">'+thHelp('xid','Xid 오류')+'</th>' : '')
       +   '<th class="thcell">'+thFilterSt()+'</th>'
       +   '<th class="thcell">'+thHelp('dep','점유 배포')+'</th></tr></thead><tbody>'
-      +   view.map(function(x){
+      +   view.map(function(x, ix){
             const dead = x.st==='확인 불가';
-            return '<tr onclick="openSlot(\'' + nd.n + '\',' + x.no + ')" style="cursor:pointer">'
-             + '<td class="num"><span class="mname mono">#'+x.no+'</span></td>'
-             + '<td>'+vendorBadge(x.dev)+x.dev+'<span class="mver mono">'+x.id+'</span></td>'
+            /* MIG 인스턴스면 그 부모 GPU 의 첫 인스턴스 앞에 부모 행을 둔다. 부모 행은 기본 접힘이다(모니터링 정책 4.3 · MON-L01 7.1).
+               상태 필터가 걸리면 걸린 인스턴스가 가려지지 않게 펼친다 */
+            let pre='';
+            if(x.migOf){
+              const first = ix===0 || view[ix-1].migOf!==x.migOf;
+              const mopen = slotSel.length>0 || DEV_SEL.length>0 || migOpen.indexOf(nd.n+':'+x.migOf)>=0;
+              if(first) pre = migRow(nd, x.migOf, mopen);
+              if(!mopen) return pre;
+            }
+            const mig = !!x.migOf;
+            return pre + '<tr onclick="openSlot(\'' + nd.n + '\',\'' + x.no + '\')" style="cursor:pointer">'
+             /* 인스턴스 행은 부모 행 아래로 들여 써서 묶음이 드러나게 한다 */
+             + '<td class="num"'+(mig? ' style="padding-left:39px;white-space:nowrap"' : '')+'><span class="mname mono">#'+x.no+'</span></td>'
+             + '<td>'+vendorBadge(x.dev)+x.dev+(x.id? '<span class="mver mono">'+x.id+'</span>' : '')+'</td>'
              /* 막대(지금 값)에서 스파크라인(추세+호버 상세)으로 바꿨다 — 건전성 카드와 같은
                 방식이다. 임계값 신호는 막대색 대신 값 색으로 옮겼다(기획 판단, 2026-08-28) */
-             + '<td>'+(dead? dash()
+             /* MIG 인스턴스는 연산 코어 사용률이 수집되지 않아 칸을 비운다(정책 4.3 · 결정 사항 댓글 3493265556) */
+             + '<td>'+(mig? '' : dead? dash()
                  : '<div class="pcwrap"><span class="pcv mono'+(x.core>=90?' crit':(x.core>=70?' warn':''))+'">'+x.core+'%</span>'
                    +'<div class="hspark">'+miniSpark('acccore'+nd.n+x.no+range, '%')+'</div></div>')+'</td>'
              + '<td>'+(dead? dash()
@@ -3649,8 +4112,9 @@ function drawAcc(el){
                      return '<div class="pcwrap"><span class="pcv mono'+(vp>=90?' crit':(vp>=70?' warn':''))+'">'+x.vram.use.toFixed(1)+' / '+x.vram.cap+' GB</span>'
                        +'<div class="hspark">'+miniSpark('accvram'+nd.n+x.no+range, '%')+'</div></div>';
                    })())+'</td>'
-             + '<td class="mono">'+(dead? dash() : x.temp+'°C')+'</td>'
-             + '<td class="mono">'+(dead? dash() : x.pw+'W')+'</td>'
+             /* MIG 인스턴스는 온도 · 전력이 오지 않는다. `-` 로 두면 값이 안 들어온 것으로 읽혀 칸을 비운다. 값은 부모 행에서 본다(정책 4.3 · 5.3) */
+             + '<td class="mono">'+(mig? '' : dead? dash() : x.temp+'°C')+'</td>'
+             + '<td class="mono">'+(mig? '' : dead? dash() : x.pw+'W')+'</td>'
              + (xidNode(nd)? '<td>'+xidCell(x)+'</td>' : '')
              + '<td><span class="stbadge '+(SLOTB[x.st]||'mu')+'">'+x.st+'</span></td>'
      /* 장치별 할당이라 슬롯 하나에 배포 하나다(2026-09-02 확인) */
@@ -3668,7 +4132,121 @@ function drawAcc(el){
       + '</div>'
       + '</div>';
   });
+  if(opened) h += '</div>';
   el.innerHTML=h;
+}
+
+/* MIG 부모 GPU 행. 가속기 이름 · 인스턴스 수 · 전체 VRAM · 온도 · 전력만 둔다. 연산 코어 · Xid · 상태 · 점유 배포 칸은 비운다(MON-L01 7.1).
+   펼침 화살표는 왼쪽이고 최근 발생 펼침(.rfire-btn)과 같은 규격이다. 눌러도 패널을 열지 않는다. 부모 GPU 는 슬롯이 아니다 */
+function migRow(nd, p, open){
+  const P=migParent(nd, p); if(!P) return '';
+  return '<tr onclick="tgMig(\'' + nd.n + '\',' + p + ')" style="cursor:pointer" title="'+(open?'접기':'펼치기')+'">'
+    + '<td class="num"><span class="rfire-btn'+(open?' on':'')+'">'
+    +   '<span class="foldbtn sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span>'
+    +   '<span class="mono">#'+p+'</span></span></td>'
+    + '<td>'+vendorBadge(P.dev)+P.dev+'<span class="mver">MIG 인스턴스 '+P.n+'개</span></td>'
+    + '<td></td>'
+    + '<td class="mono">'+P.vram+' GB</td>'
+    + '<td class="mono">'+P.temp+'°C</td>'
+    + '<td class="mono">'+P.pw+'W</td>'
+    + (xidNode(nd)? '<td></td>' : '')
+    + '<td></td><td></td></tr>';
+}
+
+/* ── 노드 그룹 공용(노드 그룹 검토 문서 · v0.28) ───────────────── */
+/* 지금 노드 목록에 보이는 노드 — 그룹을 고르면 그 그룹만. `모두 펼침` 은 보이는 노드에만 건다 */
+function shownNodes(){
+  const list=visibleNodes();
+  return (grpLayer() && GRP_SEL.length) ? list.filter(grpSelOk) : list;
+}
+/* 구획별 `노드 모두 펼침` — 그 그룹의 노드 슬롯 표만 펼치고 접는다. 노드 제목 줄 `모두 펼침` 과 같은 체크박스 · 중간 상태 규칙이다 */
+function grpNodes(k){ return visibleNodes().filter(function(nd){ return grpKey(nd)===k; }).map(function(nd){ return nd.n; }); }
+function grpFold(k){
+  const ns=grpNodes(k), open=ns.filter(function(n){ return nodeOpen.indexOf(n)>=0; }).length;
+  const all = ns.length && open===ns.length;
+  /* 노드 제목 줄과 같은 텍스트 버튼이다. 라벨은 누르면 일어날 동작이다.
+     묶음 머리 안의 버튼이라 `모두` 를 뺀다. 바로 위 노드 제목 줄의 `모두 펼치기`(전체)와 라벨로 범위가 갈린다 */
+  return '<button class="txtbtn ngfold" onclick="event.stopPropagation();setGrpNodes(\''+k+'\','+(!all)+')">'
+   + (all? '접기' : '펼치기')+'</button>';
+}
+function setGrpNodes(k, open){
+  const ns=grpNodes(k);
+  nodeOpen = nodeOpen.filter(function(n){ return ns.indexOf(n)<0; });
+  if(open) nodeOpen = nodeOpen.concat(ns);
+  render();
+}
+function syncGrpFold(){
+  document.querySelectorAll('input[data-grp]').forEach(function(el){
+    const ns=grpNodes(el.dataset.grp), open=ns.filter(function(n){ return nodeOpen.indexOf(n)>=0; }).length;
+    el.indeterminate = open>0 && open<ns.length;
+  });
+}
+/* 분해 전환 — `가속기 모델별 / 노드 그룹별`. 기본은 가속기 모델별이다(v0.28 검토에서 바꿈).
+   전체 가속기 카드는 최고 관리자에게만 있어(정책 4.4) 그 외 역할에는 그룹 요약이 없고 아래 구획만 보인다 */
+/* 기본은 가속기 모델별이다. 이 카드는 전체 가속기를 세는 자리이고, 노드 그룹별은 기존 가속기 모델별에 더한 나눠 보기다(노드 그룹 검토 문서 4.2 `가속기 모델별과 전환`) */
+let BRK='dev', grpMore=false;
+/* 전환을 바꾸면 고른 노드 그룹 · 가속기 모델을 푼다. 두 조건을 함께 걸지 않는다 */
+function setBrk(k){ BRK=k; GRP_SEL=[]; DEV_SEL=[]; render(); }
+function brkTabs(){
+  return '<div class="brk">'
+   + '<button class="'+(BRK==='dev'?'on':'')+'" aria-pressed="'+(BRK==='dev')+'" onclick="setBrk(\'dev\')">가속기 모델별</button>'
+   + '<button class="'+(BRK==='grp'?'on':'')+'" aria-pressed="'+(BRK==='grp')+'" onclick="setBrk(\'grp\')">노드 그룹별</button>'
+   + '</div>';
+}
+/* 이상 노드 수 — 상태값이 아니라 개수라 상태 배지를 쓰지 않는다(라이브러리: 상태 배지는 상태값 · 공통정책 5.1).
+   오류 색 글자 + 경고 아이콘으로 노드 수 옆에 둔다. 0건이면 두지 않는다 */
+function badTxt(n){
+  return n ? '<span class="badtx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17h.01"/></svg>이상 '+n+'</span>' : '';
+}
+function grpMoreBtn(rest){
+  return (rest>0 || grpMore ? '<button class="devmore'+(grpMore?' on':'')+'" onclick="grpMore=!grpMore;render()">'
+    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>'
+    + (grpMore? '접기' : rest+'개 노드 그룹 더 보기')+'</button>' : '');
+}
+/* 카드 한 줄에 들어가는 개수 — 영역 폭(카드 200 + 간격 10)으로 계산한다. 고정 개수로 두면 넓은 화면에서 오른쪽이 빈다 */
+let grpPerRowUsed=0;
+function grpPerRow(){
+  const el=document.querySelector('#monBody .devlist');
+  let w;
+  if(el){ const cs=getComputedStyle(el); w=el.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight); }
+  else w=window.innerWidth-420;
+  return Math.max(1, Math.floor((w+10)/210));
+}
+let grpRz;
+window.addEventListener('resize', function(){
+  clearTimeout(grpRz);
+  grpRz=setTimeout(function(){ if(tab===0 && BRK==='grp' && grpLayer()) render(); }, 150);
+});
+/* 노드 그룹 요약 — 전체 가속기 카드 안 분해. 그룹마다 카드(이름 · 설명 · 사용률 · 사용 / 전체 · 막대 · 노드 수 · 이상).
+   가속기 종류는 노드의 속성이라 카드에 두지 않는다. 한 줄에 들어가는 만큼 보이고 나머지는 `더 보기` — 그룹이 많아도 높이가 늘지 않는다.
+   카드를 누를 때마다 그 그룹을 더하고 뺀다. 아래 노드 목록은 고른 그룹으로 좁혀진다(노드 그룹 검토 문서 4.2 · 4.5 · 공통정책 3.2) */
+function grpList(nodes){
+  const rows = grpKeys(nodes).map(function(k){
+    const pn=nodes.filter(function(nd){ return grpKey(nd)===k; });
+    return {k:k, nodes:pn, slots:pn.reduce(function(a,x){ return a.concat(x.slots); },[])};
+  })
+    /* 가속기 모델별과 같은 기준 — 사용률 내림차순. `어디가 모자라나` 가 먼저다. 미지정은 맨 뒤 */
+    .sort(function(a,b){
+      if((a.k===NOGRP)!==(b.k===NOGRP)) return a.k===NOGRP? 1 : -1;
+      return pcOf(b.slots)-pcOf(a.slots);
+    });
+  const perRow = grpPerRowUsed = grpPerRow();
+  const shown = grpMore? rows : rows.slice(0,perRow), rest=rows.length-shown.length;
+  return '<div class="devlist">' + brkTabs()
+   + '<div class="ngrid">'
+   + shown.map(function(o){
+       const bad=badNodes(o.nodes), on=GRP_SEL.indexOf(o.k)>=0;
+       return '<button class="ngcard'+(on?' on':'')+'" aria-pressed="'+on+'" onclick="tgGrpSel(\''+o.k+'\')">'
+        + '<span class="ng-n">'+grpName(o.k)+'</span>'
+        + '<span class="ng-d">'+(o.k===NOGRP? '노드 그룹에 속하지 않은 노드' : (GRPDESC[o.k]||''))+'</span>'
+        + '<span class="ng-fig"><b'+(pcOf(o.slots)>=90?' class="crit"':(pcOf(o.slots)>=70?' class="warn"':''))+'>'+pcOf(o.slots)+'%</b><span>'+usedOf(o.slots)+' / '+o.slots.length+'장 사용</span></span>'
+        + barOf(o.slots, grpName(o.k))
+        + '<span class="ng-dev">노드 '+o.nodes.length+'대'+(bad? ' · '+badTxt(bad) : '')+'</span>'
+        + '</button>';
+     }).join('')
+   + '</div>'
+   + grpMoreBtn(rest)
+   + '</div>';
 }
 
 /* ── 가속기 탭 공용 ──────────────────────────────
@@ -3681,13 +4259,13 @@ const USEHELP = '사용 중을 전체로 나눈 값입니다. 확인 불가도 �
 function usedOf(list){ return list.filter(function(x){ return x.st==='사용 중'; }).length; }
 function pcOf(list){ return list.length? Math.round(usedOf(list)/list.length*100) : 0; }
 
-/* 노드 부제 — 가속기 구성. 연결 불가·사라짐이면 마지막으로 확인된 구성에 `마지막 확인` 을 붙여
-   지금 읽은 값과 가른다(정책 4.5 · REQ-MON-036). 가속기가 없는 노드는 가속기 탭에 오지 않는다(accNodes) */
+/* 노드 부제 — 가속기 구성. 연결 불가·사라짐이면 마지막으로 확인된 구성을 그대로 둔다(정책 4.5 · REQ-MON-036).
+   지금 읽은 값이 아님은 상태 배지와 상태 시작 시각이 보인다. 가속기가 없는 노드는 가속기 탭에 오지 않는다(accNodes) */
 function nodeSub(nd){
   if(nodeLost(nd)){
     const la = nd.lastAcc||[];
     return la.length
-      ? la.map(function(a){ return a.dev+' '+a.n+'장'; }).join(' · ')+' (마지막 확인)'
+      ? la.map(function(a){ return a.dev+' '+a.n+'장'; }).join(' · ')
       : '가속기 구성 확인 불가';
   }
   return devSummary(nd.slots);
@@ -3705,20 +4283,27 @@ function devSummary(list){
 const DEV_SHOWN=4;
 let devMore=false;
 function tgDevMore(){ devMore=!devMore; render(); }
-function devList(byDev){
+function devList(byDev, sw){
   const keys = Object.keys(byDev).sort(function(a,b){ return pcOf(byDev[b])-pcOf(byDev[a]); });
   const shown = devMore ? keys : keys.slice(0, DEV_SHOWN);
   const rest = keys.length - shown.length;
   return '<div class="devlist">'
    /* 전체를 쪼갠 것임이 드러나야 한다. 라벨 없이 아래에 붙이면 나열로 읽힌다.
       `모델` 만 쓰면 AI 모델(qwen3-32b)과 겹치므로 `가속기 모델` 로 쓴다 */
-   + '<div class="devlist-t">가속기 모델별'+tip('전체 가속기를 모델로 나눈 것입니다. 각 막대의 합이 위 전체와 같습니다.')+'</div>'
+   /* 노드 그룹 층이 있으면 제목 자리에 `가속기 모델별 / 노드 그룹별` 전환을 둔다(노드 그룹 검토 문서 4.2) */
+   + (sw? brkTabs() : '<div class="devlist-t">가속기 모델별'+tip('전체 가속기를 모델로 나눈 것입니다. 각 막대의 합이 위 전체와 같습니다.')+'</div>')
    + shown.map(function(d){
        const g=byDev[d];
-       return '<div class="devrow">'
+       /* 최고 관리자에게만 나오는 목록이다. 누르면 그 가속기 모델 슬롯으로 좁히고 다시 누르면 푼다 */
+       const on=DEV_SEL.indexOf(d)>=0;
+       return '<div class="devrow pick'+(on?' on':'')+'" role="button" tabindex="0" aria-pressed="'+on+'" onclick="tgDevSel(\''+d+'\')">'
         + '<div class="devrow-t">'+vendorBadge(d)+'<span class="devrow-n">'+d+'</span>'
         +   '<span class="devrow-c">'+g.length+'장</span>'
-        +   '<span class="devrow-u"><b>'+usedOf(g)+'</b> / '+g.length+'<span class="devrow-pc">'+pcOf(g)+'%</span></span>'
+        /* 확인 불가 슬롯이 있으면 장 수를 숫자로 붙인다. 막대 구간 말풍선에만 있으면 마우스를 올려야 보인다 */
+        +   '<span class="devrow-u"><b>'+usedOf(g)+'</b> / '+g.length+'<span class="devrow-pc">'+pcOf(g)+'%</span>'
+        +     (function(){ const dead=g.filter(function(x){ return x.st==='확인 불가'; }).length;
+                return dead? '<span class="devrow-pc">확인 불가 '+dead+'</span>' : ''; })()
+        +   '</span>'
         + '</div>'
         + barOf(g, d)
         + '</div>';
@@ -3804,27 +4389,39 @@ function miniBar(label, v, unit, seed){
    세그먼트로 두면 하나씩 열었을 때 어느 쪽도 아닌 상태를 표현할 수 없다 —
    체크박스는 `일부만 펼침`을 중간 상태로 받는다(파일 탐색기 트리와 같은 방식) */
 function nodeFold(){
-  const list=visibleNodes();
+  const list=shownNodes();
   const open = list.filter(function(nd){ return nodeOpen.indexOf(nd.n)>=0; }).length;
   const allOpen = open===list.length;
-  /* `.chk` 는 커스텀 체크박스다. input 은 숨기고 `.cbx` 가 네모를 그린다 */
-  return '<label class="chk foldall">'
-   + '<input type="checkbox" id="foldAll"'+(allOpen?' checked':'')
-   +   ' onchange="setAllNodes(this.checked)"><span class="cbx"></span>'
-   /* 라벨은 상태다. `모두 펼치기` 로 두면 동작이 되어 체크 표시와 어긋난다 —
-      체크가 켜져 있는데 `펼치기` 라고 적혀 있으면 아직 안 펼쳐진 것으로 읽힌다 */
-   + '<span class="cbt">모두 펼침</span></label>';
+  /* v0.28 피드백 — 체크박스에서 텍스트 버튼 하나로 바꿨다. 체크박스는 고르는 데 쓰는 것이라
+     노드 카드 위에서 `노드 전체 선택` 으로 읽히고, 체크를 풀면 접힌다는 것이 드러나지 않았다.
+     라벨은 누르면 일어날 동작이다. 하나라도 접혀 있으면 `모두 펼치기`, 모두 펼쳐져 있으면 `모두 접기` */
+  return '<button class="txtbtn foldall" id="foldAll" onclick="setAllNodes('+(!allOpen)+')">'
+   + (allOpen? '모두 접기' : '모두 펼치기')+'</button>';
 }
 /* 일부만 펼쳐진 상태 — HTML 로는 못 적고 JS 로만 걸린다 */
 function syncFoldAll(){
   const el=document.getElementById('foldAll');
-  if(!el) return;
-  const list=visibleNodes();
+  if(!el || el.type!=='checkbox') return;
+  const list=shownNodes();
   const open = list.filter(function(nd){ return nodeOpen.indexOf(nd.n)>=0; }).length;
   el.indeterminate = open>0 && open<list.length;
 }
+/* 노드 그룹 층의 노드 제목 줄 버튼 — 보이는 묶음을 모두 접거나 편다. 노드 버튼과 같은 규칙이다.
+   하나라도 접혀 있으면 `모두 펼치기`, 모두 펼쳐져 있으면 `모두 접기`. 노드 펼침은 묶음 머리의 `펼치기 · 접기` 가 맡는다 */
+function grpAllFold(nodes){
+  const ks=grpKeys(nodes);
+  const allOpen=ks.every(function(k){ return grpClosed.indexOf(k)<0; });
+  return '<button class="txtbtn foldall" id="foldAll" onclick="setAllGrps('+(!allOpen)+')">'
+   + (allOpen? '모두 접기' : '모두 펼치기')+'</button>';
+}
+function setAllGrps(open){
+  const ks=grpKeys(shownNodes());
+  grpClosed = open ? grpClosed.filter(function(k){ return ks.indexOf(k)<0; }) : grpClosed.concat(ks.filter(function(k){ return grpClosed.indexOf(k)<0; }));
+  render();
+}
 function setAllNodes(open){
-  nodeOpen = open ? accNodes().map(function(nd){ return nd.n; }) : [];
+  /* 노드 그룹을 고른 동안에는 보이는 노드에만 건다(v0.28) */
+  nodeOpen = open ? (grpLayer() && GRP_SEL.length ? shownNodes() : accNodes()).map(function(nd){ return nd.n; }) : [];
   render();
 }
 
@@ -3986,7 +4583,7 @@ function drawPerf(el){
      라벨은 서버가 판정한 값(m.label)을 그대로 쓴다. 점수 구간(HEALTH_TH)으로 다시 뽑지 않는다.
      값별 설명은 배포 정책 3.4 의 헬스 의미를 옮긴 것이다.
      점수가 없는 배포 중 오류·중지됨은 상태 진단을 둔다(정책 5.1). 유휴는 진단 대상이 아니다 */
-  if(!isV41()){
+  {
     /* 건전성 자리는 늘 둔다. 값은 하나만 놓인다(모니터링 정책 5.2·5.3).
        레플리카가 떠 있지 않으면 - (배포 목업 헬스 카드와 같은 .mu 배지), 지표를 받지 못하면 소스 상태 배지와 사유,
        그 밖에는 서버 판정 라벨. 오류는 레플리카가 있어 서버가 라벨을 준다 */
@@ -4005,17 +4602,25 @@ function drawPerf(el){
     const sev = m.label==='위험'?'crit':'warn';
     const miss = (m.missing && m.missing.length)? '<div class="rsmiss">측정하지 못한 지표: '+m.missing.join(' · ')+'</div>' : '';
     const body = (rsOpen && multi)
-      ? '<table class="rstbl"><thead><tr><th>심각도</th><th>지표</th><th>현재 값</th><th>기준</th><th>집계</th></tr></thead><tbody>'+m.reasons.map(function(r){ return '<tr><td><span class="rssv '+(HB[r.sv]||'mu')+'">'+r.sv+'</span></td><td>'+r.k+'</td><td>'+r.v+'</td><td>'+r.th+' 초과</td><td style="color:var(--muted-foreground)">'+(r.ag||'')+'</td></tr>'; }).join('')+'</tbody></table>'
+      /* 기준은 `{기준값} 이상` 이다. 판정은 기준값 이상에서 걸린다(모니터링 정책 5.2 판정 유형).
+         끝 열 기준 출처는 그 기준값이 어디서 왔는지다. 알림 임계가 건전성 기준이라 어느 규칙인지 보여야 고칠 자리를 찾는다(정책 5.2 · REQ-MON-044) */
+      ? '<table class="rstbl"><thead><tr><th>심각도</th><th>지표</th><th>현재 값</th><th>기준</th><th>집계</th><th>기준 출처</th></tr></thead><tbody>'+m.reasons.map(function(r){ return '<tr><td><span class="rssv '+(HB[r.sv]||'mu')+'">'+r.sv+'</span></td><td>'+r.k+'</td><td>'+r.v+'</td><td>'+r.th+' 이상</td><td style="color:var(--muted-foreground)">'+(r.ag||'')+'</td><td>'+srcCell(r)+'</td></tr>'; }).join('')+'</tbody></table>'
       : '<div class="rsone">'+(rl[0]||'')+(multi? ' <span class="rscnt">외 '+(rl.length-1)+'건</span>' : '')+'</div>';
     const btn = multi? '<button class="btn sm ghost rsbtn" onclick="rsOpen=!rsOpen;render()">'+(rsOpen? '접기' : '사유 '+rl.length+'건 모두 보기')+'</button>' : '';
     /* 라벨 배지가 아이콘 역할을 하므로 박스 아이콘은 두지 않는다. 버튼은 머리 줄 오른쪽에 고정한다 */
     const box = (rl.length && (m.label==='주의'||m.label==='위험'))
-      ? '<div class="alertbox '+sev+' rsbox"><div class="atx"><div class="rshead">'+hb+'<b>지표가 '+m.label+' 기준을 넘었습니다.</b>'+btn+'</div>'+body+miss+'</div></div>' : '';
+      ? '<div class="alertbox '+sev+' rsbox"><div class="atx"><div class="rshead">'+hb+'<b>지표가 기준을 벗어났습니다.</b>'+btn+'</div>'+body+miss+'</div></div>' : '';
     h+='<div class="depsub"><h4>건전성'+tip('배포가 잘 돌고 있는지 지표로 판정한 결과입니다.')+'</h4>'
-      + (box? box : '<div class="hline">'+hb+(hd? '<span class="hdesc">'+hd+'</span>' : '')+'</div>')+'</div>';
+      + (box? box : '<div class="hline">'+hb+(hd? '<span class="hdesc">'+hd+'</span>' : '')+'</div>'
+          /* 안정이어도 측정하지 못한 지표가 있으면 라벨 아래 한 줄로 둔다. 정상이라 안정인 것과 재지 못해 안정인 것을 가른다(정책 5.2 · REQ-MON-044).
+             라벨이 있는 배포(정상 · 오류)에만 둔다. `-` · 소스 상태 배지 자리에는 두지 않는다 */
+          + ((!noPods && !srcBad() && m.label==='안정' && m.missing && m.missing.length)
+             ? '<div class="hdesc" style="margin-top:6px">측정하지 못한 지표: '+m.missing.join(' · ')+'</div>' : ''))+'</div>';
     if(nom && m.why && m.label!=='유휴') h+='<div class="depsub">'+alertBox('crit', m.why, m.todo, goDepBtn())+'</div>';
-  } else
-  h+='<div class="depsub"><h4>건전성'
+  }
+  /* 4.1 범위는 판정 사유 아래에 점수를 더한다. 판정 사유 · 기준 출처는 4.0 범위라 4.1 에서도 둔다(REQ-MON-044) */
+  if(isV41())
+  h+='<div class="depsub"><h4>건전성 점수'
     + tip('아래 지표를 종합해 산출한 점수입니다. 100에 가까울수록 안정적입니다.')+'</h4>'
     + '<div class="hbox">'
     /* 점수 옆에 링을 둔다. `72 / 100` 은 읽어야 알고 링은 보면 안다.
@@ -4078,7 +4683,8 @@ function drawPerf(el){
   };
   h+=perfSec('게이트웨이','요청이 들어오는 지점입니다.',bind(PERF.gw, m.gw||[null,null,null,null,null]))
    + perfSec('서빙 엔진','모델이 실행되는 지점입니다.',bind(PERF.eng, m.eng))
-   + perfSec('인프라','자원을 사용하는 지점입니다.',bind(PERF.infra, m.infra));
+   /* MIG 인스턴스에 올라간 배포는 가속기 지표가 부모 GPU 전체 값이다. 제목 줄에 한 번만 밝힌다. 카드마다 두면 같은 말이 넷 반복된다(정책 5.1 · REQ-MON-052) */
+   + perfSec('인프라','자원을 사용하는 지점입니다.',bind(PERF.infra, m.infra), curDep().mig? '부모 GPU 전체(MIG 개별 아님)' : '');
   h += '</div>'; /* depshell 닫기 */
   el.innerHTML=h;
 }
@@ -4313,15 +4919,16 @@ function byRange(v){
   return (num>=1000) ? Math.round(r).toLocaleString() : (num%1? r.toFixed(1) : String(Math.round(r)));
 }
 
-function perfSec(title, note, items){
+function perfSec(title, note, items, sub){
   const nodata = items.every(function(x){ return x.nodata; });
-  return '<div class="depsub"><h4>'+title+tip(note)+'</h4>'
+  return '<div class="depsub"><h4>'+title+tip(note)+(sub? '<span class="mver migsub" style="font-weight:400">'+sub+'</span>' : '')+'</h4>'
     + '<div class="mgrid">'
     +   items.map(function(x){
-          /* 건전성 카드와 같은 인사이트 칩을 쓴다(healthInsight 재사용) — 방향(dir)과
-             임계값(th)이 있는 지표만 판정한다(사용자 요청, 2026-08-28) */
+          /* 칩은 판정 사유에서 가져온다. 그 지표가 사유에 있으면 사유의 등급을 붙이고, 없으면 붙이지 않는다.
+             화면이 따로 기준을 두면 사유와 반대로 나온다(모니터링 정책 5.2 · 사유의 값은 백엔드 판정값이 정본) */
           const val = x.fixed? x.v : byRange(x.v);
-          const ins = (x.nodata || !x.th) ? null : healthInsight(+String(val).replace(/,/g,''), x.dir, x.th);
+          const hit = (x.nodata || !x.hk) ? null : (dm().reasons||[]).find(function(r){ return r.k===x.hk; });
+          const ins = hit? {cls: hit.sv==='위험'? 'cr' : 'wa', label: hit.sv} : null;
           return '<div class="mcard"><div class="mt">'+x.t
             + (ins? '<span class="hflag '+ins.cls+'">'+ins.label+'</span>' : '')
             + (x.d? tip(x.d) : '')+'</div>'
@@ -4374,20 +4981,29 @@ function sevBadge(s){
 
 /* 대상 범위 — 그 워크스페이스 안에서의 범위다. `워크스페이스 전체` 로 적으면
    워크스페이스 컬럼과 같은 말이 두 번 나온다 */
-const SCOPES=['전체','llama-3-2-1b-prod','gpt-oss-120b-symphony','furiosa-qwen3-32b-npu'];
+/* 필터 선택지는 규칙에 있는 대상 범위 값으로 만든다. 고정 목록이면 목록에 있는 값을 고를 수 없는 경우가 생긴다(공통정책 3.2) */
+function ruleScopes(){
+  const v=[]; RULES.forEach(function(r){ if(r.scope!=='전체' && v.indexOf(r.scope)<0) v.push(r.scope); });
+  return ['전체'].concat(v.sort());
+}
 
+/* 스위처 · 역할로 정해지는 규칙 범위. 검색 · 필터는 걸지 않는다. 개요 카드 · 탭 배지는 검색어에 따라 바뀌지 않는다 */
+function ruleVisible(r){
+  /* 스위처가 고른 워크스페이스의 규칙만 본다. 규칙에 워크스페이스가 붙어 있으므로 그대로 견준다 */
+  if(wsCur!=='전체' && r.ws!==wsCur) return false;
+  /* 소속 워크스페이스의 규칙만 본다(모니터링 정책 2.1). 공용 워크스페이스 판정은 배포와 같다(depMine) */
+  if(!isSuper() && r.ws!=='공용 워크스페이스' && (MYWS[role]||[]).indexOf(r.ws)<0) return false;
+  return true;
+}
+function ruleBase(){ return RULES.filter(ruleVisible); }
 function ruleList(){
   const q=rq.trim().toLowerCase();
   const dir = rDir==='asc'? 1 : -1;
   return RULES.filter(function(r){
-    /* 스위처가 고른 워크스페이스의 규칙만 본다. 대상 범위가 배포면 그 배포의 워크스페이스로 판정한다 */
-    /* 규칙에 워크스페이스가 붙어 있으므로 그대로 견준다 */
-    if(wsCur!=='전체' && r.ws!==wsCur) return false;
-    /* 소속 워크스페이스의 규칙만 본다(모니터링 정책 2.1). 공용 워크스페이스 판정은 배포와 같다(depMine) */
-    if(!isSuper() && r.ws!=='공용 워크스페이스' && (MYWS[role]||[]).indexOf(r.ws)<0) return false;
+    if(!ruleVisible(r)) return false;
     if(rScope.length && rScope.indexOf(r.scope)<0) return false;
     if(!q) return true;
-    return (r.n+' '+metricName(r.metric)+' '+r.scope+' '+(r.ws||'')+' '+r.by).toLowerCase().indexOf(q)>=0;
+    return (r.n+' '+metricName(r.metric)+' '+r.scope+' '+(r.ws||'')+' '+(r.by||'')).toLowerCase().indexOf(q)>=0;
   }).sort(function(a,b){
     const k = rSort==='n'? 'n' : 'at';
     return String(a[k]).localeCompare(String(b[k]))*dir;
@@ -4411,7 +5027,7 @@ function thFilterScope(){
    +   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>'
    + '</button></span>'
    + '<span class="fdd" onclick="event.stopPropagation()">'
-   +   SCOPES.map(function(o){
+   +   ruleScopes().map(function(o){
          /* 필터에서는 `전체` 만으로 무엇의 전체인지 모른다. 라벨을 풀어 쓴다 */
          return '<label><input type="checkbox"'+(rScope.indexOf(o)>=0?' checked':'')
               + ' onchange="tgRScope(\'' + o + '\')"><span>'
@@ -4428,7 +5044,7 @@ function drawRules(el){
        바로 시작할 수 있어야 한다(워크스페이스·모델 목업과 같은 규격) */
     el.innerHTML = '<div class="dsec">'
       + emptyBox('등록된 알림 규칙이 없습니다.','임계값을 설정하면 초과 시 알림이 발생합니다.',
-                 canEdit()? '<button class="btn" onclick="openRule(-1)">규칙 추가</button>' : '')
+                 canAddRule()? '<button class="btn" onclick="openRule(-1)">규칙 추가</button>' : '')
       + '</div>';
     return;
   }
@@ -4462,16 +5078,20 @@ function drawRules(el){
     + '<th class="thcell">'+thHelp('fire','최근 발생')+'</th>'
     + '<th>등록자</th>'
     + rSortTh('at','등록일시','148px')
-    + '<th style="width:64px">작업</th></tr></thead><tbody>'
+    + (canEdit()? '<th style="width:64px">작업</th>' : '')+'</tr></thead><tbody>'
     + view.map(function(r){
         const i=RULES.indexOf(r);
         const hasFire = r.fires && r.fires.length;
         const open = ruleOpen===i;
         return '<tr'+(hasFire?' style="cursor:pointer" onclick="toggleRuleFire('+i+')"':'')+'>'
-          /* 중지된 규칙은 이름 아래 배지를 둔다. 직접 중지(사유 없음 포함)는 `중지`, 채널 삭제로 꺼진 것은 `중지 · 채널 삭제`. 툴팁에 숨기지 않는다.
+          /* 중지된 규칙은 이름 아래 배지를 둔다. 직접 중지(사유 없음 포함)는 `중지`, 채널 삭제로 꺼진 것은 `중지 · 채널 삭제`,
+             대상 배포가 종료되어 꺼진 것은 `중지 · 대상 없음`(정책 6.4). 툴팁에 숨기지 않는다.
              배지 이름은 노드 상태 `중지`(정책 4.5)와 같은 말이다 */
           + '<td><span class="rname">'+r.n+'</span>'
-          +   (r.off? '<br><span class="stbadge mu">'+(r.off==='채널 삭제'? '중지 · 채널 삭제' : '중지')+'</span>' : '')+'</td>'
+          +   (r.off? '<br><span class="stbadge mu">'+(r.off==='채널 삭제'? '중지 · 채널 삭제' : r.off==='대상 없음'? '중지 · 대상 없음' : '중지')+'</span>' : '')
+          /* 전역 규칙에 연결된 시스템 기본 규칙 복제본은 `전역 기본` 배지를 둔다. 중지 배지와 같은 자리 · 같은 규격이다(정책 6.4 · REQ-MON-084).
+             중지하면 연결이 풀려 두 배지가 함께 놓이지 않는다 */
+          +   (r.linked? '<br><span class="stbadge mu">전역 기본</span>' : '')+'</td>'
           + '<td>'+sevBadge(r.sev)+'</td>'
           /* Xid 규칙은 임계값이 없다. 고른 코드 수와 `고른 코드 발생` 으로 적는다(정책 6.3) */
           + '<td>'+metricName(r.metric)+(isXid(r.metric)? ' · 코드 '+(r.xids||[]).length+'개' : '')+'</td>'
@@ -4486,11 +5106,12 @@ function drawRules(el){
               ? '<span class="rfire-btn'+(open?' on':'')+'">'+r.fires[0]
                 + '<span class="foldbtn sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></span>'
               : dash())+'</td>'
-          + '<td>'+r.by+'</td><td>'+r.at+'</td>'
+          /* 시스템이 만든 규칙은 등록자가 없다. `-` 로 둔다 */
+          + '<td>'+(r.by||dash())+'</td><td>'+r.at+'</td>'
           /* 작업은 개수와 무관하게 더보기로 통일한다(라이브러리 · 공통정책 3.6).
              버튼을 늘어놓으면 행마다 폭이 달라지고 목록이 어수선해진다 */
-          + '<td onclick="event.stopPropagation()">'
-          +   (canEdit()
+          + (canEdit()? '<td onclick="event.stopPropagation()">' : '')
+          +   (canEditRule(r)
                ? '<div class="more" id="rm'+i+'"><button class="morebtn" onclick="tgMore(event,\'rm'+i+'\')">\u22ef</button>'
                  + '<div class="rowmenu">'
                  +   '<button onclick="openRule('+i+')">수정</button>'
@@ -4499,9 +5120,9 @@ function drawRules(el){
                  +   '<hr><button class="d" onclick="delRule('+i+')">삭제</button>'
                  + '</div></div>'
                : '')
-          + '</td></tr>'
+          + (canEdit()? '</td>' : '')+'</tr>'
           + (open
-             ? '<tr class="ruleexp"><td colspan="'+(wsCur==='전체'?11:10)+'"><div class="rfirelist">'
+             ? '<tr class="ruleexp"><td colspan="'+((wsCur==='전체'?11:10)-(canEdit()?0:1))+'"><div class="rfirelist">'
                + '<div class="rfire-h">최근 발생 '+r.fires.length+'건</div>'
                + r.fires.map(function(t){ return '<div class="rfirerow">'+t+'</div>'; }).join('')
                + '</div></td></tr>'
@@ -4526,7 +5147,7 @@ function toolbarRule(){
       검색·필터·다운로드와 새로 만들기. 탭 안에 놓인 목록이면 툴바에 둔다."
       이 화면은 탭 5개짜리라 "화면 전체 = 그 목록"이 아니다. 페이지 헤더(pact)에
       두던 것은 이 조항과 어긋났다(기획 판단, 2026-08-28) */
-   + (canEdit()
+   + (canAddRule()
       ? '<button class="btn" onclick="openRule(-1)">'
         + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>규칙 추가</button>'
       : '')
@@ -4564,7 +5185,7 @@ function openRule(i){
   const opts=ruleWsOpts();
   RF={n:r.n, metric:r.metric, op:r.op||'초과', th:r.th==null?'':String(r.th), dur:String(r.dur), scope:r.scope, ch:r.ch.slice(),
       sev: r.sev || '주의', xids:(r.xids||[]).slice(), xmode:r.xmode||'표준 등급',
-      ws: r.ws || (wsCur==='전체'? (opts[0]||'') : wsCur)};
+      ws: r.ws || (wsCur==='전체'? (opts[0]||'') : wsCur), dupErr:false};
   document.getElementById('ruleTitle').textContent = i<0? '알림 규칙 추가' : '알림 규칙 수정';
   drawRuleForm();
   document.getElementById('mdRule').classList.add('on');
@@ -4575,13 +5196,15 @@ function rfSet(k,v){
   RF[k]=v;
   /* 워크스페이스를 바꾸면 고른 배포가 그 워크스페이스에 없다 — 전체로 되돌린다 */
   if(k==='ws') RF.scope='전체';
+  /* 중복 에러는 메트릭 · 심각도 · 대상 범위를 바꾸면 지운다(MON-L01 5.2). 워크스페이스를 바꾸면 대상 범위가 바뀐다 */
+  if(k==='sev' || k==='scope' || k==='ws') RF.dupErr=false;
   drawRuleForm();
 }
 /* 메트릭을 고르면 표준 심각도·연산자·임계값을 채운다(정책 6.3 · REQ-MON-073).
    다른 메트릭으로 바꾸면 다시 채운다. 단위가 달라 이전 값이 맞지 않는다 */
 function pickMetric(k){
   const c=catItem(k); if(!c || !c.on) return;
-  RF.metric=k; RF.sev=c.sev;
+  RF.metric=k; RF.sev=c.sev; RF.dupErr=false;
   if(c.xid){ RF.op=''; RF.th=''; RF.xids=[]; RF.xq=''; RF.xmode='표준 등급'; }
   else { RF.op=c.op; RF.th=String(c.th); }
   closeMet(); drawRuleForm();
@@ -4606,12 +5229,14 @@ function metPick(){
           return '<button type="button" class="depitem'+(c.k===RF.metric?' on':'')+'"'
             + (c.on? ' onclick="pickMetric(\''+c.k+'\')"' : ' disabled')+'>'
             + '<span class="depitem-n">'+c.t+'</span>'
+            /* 건전성 판정에 쓰이는 메트릭. 상태가 아니라 분류라 색 없는 분류 배지(.vbadge)를 쓴다(정책 6.3 · REQ-MON-081 · 공통정책 1.9) */
+            + (c.hb? '<span class="vbadge">건전성 반영</span>' : '')
             + (c.on? '' : '<span class="stbadge mu">수집되지 않음</span>')
             + (c.k===RF.metric? '<span class="wck">✓</span>' : '')+'</button>';
         }).join('');
   }).join('');
   return '<div class="depwrap" id="metWrap">'
-    + '<button type="button" class="depbtn" style="width:100%" onclick="tgMet(event)">'
+    + '<button type="button" class="depbtn'+(RF.dupErr?' err':'')+'" id="metBtn" style="width:100%" onclick="tgMet(event)">'
     +   '<span class="depbtn-n">'+(cur? cur.t : '<span style="color:var(--muted-foreground)">메트릭을 선택해 주세요.</span>')+'</span>'
     +   '<span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span>'
     + '</button>'
@@ -4705,10 +5330,12 @@ function ruleValid(){
   if(wsCur==='전체' && !RF.ws) return false;
   if(!RF.metric) return false;
   const cond = isXid(RF.metric) ? RF.xids.length>0 : String(RF.th).trim()!=='';
+  if(scopeGone(rfWs(), RF.scope)) return false;
   return RF.n.trim().length>=2 && cond && String(RF.dur).trim()!=='' && !durBad();
 }
 /* 대상 범위 배포는 규칙이 속할 워크스페이스 것만이다 — 스위처가 아니라
    폼에서 고른 값을 따른다. 스위처 기준으로 두면 다른 워크스페이스 배포를 고를 수 있다 */
+function rfWs(){ return ruleIdx>=0 ? RULES[ruleIdx].ws : (wsCur==='전체'? RF.ws : wsCur); }
 function ruleDeps(){
   const w = wsCur==='전체' ? RF.ws : wsCur;
   return DEPS.filter(function(d){ return d.ws===w; });
@@ -4722,17 +5349,24 @@ function ruleDeps(){
      정책 6.1), 룸은 일반과 동일해(6.2·9장) 배포가 뜬다. 배포 생성 폼도 공용을
      선택지에 둔다. 게다가 스위처로 공용을 고르면 저장 로직이 그 값을 그대로 써
      막으려던 것이 막히지 않았다 — 한 화면에 기준이 둘이었다. */
+/* 공용 워크스페이스 규칙은 전역 규칙이라 최고 관리자에게만 선택지로 둔다(모니터링 정책 6.1 v0.19). 위 판단은 v0.19 전의 것이다 */
 function ruleWsOpts(){
   return WSLIST.filter(function(w){
-    return isSuper() || w==='공용 워크스페이스' || (MYWS[role]||[]).indexOf(w)>=0;
+    return isSuper() || (MYWS[role]||[]).indexOf(w)>=0;
   });
 }
 
 function drawRuleForm(){
   const u=metricUnit(RF.metric), xid=isXid(RF.metric);
+  const linked = ruleIdx>=0 && !!RULES[ruleIdx].linked;
+  const kids = ruleIdx>=0 ? linkedKids(RULES[ruleIdx]).length : 0;
   document.getElementById('ruleBody').innerHTML =
+      /* 전역 기본 규칙(연결된 복제본)을 고칠 때 맨 위에 안내한다. 값을 바꾸면 연결이 풀린다는 것을 저장 전에 알린다(MON-L01 5.2 · 정책 6.4) */
+      (linked? alertBox('info','',GLINK_TXT) : '')
+      /* 연결된 복제본이 있는 전역 규칙을 고칠 때(최고 관리자) 몇 개가 따라 바뀌는지 저장 전에 알린다(MON-L01 5.2 · 정책 6.4 · REQ-MON-087) */
+      + (kids? alertBox('info','','워크스페이스 규칙 '+kids+'개가 이 전역 규칙에 연결되어 있습니다. 임계값 · 조건 · 심각도 · 채널을 바꾸면 연결된 규칙에도 같은 값이 반영됩니다.') : '')
       /* 이름은 2~30자다(공통정책 1.1). 초과 입력을 막고 실시간 카운터를 둔다(7.1) */
-      '<div class="fld"><label>규칙 이름<span class="req">*</span></label>'
+    + '<div class="fld"><label>규칙 이름<span class="req">*</span></label>'
     +   '<input class="inp" maxlength="30" value="'+RF.n+'" placeholder="무엇을 감시하는지 적어 주세요."'
     +   ' oninput="RF.n=this.value;document.getElementById(\'rnCnt\').textContent=this.value.length+\'/30\';'
     +   'document.getElementById(\'ruleSave\').disabled=!ruleValid()">'
@@ -4751,6 +5385,8 @@ function drawRuleForm(){
     +   '<div class="fgrid">'
     +     '<div class="fld"><label>메트릭<span class="req">*</span></label>'
     +       metPick()
+    /* 같은 범위 · 메트릭 · 심각도의 건전성 반영 규칙이 이미 있으면 저장하지 않고 인라인 에러를 둔다(공통정책 7.8 · 정책 6.3 · REQ-MON-083) */
+    +       (RF.dupErr? '<p class="ferr" id="metErr">같은 대상 범위에 이 메트릭과 심각도로 만든 규칙이 이미 있습니다. 기존 규칙을 수정해 주세요.</p>' : '')
     +       '<div class="hint">고르면 심각도와 조건에 표준값이 채워집니다. 채운 값은 바꿀 수 있습니다.</div></div>'
     +     (xid
           /* Xid 규칙은 임계값이 없다. 조건 자리에 심각도 방식 토글 하나를 둔다 */
@@ -4764,9 +5400,12 @@ function drawRuleForm(){
             + '<div class="inline">'
             +   selBox('op', [{v:'초과',t:'초과'},{v:'미만',t:'미만'}], RF.op)
             +   '<input class="inp" style="width:110px" value="'+RF.th+'" placeholder="임계값"'
-            +   ' oninput="RF.th=this.value;document.getElementById(\'ruleSave\').disabled=!ruleValid()">'
+            +   ' oninput="RF.th=this.value;drawHealthHint();document.getElementById(\'ruleSave\').disabled=!ruleValid()">'
             +   (u? '<span class="unit">'+u+'</span>' : '')
-            + '</div></div>')
+            + '</div>'
+            /* 건전성 반영 메트릭이면 이 임계값이 건전성 주의 기준이고 위험 기준이 얼마인지 안내한다. 임계값을 바꾸면 다시 계산한다(정책 5.2 · 6.3 · REQ-MON-082) */
+            + '<div class="hint" id="hHint"'+(healthHint()? '' : ' style="display:none"')+'>'+healthHint()+'</div>'
+            + '</div>')
     /* 1분마다 평가한다. 분으로 받아 그 횟수만큼 연속으로 넘으면 발생한다(알림 정책 7.3) */
     +     '<div class="fld"><label>지속 시간<span class="req">*</span></label>'
     /* 1 이상의 정수만 받는다. 형식이 틀리면 입력 중에 인라인 에러를 두고 저장을 막는다(공통정책 7.8).
@@ -4804,7 +5443,10 @@ function drawRuleForm(){
        이미 드러나고, 어느 워크스페이스인지는 위 필드에 보인다 */
     +     '<div class="fld"><label>대상 범위</label>'
     +       selBox('scope', [{v:'전체',t:'워크스페이스 전체'}].concat(
-                ruleDeps().map(function(d){ return {v:d.n, t:d.n}; })), RF.scope)
+                ruleDeps().map(function(d){ return {v:d.n, t:d.n}; }),
+                /* 대상 배포가 종료된 규칙은 지금 값을 그대로 보이고 아래에 에러를 둔다. 고르기 전에는 저장하지 않는다(MON-L01 5.2 · 공통정책 7.8) */
+                scopeGone(rfWs(), RF.scope)? [{v:RF.scope, t:RF.scope}] : []), RF.scope, scopeGone(rfWs(), RF.scope))
+    +       (scopeGone(rfWs(), RF.scope)? '<p class="ferr" id="scopeErr">대상 배포가 없습니다. 다른 대상 범위를 골라 주세요.</p>' : '')
     +     '</div>'
     +   '</div></div>'
 
@@ -4827,30 +5469,134 @@ function drawRuleForm(){
   document.getElementById('ruleSave').disabled = !ruleValid();
   drawXidList();
 }
+/* 판정 사유 기준 출처 칸(REQ-MON-086). 배포 · 워크스페이스 규칙은 그 배포를 보는 사람이 목록에서 볼 수 있어 링크로 알림 규칙 탭을 열고
+   지표 이름으로 검색한다. 규칙 ID 로 한 건만 여는 것은 사유에 규칙 식별자가 오는지에 달려 지표로 좁힌다.
+   전역 규칙은 공용 워크스페이스에 있어 스위처로 고른 워크스페이스 목록에 없고, 기본값은 규칙이 없다. 링크 대신 도움말로 바꾸는 자리를 알린다 */
+const SRC_TIP={
+  '전역 규칙':'공용 워크스페이스의 전역 규칙입니다. 이 워크스페이스에만 다른 기준을 두려면 같은 지표로 워크스페이스 규칙을 추가합니다.',
+  '기본값':'적용되는 알림 규칙이 없어 기본 임계를 썼습니다. 다른 기준을 두려면 같은 지표로 알림 규칙을 추가합니다.'
+};
+function srcCell(r){
+  const s=r.src||'';
+  if(s==='배포 규칙' || s==='워크스페이스 규칙')
+    return '<button class="lnk" onclick="goRuleOf(\''+r.k+'\')">'+s+'</button>';
+  return s+(SRC_TIP[s]? tip(SRC_TIP[s]) : '');
+}
+function goRuleOf(k){ rq=k; rScope=[]; rPage=1; setTab(2); }
+/* 전역 원본에 연결된 복제본. 공용 워크스페이스의 시스템 기본 규칙만 원본이 된다(정책 6.4) */
+function linkedKids(g){
+  if(!g || g.ws!=='공용 워크스페이스' || !g.gid) return [];
+  return RULES.filter(function(r){ return r!==g && r.linked && r.gid===g.gid; });
+}
+const GKIDS_OFF=function(n){ return ' 연결된 워크스페이스 규칙 '+n+'개는 연결이 풀려 각 워크스페이스 규칙으로 남습니다.'; };
+/* 연결된 시스템 기본 규칙을 고치거나 중지할 때의 안내(MON-L01 5.2 · 모니터링 정책 6.4) */
+const GLINK_TXT='전역 기본 규칙입니다. 임계값 · 조건 · 심각도 · 채널을 바꾸거나 중지하면 전역 규칙과의 연결이 풀리고 이 워크스페이스 규칙으로 따로 적용됩니다.';
+/* 건전성 반영 규칙. 건전성 반영 메트릭이고 조건이 초과이며 심각도가 오류 · 주의인 규칙이다.
+   정보 규칙과 미만 조건 규칙은 알림만 보낸다(모니터링 정책 6.3). 위험 기준 안내와 중복 확인을 이 규칙에만 건다 */
+function isHealthRule(metric, op, sev){
+  const c=catItem(metric);
+  return !!(c && c.hb) && op==='초과' && sev!=='정보';
+}
+function numFmt(v){ return (Math.round(v*10)/10).toLocaleString('ko-KR'); }
+/* 위험 기준 안내. 판정 유형(정책 5.2)으로 계산한다. 초과형은 2배, 여유형은 남은 여유의 절반을 더한 값이다.
+   위험이 없는 지표는 주의까지만 판정한다고 알린다. 가속기 온도는 규칙 심각도가 등급이라 계산값을 두지 않는다 */
+function healthHint(){
+  if(!isHealthRule(RF.metric, RF.op, RF.sev)) return '';
+  const c=catItem(RF.metric);
+  if(c.hb==='temp') return '규칙 심각도가 그대로 건전성 등급이 됩니다.';
+  /* 한 범위에 주의 규칙과 오류 규칙이 함께 있으면 주의 규칙이 기준이고 오류 규칙은 알림만 보낸다.
+     주의 규칙이 없으면 오류 규칙의 임계값이 주의 기준이다(정책 5.2 · 6.3). 범위는 워크스페이스 · 대상 범위가 같은 것이다 */
+  if(RF.sev==='오류' && sibWarn()) return '건전성 기준은 같은 범위의 주의 규칙을 따릅니다. 이 규칙은 알림만 보냅니다.';
+  const pre = RF.sev==='오류' ? '같은 범위에 주의 규칙이 없어 ' : '';
+  /* 판정 유형이 정해지지 않은 지표는 위험 기준을 계산하지 않는다 */
+  if(c.hb==='na') return pre+'이 값이 건전성 주의 기준입니다.';
+  if(c.nocrit) return pre+'이 값이 건전성 주의 기준입니다. 이 지표는 주의까지만 판정합니다.';
+  const t=String(RF.th).trim();
+  if(t==='' || isNaN(+t)) return '';
+  const v = c.hb==='room' ? +t + (100 - +t)/2 : +t*2;
+  return pre+'이 값이 건전성 주의 기준입니다. 위험 기준은 '+numFmt(v)+c.u+'입니다.';
+}
+/* 같은 범위 · 메트릭의 사용 중인 주의 규칙이 있는지. 중지한 규칙은 판정에서 빠져 세지 않는다(정책 6.4) */
+function sibWarn(){
+  const w=rfWs();
+  return RULES.some(function(r,i){
+    return i!==ruleIdx && !r.off && r.ws===w && r.scope===RF.scope && r.metric===RF.metric && r.sev==='주의' && r.op==='초과';
+  });
+}
+/* 임계값 입력 중에는 안내만 다시 쓴다. 폼 전체를 다시 그리면 입력이 끊긴다 */
+function drawHealthHint(){
+  const el=document.getElementById('hHint'); if(!el) return;
+  const t=healthHint();
+  el.textContent=t; el.style.display = t? '' : 'none';
+}
+/* 같은 규칙이 있는지. 같은 워크스페이스 · 대상 범위 · 메트릭 · 심각도의 건전성 반영 규칙. 중지한 규칙은 건전성 판정에서 빠져 세지 않는다(정책 6.3 · 6.4).
+   실제 판정은 백엔드 400(OBS_ALERT_RULE_DUPLICATE_THRESHOLD)이다. 목업은 화면에서 같은 기준으로 견준다 */
+function dupRule(ws){
+  if(!isHealthRule(RF.metric, RF.op, RF.sev)) return false;
+  return RULES.some(function(r, i){
+    return i!==ruleIdx && !r.off && r.ws===ws && r.scope===RF.scope && r.metric===RF.metric
+      && r.sev===RF.sev && isHealthRule(r.metric, r.op, r.sev);
+  });
+}
 function saveRule(){
   /* 스위처가 `전체` 면 폼에서 고른 값을, 아니면 지금 보고 있는 워크스페이스를 쓴다.
      수정이면 원래 소속을 지킨다 — 만든 뒤에는 옮기지 않는다 */
   const xr=isXid(RF.metric);
+  const ws0 = ruleIdx<0 ? (wsCur==='전체'? RF.ws : wsCur) : RULES[ruleIdx].ws;
+  /* 중복이면 저장하지 않고 모달을 둔 채 메트릭 아래 인라인 에러 · 메트릭으로 포커스(MON-L01 5.2 · 공통정책 7.8) */
+  if(dupRule(ws0)){
+    RF.dupErr=true; drawRuleForm();
+    const mb=document.getElementById('metBtn'); if(mb) mb.focus();
+    return;
+  }
+  /* 연결된 복제본은 임계값 · 연산자 · 심각도 · 채널 중 하나를 바꾸면 연결이 풀린다. 이름 · 지속 시간만 고치면 그대로다(정책 6.4) */
+  const prev = ruleIdx>=0 ? RULES[ruleIdx] : null;
+  const unlink = !!(prev && prev.linked) && (String(prev.th)!==String(+RF.th) || prev.op!==RF.op || prev.sev!==RF.sev
+    || prev.ch.slice().sort().join(',')!==RF.ch.slice().sort().join(','));
   const r={n:RF.n.trim(), metric:RF.metric, op:xr?'':RF.op, th:xr?null:+RF.th, dur:+RF.dur, sev:RF.sev,
            xids:xr? RF.xids.slice() : undefined, xmode:xr? RF.xmode : undefined,
            ws:(ruleIdx<0 ? (wsCur==='전체'? RF.ws : wsCur) : RULES[ruleIdx].ws),
            scope:RF.scope, ch:RF.ch.slice(), fires:[],
            by:'성유진(yj.seong)', at:'2026-08-27 09:20:11'};
+  /* 전역 원본을 고치면 연결된 복제본이 임계값 · 연산자 · 심각도 · 채널을 따른다. 이름 · 지속 시간 · 대상 범위는 워크스페이스 값을 둔다(정책 6.4).
+     값이 바뀌지 않았으면 반영할 것이 없어 토스트에 덧붙이지 않는다 */
+  const kids = prev ? linkedKids(prev) : [];
+  const moved = kids.length && (String(prev.th)!==String(+RF.th) || prev.op!==RF.op || prev.sev!==RF.sev
+    || prev.ch.slice().sort().join(',')!==RF.ch.slice().sort().join(','));
   if(ruleIdx<0) RULES.unshift(r); else RULES[ruleIdx]=Object.assign(RULES[ruleIdx], r);
+  if(unlink) RULES[ruleIdx].linked=false;
+  if(moved) kids.forEach(function(k){ k.th=r.th; k.op=r.op; k.sev=r.sev; k.ch=r.ch.slice(); });
   closeRule(); render();
-  toast('ok', ruleIdx<0? '알림 규칙을 추가했습니다.' : '알림 규칙을 수정했습니다.');
+  toast('ok', ruleIdx<0? '알림 규칙을 추가했습니다.'
+    : '알림 규칙을 수정했습니다.'+(moved? ' 연결된 워크스페이스 규칙 '+kids.length+'개에도 반영했습니다.' : ''));
 }
 /* 규칙을 지우면 그 상황을 더 이상 알리지 않는다. 확인 알럿을 거친다(공통정책 7.5) */
 /* 규칙 중지·재개 — 되돌릴 수 있어 이름을 다시 받지 않는다(공통정책 7.5).
    받는 사람이 알림을 못 받게 되므로 확인 알럿은 둔다. 배포 일시중지와 같은 형식이다 */
 function stopRule(i){
   const r=RULES[i];
+  /* 연결된 복제본은 중지도 사용 여부를 바꾼 것이라 연결이 풀린다. 알럿에 같은 안내를 더한다(MON-L01 5.2 · 정책 6.4) */
+  /* 전역 원본을 중지하면 연결된 복제본은 따라 꺼지지 않고 연결이 풀려 남는다. 워크스페이스 알림이 함께 끊기지 않게 한다(정책 6.4) */
+  const kids=linkedKids(r);
   openConfirm('알림 규칙 중지',
-    '<b>'+r.n+'</b>'+jo(r.n,'을')+' 중지하면 조건을 평가하지 않고 알림을 보내지 않습니다. 다시 재개할 수 있습니다.',
-    function(){ r.off='직접 중지'; render(); toast('ok','알림 규칙을 중지했습니다.'); }, '중지');
+    '<b>'+r.n+'</b>'+jo(r.n,'을')+' 중지하면 조건을 평가하지 않고 알림을 보내지 않습니다. 다시 재개할 수 있습니다.'
+      + (r.linked? ' '+GLINK_TXT : '') + (kids.length? GKIDS_OFF(kids.length) : ''),
+    function(){ r.off='직접 중지'; r.linked=false; kids.forEach(function(k){ k.linked=false; }); render(); toast('ok','알림 규칙을 중지했습니다.'); }, '중지');
+}
+/* 대상 범위 배포가 없는지. 대상 범위가 전체면 해당 없다 */
+function scopeGone(ws, scope){
+  return scope!=='전체' && !DEPS.some(function(d){ return d.ws===ws && d.n===scope; });
 }
 function resumeRule(i){
   const r=RULES[i];
+  /* 대상 배포가 없으면 재개해도 감시할 것이 없다. 차단 안내 후 수정으로 보낸다(정책 6.4 · MON-L01 5.2).
+     차단 안내 모달은 평서형 제목, 본문은 규칙 → 조치(용어집 7장) */
+  if(scopeGone(r.ws, r.scope)){
+    openConfirm('대상 배포가 없습니다',
+      '종료된 배포를 대상으로 한 규칙은 재개할 수 없습니다. 수정에서 대상 범위를 바꾼 뒤 재개해 주세요.',
+      function(){ openRule(i); }, '수정');
+    return;
+  }
   /* 채널이 지워져 중지된 규칙은 지정 채널이 없다. 재개하면 워크스페이스 채널과 전역 채널 모두로 보낸다(알림 정책 7.3) */
   const chTxt = r.off==='채널 삭제'? ' 지정한 알림 채널이 없어 워크스페이스 채널과 전역 채널 모두로 보냅니다. 채널을 골라 보내려면 먼저 수정에서 채널을 지정한 뒤 재개해 주세요.' : '';
   openConfirm('알림 규칙 재개',
@@ -4864,9 +5610,12 @@ function delRule(i){
      이미 발생한 알림은 규칙의 수명을 따르지 않는다 — 통지 기록이라
      보관 기간까지 남는다(알림 정책 5.5·5.6) */
   const chTxt = r.ch.length? ' 연결된 알림 채널 '+r.ch.length+'개로도 발송되지 않습니다.' : '';
+  /* 전역 원본을 지워도 연결된 복제본은 연결이 풀려 남는다(정책 6.4) */
+  const kids=linkedKids(r);
   openConfirm('알림 규칙 삭제',
-    '<b>'+r.n+'</b>'+jo(r.n,'을')+' 삭제하면 이 조건을 더 이상 감시하지 않으며 복구할 수 없습니다.'+chTxt+' 이미 발생한 알림은 남습니다.',
-    function(){ RULES.splice(i,1); render(); toast('ok','알림 규칙을 삭제했습니다.'); }, '삭제', null, r.n);
+    '<b>'+r.n+'</b>'+jo(r.n,'을')+' 삭제하면 이 조건을 더 이상 감시하지 않으며 복구할 수 없습니다.'+chTxt+' 이미 발생한 알림은 남습니다.'
+      + (kids.length? GKIDS_OFF(kids.length) : ''),
+    function(){ kids.forEach(function(k){ k.linked=false; }); RULES.splice(RULES.indexOf(r),1); render(); toast('ok','알림 규칙을 삭제했습니다.'); }, '삭제', null, r.n);
 }
 
 /* ── 탭 4 · 트레이스 ──────────────────────────────
@@ -5193,7 +5942,8 @@ function esc2(v){ return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 function openSlot(nodeName, no){
   const nd=visibleNodes().find(function(x){ return x.n===nodeName; });
   if(!nd) return;
-  const x=nd.slots.find(function(s){ return s.no===no; });
+  /* MIG 인스턴스 번호는 `3-1` 처럼 문자열이라 글자로 견준다 */
+  const x=nd.slots.find(function(s){ return String(s.no)===String(no); });
   if(!x) return;
   curSlot={nd:nd, s:x};
   const dead = x.st==='확인 불가';
@@ -5215,7 +5965,7 @@ function openSlot(nodeName, no){
 
   document.getElementById('spBody').innerHTML =
       '<div class="pnsum">'+vendorBadge(x.dev)+x.dev
-    +   '<span class="mver">'+x.id+'</span>'
+    +   (x.id? '<span class="mver">'+x.id+'</span>' : '')
     +   '<span class="stbadge '+(SLOTB[x.st]||'mu')+'">'+x.st+'</span></div>'
     /* Xid — 이상 신호라 추이 차트보다 위에 둔다. 시간 범위와 무관한 최근 5분 값이라 범위 선택 위에 둔다.
        표는 5분 동안 가장 급한 코드·등급과 전체 건수만, 패널은 코드별 등급·건수(급한 순)와 조치 안내까지 둔다.
@@ -5258,10 +6008,12 @@ function openSlot(nodeName, no){
          + '<div class="lchart sm">'+lineChart('slot'+x.no+'core')+'</div></div>'
        + '<div class="dsec"><h4>VRAM<span class="pnv">'+x.vram.use.toFixed(1)+' / '+x.vram.cap+' GB</span></h4>'
          + '<div class="lchart sm">'+lineChart('slot'+x.no+'vram')+'</div></div>'
-       + '<div class="dsec"><h4>온도<span class="pnv">'+x.temp+'°C</span></h4>'
+       /* MIG 인스턴스는 온도 · 전력이 인스턴스 단위로 오지 않아 두지 않는다. 값은 슬롯 표의 부모 GPU 행에서 본다(정책 4.3) */
+       + (x.migOf ? '' :
+         '<div class="dsec"><h4>온도<span class="pnv">'+x.temp+'°C</span></h4>'
          + '<div class="lchart sm">'+lineChart('slot'+x.no+'temp')+'</div></div>'
        + '<div class="dsec"><h4>전력<span class="pnv">'+x.pw+'W</span></h4>'
-         + '<div class="lchart sm">'+lineChart('slot'+x.no+'pw')+'</div></div>')
+         + '<div class="lchart sm">'+lineChart('slot'+x.no+'pw')+'</div></div>'))
     /* 점유 배포는 링크로만 둔다(공통정책 2.1). 배포 하나를 눌렀으니 그 배포 화면으로 가되,
        궁금한 것은 지금 어떻게 돌고 있는지라 상세의 모니터링 탭으로 연다(2026-09-16 확인) */
     + '<div class="dsec"><h4>점유 배포</h4>'
@@ -5293,7 +6045,7 @@ function openSlot(nodeName, no){
     + (sib.length
        ? '<div class="dsec"><h4>같은 배포가 쓰는 슬롯</h4>'
          + sib.map(function(y){
-             return '<button class="lnk sibrow" onclick="openSlot(\''+y.n+'\','+y.no+')">'
+             return '<button class="lnk sibrow" onclick="openSlot(\''+y.n+'\',\''+y.no+'\')">'
               + y.n+' 슬롯 '+y.no+'</button>';
            }).join('')
          + '</div>'
@@ -5380,8 +6132,8 @@ function thHelp(k,label){
   return label+'<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span>'
     + '<span class="tip">'+COLDEF[k]+'</span></span>';
 }
-function selBox(k,opts,cur){
-  return '<select class="inp" onchange="rfSet(\'' + k + '\',this.value)">'
+function selBox(k,opts,cur,err){
+  return '<select class="inp'+(err?' err':'')+'" onchange="rfSet(\'' + k + '\',this.value)">'
     + opts.map(function(o){
         return '<option value="'+o.v+'"'+(o.v===cur?' selected':'')+'>'+o.t+'</option>';
       }).join('') + '</select>';
@@ -5492,20 +6244,106 @@ function setState(s,btn){
   if(btn){ document.querySelectorAll('#demoBar .st').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); }
   render();
 }
+/* 지표 소스는 배포 성능 탭의 정상 배포에서만 보인다. 누르면 그 자리로 옮긴다(가속기 탭에서 누르면 바뀐 것이 보이지 않았다).
+   실제 화면에는 없는 검토용 처리다 */
 function setSrc(k,btn){
   src=k;
   document.querySelectorAll('#demoBar .sr').forEach(b=>b.classList.remove('on'));
   if(btn) btn.classList.add('on');
-  render();
+  demoBase(false);
+  tab=1; dep='llama-3-2-1b-prod'; rsOpen=false; render();
+  const mb=document.getElementById('monBody'); if(mb && mb.scrollIntoView) mb.scrollIntoView({block:'start'});
 }
 function setRole(r,btn){
-  role=r; tab=0; closeSlot();
+  role=r; tab=0; closeSlot(); resetGrpView();
   document.querySelectorAll('#demoBar .rl').forEach(b=>b.classList.remove('on'));
   if(btn) btn.classList.add('on');
   /* 퍼스널 영역은 GNB 하단 — 워크스페이스를 벗어난 자리라 플랫폼 역할만 표시한다.
      워크스페이스 역할은 대상마다 달라 한 값으로 적을 수 없다 */
   document.getElementById('roleName').textContent = isSuper()? '최고 관리자' : '일반 사용자';
   render();
+}
+
+/* ── v0.28 데모 바 바로 가기 ──────────────────────
+   실제 화면에는 없는 검토용 처리다. 누르면 그 상태가 보이는 화면으로 바로 옮긴다.
+   데이터 상태는 기본, 워크스페이스는 전체로 돌리고 필요한 역할 · 범위를 맞춘다 */
+function demoBase(needSuper){
+  state='default';
+  document.querySelectorAll('#demoBar .st').forEach(function(b){ b.classList.toggle('on', b.textContent==='기본'); });
+  if(needSuper && !isSuper()) setRole('super', document.querySelector('#demoBar .rl'));
+  if(role==='viewer') setRole('super', document.querySelector('#demoBar .rl'));
+  wsCur='전체'; mineOnly=false; drawWsBtn(); closeRule(); closeConfirm(); closeSlot();
+}
+/* 실제 화면에는 없는 검토용 처리다. 배포 성능 탭에서 MIG 배포를 고른다(안정 + 측정하지 못한 지표 · 인프라 제목 줄 MIG 표기) */
+function demoMigDep(){
+  demoBase(false);
+  scope=1; document.querySelectorAll('#demoBar .sc').forEach(function(b){ b.classList.toggle('on', b.textContent==='4.0'); });
+  src='ok'; document.querySelectorAll('#demoBar .sr').forEach(function(b){ b.classList.toggle('on', b.textContent==='정상'); });
+  tab=1; dep='llama-3-8b-mig'; rsOpen=false; render();
+  const mb=document.getElementById('monBody'); if(mb && mb.scrollIntoView) mb.scrollIntoView({block:'start'});
+}
+/* 실제 화면에는 없는 검토용 처리다. 가속기 탭에서 gpu-svr-05 를 펼치고 MIG 부모 GPU 행을 펼친다 */
+function demoMigSlot(){
+  demoBase(true);
+  tab=0; resetGrpView(); slotSel=[];
+  nodeOpen=['gpu-svr-05']; migOpen=['gpu-svr-05:3']; render();
+  setTimeout(function(){ const el=document.getElementById('nd-gpusvr05'); if(el) el.scrollIntoView({block:'center'}); }, 0);
+}
+/* 실제 화면에는 없는 검토용 처리다. 가속기 탭을 `가속기 모델별` 로 두고 NVIDIA-A100 을 고른다.
+   gpu-svr-02 는 A100 · L40S 가 섞인 노드라 A100 슬롯만 남는 것이 보인다 */
+function demoDevSel(){
+  demoBase(true);
+  tab=0; resetGrpView(); slotSel=[];
+  BRK='dev'; DEV_SEL=['NVIDIA-A100']; render();
+  const mb=document.getElementById('monBody'); if(mb && mb.scrollIntoView) mb.scrollIntoView({block:'start'});
+}
+/* 실제 화면에는 없는 검토용 처리다. ml-research 에 이미 있는 `가속기 온도 오류`(전역 기본, 85°C 오류)와 같은 규칙을 채워 저장을 누른다 */
+function demoDupRule(){
+  demoBase(true);
+  tab=2; render();
+  openRule(-1);
+  RF.n='GPU 온도 위험'; RF.ws='ml-research'; RF.scope='전체';
+  pickMetric('gpu_temp');
+  saveRule();
+}
+/* 실제 화면에는 없는 검토용 처리다. 연결된 시스템 기본 규칙 중 첫 번째의 수정 모달을 연다 */
+function demoLinkedRule(){
+  demoBase(true);
+  tab=2; render();
+  const i=RULES.findIndex(function(r){ return r.linked; });
+  if(i>=0) openRule(i); else toast('ok','전역 기본 규칙이 없습니다. 연결이 모두 풀렸습니다.');
+}
+
+/* 실제 화면에는 없는 검토용 처리다. 연결된 복제본이 있는 공용 워크스페이스 원본 규칙의 수정 모달을 연다(정책 6.4 · REQ-MON-087) */
+function demoGlobalEdit(){
+  demoBase(true);
+  tab=2; render();
+  const i=RULES.findIndex(function(r){ return linkedKids(r).length>0; });
+  if(i>=0) openRule(i); else toast('ok','연결된 복제본이 있는 전역 규칙이 없습니다.');
+}
+/* 실제 화면에는 없는 검토용 처리다. 대상 배포가 종료된 규칙으로 목록을 좁히고 재개 차단 알럿을 연다(정책 6.4 · MON-L01 5.2) */
+function demoGoneRule(){
+  demoBase(true);
+  tab=2; rq='첫 토큰 지연 평가'; rScope=[]; rPage=1; render();
+  const i=RULES.findIndex(function(r){ return r.off==='대상 없음'; });
+  if(i>=0) resumeRule(i);
+}
+/* 실제 화면에는 없는 검토용 처리다. ai-service-team 에 대기 요청 오류 규칙을 새로 쓰는 폼을 연다. 같은 범위에 주의 규칙이 있어 알림만 보낸다는 안내가 나온다(정책 5.2 · 6.3) */
+function demoErrHint(){
+  demoBase(true);
+  tab=2; render();
+  openRule(-1);
+  RF.n='대기 요청 과다'; RF.ws='ai-service-team'; RF.scope='전체';
+  pickMetric('queue_depth');
+  RF.sev='오류'; drawRuleForm();
+}
+/* 실제 화면에는 없는 검토용 처리다. llama-3-2-1b-prod 판정 사유를 펼쳐 기준 출처 링크 · 도움말을 보인다(REQ-MON-086) */
+function demoSrcLink(){
+  demoBase(false);
+  scope=1; document.querySelectorAll('#demoBar .sc').forEach(function(b){ b.classList.toggle('on', b.textContent==='4.0'); });
+  src='ok'; document.querySelectorAll('#demoBar .sr').forEach(function(b){ b.classList.toggle('on', b.textContent==='정상'); });
+  tab=1; dep='llama-3-2-1b-prod'; rsOpen=true; render();
+  const t=document.querySelector('.rstbl'); if(t && t.scrollIntoView) t.scrollIntoView({block:'center'});
 }
 
 drawWsBtn();
