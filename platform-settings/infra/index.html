@@ -1,6 +1,23 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 인프라 자원 목업 v0.12 (2026-10-14)
+  콘체르토 매니저 — 플랫폼 설정 | 인프라 자원 목업 v0.13 (2026-10-23)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.13 추가 (2026-10-23) ─────────────────────
+  SET-INFRA-L01 v0.13 과 같은 버전이다. 근거는 노드 그룹 검토 문서(pageId 3493134511) 5장 영향 범위
+  `노드 표에 노드 그룹 열과 필터 추가` · 모니터링 정책 4.1(노드 그룹) · REQ-SET-INFRA-012 · 016 · 7.2.
+  · 노드 표에 노드 그룹 열을 노드 다음에 두었다. 노드 그룹이 없는 노드는 `미지정` 이다(용어집 5장).
+  · 노드 그룹 열 헤더에 필터를 두었다. 값이 몇 개뿐인 열이라 헤더 필터다(공통정책 3.2). 같은 화면
+    채널 목록의 헤더 필터와 같은 규격(.thfilter + .fdd)이다. 노드 이름 검색은 두지 않는다(5.1 검색 없음).
+  · 노드 그룹 열과 필터는 항상 둔다(2026-10-26 정정). 처음엔 노드 그룹이 둘 이상일 때만 두었으나,
+    라벨이 빠진 노드를 찾는 자리가 이 화면이고 모두 미지정인 것도 정보라 조건을 뺐다. 헤더 도움말에 미지정의 뜻을 둔다.
+    모니터링 가속기 탭의 노드 그룹 층(0~1개면 두지 않음)은 묶는 층이라 기준이 다르다.
+  · 노드를 재개하면 응답의 실제 상태로 돌아간다. 전에는 목업이 무조건 정상으로 바꿨다(2026-10-26 정정).
+  · 데모 노드를 모니터링 목업 v0.28 과 같은 열한 대로 늘렸다(노드 그룹 3개 · 가속기 노드 10대 ·
+    가속기 없는 노드 1대). 노드 그룹 이름 · 구성은 검토용 값이다.
+  · 데모 바 `노드 그룹:` 으로 노드 그룹이 있는 구성과 없는 구성을 바꾼다. 실제 화면에는 없는 검토용 처리다.
+  · 데모 바 `노드 실행:` · `노드 그룹:` 을 누르면 최고 관리자 · 기본 데이터로 맞추고 클러스터 탭 노드 표로 옮긴다.
+    `노드 없음` 은 중지를 실행한 결과(「노드를 찾을 수 없습니다.」 실패 토스트와 목록 다시 조회)를 바로 보인다(2026-10-26).
+    전에는 값만 바뀌고 화면이 그대로라 무엇이 달라졌는지 보이지 않았다.
 
   ── v0.12 추가 (2026-10-14) ─────────────────────
   · 노드 행 작업을 `중지`·`재개` 버튼에서 `⋯` 더보기 메뉴로 옮겼다. 공통정책 3.6 「행 단위 작업 액션은
@@ -23,8 +40,10 @@
     배지 색은 모니터링 목업과 같다. 연결 불가·사라짐 `cr`, 정상 `ok`, 점검·중지 `mu`.
     ⚠ 배포 목업은 `연결 불가` 를 `mu` 로 둔다. 화면 간 색이 갈려 확인 대상이다.
     상태 헤더 도움말에 값별 의미를 둔다(공통정책 2.3).
-  · 연결 불가·사라짐 노드의 가속기 칸은 마지막으로 확인된 구성에 `마지막 확인` 을 붙인다
-    (REQ-SET-INFRA-013 · CON-709 last_known_accelerators).
+  · 연결 불가·사라짐 노드의 가속기 칸은 마지막으로 확인된 구성을 그대로 둔다
+    (REQ-SET-INFRA-013 · CON-709 last_known_accelerators). 보조 표기를 붙이지 않는다.
+    같은 행의 상태 배지와 상태 시작 시각이 지금 읽은 값이 아님을 보인다(2026-10-26).
+  · 가속기 구성 값에 단위 `장` 을 붙였다(용어집 1장 단위 · 5장 장). 모니터링 목업 노드 부제와 같은 표기다(2026-10-26).
   · 작업 열 — `중지` 상태면 `재개`, 그 외 상태면 `중지` 를 노출한다(REQ-SET-INFRA-014).
     원문은 동작과 메모 선택만 준다. 어느 상태에서 중지를 막는지 정하지 않아 상태로 막지 않는다.
     행 작업은 `⋯` 더보기 메뉴에 둔다(공통정책 3.6, 2026-10-14 변경). `중지` 는 위험 색 항목, `재개` 는 기본 항목이다.
@@ -661,7 +680,7 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .cfname label b{color:var(--foreground);font-weight:600}
 /* 확인 알럿 안 선택 메모 — 이름 재입력과 같은 자리 규격(.cfname)을 쓴다 */
 .cfname textarea.inp{resize:vertical;min-height:72px;line-height:1.55}
-/* 노드 표 — 상태 시작 시각·마지막 확인 보조 표기 */
+/* 노드 표 — 상태 시작 시각 */
 .ndwhen{font-variant-numeric:tabular-nums;white-space:nowrap}
 .f{margin-bottom:16px}
 /* 폼 라벨 — 라이브러리 .field > label 규격. 굵기를 주지 않아 입력값이 앞선다 */
@@ -2185,6 +2204,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <span class="dgrp"><span class="demo-label">노드 실행:</span>
   <button class="ng on" onclick="setNg(false,this)">정상 응답</button>
   <button class="ng" onclick="setNg(true,this)">노드 없음</button></span>
+  <!-- 노드 그룹이 있는 구성과 없는 구성(v0.13). 실제 화면에는 없는 검토용 처리다 -->
+  <span class="dgrp"><span class="demo-label">노드 그룹:</span>
+  <button class="ngd on" onclick="setNgDemo(true,this)">3개</button>
+  <button class="ngd" onclick="setNgDemo(false,this)">없음</button></span>
   <span class="dgrp"><span class="demo-label">테마:</span>
   <button onclick="document.body.classList.remove('dark')">라이트</button>
   <button onclick="document.body.classList.add('dark')">다크</button></span>
@@ -2564,6 +2587,8 @@ const COLDEF={
     +'<dt>사라짐</dt><dd>클러스터에서 노드가 확인되지 않습니다.</dd>'
     +'<dt>중지</dt><dd>최고 관리자가 중지했습니다.</dd></dl>',
   nsince:'지금 상태가 시작된 시각입니다.',
+  /* 라벨 부여는 화면이 아니라 설치 · 운영 절차라 왜 미지정인지 밝힌다. 노드 그룹을 확인할 수 없는 노드는 캐싱 요청이 거절된다(MODEL-L01 5.3) */
+  ng:'운영자가 노드에 붙인 라벨로 정한 묶음입니다. 라벨이 없는 노드는 미지정이며, 이 노드에는 모델 캐싱을 요청할 수 없습니다.',
   cls:'클러스터에 연결할 수 있는지를 나타냅니다.'
     +'<dl><dt>정상</dt><dd>룸을 만들고 자원을 배정할 수 있습니다.</dd>'
     +'<dt>오류</dt><dd>연결에 실패했습니다. 인프라 담당자에게 문의해 주세요.</dd></dl>'
@@ -3018,8 +3043,8 @@ const IMAGES=[
 /* 워크스페이스 정책 3.1 — 클러스터는 룸 단위로 지정한다.
    운영룸은 단일이고 개발룸만 고른다. 멀티클러스터 지정은 별도 기획 */
 const CLUSTERS=[
-  {n:'remote-cluster-main', role:'운영룸 · 개발룸', node:12, acc:'NVIDIA-H200 8 · Furiosa RNGD 8', st:'정상'},
-  {n:'remote-cluster-lab', role:'개발룸', node:4, acc:'NVIDIA-H200 MIG 14', st:'정상'}
+  {n:'remote-cluster-main', role:'운영룸 · 개발룸', node:12, acc:'NVIDIA-H200 8장 · Furiosa RNGD 8장', st:'정상'},
+  {n:'remote-cluster-lab', role:'개발룸', node:4, acc:'NVIDIA-H200 MIG 14장', st:'정상'}
 ];
 
 function drawRun(){
@@ -3130,37 +3155,99 @@ function runCluster(){
            (CON-709 last_known_accelerators)
    ⚠ 노드의 소속 클러스터는 CON-709 servers[] 에 없다. 컬럼으로 두지 않았다 — 확인 대상 */
 const NODES=[
-  {n:'gpu-svr-01', st:'정상',      since:'2026-09-28 10:12', acc:'NVIDIA-H200 8'},
-  {n:'gpu-svr-02', st:'점검',      since:'2026-10-12 08:40', acc:'NVIDIA-A100 4 · NVIDIA-L40S 2'},
-  {n:'gpu-svr-03', st:'연결 불가', since:'2026-10-12 09:41', acc:'NVIDIA-H200 4'},
-  {n:'npu-svr-01', st:'중지',      since:'2026-10-11 18:05', acc:'Furiosa RNGD 8'},
-  {n:'npu-svr-02', st:'정상',      since:'2026-09-28 10:12', acc:'Furiosa RNGD-S 6'},
-  {n:'cpu-svr-01', st:'정상',      since:'2026-09-28 10:12', acc:''}
+  {n:'gpu-svr-01', g:'serving-gpu', st:'정상',      since:'2026-09-28 10:12', acc:'NVIDIA-H200 8장'},
+  {n:'gpu-svr-02', g:'dev-gpu',     st:'점검',      since:'2026-10-12 08:40', acc:'NVIDIA-A100 4장 · NVIDIA-L40S 2장'},
+  {n:'gpu-svr-03', g:'serving-gpu', st:'연결 불가', since:'2026-10-12 09:41', acc:'NVIDIA-H200 4장'},
+  {n:'npu-svr-01', g:'serving-npu', st:'중지',      since:'2026-10-11 18:05', acc:'Furiosa RNGD 8장'},
+  {n:'npu-svr-02', g:'serving-npu', st:'정상',      since:'2026-09-28 10:12', acc:'Furiosa RNGD-S 6장'},
+  {n:'cpu-svr-01', g:null,          st:'정상',      since:'2026-09-28 10:12', acc:''},
+  {n:'gpu-svr-04', g:'serving-gpu', st:'정상',      since:'2026-09-28 10:12', acc:'NVIDIA-H200 8장'},
+  {n:'gpu-svr-05', g:'serving-gpu', st:'정상',      since:'2026-09-28 10:12', acc:'NVIDIA-H200 8장'},
+  {n:'gpu-svr-06', g:'dev-gpu',     st:'정상',      since:'2026-10-02 14:30', acc:'NVIDIA-A100 4장'},
+  {n:'gpu-svr-07', g:'dev-gpu',     st:'정상',      since:'2026-10-02 14:30', acc:'NVIDIA-L40S 4장'},
+  {n:'npu-svr-03', g:'serving-npu', st:'정상',      since:'2026-09-28 10:12', acc:'Furiosa RNGD 8장'}
 ];
+/* 노드 그룹(v0.13). 운영자가 노드에 붙인 라벨이다. 화면에서는 조회만 한다(모니터링 정책 4.1).
+   g 가 없으면 `미지정`(용어집 5장). 데모 그룹 이름 · 구성은 모니터링 목업 v0.28 과 같은 검토용 값이다 */
+let NG_DEMO=true;   /* 검토용: 데모 바 `노드 그룹:` 없음. 실제 화면에는 없는 검토용 처리다 */
+let ngSel=[];
+function ndGrp(nd){ return (NG_DEMO && nd.g) ? nd.g : '미지정'; }
+/* 노드 그룹 열 · 필터는 항상 둔다(REQ-SET-INFRA-012 · 016). 라벨이 빠진 노드를 찾는 자리가 이 화면이다.
+   모두 `미지정` 이면 라벨을 아직 붙이지 않았다는 뜻이라 그것도 보여야 한다. 모니터링 가속기 탭의 노드 그룹 층(0~1개면 두지 않음)은
+   노드를 묶는 층이고 여기는 노드의 속성을 보이는 열이라 기준이 다르다(2026-10-26) */
+function ngOn(){ return true; }
+function ngOpts(){
+  const o=[]; NODES.forEach(function(nd){ const k=ndGrp(nd); if(k!=='미지정' && o.indexOf(k)<0) o.push(k); });
+  o.sort(); if(NODES.some(function(nd){ return ndGrp(nd)==='미지정'; })) o.push('미지정');
+  return o;
+}
+function tgNg(v){ const i=ngSel.indexOf(v); i<0? ngSel.push(v) : ngSel.splice(i,1); drawSys(); }
+function ngTh(){
+  const opts=ngOpts();
+  /* 헤더 도움말 + 필터. 구성 요소 상태 열(compFilter)과 같은 규격이다(공통정책 4.7) */
+  return '<th class="thcell"><span class="thwrap">노드 그룹'
+   + '<span class="thic" tabindex="0">?</span>'
+   + '<button class="thfilter'+(ngSel.length?' on':'')+'" onclick="tgFdd(event,\'ng\')" title="필터">'
+   + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button></span>'
+   + '<div class="thpop">'+COLDEF.ng+'</div>'
+   + '<div class="fdd" onclick="event.stopPropagation()">'
+   + '<label><input type="checkbox" '+(ngSel.length===0?'checked':'')+' onchange="ngSel=[];drawSys()">전체</label><hr>'
+   + opts.map(function(o){
+       const c=NODES.filter(function(x){ return ndGrp(x)===o; }).length;
+       return '<label><input type="checkbox" '+(ngSel.indexOf(o)>=0?'checked':'')
+        + ' onchange="tgNg(\''+o+'\')">'+o+'<span class="fc">'+c+'</span></label>';
+     }).join('')
+   + '</div></th>';
+}
+function setNgDemo(v,btn){
+  NG_DEMO=v; ngSel=[];
+  document.querySelectorAll('#demoBar .ngd').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  /* 다른 데모 상태(일반 사용자 · 빈 상태 등)에서 눌러도 노드 표가 보이게 맞춘다 */
+  if(role!=='super') setRole('super', document.querySelector('#demoBar .rl'));
+  if(dstate!=='default') setState('default', document.querySelector('#demoBar .st'));
+  if(view!=='sys') goDemo('sys', document.querySelector('#demoBar .vw'));
+  setSTab(1);   /* 클러스터 탭의 노드 표로 바로 보낸다 */
+  const t=document.querySelector('.ndtbl'); if(t && t.scrollIntoView) t.scrollIntoView({block:'center'});
+}
 /* 배지 색 — 모니터링 목업 NODEB 와 같다. 연결 불가·사라짐은 조치가 필요해 cr,
    점검·중지는 의도된 상태라 mu 다(모니터링 정책 4.5) */
 const NODEB={'정상':'ok','점검':'mu','연결 불가':'cr','사라짐':'cr','중지':'mu'};
 function nodeLost(nd){ return nd.st==='연결 불가' || nd.st==='사라짐'; }
 /* 데모 — 실행 시점에 노드가 사라진 경우를 재현한다. 실제 화면에는 없는 검토용 처리다 */
 let ndGone=false;
+/* 누르면 그 분기를 볼 수 있는 자리로 바로 보낸다. 최고 관리자 · 기본 데이터로 맞추고 클러스터 탭 노드 표로 옮긴다.
+   `노드 없음` 은 확인 알럿을 거친 뒤의 결과(실패 토스트와 목록 다시 조회)를 바로 보인다. 알럿을 띄우면 무엇을 보여 주는지 알 수 없었다.
+   이후 직접 중지 · 재개를 눌러도 같은 실패가 난다 */
 function setNg(v,btn){
   ndGone=v;
   document.querySelectorAll('#demoBar .ng').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
+  if(role!=='super') setRole('super', document.querySelector('#demoBar .rl'));
+  if(dstate!=='default') setState('default', document.querySelector('#demoBar .st'));
+  if(view!=='sys') goDemo('sys', document.querySelector('#demoBar .vw'));
+  setSTab(1);
+  const t=document.querySelector('.ndtbl'); if(t && t.scrollIntoView) t.scrollIntoView({block:'center'});
+  if(v){
+    const nd=NODES.find(function(x){ return x.st!=='중지'; });
+    if(nd) runNode(nd.n, true, '');
+  }
 }
 function nodeTable(){
-  return '<div class="resblock"><div class="rh"><h5>노드</h5><span class="cnt">'+NODES.length+'</span></div>'
-   + '<div class="tblwrap"><table class="tbl"><thead><tr>'
+  const on=ngOn();
+  const list=NODES.filter(function(nd){ return !on || !ngSel.length || ngSel.indexOf(ndGrp(nd))>=0; });
+  return '<div class="resblock"><div class="rh"><h5>노드</h5><span class="cnt">'+list.length+'</span></div>'
+   + '<div class="tblwrap ndtbl"><table class="tbl"><thead><tr>'
    /* 정렬은 값을 견주는 컬럼(노드 이름·상태 시작 시각)에 둔다. 상태 시작 시각은 헤더 도움말을 함께 둔다 */
-   + sortTh('nd','n','노드') + '<th class="thcell">'+thHelp('nst','상태')+'</th>'
+   + sortTh('nd','n','노드') + (on? ngTh() : '') + '<th class="thcell">'+thHelp('nst','상태')+'</th>'
    + ndSinceTh() + '<th>가속기</th>'
    /* 이 화면 전체가 최고 관리자 전용이다(9.4). 권한이 없으면 화면 자체가 막혀 작업 열을 따로 가르지 않는다 */
    + '<th style="width:96px">작업</th>'
    + '</tr></thead><tbody>'
-   + applySort('nd', NODES).map(function(nd, ix){
+   + applySort('nd', list).map(function(nd, ix){
        /* 노드는 갈 곳이 없는 식별자라 강조만 한다(.rname · 7.2 `클릭 대상을 두지 않는다`) */
        const acc = nd.acc
-         ? nd.acc + (nodeLost(nd)? '<span class="sub">(마지막 확인)</span>' : '')
+         ? nd.acc
          : '<span class="dash">-</span>';
        /* 행 작업은 더보기 메뉴에 둔다(공통정책 3.6). 중지 상태면 재개, 그 외 상태면 중지(REQ-SET-INFRA-014) */
        const item = nd.st==='중지'
@@ -3169,14 +3256,15 @@ function nodeTable(){
        const btn = '<div class="more" id="nm'+ix+'"><button class="morebtn" onclick="tgMore(event,\'nm'+ix+'\')">⋯</button>'
          + '<div class="rowmenu">'+item+'</div></div>';
        return '<tr><td><span class="rname">'+nd.n+'</span></td>'
+        + (on? '<td>'+ndGrp(nd)+'</td>' : '')
         + '<td><span class="stbadge '+(NODEB[nd.st]||'mu')+'">'+nd.st+'</span></td>'
         + '<td class="ndwhen">'+nd.since+'</td>'
         + '<td>'+acc+'</td>'
         + '<td>'+btn+'</td></tr>';
      }).join('')
    + '</tbody></table></div>'
-   /* 노드는 열 개를 넘을 수 있다(모니터링 정책 4.4 ⚠). 페이지당 20건(SET-INFRA-L01 5.1 · 공통정책 3.7) */
-   + pagerBar(NODES.length) + '</div>';
+   /* 4.0 기준 규모는 노드 20대다(모니터링 정책 4.4). 페이지당 20건(SET-INFRA-L01 5.1 · 공통정책 3.7) */
+   + pagerBar(list.length) + '</div>';
 }
 /* 상태 시작 시각 — 정렬 헤더에 도움말을 함께 둔다. sortTh 와 같은 정렬 표시 규격이다 */
 function ndSinceTh(){
@@ -3206,7 +3294,10 @@ function runNode(name, stop, memo){
     drawSys();
     return;
   }
-  nd.st = stop ? '중지' : '정상';
+  /* 응답(InfraServerDTO)의 상태로 바꾼다. 재개하면 노드 감시가 정한 실제 상태로 돌아간다 — 연결 불가 노드는 다시 연결 불가다.
+     목업은 중지 전 상태를 기억해 되돌린다(CON-709). 처음부터 중지였던 노드는 정상으로 둔다 */
+  if(stop){ nd.prev = nd.st; nd.st = '중지'; }
+  else { nd.st = nd.prev || '정상'; delete nd.prev; }
   nd.since = nowMin();
   drawSys();
   toast('ok', stop ? '노드를 중지했습니다.' : '노드를 재개했습니다.');
