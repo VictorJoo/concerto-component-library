@@ -1,6 +1,13 @@
 <!--
-  콘체르토 매니저 · 플랫폼 설정 | 보안 및 감사 목업 v0.18 (2026-10-26)
+  콘체르토 매니저 · 플랫폼 설정 | 보안 및 감사 목업 v0.19 (2026-10-27)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.19 변경 (2026-10-27) ─────────────────────
+  SET-AUDIT-L01 v0.19 와 같은 버전이다. 근거는 감사로그 정책 v0.19 3.3 WORKSPACE · SYSTEM.
+  · 작업값에 운영룸 다시 생성과 알림 채널 수정을 더했다. 정책 v0.19 에서 기록 대상에 넣었고 라벨이 없으면 원시값으로 나올 자리다(REQ-SET-AUDIT-009).
+    운영룸 다시 생성 키 ROOM_REISSUE 는 구현 값이다(room_reissue). 알림 채널 수정 키는 가안이다. 지금 구현은 채널 수정을 기록하지 않는다.
+  · 데모 기록을 더했다. 운영룸 다시 생성(워크스페이스 갈래, 다시 연결한 배포 수), 알림 채널 수정(시스템 갈래, 바뀐 항목 전후).
+    필터는 데모 기록에 있는 작업만 목록에 올리므로 라벨을 확인할 수 있게 한 건씩 둔다. 실제 화면에는 없는 검토용 데이터다.
 
   ── v0.18 변경 (2026-10-26) ─────────────────────
   SET-AUDIT-L01 v0.18 과 같은 버전이다. 근거는 감사로그 정책 v0.18 3.3 MONITORING · SYSTEM · 4.2.
@@ -2186,7 +2193,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <!-- ══════════ 채널 추가 모달 ══════════ -->
   <div class="mdbg" id="mdCh">
     <div class="modal">
-      <div class="mdhead"><h3>알림 채널 추가</h3></div>
+      <div class="mdhead"><h3>알림 채널 등록</h3></div>
       <div class="mdbody">
         <div class="fld"><label>채널명<span class="req">*</span></label>
           <input class="inp" placeholder="예) MLOps Core Slack"></div>
@@ -2367,6 +2374,9 @@ const ACTKO={
   WORKSPACE_UPDATED:'워크스페이스 수정', WORKSPACE_DELETED:'워크스페이스 삭제',
   WORKSPACE_QUOTA_UPDATED:'자원 할당량 변경',
   ROOM_DELETED:'룸 삭제',
+  /* 운영룸 다시 생성 — 그 룸의 배포가 새 게이트웨이에 다시 연결된다. 다른 사용자 영향(감사로그 정책 3.3 WORKSPACE).
+     키는 구현 값이다(room_reissue). 게이트웨이 이름 전후는 내부 식별자라 내용에 두지 않는다(공통정책 7.9) */
+  ROOM_REISSUE:'운영룸 다시 생성',
   CDE_EXTENDED:'CDE 연장', CDE_RETURNED:'CDE 반납', CDE_RECLAIMED:'CDE 회수',
   /* 만료되면 접속이 차단되고 연산 파드가 정지된다. 3 일 뒤 시스템이 회수한다(CDE 정책 5.2).
      정지는 만료와 동시에 일어나 따로 남길 사건이 아니다 — 만료 하나로 둔다.
@@ -2388,7 +2398,9 @@ const ACTKO={
   /* 시스템 */
   /* 라이선스·외부 연동 변경은 따로 키를 두지 않는다. 현행 SETTINGS_UPDATED 가 대상으로 갈라
      이미 남기고 있다(데모 기록의 `외부 연동`) */
-  NOTIFICATION_CHANNEL_CREATED:'알림 채널 등록', NOTIFICATION_CHANNEL_DELETED:'알림 채널 삭제',
+  /* 알림 채널 수정 — 수신 대상 · 최소 심각도가 바뀌면 받는 사람이 달라진다(감사로그 정책 3.3 SYSTEM · SET-INTEG-L01 REQ-056).
+     ⚠ 키 이름은 가안. 지금 구현은 채널 수정을 기록하지 않는다 */
+  NOTIFICATION_CHANNEL_CREATED:'알림 채널 등록', NOTIFICATION_CHANNEL_UPDATED:'알림 채널 수정', NOTIFICATION_CHANNEL_DELETED:'알림 채널 삭제',
   AUDIT_LOG_VIEWED:'감사 로그 조회', AUDIT_LOG_EXPORTED:'감사 로그 다운로드'
 };
 /* ⚠ 매핑에 없는 값은 원시값이 그대로 나온다. 현행 작업값 전수를 받아야 한다
@@ -2423,6 +2435,9 @@ const AUDIT=[
   {at:'2026-08-19 18:20:05', cat:'MONITORING', ip:'192.168.1.42', act:'ALERT_RULE_SUSPENDED', who:'yj.seong', name:'성유진', tgt:'KV 캐시 포화', d:'워크스페이스: ai-service-team'},
   {at:'2026-08-20 09:12:40', cat:'MONITORING', ip:'192.168.1.42', act:'ALERT_RULE_RESUMED', who:'yj.seong', name:'성유진', tgt:'KV 캐시 포화', d:'워크스페이스: ai-service-team'},
   {at:'2026-08-18 18:02:40', cat:'MONITORING', ip:'', act:'ALERT_RULE_SUSPENDED', who:'시스템', name:'', tgt:'첫 토큰 지연 평가', d:'워크스페이스: ai-service-team\n사유: 대상 배포 qwen3-8b-eval 종료'},
+  /* 운영룸 다시 생성 · 알림 채널 수정(v0.19). 비밀값은 전후를 남기지 않는다(정책 4.2) */
+  {at:'2026-08-20 13:22:18', cat:'WORKSPACE', ip:'192.168.1.10', act:'ROOM_REISSUE', who:'bg.kim', name:'김병건', tgt:'ai-service-team 운영룸', d:'워크스페이스: ai-service-team\n다시 연결한 배포: 3'},
+  {at:'2026-08-20 13:40:51', cat:'SYSTEM', ip:'192.168.1.10', act:'NOTIFICATION_CHANNEL_UPDATED', who:'bg.kim', name:'김병건', tgt:'ops-webhook', d:'최소 심각도: 모두 → 오류만\n서명 키: 교체'},
   /* 노드 중지 · 재개. 메모를 적었으면 내용에 남고, 적지 않았으면 메모 항목을 두지 않는다(정책 4.2) */
   {at:'2026-08-19 09:45:10', cat:'SYSTEM', ip:'192.168.1.10', act:'INFRA_SERVER_SUSPENDED', who:'bg.kim', name:'김병건', tgt:'gpu-svr-03', d:'상태: 연결 불가 → 중지\n메모: GPU 교체 중. 10-28 복구 예정'},
   {at:'2026-08-20 10:05:33', cat:'SYSTEM', ip:'192.168.1.10', act:'INFRA_SERVER_RESUMED', who:'bg.kim', name:'김병건', tgt:'gpu-svr-03', d:'상태: 중지 → 정상'},
@@ -3484,8 +3499,8 @@ function drawChans(){
       + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'
       +   '<path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>'
       + '<h3>등록된 채널이 없습니다.</h3>'
-      + '<p>채널을 추가하면 플랫폼에서 발생한 일을 알립니다.</p>'
-      + '<button class="btn" onclick="openCh()">채널 추가</button></div>';
+      + '<p>채널을 등록하면 플랫폼에서 발생한 일을 알립니다.</p>'
+      + '<button class="btn" onclick="openCh()">채널 등록</button></div>';
     return;
   }
 
@@ -3504,13 +3519,13 @@ function drawChans(){
    + '<button class="cbtn" title="다운로드" onclick="dlChans()">'
    +   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">'
    +   '<path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg></button>'
-   + '<button class="btn" onclick="openCh()">채널 추가</button></div>'
+   + '<button class="btn" onclick="openCh()">채널 등록</button></div>'
    + (list.length
       ? '<div class="tblwrap"><table class="tbl"><thead><tr>'
         + sortTh('ch','n','채널명')
         + '<th class="thcell">'+chFilter('cst','상태',['정상','실패','미확인'],cSt,'tgCSt2','chst')+'</th>'
         + '<th class="thcell">'+chFilter('cty','유형',['Slack','이메일','웹훅'],cTy,'tgCTy')+'</th>'
-        + '<th>범위</th><th>주소</th>'
+        + '<th>범위</th><th>수신 대상</th>'
         + sortTh('ch','sent','마지막 발송')
         + sortTh('ch','at','등록일시')
         + '<th style="width:64px">작업</th>'
