@@ -1,8 +1,57 @@
 <!--
-  콘체르토 매니저 · 배포 화면 목업 v0.38 (2026-10-23)
+  콘체르토 매니저 · 배포 화면 목업 v0.39 (2026-10-27)
   색·컴포넌트 규격은 워크스페이스 목업 v0.33 를 그대로 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
 
   ── 변경 ────────────────────────────────────────
+  ── v0.39 (2026-10-27) ──
+        · 기획서 DEP-L01 전체 대조로 고쳤다.
+          목록: 검색을 모든 항목으로 넓히고(공통정책 3.3), 기본 정렬을 최근 변경일시 내림차순으로 했다(REQ-DEP-006). 일시를 초까지 쓴다(7.1 · 7.4).
+          배포명을 누르면 패널이 열린다(7.1). 빈 상태 제목을 `배포가 없습니다.` 로 맞췄다(6장).
+          상태별 액션: 오류는 일시중지를 두지 않고, 중지됨은 재시작을 두지 않는다(5.2). 비활성 항목에는 현재 상태를 사유로 둔다.
+          패널: 조회 전용으로 헤더 `⋯` 메뉴와 생성 실패 `다시 시도` 를 뺐다(REQ-DEP-018 · 7.2). 모델을 `{모델명}({버전})` 으로 쓴다. 열 때 패널 안 로딩을 먼저 보인다(6장).
+          상세: 기본 정보에 엔드포인트 행과 복사 버튼을 두었다(REQ-DEP-022). 설정 변경으로 재기동해도 엔드포인트를 지우지 않고, 저장하면 최근 변경일시를 갱신한다(5.1).
+          동작 확인: 예시 · 보내기가 상세를 다시 그리지 않아 입력 · 응답이 보이지 않던 것을 고쳤다(REQ-DEP-059 · 060).
+          모니터링: 사유 코드만 있는 주의 배포에도 안내 박스를 둔다(7.6).
+          생성: 03 호출 주소를 호스트명 바로 다음에 두고(7.3), 중복 확인 중 버튼 스피너를 두었다(6장). 배정 0장 워크스페이스는 배포 전 검사도 `줄여 주세요` 대신 상태만 쓴다(5.3).
+          엔진 인자 중복을 배포 전 검사 ✕ 로 둔다(5.3).
+          설정 변경: 구간 순서를 재기동 필요 → 변경 불가 → 재기동 없음으로 하고 `재기동 없음` 배지를 두었다. API Key 인증을 선택 상자로, 최대 컨텍스트 길이 흐린 값을 모델 기본값 숫자로 했다(7.7).
+          서버가 배포 조건으로 거절하면 모달 상단에 사유 한 문장을 둔다(5.3). 데모 바 `설정 저장 · 조건 거절` 로 본다.
+          벤치마크: 시작 거절에 전용 저장소 거절 · 그 밖 거절을, 결과 내려받기 실패 토스트를, 결과 리포트 모달 로딩 · 오류를 더했다(5.3 · 7장).
+          TPOT 정의가 바뀌기 전 이력은 TPOT을 `-` 로 둔다(7.4). 데모 바 `결과 리포트` 로 본다. 위 데모 값은 검토용이며 실제 화면에는 없다.
+          외부 배포 가져오기: 선택 열을 두고 열 순서를 기획서와 맞췄다. 연결할 모델이 있어야 선택할 수 있다(7.5).
+          동작 확인: 중지됨 안내를 `다시 시작한 뒤 요청을 보낼 수 있습니다.` 로 맞췄다. 중지됨의 액션 라벨이 `다시 시작` 이다(DEP-L01 5.2 · 6장).
+          데모 바: 데이터 상태는 목록으로, 지표 소스는 정상 배포의 상세 모니터링 탭으로 옮겨 어느 화면에서 눌러도 바로 보인다. `여유 있음` 을 `잔여 있음` 으로 고쳤다(용어집 5장).
+        · 벤치마크 도구를 AIPerf 하나로 줄였다(배포 정책 7.1 · DEP-L01 7.4 · CON-918 · CON-919).
+          선택지에서 LLMPerf를 뺐다. 구현과 같게 선택 칸은 두고 선택지만 하나다. 도움말은 토크나이저를 쓴다는 것만 남겼다.
+        · 토크나이저를 찾을 수 없어 시작이 거절되면 실패 토스트로 알린다(DEP-L01 5.3).
+          v0.38은 도구 선택 아래 인라인 에러로 두고 LLMPerf로 바꾸라고 안내했다. 바꿀 도구가 없어져 이 화면에서 고칠 값이 없다.
+          그 밖의 시작 실패와 같은 자리다. 문구 `이 배포는 토크나이저를 찾을 수 없어 벤치마크를 실행할 수 없습니다.`
+        · 실행 이력 샘플의 실행 중 LLMPerf 행을 AIPerf로 바꿨다. 지금은 LLMPerf로 실행할 수 없다.
+          지난 실패 행의 LLMPerf는 남겼다. 지난 실행 이력은 그대로 조회된다(CON-919).
+        · 데모 바 `토크나이저 없음` 은 실패 토스트까지 보인다. 검토용 처리이며 실제 화면에는 없다.
+        · 시스템이 직접 설정하는 엔진 인자를 예약어에 더했다(배포 정책 5.3 · DEP-L01 5.3 · CON-931).
+          차트가 컨테이너 인자로 직접 싣는 다섯 가지다. 같은 인자를 또 넣으면 두 번 실려 서버가 거절한다.
+          `--kv-transfer-config` · `--kv-events-config` · `--disable-log-requests` · `--otlp-traces-endpoint` · `--collect-detailed-traces`
+          목록 밖 인자 칸에 넣으면 `이 인자는 시스템이 설정하므로 넣을 수 없습니다.` 를 띄운다. 앞 단계에서 정하는 인자는 종전 문구 그대로다.
+        · 엔진 인자 목록에서 `--otlp-traces-endpoint` 를 뺐다. 예약어가 되어 관측 그룹이 비어 그룹째 없앴다. 4개 그룹 27개 인자다.
+        · 배포를 만든 직후 지표가 아직 없으면 헬스 자리에 `수집 대기` 를 둔다(모니터링 정책 5.3 · DEP-L01 7.6).
+          사유는 `배포를 만든 직후라 지표가 아직 쌓이지 않았습니다.` 다. 모니터링 목업 v0.29와 같은 문구다.
+        · 유예 시간(5분)이 지나도 지표가 들어오지 않으면 응답하지 않는 배포로 보고 헬스를 위험으로 둔다(모니터링 정책 5.3).
+          설명은 패널 `지표가 들어오지 않습니다. 서빙 엔진이 응답하지 않을 수 있습니다.`,
+          모니터링 탭 `지표가 들어오지 않습니다. 서빙 엔진이 응답하지 않을 수 있어 아래 주요 이벤트를 확인해 주세요.` 다. 값은 - 로 둔다.
+          모니터링 목업은 배포 상세로 보내는 문구다. 배포 상세에서는 같은 탭의 주요 이벤트로 이어 준다. 외부 배포는 이 판정을 하지 않는다.
+        · 데모 바 지표 소스에 `수집 대기` · `5분 뒤 값 없음` 을 더했다(CON-935). 검토용 처리이며 실제 화면에는 없다.
+        · 설정 변경 모달의 형식 검증을 더했다(DEP-L01 7.7). 저장 시 인라인 에러를 붙이고 첫 오류 필드로 포커스한다(공통정책 7.8).
+          레플리카 수는 1 이상의 정수 `1 이상의 정수를 입력해 주세요.` 상한은 정해지지 않아(CON-849) 보지 않는다.
+          최대 컨텍스트 길이는 비우면 모델 기본값이고, 값이 있으면 1 이상의 정수 `1 이상의 정수를 입력해 주세요.` 다. 모델 상한 초과는 종전 문구다.
+          가속기 메모리 사용률은 0.1~1.0 `0.1~1.0 사이의 값을 입력해 주세요.`
+          전에는 레플리카 수를 비우면 이전 값으로 조용히 돌아갔다.
+        · 모니터링 탭 처리량 추이 아래 `상세 지표 →` 옆에 `Grafana 열기` 를 두었다(모니터링 정책 5.4 · DEP-L01 7.6 · CON-470 · CON-945).
+          이 배포의 Grafana 대시보드를 새 탭으로 연다. 역할 · 배포 상태로 가르지 않는다.
+          지표 · 추적 수집을 사용하지 않는 배포는 비활성이고 사유 `지표 · 추적 수집을 사용하지 않는 배포입니다.` 를 단다. 모니터링 목업과 같은 문구다.
+          데모 바 `Grafana 비활성` 으로 solar-open-100b-paused 상세 모니터링 탭을 연다. 검토용 처리이며 실제 화면에는 없다.
+        · `상세 지표 →` 의 이동 안내를 `모니터링 화면의 배포 성능 탭으로 이동합니다.` 로 고쳤다. 탭 이름이 오버뷰 대시보드에서 배포 성능으로 바뀌었다(모니터링 정책 3장).
+
   ── v0.38 (2026-10-23) ──
         · 벤치마크 시작 거절을 두었다(DEP-L01 5.3 · 배포 정책 7.1 · CON-884 2026-10-22).
           토크나이저를 찾을 수 없어 AIPerf로 시작하지 못하면 도구 선택 아래 인라인 에러
@@ -178,7 +227,7 @@
             가속기 수를 줄여 주세요.` 로 고쳤다. 종전 `레플리카당 수량` 이 필드 라벨과 달랐다
           · 한도 초과 검증에서 필드 지정(`f:'gpu'`)을 뺐다. 두 값의 곱이 넘은 것이라
             한쪽 필드를 지목할 수 없다. 배포 버튼을 막는 역할은 그대로다
-          · 데모 바에 `자원` 축 — 여유 있음 · 한도 초과 · 배정 0. 누르면 02 자원 단계까지
+          · 데모 바에 `자원` 축 — 잔여 있음 · 한도 초과 · 배정 0. 누르면 02 자원 단계까지
             옮기고 값을 채워 바로 보인다. 실제 화면에는 없는 검토용 처리다
           · 이동 버튼은 최고 관리자·워크스페이스 관리자에게만 둔다. 할당량 수정은 최고
             관리자, 증액 신청은 워크스페이스 관리자이고 편집자는 둘 다 없는데 배포 생성은
@@ -799,6 +848,8 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .desc{font-size:12.5px;color:var(--muted-foreground);line-height:1.65;background:var(--muted);border:1px solid var(--border);border-radius:9px;padding:11px 12px;margin-bottom:12px}
 /* 이동 링크 — 색이 아니라 밑줄로 구분한다 */
 .secact{display:flex;gap:7px;margin-top:12px}
+.disw{display:inline-block;cursor:not-allowed}
+.disw > :disabled{pointer-events:none}
 .emptyline{font-size:12.5px;color:var(--muted-foreground);font-style:italic}
 
 /* 모달 */
@@ -2199,7 +2250,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     <div class="mdbody" id="bmBody"></div>
     <div class="mdfoot">
       <button class="btn ghost" onclick="closeBmRep()">닫기</button>
-      <button class="btn" id="bmDl" onclick="act('벤치마크 결과를 내려받습니다.')">결과 내려받기</button>
+      <button class="btn" id="bmDl" onclick="bmDownload()">결과 내려받기</button>
     </div>
   </div>
 </div>
@@ -2247,7 +2298,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <button class="rv on" onclick="setReview('ok',this)">통과</button>
         <button class="rv" onclick="setReview('err',this)">확인 필요</button>
         <span class="demo-label" style="margin-left:12px;">자원:</span>
-        <button class="rq" onclick="setQuota('free',this)">여유 있음</button>
+        <button class="rq" onclick="setQuota('free',this)">잔여 있음</button>
         <button class="rq" onclick="setQuota('none',this)">한도 초과</button>
         <button class="rq" onclick="setQuota('zero',this)">배정 0</button>
         <span class="demo-label" style="margin-left:12px;">권한:</span>
@@ -2258,10 +2309,26 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <span class="demo-label" style="margin-left:12px;">벤치마크 시작:</span>
   <button class="bs on" onclick="setBmStart('ok',this)">접수</button>
   <button class="bs" onclick="setBmStart('tok',this)">토크나이저 없음</button>
+  <button class="bs" onclick="setBmStart('byob',this)">저장소 거절</button>
+  <button class="bs" onclick="setBmStart('etc',this)">그 밖 거절</button>
+  <!-- 결과 리포트 모달 상태와 내려받기 실패. 실제 화면에는 없는 검토용 처리다 -->
+  <span class="demo-label" style="margin-left:12px;">결과 리포트:</span>
+  <button class="br on" onclick="setBmRep('ok',this)">정상</button>
+  <button class="br" onclick="setBmRep('loading',this)">로딩</button>
+  <button class="br" onclick="setBmRep('error',this)">오류</button>
+  <button class="br" onclick="setBmRep('dlfail',this)">내려받기 실패</button>
+  <span class="demo-label" style="margin-left:12px;">설정 저장:</span>
+  <button class="cr on" onclick="setCfgRej(false,this)">반영</button>
+  <button class="cr" onclick="setCfgRej(true,this)">조건 거절</button>
   <span class="demo-label" style="margin-left:12px;">지표 소스:</span>
   <button class="sr on" onclick="setSrc('ok',this)">정상</button>
   <button class="sr" onclick="setSrc('unavailable',this)">수집 불가</button>
   <button class="sr" onclick="setSrc('not_configured',this)">미설정</button>
+  <button class="sr" onclick="setSrc('pending',this)">수집 대기</button>
+  <button class="sr" onclick="setSrc('no_series',this)">5분 뒤 값 없음</button>
+  <!-- 검토용 처리. 실제 화면에는 없다 -->
+  <span class="demo-label" style="margin-left:12px;">v0.39 확인:</span>
+  <button onclick="demoGrafanaOff()">Grafana 비활성</button>
   <span class="demo-label" style="margin-left:12px;">테마:</span>
   <button onclick="document.body.classList.remove('dark')">라이트</button>
   <button onclick="document.body.classList.add('dark')">다크</button>
@@ -2362,14 +2429,14 @@ const MODELS=[
 const DEPS=[
  {n:'llama-3-2-1b-prod', ws:'ai-service-team', model:'llama-3.2-1b-instruct', mver:'latest',
   type:'자체 배포', st:'정상', rep:2, tgt:2, acc:'nvidia-h200', gpu:1, topo:'단일',
-  owner:'성유진(yj.seong)', at:'2026-08-12 14:20', upd:'2026-08-12 17:20', health:'위험',
+  owner:'성유진(yj.seong)', at:'2026-08-12 14:20:17', upd:'2026-08-12 17:20:34', health:'위험',
   reasons:[{sv:'위험',k:'첫 토큰 지연',v:'6.1초',th:'5초',ag:'레플리카별 p95 중 최댓값 · 최근 5분',t:'첫 토큰 지연 6.1초(위험 기준 5초)'},{sv:'위험',k:'가속기 사용률',v:'97%',th:'95%',ag:'최근 5분 평균',t:'가속기 사용률 97%(위험 기준 95%)'},{sv:'주의',k:'토큰당 지연',v:'240ms',th:'200ms',ag:'p99 · 최근 5분',t:'토큰당 지연 240ms(주의 기준 200ms)'}], missing:['KV 캐시 사용률','가속기 온도'],
   ep:'https://gw.ai-service.concerto.io/v1',
   gw:true, host:'gw.ai-service.concerto.io', tls:true, auth:true, obs:true, keys:['lang-chain-agent-prod','batch-infer-key']},
 
  {n:'gpt-oss-120b-symphony', ws:'ai-service-team', model:'gpt-oss-120b', mver:'latest',
   type:'자체 배포', st:'정상', rep:4, tgt:4, acc:'nvidia-h200', gpu:4, topo:'프리필·디코드 분리',
-  owner:'임승주(sj.lim)', at:'2026-08-09 10:02', upd:'2026-08-09 13:02', health:'주의',
+  owner:'임승주(sj.lim)', at:'2026-08-09 10:02:51', upd:'2026-08-09 13:02:08', health:'주의',
   /* v0.36 · 저활용 주의(모니터링 정책 5.2). 모니터링 목업과 같은 배포를 저활용 주의로 둔 검토용 값이다 */
   hreason:'UNDER_UTILIZATION', reasonText:'저활용 · 가속기 사용률 3%',
   ep:'https://gw.ai-service.concerto.io/v1',
@@ -2378,30 +2445,30 @@ const DEPS=[
 
  {n:'qwen3-6-35b-a3b-fp8-bench', ws:'ml-research', model:'qwen3-6-35b-a3b-fp8', mver:'1.0.0',
   type:'자체 배포', st:'생성 중', rep:0, tgt:2, acc:'nvidia-h200-mig', gpu:2, topo:'단일',
-  owner:'유지현(jh.yu)', at:'2026-08-18 09:41', upd:'2026-08-18 12:41', health:'-',
+  owner:'유지현(jh.yu)', at:'2026-08-18 09:41:25', upd:'2026-08-18 12:41:42', health:'-',
   ep:'https://gw.concerto.okestro.io/v1', gw:true, host:'', tls:false, auth:true, obs:true, keys:[]},
 
  {n:'furiosa-qwen3-32b-npu', ws:'test-npu', model:'furiosa-qwen3-32b-fp8', mver:'latest',
   type:'자체 배포', st:'오류', rep:0, tgt:2, acc:'furiosa-rngd', gpu:8, topo:'단일',
-  owner:'김병건(bg.kim)', at:'2026-08-15 17:33', upd:'2026-08-15 20:33', health:'위험',
+  owner:'김병건(bg.kim)', at:'2026-08-15 17:33:59', upd:'2026-08-15 20:33:16', health:'위험',
   ep:'https://gw.concerto.okestro.io/v1',
   gw:true, host:'', tls:false, auth:true, obs:true, keys:[]},
 
  {n:'gemma-4-12b-it-idle', ws:'ai-service-team', model:'gemma-4-12b-it', mver:'1.0.0',
   type:'자체 배포', st:'유휴', rep:0, tgt:2, acc:'nvidia-h200-mig', gpu:1, topo:'단일',
-  owner:'성유진(yj.seong)', at:'2026-07-30 11:15', upd:'2026-07-30 14:15', health:'-',
+  owner:'성유진(yj.seong)', at:'2026-07-30 11:15:33', upd:'2026-07-30 14:15:50', health:'-',
   ep:'https://gw.ai-service.concerto.io/v1',
   gw:true, host:'gw.ai-service.concerto.io', tls:true, auth:true, obs:true, keys:['lang-chain-agent-prod']},
 
  {n:'solar-open-100b-paused', ws:'ai-service-team', model:'solar-open-100b-nvfp4a16', mver:'1.0.0',
   type:'자체 배포', st:'중지됨', rep:0, tgt:1, acc:'nvidia-h200', gpu:2, topo:'단일',
-  owner:'오경환(kh.oh)', at:'2026-07-22 16:48', upd:'2026-07-22 19:48', health:'-',
+  owner:'오경환(kh.oh)', at:'2026-07-22 16:48:07', upd:'2026-07-22 19:48:24', health:'-',
   ep:'https://gw.ai-service.concerto.io/v1',
   gw:true, host:'gw.ai-service.concerto.io', tls:true, auth:true, obs:false, keys:[]},
 
  {n:'gemma-4-31b-fp8-failed', ws:'test-npu', model:'gemma-4-31b-it-fp8-block', mver:'1.0.0',
   type:'자체 배포', st:'생성 실패', rep:0, tgt:1, acc:'nvidia-h200', gpu:4, topo:'단일', reason:'ImagePullBackOff' /* 검토용 값 */,
-  owner:'유지현(jh.yu)', at:'2026-08-17 13:07', upd:'2026-08-17 16:07', health:'-',
+  owner:'유지현(jh.yu)', at:'2026-08-17 13:07:41', upd:'2026-08-17 16:07:58', health:'-',
   ep:'https://gw.concerto.okestro.io/v1', gw:true, host:'', tls:false, auth:true, obs:true, keys:[]}
 ,
 
@@ -2412,13 +2479,13 @@ const DEPS=[
     상태를 읽지 못한 것이라 레플리카는 비우고(-) 헬스도 `-` 다. 상태 분기를 보이기 위한 검토용 값이다 */
  {n:'furiosa-gpt-oss-120b-biz-prod', ws:'공용 워크스페이스', model:'-', mver:'-',
   type:'외부 배포', st:'확인 불가', rep:null, tgt:null, acc:'furiosa-rngd', gpu:8, topo:'-',
-  owner:'-', at:'2026-07-07 18:34', upd:'2026-07-07 21:34', health:'-',
+  owner:'-', at:'2026-07-07 18:34:15', upd:'2026-07-07 21:34:32', health:'-',
   ep:'https://biz-prod.internal/furiosa-gpt-oss-120b/v1',
   gw:false, host:'', tls:false, auth:false, obs:false, keys:[]},
 
  {n:'gpt-oss-20b-081valid', ws:'공용 워크스페이스', model:'-', mver:'-',
   type:'외부 배포', st:'연결 불가', rep:null, tgt:null, acc:'nvidia-h200', gpu:2, topo:'-',
-  owner:'-', at:'2026-07-07 18:36', upd:'2026-07-07 21:36', health:'-',
+  owner:'-', at:'2026-07-07 18:36:49', upd:'2026-07-07 21:36:06', health:'-',
   ep:'https://081valid.internal/gpt-oss-20b/v1',
   gw:false, host:'', tls:false, auth:false, obs:false, keys:[]}
 ];
@@ -2444,7 +2511,13 @@ const HB={'안정':'ok','주의':'wa','위험':'cr','-':'mu'};
 let rsOpen=false;
 function reasonBox(d){
   const a=d.reasons||[];
-  if(!a.length || (d.health!=='주의' && d.health!=='위험')) return '';
+  if(d.health!=='주의' && d.health!=='위험') return '';
+  /* 사유 코드만 있는 주의(저활용 등)도 안내 박스를 둔다. 사유가 한 건이라 펼침이 없다(DEP-L01 7.6 · 모니터링 정책 5.2) */
+  if(!a.length){
+    if(!d.reasonText) return '';
+    const sv=d.health==='위험'?'crit':'warn';
+    return '<div class="alertbox '+sv+' rsbox"><div class="atx"><div class="rshead"><span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span><b>'+d.reasonText+'</b></div></div></div>';
+  }
   const multi=a.length>1, sev=d.health==='위험'?'crit':'warn';
   const miss=(d.missing&&d.missing.length)? '<div class="rsmiss">측정하지 못한 지표: '+d.missing.join(' · ')+'</div>' : '';
   const body=(rsOpen&&multi)
@@ -2601,9 +2674,9 @@ function fApply(k){ const f=axis(k); const opts=f.opts.filter(function(o){return
   fsel[k]=v; document.querySelectorAll('th').forEach(function(x){x.classList.remove('fdd-on');}); render(); }
 document.addEventListener('click',function(){document.querySelectorAll('th').forEach(function(x){x.classList.remove('fdd-on');});});
 
-/* 정렬 기본값 — 최근 생성 순(공통정책 3.1) */
-let sortKey='at', sortDir='desc';
-function tgSort(k){ if(sortKey===k){sortDir=sortDir==='asc'?'desc':'asc';} else {sortKey=k;sortDir=(k==='at')?'desc':'asc';} render(); }
+/* 정렬 기본값 — 최근 변경일시 내림차순(DEP-L01 REQ-DEP-006 · 7.1) */
+let sortKey='upd', sortDir='desc';
+function tgSort(k){ if(sortKey===k){sortDir=sortDir==='asc'?'desc':'asc';} else {sortKey=k;sortDir=(k==='upd'||k==='at')?'desc':'asc';} render(); }
 function applySort(list){ const dir=sortDir==='asc'?1:-1;
   return list.slice().sort(function(a,b){ return String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ko',{numeric:true})*dir; }); }
 function sortTh(k,label){ const on=sortKey===k;
@@ -2620,7 +2693,8 @@ function base(){
 function rows(){
   let d=base();
   const q=sq.trim().toLowerCase();
-  if(q) d=d.filter(function(x){ return x.n.toLowerCase().indexOf(q)>=0 || x.model.toLowerCase().indexOf(q)>=0; });
+  /* 검색어는 목록의 모든 항목을 대상으로 한다(공통정책 3.3 · REQ-DEP-004) */
+  if(q) d=d.filter(function(x){ return [x.n,x.st,x.type,x.ws,x.model,x.mver,x.owner,x.upd].some(function(v){ return String(v||'').toLowerCase().indexOf(q)>=0; }); });
   FDEF.forEach(function(f){ const s=fsel[f.k]||[]; if(s.length) d=d.filter(function(x){ return s.indexOf(x[f.k])>=0; }); });
   return applySort(d);
 }
@@ -2654,7 +2728,7 @@ function render(keepPanel){
     return; }
   if(state==='empty'){ pg.style.display='none';
     el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 15c-1.5 1.5-2 4-2 4s2.5-.5 4-2m3-1l7-7M13 5s4 0 6 2 2 6 2 6l-9 5-4-4 5-9z"/></svg>'
-      +'<h3>생성된 배포가 없습니다.</h3>'
+      +'<h3>배포가 없습니다.</h3>'
       +'<p>'+(canDeploy()?'모델을 배포하면 목록에 표시됩니다.':'배포가 생성되면 목록에 표시됩니다.')+'</p>'
       +(canDeploy()?'<button class="btn" onclick="openWiz()">배포 생성</button>':'')+'</div>';
     return; }
@@ -2723,7 +2797,7 @@ function tableView(d){
    + d.map(function(x){
        const i=DEPS.indexOf(x);
        return '<tr id="row'+i+'" onclick="openPanel('+i+')">'
-        + '<td><a class="mname" onclick="event.stopPropagation();openDetailAt('+i+')">'+x.n+'</a></td>'
+        + '<td><a class="mname" onclick="event.stopPropagation();openPanel('+i+')">'+x.n+'</a></td>'
         + '<td>'+stBadge(x.st)+'</td>'
         + '<td>'+x.type+'</td>'
         + '<td>'+x.ws+'</td>'
@@ -2746,7 +2820,7 @@ function rowMore(i){
   const d=DEPS[i];
   if(!canDeploy()) return '';
   const b=busy(d);
-  const why=b? '지금은 '+d.st+' 상태라 실행할 수 없습니다.' : '';
+  const why='지금은 '+d.st+' 상태라 실행할 수 없습니다.';
   function mi(label,fn,dis,cls){
     return '<button'+(cls?' class="'+cls+'"':'')+(dis?' disabled title="'+why+'"':' onclick="event.stopPropagation();'+fn+'"')+'>'+label+'</button>';
   }
@@ -2772,8 +2846,9 @@ function rowMore(i){
   return head
    /* 중지는 정상 기동된 적이 있어 같은 설정으로 다시 올린다. 생성 실패와 구분하려고
       `다시 시작` 으로 쓴다(정책 3.3) */
-   + (d.st==='중지됨'? mi('다시 시작','startDep('+i+')',b) : mi('일시중지','pauseDep('+i+')', b||!running(d)))
-   + mi('재시작','restartDep('+i+')', b||!restartable(d))
+   + (d.st==='중지됨'? mi('다시 시작','startDep('+i+')',b) : d.st==='오류'? '' : mi('일시중지','pauseDep('+i+')', b||!running(d)))
+   /* 상태별로 가능한 액션만 둔다(5.2). 오류는 일시중지가 없고 중지됨은 다시 시작이 재시작을 대신한다 */
+   + (d.st==='중지됨'? '' : mi('재시작','restartDep('+i+')', b||!restartable(d)))
    + mi('설정 변경','openCfg('+i+')', b)
    + '<hr>'
    + mi('종료','delDep('+i+')', b, 'd')
@@ -2801,6 +2876,8 @@ function tgSec(k){ const el=document.getElementById('sec_'+k); if(!el) return;
 function dl(pairs){ return '<dl class="dl">'+pairs.map(function(p){ return '<dt>'+p[0]+'</dt><dd>'+p[1]+'</dd>'; }).join('')+'</dl>'; }
 
 function openPanel(i){
+  /* 패널을 새로 열거나 다른 행을 고르면 패널 안에 로딩을 먼저 보인다(DEP-L01 6장 배포 패널) */
+  const fresh = !document.getElementById('panel').classList.contains('on') || !cur || cur.i!==i;
   const d=DEPS[i]; cur={d:d,i:i};
   document.getElementById('pnName').textContent=d.n;
   /* 설명을 두지 않는다. 마법사 4단계에서 받지 않는 값이라 화면에 자리만 남는다.
@@ -2808,10 +2885,9 @@ function openPanel(i){
   const de=document.getElementById('pnDesc');
   if(de) de.style.display='none';
   document.getElementById('pnTags').innerHTML = stBadge(d.st, true)+'<span class="vtag">'+d.type+'</span>';
-  document.getElementById('pnMenu').innerHTML = canDeploy()
-    ? rowMenuItems(i)
-    : '<button disabled>실행할 수 있는 작업이 없습니다.</button>';
-  document.getElementById('pnMore').style.display = canDeploy()?'':'none';
+  /* 패널은 조회 전용이다. 편집 · 제어 액션을 두지 않는다(REQ-DEP-018 · 7.2 · 공통정책 4.2.2). 제어는 목록 행 메뉴와 상세에서 한다 */
+  document.getElementById('pnMenu').innerHTML = '';
+  document.getElementById('pnMore').style.display = 'none';
 
   const b=[];
   /* 상태로 조치가 필요한 건은 패널 상단에 먼저 알린다 */
@@ -2820,7 +2896,7 @@ function openPanel(i){
       '<button class="btn ghost sm" onclick="openDetail()">상세 열기</button>', false));
   if(d.st==='생성 실패')
     b.push(alertBox('crit','배포를 기동하지 못했습니다.',failText(d)+' 설정을 확인한 뒤 다시 시도해 주세요.',
-      '<button class="btn ghost sm" onclick="act(\'다시 시도를 요청했습니다.\')">다시 시도</button>', false));
+      '<button class="btn ghost sm" onclick="openDetail()">상세 열기</button>', false));
 
   /* 생성일시만으로는 마지막 상태 변경 시점을 알 수 없다(8/19 회의 3.2).
      ⚠ DB 컬럼을 추가할지 기존 값을 갱신할지는 미결이다 */
@@ -2839,7 +2915,7 @@ function openPanel(i){
     ['모델', d.model==='-'
        ? '<span class="dash">-</span>'
        : '<a class="mname" onclick="event.stopPropagation();act(\''+d.model+' 모델 화면으로 이동합니다.\')">'+d.model+'</a>'
-         +(d.mver==='-'?'':'<span class="mver">'+d.mver+'</span>')],
+         +(d.mver==='-'?'':'('+d.mver+')')],
     ['서빙 방식'+tip('단일은 같은 구성의 레플리카로 서비스합니다. 프리필·디코드 분리는 프롬프트 분석과 토큰 생성을 나누어 배치합니다.'), d.topo],
     /* 표기는 상세와 같게 둔다. 같은 값을 화면마다 다르게 쓰면 대조가 안 된다 */
     ['가속기', d.gpu
@@ -2855,7 +2931,8 @@ function openPanel(i){
       /* v0.36 · 배지 아래 설명 문장. 주의는 사유 코드가 있으면 사유 문장이다(모니터링 정책 5.2).
          소스 상태 배지일 때는 판정 값이 아니라 두지 않는다 */
       healthBadge(d)
-      + (!srcBadge(d) && healthDesc(d) ? '<div class="hint">'+healthDesc(d)+'</div>' : '')]
+      + (noSeries(d) ? '<div class="hint">'+NOSERIES_TXT+'</div>'
+         : (!srcBadge(d) && healthDesc(d) ? '<div class="hint">'+healthDesc(d)+'</div>' : ''))]
   ])), 'spec'));
 
   /* v0.36 · `외부 접근` 행을 뺐다. 어느 문서에도 없고 설정하는 곳도 없는 값이다(DEP-L01 7.2).
@@ -2886,7 +2963,11 @@ function openPanel(i){
     +   '<button class="btn ghost sm" onclick="act(\''+d.ws+' 워크스페이스로 이동합니다.\')">워크스페이스 열기<span class="ar">→</span></button>'
     + '</div>', 'rel'));
 
-  document.getElementById('pnBody').innerHTML=b.join('');
+  const pb=document.getElementById('pnBody'), html=b.join('');
+  if(fresh){
+    pb.innerHTML=Array(6).fill('<div class="skrow" style="margin:14px 0"></div>').join('');
+    setTimeout(function(){ if(cur && cur.d===d) pb.innerHTML=html; }, 250);
+  } else pb.innerHTML=html;
   document.getElementById('panel').classList.add('on');
   document.body.classList.add('panel-on');
   markRowSel();
@@ -2912,7 +2993,7 @@ document.addEventListener('keydown',function(e){
 
 function rowMenuItems(i){
   const d=DEPS[i], b=busy(d);
-  const why=b? '지금은 '+d.st+' 상태라 실행할 수 없습니다.' : '';
+  const why='지금은 '+d.st+' 상태라 실행할 수 없습니다.';
   function mi(label,fn,dis,cls){
     return '<button'+(cls?' class="'+cls+'"':'')+(dis?' disabled title="'+why+'"':' onclick="event.stopPropagation();'+fn+'"')+'>'+label+'</button>';
   }
@@ -2927,8 +3008,9 @@ function rowMenuItems(i){
      실패한 삭제를 다시 실행하는 것만 남긴다(정책 3.2) — 목록 행 메뉴와 같다 */
   if(d.st==='삭제 실패')
     return mi('다시 시도','delDep('+i+')', b);
-  return (d.st==='중지됨'? mi('다시 시작','startDep('+i+')',b) : mi('일시중지','pauseDep('+i+')', b||!running(d)))
-   + mi('재시작','restartDep('+i+')', b||!restartable(d))
+  return (d.st==='중지됨'? mi('다시 시작','startDep('+i+')',b) : d.st==='오류'? '' : mi('일시중지','pauseDep('+i+')', b||!running(d)))
+   /* 상태별로 가능한 액션만 둔다(5.2). 오류는 일시중지가 없고 중지됨은 다시 시작이 재시작을 대신한다 */
+   + (d.st==='중지됨'? '' : mi('재시작','restartDep('+i+')', b||!restartable(d)))
    + mi('설정 변경','openCfg('+i+')', b)
    + '<hr>' + mi('종료','delDep('+i+')', b, 'd');
 }
@@ -2980,8 +3062,8 @@ function drawDetail(){
       ? dbtn('다시 시도','delDep('+i+')', b)
       : (d.st==='중지됨'
           ? dbtn('다시 시작','startDep('+i+')', b)
-          : dbtn('일시중지','pauseDep('+i+')', b||!running(d)))
-        + dbtn('재시작','restartDep('+i+')', b||!restartable(d))
+          : d.st==='오류'? '' : dbtn('일시중지','pauseDep('+i+')', b||!running(d)))
+        + (d.st==='중지됨'? '' : dbtn('재시작','restartDep('+i+')', b||!restartable(d)))
         + dbtn('설정 변경','openCfg('+i+')', b)
         + dbtn('종료','delDep('+i+')', b, 'danger-line');
 
@@ -3009,8 +3091,12 @@ function drawDetail(){
         ['모델', d.model==='-'
           ? '<span class="dash">-</span>'
           : '<a class="mname" onclick="act(\''+d.model+' 모델 화면으로 이동합니다.\')">'+d.model+'</a>'
-            +(d.mver==='-'?'':'<span class="mver">'+d.mver+'</span>')],
+            +(d.mver==='-'?'':'('+d.mver+')')],
         ['워크스페이스', '<a class="mname" onclick="act(\''+d.ws+' 워크스페이스로 이동합니다.\')">'+d.ws+'</a>'],
+        /* 엔드포인트는 복사 버튼과 함께 둔다(REQ-DEP-022). 패널 연관 리소스와 같은 값 · 표기다 */
+        ['엔드포인트', d.ep
+           ? '<span class="eprow"><span class="path">'+d.ep+'</span>'+copyBtn('엔드포인트')+'</span>'
+           : '<span class="dash">기동 후 발급됩니다.</span>'],
         ['담당자', userRef(d.owner)],
         ['생성일시', d.at]
       ])
@@ -3019,6 +3105,9 @@ function drawDetail(){
    + (dTab===0? dOverview(d) : dTab===1? dMonitor(d) : dBench(d));
 }
 function setDTab(i){ dTab=i; drawDetail(); }
+/* 일시 표기 YYYY-MM-DD HH:mm:ss(공통정책 1.3) */
+function nowStr(){ const t=new Date(), z=function(n){ return String(n).padStart(2,'0'); };
+  return t.getFullYear()+'-'+z(t.getMonth()+1)+'-'+z(t.getDate())+' '+z(t.getHours())+':'+z(t.getMinutes())+':'+z(t.getSeconds()); }
 function dcard(t,v,cls){ return '<div class="dcard"><div class="ct">'+t+'</div><div class="cv'+(cls?' '+cls:'')+'">'+v+'</div></div>'; }
 
 /* 진단 — 기술문서 §10.5(원인 설명 + 조치 권고) */
@@ -3042,7 +3131,7 @@ function diagBox(d){
        s:'대기 중인 요청이 계속 쌓이고 있습니다. 최근 1시간 P99 지연이 기준의 3배를 넘었습니다.',
        r:'레플리카 수를 늘리거나 동시 처리 요청 수를 조정해 주세요.'}
     : {t:'처리 여력이 줄고 있습니다.',
-       s:'가속기 메모리 사용률이 90%를 넘는 시간이 이어지고 있습니다. 지금은 요청을 처리하고 있으나 여유가 없습니다.',
+       s:'가속기 메모리 사용률이 90%를 넘는 시간이 이어지고 있습니다. 지금은 요청을 처리하고 있으나 남은 메모리가 거의 없습니다.',
        r:'레플리카를 늘리거나 가속기 메모리 사용 비율을 낮춰 주세요.'};
   return '<div class="diag'+(err?'':' warn')+'"><svg class="dic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>'
    + '<div class="dtx"><div class="dtt">'+t.t+'</div>'
@@ -3057,7 +3146,7 @@ function diagBox(d){
 function tstBlock(d){
   switch(d.st){
     case '생성 중':   return '기동이 끝나면 요청을 보낼 수 있습니다.';
-    case '중지됨':    return '재시작한 뒤 요청을 보낼 수 있습니다.';
+    case '중지됨':    return '다시 시작한 뒤 요청을 보낼 수 있습니다.';
     case '생성 실패': return failText(d)+' 설정을 확인해 주세요.';
     case '삭제 중':   return '삭제 중인 배포에는 요청을 보낼 수 없습니다.';
     case '삭제 실패': return '삭제에 실패한 배포에는 요청을 보낼 수 없습니다.';
@@ -3069,7 +3158,9 @@ function tstBlock(d){
 let TST={q:'', a:'', err:'', ms:0, ti:0, to:0};
 /* 예시 — 무엇을 넣으면 되는지 보여준다. 누르면 입력란에 들어간다 */
 const TSTEX=['안녕하세요','한국의 수도는?','다음 문장을 영어로 번역해 줘: 오늘 날씨가 좋다'];
-function tstPick(v){ TST.q=v; TST.a=''; TST.err=''; render(); }
+/* 동작 확인은 상세 개요 탭에 있다. 목록 render 가 아니라 상세를 다시 그려야 입력 · 응답이 보인다 */
+function tstRedraw(){ if(view==='detail') drawDetail(); else render(); }
+function tstPick(v){ TST.q=v; TST.a=''; TST.err=''; tstRedraw(); }
 function tstOn(el){
   TST.q=el.value;
   const b=document.getElementById('tstGo');
@@ -3081,7 +3172,7 @@ function tstSend(){
   /* 시안이라 정해진 응답을 돌려준다. 실제로는 엔드포인트를 부른다 */
   TST.err=''; TST.a='안녕하세요. 무엇을 도와드릴까요?';
   TST.ms=845; TST.ti=12; TST.to=28;
-  render();
+  tstRedraw();
 }
 function dOverview(d){
   const curl='curl -X POST '+(d.ep||'{엔드포인트}')+'/chat/completions \\\n'
@@ -3181,20 +3272,33 @@ function resBlock(title,cnt,go,body){
 function hasPods(d){ return d.st==='정상'||d.st==='오류'; }
 /* 지표 소스 상태 배지와 사유 — 모니터링 목업과 같은 문구다(모니터링 정책 5.3) */
 const SRC={unavailable:['수집 불가','지표를 일시적으로 불러오지 못하고 있습니다.'],
-           not_configured:['미설정','이 배포는 지표 수집이 설정되어 있지 않습니다.']};
+           not_configured:['미설정','이 배포는 지표 수집이 설정되어 있지 않습니다.'],
+           /* v0.39 · 배포를 만든 직후 유예 시간(5분) 안이다 */
+           pending:['수집 대기','배포를 만든 직후라 지표가 아직 쌓이지 않았습니다.']};
+/* v0.39 · 유예 시간이 지나도 지표가 없으면 응답하지 않는 배포로 보고 헬스를 위험으로 둔다(모니터링 정책 5.3).
+   소스 상태 배지가 아니라 판정 값이다 */
+/* 모니터링 화면은 배포 상세로 보내는 문구다. 여기가 배포 상세라 이동 안내 없이 상태만 쓴다 */
+const NOSERIES_TXT='지표가 들어오지 않습니다. 서빙 엔진이 응답하지 않을 수 있습니다.';
+/* 상세 모니터링 탭은 같은 탭 아래 주요 이벤트에서 기동 · 레플리카 변화를 볼 수 있어 그 자리를 가리킨다(DEP-L01 7.6).
+   패널에는 주요 이벤트가 없어 상태만 쓴다 */
+const NOSERIES_TXT_DT='지표가 들어오지 않습니다. 서빙 엔진이 응답하지 않을 수 있어 아래 주요 이벤트를 확인해 주세요.';
+/* 외부 배포는 이 판정을 하지 않는다(모니터링 정책 5.3) */
+function noSeries(d){ return d.st==='정상' && d.type!=='외부 배포' && src==='no_series'; }
 /* 지표를 받는 배포는 정상뿐이다. 오류는 응답하지 않아 지표가 없고(모니터링 정책 5.1), 헬스는 서버가 배포 상태로 준 값(위험)이다.
    소스 상태 배지는 지표를 받아야 할 배포(정상)에만 쓴다 */
-function srcBadge(d){ return d.st==='정상' && src!=='ok' ? SRC[src] : null; }
+function srcBadge(d){ return d.st==='정상' && SRC[src] ? SRC[src] : null; }
 /* 헬스 표시 — 패널·모니터링 탭이 같은 값을 쓴다(배포 정책 3.4) */
 function healthBadge(d){
   const sb = srcBadge(d);
+  if(noSeries(d)) return '<span class="stbadge '+HB['위험']+'">위험</span>';
   return sb ? '<span class="stbadge mu">'+sb[0]+'</span>'
             : '<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>';
 }
 function dMonitor(d){
   const pods = hasPods(d);
   const sb = srcBadge(d);
-  const on = d.st==='정상' && !sb;
+  const ns = noSeries(d);
+  const on = d.st==='정상' && !sb && !ns;
   const mv=function(t,v,u,help){ return '<div class="mcard"><div class="mt">'+t+(help?tip(help):'')+'</div><div class="mv">'+v+'</div>'+(u?'<div class="mu">'+u+'</div>':'')+'</div>'; };
   const bars=Array.from({length:34},function(){ return '<div class="bar" style="height:'+(on? 18+Math.round(Math.random()*70) : 2)+'%"></div>'; }).join('');
   /* 주요 이벤트 — 배포의 상태가 바뀐 일만 남긴다(정책 8.4).
@@ -3231,6 +3335,9 @@ function dMonitor(d){
            '배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 배포 상태와 다른 축입니다.')
       /* v0.36 · 부제 자리에 설명 문장을 둔다. 주의는 사유 코드가 있으면 사유 문장이다(모니터링 정책 5.2) */
       /* 아래 사유 박스가 있으면 카드에는 라벨만 둔다 — 같은 사유가 두 번 나오지 않게 */
+      : ns
+      ? mv('헬스',healthBadge(d),NOSERIES_TXT_DT,
+           '배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 배포 상태와 다른 축입니다.')
       : mv('헬스','<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>',(on && reasonBox(d))? '' : healthDesc(d),
            '배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 배포 상태와 다른 축입니다.'))
    + '</div>'
@@ -3243,7 +3350,13 @@ function dMonitor(d){
    /* 값이 없으면 낮은 막대로 채우지 않는다. 작았던 값으로 읽힌다 */
    + (on ? '<div class="chart">'+bars+'</div>' : '<div class="emptyline">아직 값이 들어오지 않습니다.</div>')
    + '<div class="secact" style="margin-top:14px">'
-   +   '<button class="btn ghost sm" onclick="act(\'모니터링 화면의 오버뷰 대시보드로 이동합니다.\')">상세 지표<span class="ar">→</span></button>'
+   +   '<button class="btn ghost sm" onclick="act(\'모니터링 화면의 배포 성능 탭으로 이동합니다.\')">상세 지표<span class="ar">→</span></button>'
+   /* Grafana 열기 — 이 배포의 Grafana 대시보드를 새 탭으로 연다(모니터링 정책 5.4 · DEP-L01 7.6).
+      열람 권한은 백엔드가 판정해 역할로 가르지 않고 배포 상태로도 가르지 않는다.
+      지표 · 추적 수집을 사용하지 않는 배포는 대시보드가 없어 비활성으로 두고 사유를 단다. 이 화면에서 조치할 수 없어 상태만 말한다 */
+   +   (d.obs
+        ? '<button class="btn ghost sm" onclick="act(\'Grafana 대시보드를 새 탭으로 엽니다.\')">Grafana 열기</button>'
+        : '<span class="disw" title="지표 · 추적 수집을 사용하지 않는 배포입니다."><button class="btn ghost sm" disabled>Grafana 열기</button></span>')
    + '</div></div>'
    + '<div class="dsec"><h4>주요 이벤트'+tip('배포에 일어난 일만 모아 보여줍니다.')+'</h4>'
    /* 주요 이벤트는 지표가 아니라 배포에 일어난 일이라 소스 상태와 무관하게 보인다 */
@@ -3270,16 +3383,20 @@ function dMonitor(d){
 const BM=[
   /* 실행자는 중단 권한을 가르는 값이다. 편집자는 본인 실행만 중단한다(배포 정책 7.2).
      본인 실행·남의 실행을 함께 볼 수 있게 실행 중 두 건을 둔다. 실제 화면에는 없는 검토용 값이다 */
-  {st:'실행 중', engine:'AIPerf',  at:'2026-08-20 11:12', done:34, total:100, by:'성유진(yj.seong)'},
-  {st:'실행 중', engine:'LLMPerf', at:'2026-08-20 10:40', done:71, total:100, by:'임승주(sj.lim)'},
-  {st:'완료',   engine:'AIPerf',  at:'2026-08-17 14:02', by:'성유진(yj.seong)', upd:'2026-08-17 17:02', ttft:186, tps:'42.8',
+  {st:'실행 중', engine:'AIPerf',  at:'2026-08-20 11:12:23', done:34, total:100, by:'성유진(yj.seong)'},
+  {st:'실행 중', engine:'AIPerf',  at:'2026-08-20 10:40:40', done:71, total:100, by:'임승주(sj.lim)'},
+  {st:'완료',   engine:'AIPerf',  at:'2026-08-17 14:02:57', by:'성유진(yj.seong)', upd:'2026-08-17 17:02:14', ttft:186, tps:'42.8',
    /* 부하 구간의 GPU 지표를 성능값과 한 세트로 저장한다(2026-09-14 확인) */
    rep:{req:100, ok:100, ttft:{avg:186, p95:241}, tpot:{avg:11.4, p95:16.2}, tps:'42.8', dur:'3시간 0분',
         gpu:{util:{avg:78, max:94}, mem:{avg:62.4, max:71.8}, pw:{avg:248, max:301}}}},
-  {st:'완료',   engine:'AIPerf',  at:'2026-08-12 09:31', by:'임승주(sj.lim)', upd:'2026-08-12 12:31', ttft:203, tps:'39.1',
+  {st:'완료',   engine:'AIPerf',  at:'2026-08-12 09:31:31', by:'임승주(sj.lim)', upd:'2026-08-12 12:31:48', ttft:203, tps:'39.1',
    rep:{req:100, ok:98,  ttft:{avg:203, p95:288}, tpot:{avg:12.9, p95:19.4}, tps:'39.1', dur:'3시간 0분',
         gpu:{util:{avg:71, max:88}, mem:{avg:58.2, max:66.1}, pw:{avg:231, max:284}}}},
-  {st:'실패',   engine:'LLMPerf', at:'2026-08-09 17:48', by:'유지현(jh.yu)', upd:'2026-08-09 20:48', ttft:0,   tps:'0',
+  /* TPOT 정의가 바뀌기 전 이력이다. TPOT 평균 · p95 를 - 로 둔다(DEP-L01 7.4). 실제 화면에는 없는 검토용 값이다 */
+  {st:'완료',   engine:'AIPerf',  at:'2026-08-10 15:20:44', by:'성유진(yj.seong)', upd:'2026-08-10 18:20:51', ttft:214, tps:'37.6',
+   rep:{req:100, ok:100, ttft:{avg:214, p95:296}, tpot:null, tps:'37.6', dur:'3시간 0분'}},
+  /* 지난 LLMPerf 실행은 이력으로 남는다(CON-919). 지금은 AIPerf로만 실행한다 */
+  {st:'실패',   engine:'LLMPerf', at:'2026-08-09 17:48:05', by:'유지현(jh.yu)', upd:'2026-08-09 20:48:22', ttft:0,   tps:'0',
    fail:'BENCH_TIMEOUT'}
 ];
 /* 실패 사유 문구(DEP-L01 5.3). 원문 오류(failure_detail)는 보이지 않는다(공통정책 7.9).
@@ -3291,9 +3408,12 @@ const BENCH_FAIL={
   BENCH_RESULT_MISSING:'실행은 끝났으나 결과를 받지 못했습니다.'
 };
 function benchFailMsg(code){ return BENCH_FAIL[code] || '벤치마크를 완료하지 못했습니다.'; }
-/* 시작 거절(DEP-L01 5.3). 실행 이력이 생기지 않아 결과 모달이 아니라 설정 자리에 보인다.
+/* 시작 거절(DEP-L01 5.3). 실행 이력이 생기지 않고 실패 토스트로 알린다. 이 화면에서 고칠 값이 없어 상태만 적는다.
    토크나이저 출처를 정하지 못한 경우와 S3에서 토크나이저를 찾지 못한 경우가 같은 문구다. 원문 오류는 노출하지 않는다(공통정책 7.9) */
-const BENCH_START_TOK='이 배포는 토크나이저를 찾을 수 없어 AIPerf로 측정할 수 없습니다. LLMPerf로 바꿔 실행해 주세요.';
+const BENCH_START_TOK='이 배포는 토크나이저를 찾을 수 없어 벤치마크를 실행할 수 없습니다.';
+/* 전용 저장소 주소가 허용되지 않아 결과를 저장할 수 없는 경우 · 그 밖의 시작 거절(DEP-L01 5.3 · 배포 정책 7.3) */
+const BENCH_START_BYOB='워크스페이스 전용 저장소에 결과를 저장할 수 없어 벤치마크를 시작하지 못했습니다. 관리자에게 문의해 주세요.';
+const BENCH_START_ETC='벤치마크를 시작하지 못했습니다.';
 let BM_TOOL='AIPerf', BM_ERR='';
 /* 검토용: 시작 응답 분기. 'ok' 접수 · 'tok' 토크나이저 없음. 실제 화면에는 없다 */
 let BM_START='ok';
@@ -3302,7 +3422,7 @@ function setBmStart(k,btn){
   document.querySelectorAll('#demoBar .bs').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
   /* 검토용: 누르면 정상 상태인 자체 배포의 벤치마크 탭으로 바로 간다. 정상이 아닌 배포는 실행 버튼이 비활성이라(배포 정책 7.1) 분기를 볼 수 없다.
-     `토크나이저 없음` 은 AIPerf로 실행한 결과(인라인 에러)까지 보인다. 실제 화면에는 없는 검토용 처리다 */
+     `토크나이저 없음` 은 실행한 결과(실패 토스트)까지 보인다. 실제 화면에는 없는 검토용 처리다 */
   /* 뷰어에게는 벤치마크 설정 · 실행이 없어(7.10) 분기를 볼 수 없다. 편집자로 바꿔 보인다 */
   if(role==='viewer') setRole('editor');
   if(!(cur && benchable(cur.d))){
@@ -3311,20 +3431,14 @@ function setBmStart(k,btn){
     openDetailAt(i);
   }
   dTab=2; BM_TOOL='AIPerf';
-  if(k==='tok'){ runBench(); } else { drawDetail(); }
-  const el=document.getElementById('bmTool'); if(el){ el.scrollIntoView({block:'center'}); if(k==='tok') el.focus(); }
+  drawDetail(); if(k!=='ok') runBench();
+  const el=document.getElementById('bmTool'); if(el) el.scrollIntoView({block:'center'});
 }
-function bmToolChange(v){
-  BM_TOOL=v;
-  if(BM_ERR){ BM_ERR=''; drawDetail(); const el=document.getElementById('bmTool'); if(el) el.focus(); }
-}
+function bmToolChange(v){ BM_TOOL=v; }
 function runBench(){
-  /* LLMPerf는 토크나이저를 쓰지 않아 이 거절이 없다(CON-884) */
-  if(BM_START==='tok' && BM_TOOL==='AIPerf'){
-    BM_ERR=BENCH_START_TOK; drawDetail();
-    const el=document.getElementById('bmTool'); if(el) el.focus();
-    return;
-  }
+  if(BM_START==='tok'){ toast('cr', BENCH_START_TOK); return; }
+  if(BM_START==='byob'){ toast('cr', BENCH_START_BYOB); return; }
+  if(BM_START==='etc'){ toast('cr', BENCH_START_ETC); return; }
   BM_ERR='';
   toast('ok','벤치마크를 시작했습니다. 진행 상황은 실행 이력에서 확인합니다.');
 }
@@ -3352,12 +3466,11 @@ function dBench(d){
   const ext = d.type==='외부 배포';
   return (canDeploy() && !ext ? '<div class="dsec"><h4>벤치마크 설정</h4>'
    + '<div class="bmgrid">'
-   /* 시작 거절 사유는 원인 자리(도구 선택) 아래 인라인으로 둔다(DEP-L01 5.3 · 공통정책 7.8) */
-   +   bfld('벤치마크 도구'+tip('AIPerf는 모델의 토크나이저를 사용해 측정합니다. LLMPerf는 토크나이저 없이 측정합니다.'),
-         '<select class="inp'+(BM_ERR?' err':'')+'" id="bmTool" onchange="bmToolChange(this.value)">'
-         + ['AIPerf','LLMPerf'].map(function(o){ return '<option'+(o===BM_TOOL?' selected':'')+'>'+o+'</option>'; }).join('')
-         + '</select>'
-         + (BM_ERR? '<p class="ferr">'+BM_ERR+'</p>' : ''))
+   /* 도구는 AIPerf 하나다(배포 정책 7.1 · CON-918). 구현과 같게 선택 칸은 둔다 */
+   +   bfld('벤치마크 도구'+tip('모델의 토크나이저를 사용해 측정합니다.'),
+         '<select class="inp" id="bmTool" onchange="bmToolChange(this.value)">'
+         + ['AIPerf'].map(function(o){ return '<option'+(o===BM_TOOL?' selected':'')+'>'+o+'</option>'; }).join('')
+         + '</select>')
    +   bfld('동시 요청 수','<input class="inp" value="1">','같은 시점에 몇 건을 보낼지 정합니다. 실서비스에서 예상되는 동시 호출 수에 맞춥니다.')
    +   bfld('총 요청 수','<input class="inp" value="100">','측정에 사용할 표본 크기입니다.')
    + '</div>'
@@ -3404,7 +3517,7 @@ function dBench(d){
              + '<td>'+b.at+'</td>'
              + '<td>'+cell+'</td>'
              + '<td>'+(done
-                 ? '<button class="cbtn sm" title="결과 내려받기" onclick="event.stopPropagation();act(\'벤치마크 결과를 내려받습니다.\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v11M8 12l4 4 4-4M5 20h14"/></svg></button>'
+                 ? '<button class="cbtn sm" title="결과 내려받기" onclick="event.stopPropagation();bmDownload()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v11M8 12l4 4 4-4M5 20h14"/></svg></button>'
                  : canAbortBm(b)
                  /* 중단은 실행 중인 건에만, 권한이 있는 사람에게만 둔다(DEP-L01 7.4 · 공통정책 7.10).
                     되돌릴 수 없는 동작이라 진입은 외곽선 파괴 버튼, 최종 실행은 확인 알럿의 채움 버튼이다(종료·등록 해제와 같은 규격) */
@@ -3417,9 +3530,37 @@ function dBench(d){
 }
 /* 벤치마크 결과 — 이력 행에서 연다. 요약 지표 둘만으로는 판단이 서지 않아 결과 전체를 담는다(명세 29).
    평균과 p95 를 함께 둔다 — 평균만 보면 꼬리 지연이 가려진다 */
+/* 검토용: 결과 리포트 모달 상태 · 내려받기 응답. 'ok' · 'loading' · 'error' · 'dlfail'. 실제 화면에는 없다 */
+let BM_REP='ok';
+function setBmRep(k,btn){
+  BM_REP=k;
+  document.querySelectorAll('#demoBar .br').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  if(role==='viewer') setRole('editor');
+  if(!(cur && benchable(cur.d))){ const i=DEPS.findIndex(function(d){ return benchable(d); }); if(i<0) return; openDetailAt(i); }
+  dTab=2; drawDetail();
+  openBmRep(BM.findIndex(function(b){ return b.st==='완료'; }));
+}
+/* 결과를 저장한 전용 저장소 설정이 지워졌거나 바뀌면 내려받지 못한다(DEP-L01 5.3 · 배포 정책 7.3) */
+function bmDownload(){
+  if(BM_REP==='dlfail'){ toast('cr','결과를 내려받지 못했습니다. 관리자에게 문의해 주세요.'); return; }
+  act('벤치마크 결과를 내려받습니다.');
+}
+/* TPOT 정의가 바뀌기 전 이력은 값을 비교할 수 없어 - 로 둔다(DEP-L01 7.4 · 배포 정책 7.3) */
+function tpotV(v){ return (v===null||v===undefined)? '<span class="dash">-</span>' : v+' ms'; }
 function openBmRep(ix){
   const b=BM[ix]; if(!b) return;
   document.getElementById('bmSub').textContent = b.engine + ' · ' + b.at;
+  /* 모달 안 로딩 · 오류(DEP-L01 7장 UI 상태) */
+  if(BM_REP==='loading' || BM_REP==='error'){
+    document.getElementById('bmDl').style.display='none';
+    document.getElementById('bmBody').innerHTML = BM_REP==='loading'
+      ? Array(6).fill('<div class="skrow" style="margin:12px 0"></div>').join('')
+      : '<div class="state" style="padding:28px 0"><h3>결과를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p>'
+        + '<button class="btn ghost" onclick="BM_REP=\'ok\';openBmRep('+ix+')">다시 시도</button></div>';
+    document.getElementById('mdBm').classList.add('on');
+    return;
+  }
   /* 실패 건은 사유만 담는다. 측정값이 없다 */
   if(!b.rep){
     if(b.st!=='실패') return;
@@ -3445,8 +3586,8 @@ function openBmRep(ix){
     + '<dt>처리량</dt><dd>'+r.tps+' TPS</dd>'
     + '<dt>TTFT 평균</dt><dd>'+r.ttft.avg+' ms</dd>'
     + '<dt>TTFT p95</dt><dd>'+r.ttft.p95+' ms</dd>'
-    + '<dt>TPOT 평균</dt><dd>'+r.tpot.avg+' ms</dd>'
-    + '<dt>TPOT p95</dt><dd>'+r.tpot.p95+' ms</dd>'
+    + '<dt>TPOT 평균</dt><dd>'+tpotV(r.tpot && r.tpot.avg)+'</dd>'
+    + '<dt>TPOT p95</dt><dd>'+tpotV(r.tpot && r.tpot.p95)+'</dd>'
     + '</dl></div>'
     /* 부하 구간의 GPU 지표다. 성능값과 한 세트로 재고 저장한다.
        모니터링은 실시간 추이를 보는 화면이고 여기는 그 구간의 고정 스냅샷이라 다르다 */
@@ -3632,10 +3773,7 @@ const EARGS=[
  {s:'모델·엔진 동작', k:'--model',            t:'lock', w:'01 모델',
   x:'배포할 모델입니다.'},
 
-
- /* ── 관측 ───────────────────────────────────── */
- {s:'관측', k:'--otlp-traces-endpoint', t:'text', p:'http://collector:4317',
-  x:'추적 데이터를 보낼 주소입니다.'}
+ /* 관측 그룹(`--otlp-traces-endpoint`)은 뺐다. 추적 주소는 시스템이 직접 설정한다(CON-931) */
 ];
 
 function argCount(){ let n=0; for(const k in WF.args){ if(String(WF.args[k]).trim()!=='') n++; } return n+customArgCount(); }
@@ -3643,6 +3781,9 @@ function argCount(){ let n=0; for(const k in WF.args){ if(String(WF.args[k]).tri
 /* 예약어 — 차트·마법사가 이미 정하는 값이라 인자로 받으면 걸러낸다(회의 4.10) */
 const RESERVED_ARGS=['--model','--served-model-name','--tensor-parallel-size',
   '--port','--gpu-memory-utilization','--max-model-len'];
+/* 시스템이 직접 설정하는 인자 — 차트가 컨테이너 인자로 싣는다. 넣으면 두 번 실려 서버가 거절한다(CON-931) */
+const SYSTEM_ARGS=['--kv-transfer-config','--kv-events-config','--disable-log-requests',
+  '--otlp-traces-endpoint','--collect-detailed-traces'];
 
 /* 목록에 없는 인자 — 키·값 둘 다 직접 입력. TUI 도 list + custom entry 구조라
    같은 방식으로 둔다. 예약어만 걸러내고 값이 맞는지는 서버가 판정한다 */
@@ -3656,6 +3797,8 @@ function commitCustomKey(i){
   if(k && k.indexOf('--')!==0) k='--'+k.replace(/^-+/,'');
   if(RESERVED_ARGS.indexOf(k)>=0){
     row.err='이 인자는 앞 단계에서 이미 정합니다.';
+  } else if(SYSTEM_ARGS.indexOf(k)>=0){
+    row.err='이 인자는 시스템이 설정하므로 넣을 수 없습니다.';
   } else {
     row.key=k; row.err='';
   }
@@ -3774,8 +3917,11 @@ function dryRun(){
     rows.push({t:'ok', m:'설정 확인'});
     /* 자원 초과는 화면도 잡지만 여기서는 클러스터 잔여 기준으로 다시 본다 */
     const need = wTotalGpu(), free = WF.ws? gpuFree(WF.ws) : 0;
-    if(need > free) rows.push({t:'warn', m:'요청 가속기 '+need+'장 · 배분 가능 '+free+'장',
-      d:'배분 가능한 양을 넘습니다. 워크스페이스 할당량을 조정하거나 수를 줄여 주세요.'});
+    /* 워크스페이스를 고르지 않았으면 자원을 판정하지 않는다. 배정이 0장이면 줄여도 풀리지 않아 상태만 쓴다(5.3 · 공통정책 7.9) */
+    if(WF.ws && need > free) rows.push({t:'warn', m:'요청 가속기 '+need+'장 · 배분 가능 '+free+'장',
+      d: gpuTotal(WF.ws)===0
+        ? '이 워크스페이스에 배분된 가속기가 없어 배포할 수 없습니다.'
+        : '배분 가능한 가속기를 넘습니다. 레플리카 수나 레플리카당 가속기 수를 줄여 주세요.'});
     /* 모델 배포 조건. 화면이 이미 막으므로 마지막 확인이다(배포 정책 2.3) */
     const q=modelReq(WF.model)||{}, wm=wModelOf();
     /* 계열 불일치는 백엔드 거절 코드가 없어 검사 항목에 두지 않는다. 화면이 02 자원에서 막는다 */
@@ -3785,6 +3931,10 @@ function dryRun(){
       rows.push({t:'err', m:'최대 컨텍스트 길이가 모델 상한('+ctxN(q.ctx)+' 토큰)을 넘습니다.'});
     if(accNoPd(WF.acc) && WF.topo==='pd')
       rows.push({t:'err', m:'이 가속기에서는 프리필·디코드 분리를 지원하지 않습니다.'});
+    /* 엔진 인자 중복 — 목록에서 고른 인자를 직접 입력으로 또 넣었거나 직접 입력끼리 겹치면 서버가 거절한다(DEP-L01 5.3) */
+    const ck=WF.customArgs.map(function(r){ return r.key; }).filter(function(k){ return k; });
+    if(ck.some(function(k,ix){ return ck.indexOf(k)!==ix || (WF.args[k]!==undefined && String(WF.args[k]).trim()!==''); }))
+      rows.push({t:'err', m:'같은 엔진 인자가 두 번 들어갔습니다. 하나만 남겨 주세요.'});
     /* 인자 충돌 — 데모로 하나만 둔다 */
     if(WF.maxLen==='4K' || WF.maxLen==='8K')
       rows.push({t:'err', m:'최대 배치 토큰 수는 최대 컨텍스트 길이보다 클 수 없습니다',
@@ -4128,7 +4278,7 @@ function paneModelAdv(){
           : '한 번에 처리할 토큰 수입니다.')
    +   fld('가속기 메모리 사용률','gpuUtil',
         selBox('gpuUtil',['0.80','0.85','0.90','0.95'],WF.gpuUtil),
-        '높이면 더 많은 요청을 담지만 여유가 줄어듭니다.')
+        '높이면 더 많은 요청을 담지만 남는 메모리가 줄어듭니다.')
    + '</div>'
    + '<h4 class="advsub">엔진 인자</h4>'
    + '<p class="advnote">비워 두면 이 인자를 넣지 않습니다. 넣지 않은 인자는 엔진 자체 값을 따릅니다.</p>'
@@ -4329,7 +4479,7 @@ function paneGw(){
           +' oninput="WF.name=this.value;WF.nameChecked=false;wSetQuiet(\'name\',this.value)"'
           +' onblur="wBlur(\'name\')"')
         + '<button class="btn ghost sm"'+(nm?'':' disabled')
-        +   ' onclick="WF.nameChecked=true;wBlur(\'name\');toast(\'ok\',\'사용할 수 있는 배포명입니다.\')">중복 확인</button>'
+        +   ' onclick="runSync(this,function(){ WF.nameChecked=true;wBlur(\'name\');toast(\'ok\',\'사용할 수 있는 배포명입니다.\'); })">중복 확인</button>'
         + '</div>',
         WF.nameChecked? '사용할 수 있는 배포명입니다.' : '나중에 바꿀 수 없습니다.', true)
    + '</div>'
@@ -4342,6 +4492,12 @@ function paneGw(){
    +     fld('호스트명','host',
           '<div class="ro">'+(prodHost()||'gw.concerto.okestro.io')+'</div>',
           '운영룸에서 정합니다. 배포마다 바꿀 수 없습니다.')
+   +   '</div>'
+   /* 호출 주소는 호스트명 바로 다음에 둔다(DEP-L01 7.3 필드 순서) */
+   +   '<div class="epprev"><span class="el">호출 주소</span>'
+   +     '<span class="ev">https://'+(prodHost() || 'gw.concerto.okestro.io')+'/v1</span></div>'
+   +   '<div class="hint">이 운영룸의 배포가 함께 쓰는 주소입니다. 요청 본문의 모델명으로 배포를 구분합니다.</div>'
+   +   '<div class="fgrid" style="margin-top:14px">'
    /* v0.35 · HTTPS 선택을 뺐다. 운영룸 배포는 마법사의 호스트·TLS 값을 쓰지 않고(거절 없이 무시)
       리스너는 운영룸 게이트웨이가 정한다(릴리즈 노트 v4.0.0 4장 · 배포 정책 2.5) */
    /* API Key 인증 — 키 목록·발급은 워크스페이스 소관이고(8/19 회의 3.4)
@@ -4362,11 +4518,7 @@ function paneGw(){
         : '')
    +   '</div>'
    /* v0.35 · 운영룸마다 게이트웨이가 하나이고 그 룸의 배포가 같은 주소를 쓴다. 배포는 요청 본문의
-      모델명으로 구분한다(배포 정책 2.5). 경로에 워크스페이스·배포명을 붙이던 미리보기를 고쳤다.
-      기본 도메인 값은 워크스페이스 목업과 같은 검토용 값이다 */
-   +   '<div class="epprev"><span class="el">호출 주소</span>'
-   +     '<span class="ev">https://'+(prodHost() || 'gw.concerto.okestro.io')+'/v1</span></div>'
-   +   '<div class="hint">이 운영룸의 배포가 함께 쓰는 주소입니다. 요청 본문의 모델명으로 배포를 구분합니다.</div>'
+      모델명으로 구분한다(배포 정책 2.5). 기본 도메인 값은 워크스페이스 목업과 같은 검토용 값이다 */
    + '</div>'
 
    + '<div class="fsec"><h4>호출 제한</h4>'
@@ -4645,22 +4797,37 @@ function goDemo(kind,btn){
 }
 /* 지표 소스 상태 — 검토용 장치다. 실제 값은 배포 지표 응답의 소스 상태를 따른다(모니터링 정책 5.3) */
 let src='ok';
+/* 실제 화면에는 없는 검토용 처리다. 지표 · 추적 수집을 사용하지 않는 배포의 상세 모니터링 탭을 연다(모니터링 정책 5.4) */
+function demoGrafanaOff(){
+  const sb=document.querySelector('#demoBar .st'); setState('default', sb);
+  const i=DEPS.findIndex(function(x){ return x.n==='solar-open-100b-paused'; });
+  openDetailAt(i); setDTab(1);
+  const e=document.querySelector('.secact'); if(e && e.scrollIntoView) e.scrollIntoView({block:'center'});
+}
+/* 소스 상태는 정상 배포의 헬스 자리(상세 모니터링 탭 · 패널)에 나온다.
+   어느 화면에서 눌러도 정상 자체 배포의 상세 모니터링 탭으로 옮겨 바로 보이게 한다. 실제 화면에는 없는 검토용 처리다 */
 function setSrc(k,btn){
   src=k;
   document.querySelectorAll('#demoBar .sr').forEach(function(b){b.classList.remove('on');});
   if(btn) btn.classList.add('on');
-  if(view==='detail') drawDetail(); else render(true);
+  if(state!=='default'){ state='default'; document.querySelectorAll('#demoBar .st').forEach(function(b,i){ b.classList.toggle('on', i===0); }); }
+  const i=DEPS.findIndex(function(x){ return x.st==='정상' && x.type!=='외부 배포'; });
+  openDetailAt(i); setDTab(1); vwBtn(1);
 }
+/* 데이터 상태(빈 상태 · 로딩 · 오류)는 목록에만 있다. 어느 화면에서 눌러도 목록으로 옮겨 보인다. 실제 화면에는 없는 검토용 처리다 */
 function setState(s,btn){
   state=s;
   if(btn){ document.querySelectorAll('#demoBar .st').forEach(function(b){b.classList.remove('on');}); btn.classList.add('on'); }
-  if(view==='detail') drawDetail(); else if(view==='wiz') drawWiz();
+  if(view!=='list'){ wsBack=null; view='list'; cur=null; syncView(); vwBtn(0); }
   render(true);
 }
 /* 검수 케이스 — 통과·확인 필요 두 상태를 견주기 위한 시안 장치 */
 function setReview(k, btn){
   document.querySelectorAll('.demo-bar .rv').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
+  /* 어느 화면에서 눌러도 생성 마법사 04 검수로 옮긴다. 실제 화면에는 없는 검토용 처리다 */
+  if(!canDeploy()) setRole('editor');
+  if(view!=='wiz' || !WF) openWiz();
   if(!WF) return;
   if(k==='ok'){ WF.name='llama-prod'; WF.ws='ai-service-team'; }
   else { WF.name=''; WF.ws=''; }
@@ -4863,10 +5030,22 @@ function cfgDef(d){
     anon: String(anonOf(d))
   };
 }
+/* 검토용: 저장 시 서버가 배포 조건으로 거절하는 경우. 실제 화면에는 없다 */
+let CFG_REJ=false;
+function setCfgRej(v,btn){
+  CFG_REJ=v;
+  document.querySelectorAll('#demoBar .cr').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  if(!canDeploy()) setRole('editor');
+  const i=DEPS.findIndex(function(x){ return x.st==='정상' && x.type!=='외부 배포' && modelReq(x.model) && modelReq(x.model).ctx; });
+  const j= i>=0? i : DEPS.findIndex(function(x){ return x.st==='정상' && x.type!=='외부 배포'; });
+  openDetailAt(j); openCfg(j);
+  if(v){ CFG.maxLen='131072'; submitCfg(); }
+}
 function openCfg(i){
   const d=DEPS[i]; if(!d || busy(d)) return;
   cur={d:d,i:i};
-  CFG=cfgDef(d);
+  CFG=cfgDef(d); CFG.reject='';
   drawCfg();
   document.getElementById('mdCfg').classList.add('on');
 }
@@ -4917,6 +5096,7 @@ function cfgStep(k,label,unit,min,max,step,hint,attr,err){
 function drawCfg(){
   const d=cur.d, chg=cfgChg();
   let h='';
+  if(CFG.reject) h+=alertBox('crit','설정을 저장하지 못했습니다.',CFG.reject,'',false);
 
   /* 영향이 큰 것부터 둔다. 배지는 저장 뒤에 무엇이 따르는지를 말한다 —
      둘 다 저장을 눌러야 반영되고, 차이는 재기동이 따르느냐다 */
@@ -4927,27 +5107,40 @@ function drawCfg(){
    + (CFG.auto
       ? cfgStep('minRep','최소 레플리카','개',0,16,1,'호출이 없어도 이 수만큼 유지합니다. 0으로 두면 호출이 없을 때 모두 내려갑니다.')
         + cfgStep('maxRep','최대 레플리카','개',1,16,1)
-      : cfgStep('rep','레플리카 수','개',1,16,1))
+      : cfgStep('rep','레플리카 수','개',1,16,1,'','id="cfgRep"',!!CFG.repErr)
+        + (CFG.repErr? '<p class="ferr" style="text-align:right">'+CFG.repErr+'</p>' : ''))
    + '</div>';
 
   h+='<div class="cfggrp"><div class="gh"><h5>엔진 설정</h5><span class="gtag rst">재기동 필요</span></div>'
    + '<div class="gd">저장하면 배포가 다시 기동됩니다.</div>'
-   + cfgRow('maxLen','최대 컨텍스트 길이','inputmode="numeric" placeholder="모델 기본값"'+(CFG.err? ' id="cfgMaxLen" style="border-color:var(--destructive)"':' id="cfgMaxLen"'),'한 번에 처리할 토큰 수입니다. 비우면 모델 기본값을 사용합니다.')
+   /* 비우면 모델 기본값이다. 그 값을 입력란에 흐리게 보인다(DEP-L01 7.7) */
+   + cfgRow('maxLen','최대 컨텍스트 길이','inputmode="numeric" placeholder="'+(((modelReq(d.model)||{}).ctx)||'모델 기본값')+'"'+(CFG.err? ' id="cfgMaxLen" style="border-color:var(--destructive)"':' id="cfgMaxLen"'),'한 번에 처리할 토큰 수입니다. 비우면 모델 기본값을 사용합니다.')
    /* 모델 상한을 넘으면 저장 시 인라인 에러(REQ-DEP-089 · DEP-L01 5.3) */
    + (CFG.err? '<p class="ferr" style="text-align:right">'+CFG.err+'</p>' : '')
-   + cfgStep('gpuUtil','가속기 메모리 사용률','',0.1,1.0,0.1,'높이면 더 많은 요청을 담지만 여유가 줄어듭니다. 0.1 ~ 1.0 사이로 지정합니다.')
+   + cfgStep('gpuUtil','가속기 메모리 사용률','',0.1,1.0,0.1,'높이면 더 많은 요청을 담지만 남는 메모리가 줄어듭니다. 0.1 ~ 1.0 사이로 지정합니다.','id="cfgGpuUtil"',!!CFG.utilErr)
+   + (CFG.utilErr? '<p class="ferr" style="text-align:right">'+CFG.utilErr+'</p>' : '')
    + '</div>';
 
   /* ⚠ 추론 기본값(temperature · top_p · 시스템 프롬프트)은 두지 않는다.
      현행 Configure 모달 내용이 관측되지 않았고 TUI · 차트에도 없다.
      vLLM 은 이 값들을 호출 시 파라미터로 받으므로 배포 설정에 둘 값이 아닐 수 있다 */
 
+  /* 구간 순서는 재기동 필요 → 변경 불가 → 재기동 없음이다(DEP-L01 7.7).
+     바꿀 수 없는 값도 자리를 둔다 — 없으면 어디서 바꾸는지 찾아 헤맨다 */
+  h+='<div class="cfggrp"><div class="gh"><h5>병렬 처리</h5><span class="gtag">변경 불가</span></div>'
+   + '<div class="cfgrow"><label>레플리카당 가속기 수</label>'
+   +   '<span class="dash" style="text-align:right">'+accName(d.acc)+' × '+(d.gpu||0)+'</span></div>'
+   + '<div class="gd" style="margin:8px 0 0">이 값은 여기서 바꿀 수 없습니다. 배포를 다시 만들어 주세요.</div>'
+   + '</div>';
+
   /* API Key 인증 — 재기동이 따르지 않아 용량·엔진 설정과 구간을 나눈다.
      `즉시 반영` 이라 쓰지 않는다. 저장을 눌러야 반영되는 것은 같다(배포 정책 2.6) */
-  h+='<div class="cfggrp"><div class="gh"><h5>접근 설정</h5></div>'
+  h+='<div class="cfggrp"><div class="gh"><h5>접근 설정</h5><span class="gtag">재기동 없음</span></div>'
    + '<div class="gd">저장하면 바로 적용되며 배포는 다시 기동되지 않습니다.</div>'
    + '<div class="cfgrow"><label>API Key 인증'+tip('끄면 키 없이 호출할 수 있습니다. 요청자를 식별하지 못해 사용량을 셀 수 없습니다.')+chgMark('auth')+'</label>'
-   +   '<span class="sw'+(CFG.auth?' on':'')+'" onclick="cSet(\'auth\',!CFG.auth)"></span></div>'
+   /* 생성 마법사 03과 같은 선택 상자다(DEP-L01 7.3 · 7.7) */
+   +   '<select class="inp" style="width:auto" onchange="cSet(\'auth\',this.value===\'true\')">'
+   +     '<option value="true"'+(CFG.auth?' selected':'')+'>사용</option><option value="false"'+(CFG.auth?'':' selected')+'>사용 안 함</option></select></div>'
    /* v0.36 · 인증을 끄면 키 없는 요청 분당 한도를 받는다. 재기동 없음 구간이라 재기동 경고를 부르지 않는다
       (배포 정책 5.5 · CON-866 9항 · DEP-L01 7.7). 검증은 저장 시 인라인 에러(공통정책 7.8) */
    + (!CFG.auth
@@ -4958,12 +5151,6 @@ function drawCfg(){
       : '')
    + '</div>';
 
-  /* 바꿀 수 없는 값도 자리를 둔다 — 없으면 어디서 바꾸는지 찾아 헤맨다 */
-  h+='<div class="cfggrp"><div class="gh"><h5>병렬 처리</h5><span class="gtag">변경 불가</span></div>'
-   + '<div class="cfgrow"><label>레플리카당 가속기 수</label>'
-   +   '<span class="dash" style="text-align:right">'+accName(d.acc)+' × '+(d.gpu||0)+'</span></div>'
-   + '<div class="gd" style="margin:8px 0 0">이 값은 여기서 바꿀 수 없습니다. 배포를 다시 만들어 주세요.</div>'
-   + '</div>';
 
   if(chg.rest) h+='<div class="rstwarn">'
    + '<b>재기동</b><span>저장하면 배포가 다시 기동되며, 그동안 호출이 실패할 수 있습니다.</span></div>';
@@ -4982,12 +5169,27 @@ function submitCfg(){
   const q=modelReq(d.model)||{};
   /* v0.36 · 오류를 모두 인라인으로 붙이고 화면 순서상 첫 오류 필드에 포커스한다(공통정책 7.8).
      키 없는 요청 분당 한도는 인증을 끈 경우만 검증한다(배포 정책 5.5 · CON-866 9항) */
-  CFG.err = (q.ctx && CFG.maxLen && (parseInt(CFG.maxLen)||0)>q.ctx)
+  /* v0.39 · 레플리카 수 · 최대 컨텍스트 길이 · 가속기 메모리 사용률의 형식 검증(DEP-L01 7.7).
+     레플리카 상한은 정해지지 않아(CON-849) 하한만 본다. 최대 컨텍스트 길이는 비우면 모델 기본값이라 오류가 아니다 */
+  const isInt=function(v){ return /^\d+$/.test(String(v).trim()); };
+  CFG.repErr = (!CFG.auto && !(isInt(CFG.rep) && parseInt(CFG.rep,10)>=1)) ? '1 이상의 정수를 입력해 주세요.' : '';
+  const ml=String(CFG.maxLen).trim();
+  CFG.err = (ml && !(isInt(ml) && parseInt(ml,10)>=1)) ? '1 이상의 정수를 입력해 주세요.'
+    : (q.ctx && ml && (parseInt(ml)||0)>q.ctx)
     ? '이 모델의 최대 컨텍스트 길이는 '+ctxN(q.ctx)+' 토큰입니다. '+ctxN(q.ctx)+' 이하로 입력해 주세요.' : '';
+  const gu=String(CFG.gpuUtil).trim(), guN=Number(gu);
+  CFG.utilErr = (gu==='' || isNaN(guN) || guN<0.1 || guN>1) ? '0.1~1.0 사이의 값을 입력해 주세요.' : '';
   CFG.anonErr = (!CFG.auth && !anonOk(CFG.anon)) ? '1~1,000,000 사이의 정수를 입력해 주세요.' : '';
-  if(CFG.err || CFG.anonErr){
+  /* 검토용: 화면 검증을 지나도 서버가 배포 조건으로 거절하면 모달 상단에 사유 한 문장을 둔다(DEP-L01 5.3). 모달과 입력값은 그대로 둔다 */
+  if(CFG_REJ && !(CFG.repErr || CFG.utilErr || CFG.anonErr)){
+    const lim=(q.ctx||32768);
+    CFG.err=''; CFG.reject='최대 컨텍스트 길이가 모델 상한('+ctxN(lim)+' 토큰)을 넘습니다.';
+    drawCfg(); return;
+  }
+  if(CFG.repErr || CFG.err || CFG.utilErr || CFG.anonErr){
     drawCfg();
-    const el=document.getElementById(CFG.err? 'cfgMaxLen' : 'cfgAnon'); if(el) el.focus();
+    /* 화면 순서상 첫 오류 필드 — 레플리카 수 → 최대 컨텍스트 길이 → 가속기 메모리 사용률 → 키 없는 요청 분당 한도 */
+    const el=document.getElementById(CFG.repErr? 'cfgRep' : CFG.err? 'cfgMaxLen' : CFG.utilErr? 'cfgGpuUtil' : 'cfgAnon'); if(el) el.focus();
     return;
   }
   closeCfg();
@@ -4999,9 +5201,11 @@ function submitCfg(){
     d.auto=CFG.auto; d.maxRep=parseInt(CFG.maxRep)||d.maxRep;
     d.tgt=parseInt(CFG.auto? CFG.minRep : CFG.rep)||d.tgt;
     d.maxLen=CFG.maxLen; d.gpuUtil=CFG.gpuUtil;
-    d.st='생성 중'; d.rep=0; d.ep='';
+    /* 엔드포인트는 운영룸 호스트로 정해져 재기동해도 바뀌지 않는다(5.1). 최근 변경일시를 갱신한다(5.1) */
+    d.st='생성 중'; d.rep=0; d.upd=nowStr();
     toast('ok','설정 변경을 요청했습니다. 다시 기동되면 알림으로 안내됩니다.');
   } else {
+    d.upd=nowStr();
     toast('ok','설정을 변경했습니다.');
   }
   if(view==='detail') drawDetail();
@@ -5049,13 +5253,15 @@ let IMP=null;
 function openImport(){
   if(!canImport()) return;
   /* 매칭 결과는 화면을 열 때마다 다시 받는다 */
-  IMP = FOUND.map(function(f){ return { pick: f.match||'', auto: f.auto }; });
+  /* 선택은 연결할 모델이 있을 때만 할 수 있다(DEP-L01 7.5). 자동 연결한 행은 선택해 둔다 */
+  IMP = FOUND.map(function(f){ return { pick: f.match||'', auto: f.auto, sel: !!f.match }; });
   view='imp'; cur=null; closePanel(); syncView(); drawImport(); vwBtn(3);
 }
-function impSet(i,v){ IMP[i].pick=v; drawImport(); }
+function impSet(i,v){ IMP[i].pick=v; IMP[i].sel=!!v; drawImport(); }
+function impSel(i,v){ if(!IMP[i].pick) return; IMP[i].sel=v; drawImport(); }
 /* 연결한 것이 있으면 확인받는다. 자동 연결분은 화면이 채워 준 것이라 세지 않는다 */
 function impQuit(){
-  const touched = IMP.some(function(x,i){ return x.pick !== (FOUND[i].match||''); });
+  const touched = IMP.some(function(x,i){ return x.pick !== (FOUND[i].match||'') || x.sel !== !!FOUND[i].match; });
   if(touched){
     openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.',
       function(){ backToList(); }, '취소', '계속 작성');
@@ -5063,7 +5269,7 @@ function impQuit(){
   }
   backToList();
 }
-function impPicked(){ return IMP.filter(function(x){ return x.pick; }).length; }
+function impPicked(){ return IMP.filter(function(x){ return x.pick && x.sel; }).length; }
 
 function drawImport(){
   const picked=impPicked();
@@ -5080,25 +5286,22 @@ function drawImport(){
 
   h+='<div class="dsec"><h4>찾은 워크로드 <span style="font-weight:400;color:var(--muted-foreground)">'+FOUND.length+'건</span></h4>'
    + '<div class="tblwrap"><table class="tbl"><thead><tr>'
+   /* 열 순서는 선택 → 워크로드 → 위치 → 상태 → 가속기 → 연결할 모델 → 워크스페이스다(DEP-L01 7.5) */
+   +   '<th style="width:40px"></th>'
    +   '<th>워크로드</th>'
-   +   '<th style="width:104px">상태</th>'
    +   '<th class="thcell" style="width:150px">'+thHelp('imploc','위치')+'</th>'
-   +   '<th style="width:150px">워크스페이스</th>'
+   +   '<th style="width:104px">상태</th>'
    +   '<th class="thcell" style="width:160px">'+thHelp('impacc','가속기')+'</th>'
    +   '<th class="thcell" style="width:260px">'+thHelp('impmatch','연결할 모델')+'</th>'
+   +   '<th style="width:150px">워크스페이스</th>'
    + '</tr></thead><tbody>'
    + FOUND.map(function(f,i){
        const on=!!IMP[i].pick;
        return '<tr'+(on?' class="imppick"':'')+'>'
+        + '<td><input type="checkbox" aria-label="선택"'+(IMP[i].sel?' checked':'')+(IMP[i].pick?'':' disabled title="연결할 모델을 고르면 선택할 수 있습니다."')+' onchange="impSel('+i+',this.checked)"></td>'
         + '<td>'+f.pod+'</td>'
-        + '<td><span class="stbadge '+(f.st==='절전'?'mu':'ok')+'">'+f.st+'</span></td>'
         + '<td class="dash">'+f.ns+'</td>'
-       /* 귀속 워크스페이스는 가져올 때 정한다. 서버는 요청마다 받은 워크스페이스에 두고, 없으면 공용 워크스페이스에 둔다(CON-866 4항).
-          운영룸 구획에 있는 워크로드는 그 워크스페이스를 미리 골라 둔다(DEP-L01 7.5) */
-       + '<td><select class="inp" onchange="IMP['+i+'].ws=this.value">'
-       +   WSLIST.map(function(w){ const cur=IMP[i].ws||wsOfNs(f.ns)||'공용 워크스페이스';
-             return '<option'+(cur===w?' selected':'')+'>'+w+'</option>'; }).join('')
-       + '</select></td>'
+        + '<td><span class="stbadge '+(f.st==='절전'?'mu':'ok')+'">'+f.st+'</span></td>'
         /* 표기는 목록과 같게 둔다. 같은 값을 화면마다 다르게 쓰면 대조가 안 된다 */
    + '<td>'+(f.gpu? accName(f.acc)+' × '+f.gpu : '<span class="dash">-</span>')+'</td>'
         + '<td><select class="inp" onchange="impSet('+i+',this.value)">'
@@ -5113,7 +5316,14 @@ function drawImport(){
          REQ-DEP-048). 샘플의 gemma-4-31b-it 는 양자화만 다른 gemma-4-31b-it-fp8-block 만 등록되어 있어 연결되지 않는 행이다(검토용 값).
       후보 목록에는 가속기를 쓰는 LLM 워크로드가 오른다 */
    + (IMP[i].auto && IMP[i].pick? '<div class="hint">모델 명칭과 메타데이터로 연결했습니다. 맞는지 확인해 주세요.</div>':'')
-        + '</td></tr>';
+        + '</td>'
+       /* 귀속 워크스페이스는 가져올 때 정한다. 서버는 요청마다 받은 워크스페이스에 두고, 없으면 공용 워크스페이스에 둔다(CON-866 4항).
+          운영룸 구획에 있는 워크로드는 그 워크스페이스를 미리 골라 둔다(DEP-L01 7.5) */
+       + '<td><select class="inp" onchange="IMP['+i+'].ws=this.value">'
+       +   WSLIST.map(function(w){ const cur=IMP[i].ws||wsOfNs(f.ns)||'공용 워크스페이스';
+             return '<option'+(cur===w?' selected':'')+'>'+w+'</option>'; }).join('')
+       + '</select></td>'
+        + '</tr>';
      }).join('')
    + '</tbody></table></div></div>';
 
@@ -5130,11 +5340,11 @@ function drawImport(){
 function submitImport(){
   const add=[];
   FOUND.forEach(function(f,i){
-    if(!IMP[i].pick) return;
+    if(!(IMP[i].pick && IMP[i].sel)) return;
     add.push({ n:f.pod+'-'+f.ns, ws:IMP[i].ws||wsOfNs(f.ns)||'공용 워크스페이스', model:'-', mver:'-',
       type:'외부 배포', st:f.st==='절전'?'유휴':'정상', rep:f.gpu>1?2:1, tgt:null,
       acc:f.acc, gpu:f.gpu, topo:'-',
-      owner:'-', at:'2026-08-18 10:40', upd:'2026-08-18 13:40', health:'안정',
+      owner:'-', at:'2026-08-18 10:40:39', upd:'2026-08-18 13:40:56', health:'안정',
       ep:'https://'+f.ns+'.internal/'+f.pod+'/v1',
       gw:false, host:'', tls:false, auth:false, obs:false, keys:[] });
   });
