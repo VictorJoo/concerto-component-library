@@ -1,8 +1,40 @@
 <!--
-  콘체르토 매니저 — 모니터링 목업 v0.28 (2026-10-23)
+  콘체르토 매니저 — 모니터링 목업 v0.29 (2026-10-27)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다 —
   필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
 
+  ── v0.29 (2026-10-27) ──────────────────────
+  · 메트릭 묶음을 카탈로그 다섯 묶음(GPU · NPU · 추론 엔진 · 게이트웨이 · 노드)으로 고쳤다(모니터링 정책 6.3 · MON-L01 7.3).
+    묶음은 카탈로그가 내려 주며 수집 출처로 갈린다. GPU 건전성 묶음을 없앴다. 배포 건전성(정책 5장)과 이름이 겹치고, 그 항목 대부분이 건전성에 반영되지 않는다.
+    GPU 복구 · 점검 항목은 GPU 묶음에 두고 운영 상태 배지(복구 검토 · 긴급 조사)로 구분한다. 묶음 이름에 수집 도구 이름을 붙이지 않는다(공통정책 7.9).
+  · 건전성 위험 기준 안내를 고쳤다(모니터링 정책 5.2 · 6.3 · MON-L01 REQ-MON-082 · 결정 사항 댓글 3502866648).
+    한 범위에 주의 규칙과 오류 규칙이 함께 있으면 주의 규칙이 주의 기준, 오류 규칙이 위험 기준이다. 오류 규칙 임계값이 주의 규칙 이하이면
+    위험 기준으로 쓰지 않고 판정 유형으로 계산한다. 오류 규칙 폼은 같은 범위에 주의 규칙이 있으면 이 값이 위험 기준이라고,
+    없으면 이 값이 위험 기준이고 주의 기준은 거꾸로 계산한 값(초과형 절반, 여유형은 위험 기준에서 남은 여유를 2배로 잡은 지점)이라고 안내한다.
+    주의 규칙 폼은 같은 범위 오류 규칙이 있으면 그 값을 위험 기준으로 안내한다.
+    주의까지만 판정하는 지표(가속기 사용률 · 대기 요청 · 선점)의 오류 규칙은 알림만 보낸다고, 오류 규칙만 있으면 주의 기준과 주의까지만 판정한다고 안내한다.
+    여유형에서 거꾸로 계산한 주의 기준이 위험 기준의 절반보다 낮으면 절반으로 안내한다(위험 40%면 주의 20%). 위험 기준이 50% 이하면
+    계산값이 0 이하가 되어 늘 주의가 되기 때문이다(정책 5.2).
+  · 시스템 기본 규칙 템플릿 샘플의 `응답 지연 증가`(P99 2,000ms)를 `첫 토큰 지연 증가`(P95 3,000ms 주의)로 바꿨다(정책 6.4 · 10-27 결정).
+    응답 지연은 출력 길이에 비례해 기본 규칙으로는 늘 울린다. 카탈로그에는 남아 직접 만들 수 있다.
+  · 규칙 폼 알림 채널을 그 규칙의 워크스페이스 채널과 전역 채널로 좁혔다. 채널마다 유형 · 전역 여부 · 최소 심각도를 함께 보인다(MON-L01 7.3 ·
+    SET-INTEG-L01 7.4). 규칙 심각도가 채널 최소 심각도보다 낮으면 그 채널로 알림이 가지 않아 고를 수 없게 두고 아래에 사유를 둔다.
+    조건 때문에 막히는 것이라 비활성으로 둔다(공통정책 7.10). Xid 표준 등급은 코드마다 등급이 달라 막지 않는다.
+    데모 바 `오류 규칙 안내` 로 llama-3-2-1b-prod 첫 토큰 지연 오류 규칙(7,000ms) 폼을 연다.
+  · 지표 소스 상태에 수집 대기와 5분 뒤 값 없음을 더했다(모니터링 정책 5.3 · MON-L01 REQ-MON-049 · CON-935).
+    생성 5분 안에 값이 하나도 없으면 건전성 자리에 `수집 대기` 배지와 `배포를 만든 직후라 지표가 아직 쌓이지 않았습니다.` 를 둔다.
+    5분이 지나도 값이 하나도 없으면 서빙 엔진이 응답하지 않는 것으로 보고 건전성 `위험`, 확인 필요 항목에 올린다(BE metrics_service force_offline).
+    지표를 받지 못한 상태에서는 판정 사유 안내 박스를 두지 않는다. 종전에는 수집 불가 · 미설정에서도 샘플 사유 박스가 보였다.
+    하단 데모 바 지표 소스 `수집 대기` · `5분 뒤 값 없음` 으로 본다. 검토용 처리다.
+  · 알림 규칙 메트릭 목록에 GPU 복구 · 점검 항목 13개를 더했다(모니터링 정책 6.3 · MON-L01 REQ-MON-088 · CON-934).
+    새로 생긴 9종(복구 권고 값별 4종 · 행 재매핑 예비 소진 · PCIe 링크 저하 · PCIe 재전송(1시간) · GPU 간 P2P 이상 · 점검 필요 GPU 수)과
+    기존 4종(행 재매핑 대기 · 실패 · SRAM 임계 초과 · 패브릭 상태 이상)이다.
+    복구 검토 · 긴급 조사 항목은 이름 옆에 분류 배지를 둔다. 항목마다 고정인 값이라 건전성 반영 배지와 같은 색 없는 분류 배지다.
+    고르면 표준 심각도가 채워진다. 행 재매핑 대기는 오류, SRAM 임계 초과 · 패브릭 상태 이상은 주의다.
+  · 배포 성능 탭 배포 선택 옆에 `Grafana 열기` 를 두었다(모니터링 정책 5.4 · MON-L01 REQ-MON-089 · CON-470 · CON-945).
+    고른 배포의 Grafana 대시보드를 새 탭으로 연다. 역할 · 배포 상태로 가르지 않는다.
+    지표 · 추적 수집을 사용하지 않는 배포는 비활성이고 사유 `지표 · 추적 수집을 사용하지 않는 배포입니다.` 를 단다.
+    데모 바 `v0.29 확인: Grafana 비활성` 으로 solar-open-100b-paused 를 고른 화면을 연다. 담지 않은 것 목록의 Grafana 확인 대상 주석은 지웠다.
   ── v0.28 (2026-10-23) ──────────────────────
   노드 그룹 검토 문서(3493134511) 시안 2 를 반영했다. 회신 2026-10-22 · 2026-10-23 기준이다.
   · 이름은 `노드 그룹` 이다(2026-10-23 회신). 배포 생성 위저드에 서빙 풀 · 프리필 풀 · 디코드 풀이 있어 `풀` 을 쓰지 않는다.
@@ -193,7 +225,7 @@
   ── v0.24 (2026-10-16) ──────────────────────
   MON-L01 v0.24 · 모니터링 정책 v0.15 · 알림 정책 v0.15 와 같은 날 판이다. 알림 규칙 요건 변경(알림 정책 댓글 2026-10-14).
   · 메트릭 프리셋을 없애고 카탈로그 하나로 고른다(모니터링 정책 6.3 · REQ-MON-068).
-    GPU · GPU 건전성 · NPU · 엔진 · 게이트웨이 · 노드 순으로 묶고 묶음마다 제목을 둔다.
+    GPU · GPU 건전성 · NPU · 엔진 · 게이트웨이 · 노드 순으로 묶고 묶음마다 제목을 둔다(v0.29에서 다섯 묶음으로 고침).
     배포 선택과 같은 팝업 규격(.depwrap · .depdd)이다. 네이티브 select 는 배지를 넣지 못한다.
   · 수집되지 않는 메트릭은 목록에 두고 `수집되지 않음` 배지를 붙여 고를 수 없게 한다.
     골라도 알림이 오지 않는다.
@@ -342,7 +374,6 @@
     기술문서 10.3·10.4 는 기능으로 서술하나 TUI 문서 2-1 은 Observability 를
     `Grafana 등으로 연동 · 베타 수준` 으로, 3장은 하반기 로드맵으로 둔다.
     두 문서가 어긋나 확인 대상이다(정책 7. 3번)
-  · Grafana 외부 링크 — 유지 여부 확인 대상(정책 7. 8번)
   · 개별 배포의 설정·제어 — 모니터링은 보는 화면이다. 조치는 그 자산의 화면에서 한다
   · 클러스터 이름·연결 배지 — 현행은 `Okestro K8s Cluster` 와 `CONNECTED`·`PRIMARY REGION`
     을 두나 사용자가 고를 수 없는 값이고(7.9) 연결이 끊기면 화면 자체가 뜨지 않는다.
@@ -464,6 +495,8 @@ body.panel-on .page{padding-right:calc(var(--panel-w) + 28px)}
 .btn{padding:8px 15px;background:var(--primary);color:var(--primary-foreground);border:0;border-radius:8px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
 .btn:hover:not(:disabled){background:var(--primary-hover)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
+.disw{display:inline-block;cursor:not-allowed}
+.disw > :disabled{pointer-events:none}
 .btn.ghost{background:transparent;border:1px solid var(--border-strong);color:var(--foreground)}
 .btn.ghost:hover:not(:disabled){background:var(--hover);border-color:var(--foreground)}
 .btn.danger{background:var(--destructive);color:#fff}
@@ -2649,7 +2682,9 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <span class="dgrp"><span class="demo-label">지표 소스:</span>
     <button class="sr on" onclick="setSrc('ok',this)">정상</button>
     <button class="sr" onclick="setSrc('unavailable',this)">수집 불가</button>
-    <button class="sr" onclick="setSrc('not_configured',this)">미설정</button></span>
+    <button class="sr" onclick="setSrc('not_configured',this)">미설정</button>
+    <button class="sr" onclick="setSrc('pending',this)">수집 대기</button>
+    <button class="sr" onclick="setSrc('no_series',this)">5분 뒤 값 없음</button></span>
   <!-- 노드 그룹 수 — 검토용 처리. 실제 화면에는 없다(노드 그룹 검토 문서) -->
   <span class="dgrp"><span class="demo-label">노드 그룹:</span>
     <button class="ng on" onclick="setGrpScale('base',this)">3개 · 노드 10대</button>
@@ -2666,6 +2701,9 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     <button onclick="demoGoneRule()">대상 없음 규칙</button>
     <button onclick="demoErrHint()">오류 규칙 안내</button>
     <button onclick="demoSrcLink()">기준 출처</button></span>
+  <!-- v0.29 새 상태로 바로 가기. 검토용 처리. 실제 화면에는 없다 -->
+  <span class="dgrp"><span class="demo-label">v0.29 확인:</span>
+    <button onclick="demoGrafanaOff()">Grafana 비활성</button></span>
   <span class="dgrp"><span class="demo-label">테마:</span>
     <button onclick="document.body.classList.remove('dark')">라이트</button>
     <button onclick="document.body.classList.add('dark')">다크</button></span>
@@ -2696,7 +2734,6 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
    ── 담지 않은 것 ────────────────────────────────
    · 트레이스 추적 · 3-Way 뷰어 — 기술문서 10.3·10.4 에 있으나 현행에 진입점만 있다.
      별도 화면으로 둘지 확인 대상(정책 7. 3번)
-   · Grafana 외부 링크 — 유지 여부 확인 대상(정책 7. 8번)
    ══════════════════════════════════════════════════════════ */
 
 /* ===== 상태 ===== */
@@ -2995,7 +3032,8 @@ const DEPS=[
   {n:'llama-3-8b-mig',         ws:'ai-service-team', st:'정상', mig:true},
   {n:'gemma-4-12b-it-idle',    ws:'ml-research',     st:'유휴'},
   {n:'furiosa-qwen3-32b-npu',  ws:'test-npu',        st:'오류'},
-  {n:'solar-open-100b-paused',  ws:'ml-research',     st:'중지됨'}
+  /* 지표 · 추적 수집을 사용하지 않고 만든 배포. Grafana 열기가 비활성이다(모니터링 정책 5.4). 배포 목업의 같은 이름 샘플도 수집을 쓰지 않는다 */
+  {n:'solar-open-100b-paused',  ws:'ml-research',     st:'중지됨', obs:false}
 ];
 /* 슬롯의 점유 배포에서 워크스페이스를 역추적한다.
    ⚠ 백엔드가 이 매핑을 내려주는지 확인 대상(정책 7. 16번) */
@@ -3074,10 +3112,16 @@ function dm(){ return DEPM[dep] || DEPM['llama-3-2-1b-prod']; }
    레플리카가 떠 있지 않은 배포는 지표를 조회하지 않으므로 소스 상태와 무관하게 - 다 */
 let src='ok';
 const SRC={unavailable:['수집 불가','지표를 일시적으로 불러오지 못하고 있습니다.'],
-           not_configured:['미설정','이 배포는 지표 수집이 설정되어 있지 않습니다.']};
+           not_configured:['미설정','이 배포는 지표 수집이 설정되어 있지 않습니다.'],
+           /* 생성 5분 안에 값이 하나도 없으면 수집 대기다. 막 만든 배포라 값이 아직 쌓이지 않은 것이다(정책 5.3 · BE metrics_service _within_pending_grace) */
+           pending:['수집 대기','배포를 만든 직후라 지표가 아직 쌓이지 않았습니다.']};
+/* 생성 5분이 지나도 값이 하나도 없으면 응답하지 않는 배포로 본다. 건전성은 위험이고 확인 필요 항목에 오른다(정책 4.4 · 5.3 · BE force_offline).
+   조회가 실패한 수집 불가와 다르다 */
+const NOSERIES_TXT='지표가 들어오지 않습니다. 서빙 엔진이 응답하는지 배포 상세에서 확인해 주세요.';
+function noSeries(){ return src==='no_series' && curDep().st==='정상'; }
 /* 소스 상태 배지는 지표를 받아야 할 배포(정상)에만 쓴다. 오류는 응답하지 않아 원래 지표가 없고(정책 5.1)
    건전성은 서버가 배포 상태로 준 값이다. 배포 목업 srcBadge() 와 같은 기준이다 */
-function srcBad(){ return src!=='ok' && curDep().st==='정상'; }
+function srcBad(){ return src!=='ok' && src!=='no_series' && curDep().st==='정상'; }
 /* 가속기에 원래 없는 지표는 카드·차트를 두지 않는다(모니터링 정책 5.3). 백엔드가 가속기별 지표 목록을 내려준다.
    4.0 범위 화면 지표는 NVIDIA·Furiosa 에 모두 있다. Rebellions 는 게이트웨이 계층만 남는다. 데모 배포에는 Rebellions 가 없다 */
 let dep = DEPS[0].n;
@@ -3101,6 +3145,7 @@ function depBad(d){
   /* 정상 배포인데 지표를 받지 못하면(수집 불가 · 미설정) 올리지 않는다. 건전성 자리 배지로 보인다(모니터링 정책 4.4 · 5.3).
      데모는 소스 상태를 하나로 바꾸므로 고른 배포 기준이다 */
   if(d.n===curDep().n && srcBad()) return null;
+  if(d.n===curDep().n && noSeries()) return {sev:'위험', why:'지표가 들어오지 않습니다.'};
   if(!m || (m.label!=='주의' && m.label!=='위험') || underUsed(m)) return null;
   const why = (isV41() || m.score===null)? m.why : (reasonShort(m) || '건전성이 '+m.label+' 상태입니다.');
   return why? {sev:m.label, why:why} : null;
@@ -3254,7 +3299,7 @@ let RULES=[
      gid 는 원본과 복제본을 잇는 검토용 키다. 연결된 복제본(linked)은 원본의 임계값 · 연산자 · 심각도 · 채널을 따른다(정책 6.4) */
   {n:'VRAM 초과', metric:'vram_gb', op:'초과', th:75, dur:1, sev:'오류',
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g1'},
-  {n:'응답 지연 증가', metric:'latency_p99_ms', op:'초과', th:2000, dur:1, sev:'주의',
+  {n:'첫 토큰 지연 증가', metric:'ttft_p95_ms', op:'초과', th:3000, dur:1, sev:'주의',
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g2'},
   {n:'가속기 온도 오류', metric:'gpu_temp', op:'초과', th:85, dur:1, sev:'오류',
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g3'},
@@ -3264,7 +3309,7 @@ let RULES=[
      사용자 규칙 `가속기 온도 이상` 이 같은 범위 · 메트릭 · 심각도라 함께 둘 수 없다(정책 6.3 중복). 지운 복제본의 지표는 전역 규칙으로 판정한다(정책 6.4) */
   {n:'VRAM 초과', metric:'vram_gb', op:'초과', th:75, dur:1, sev:'오류',
    ws:'ai-service-team', scope:'전체', ch:[], by:null, at:'2026-08-20 10:00:00', fires:[], linked:true, gid:'g1'},
-  {n:'응답 지연 증가', metric:'latency_p99_ms', op:'초과', th:2000, dur:1, sev:'주의',
+  {n:'첫 토큰 지연 증가', metric:'ttft_p95_ms', op:'초과', th:3000, dur:1, sev:'주의',
    ws:'ai-service-team', scope:'전체', ch:[], by:null, at:'2026-08-20 10:00:00', fires:[], linked:true, gid:'g2'},
   {n:'가속기 온도 주의', metric:'gpu_temp', op:'초과', th:80, dur:1, sev:'주의',
    ws:'ai-service-team', scope:'전체', ch:[], by:null, at:'2026-08-20 10:00:00', fires:[], linked:true, gid:'g4'},
@@ -3274,7 +3319,7 @@ let RULES=[
      `가속기 온도 주의` 는 워크스페이스에서 임계값을 80°C 에서 78°C 로 고쳐 연결이 풀린 예다. 규칙 이름 · 시각은 검토용이다 */
   {n:'VRAM 초과', metric:'vram_gb', op:'초과', th:75, dur:1, sev:'오류',
    ws:'ml-research', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], linked:true, gid:'g1'},
-  {n:'응답 지연 증가', metric:'latency_p99_ms', op:'초과', th:2000, dur:1, sev:'주의',
+  {n:'첫 토큰 지연 증가', metric:'ttft_p95_ms', op:'초과', th:3000, dur:1, sev:'주의',
    ws:'ml-research', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:['2026-10-21 13:22:05'], linked:true, gid:'g2'},
   {n:'가속기 온도 오류', metric:'gpu_temp', op:'초과', th:85, dur:1, sev:'오류',
    ws:'ml-research', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], linked:true, gid:'g3'},
@@ -3285,7 +3330,7 @@ let RULES=[
 /* 메트릭 카탈로그: 백엔드가 가진다. 프로파일 순서로 묶는다(정책 6.3).
    sev·op·th 는 메트릭을 고를 때 채우는 표준값이다. on:false 는 수집되지 않는 메트릭이다.
    ⚠ 항목과 값은 데모다. 실제로는 카탈로그 응답을 따른다 */
-const PROFILES=['GPU','GPU 건전성','NPU','엔진','게이트웨이','노드'];
+const PROFILES=['GPU','NPU','추론 엔진','게이트웨이','노드'];
 /* hb: 건전성 판정 유형(모니터링 정책 5.2 · 6.3). 백엔드가 카탈로그 항목마다 내려준다(결정 사항 댓글 3493658729 결정(안) 3).
      over 초과형(위험 = 기준값의 2배) · room 여유형(위험 = 기준값 + 상한까지 남은 여유의 절반) · temp 규칙 심각도가 등급.
    nocrit: 위험이 없어 주의까지만 판정하는 지표다.
@@ -3296,19 +3341,35 @@ const CATALOG=[
   {k:'vram_gb',        p:'GPU',      t:'VRAM 사용량',    u:'GB', sev:'오류', op:'초과', th:75,   on:true},
   {k:'gpu_temp',       p:'GPU',      t:'가속기 온도',     u:'°C', sev:'오류', op:'초과', th:85,   on:true, hb:'temp'},
   {k:'gpu_power',      p:'GPU',      t:'가속기 전력',     u:'W',  sev:'주의', op:'초과', th:650,  on:true},
-  {k:'gpu_xid',        p:'GPU 건전성', t:'GPU Xid 오류',   u:'',   sev:'정보', xid:true,            on:true},
-  {k:'gpu_ecc',        p:'GPU 건전성', t:'ECC 오류',       u:'건', sev:'오류', op:'초과', th:0,    on:false},
-  {k:'gpu_throttle',   p:'GPU 건전성', t:'클럭 제한',      u:'건', sev:'주의', op:'초과', th:0,    on:false},
-  {k:'throttle_ratio', p:'GPU 건전성', t:'열·전력 제한 비율', u:'%', sev:'주의', op:'초과', th:5,    on:true, hb:'over'},
+  {k:'gpu_xid',        p:'GPU', t:'GPU Xid 오류',   u:'',   sev:'정보', xid:true,            on:true},
+  {k:'gpu_ecc',        p:'GPU', t:'ECC 오류',       u:'건', sev:'오류', op:'초과', th:0,    on:false},
+  {k:'gpu_throttle',   p:'GPU', t:'클럭 제한',      u:'건', sev:'주의', op:'초과', th:0,    on:false},
+  {k:'throttle_ratio', p:'GPU', t:'열·전력 제한 비율', u:'%', sev:'주의', op:'초과', th:5,    on:true, hb:'over'},
+  /* GPU 복구 · 점검 항목(모니터링 정책 6.3 · CON-934). ops 는 운영 상태로 항목마다 고정이다(BE ops_state recovery 복구 검토 · urgent 긴급 조사).
+     심각도와 별개 값이고 건전성 판정에 쓰지 않는다. byGpu 는 GPU마다 따로 알리는 항목이다.
+     행 재매핑 대기는 오류, SRAM 임계 초과 · 패브릭 상태 이상은 주의가 표준 심각도다 */
+  {k:'gpu_recovery_gpu_reset',   p:'GPU', t:'GPU 복구 권고: GPU 리셋',      u:'', sev:'오류', op:'초과', th:0,  on:true, ops:'복구 검토', byGpu:true},
+  {k:'gpu_recovery_node_reboot', p:'GPU', t:'GPU 복구 권고: 노드 재부팅',    u:'', sev:'오류', op:'초과', th:0,  on:true, ops:'긴급 조사', byGpu:true},
+  {k:'gpu_recovery_drain_p2p',   p:'GPU', t:'GPU 복구 권고: P2P 드레인',    u:'', sev:'오류', op:'초과', th:0,  on:true, ops:'복구 검토', byGpu:true},
+  {k:'gpu_recovery_drain_reset', p:'GPU', t:'GPU 복구 권고: 드레인 후 리셋',  u:'', sev:'오류', op:'초과', th:0,  on:true, ops:'복구 검토', byGpu:true},
+  {k:'gpu_row_remap_pending',    p:'GPU', t:'행 재매핑 대기',             u:'개', sev:'오류', op:'초과', th:0,  on:true, ops:'복구 검토'},
+  {k:'gpu_row_remap_failure',    p:'GPU', t:'행 재매핑 실패',             u:'개', sev:'오류', op:'초과', th:0,  on:true, ops:'긴급 조사'},
+  {k:'gpu_bank_remap_exhausted', p:'GPU', t:'행 재매핑 예비 소진',         u:'개', sev:'주의', op:'초과', th:0,  on:true, byGpu:true},
+  {k:'gpu_pcie_link_degraded',   p:'GPU', t:'PCIe 링크 저하(10분 지속)',   u:'', sev:'주의', op:'초과', th:0,  on:true, byGpu:true},
+  {k:'gpu_pcie_replay_1h',       p:'GPU', t:'PCIe 재전송(1시간)',         u:'건', sev:'주의', op:'초과', th:10, on:true, byGpu:true},
+  {k:'gpu_p2p_not_ok',           p:'GPU', t:'GPU 간 P2P 이상',            u:'', sev:'주의', op:'초과', th:0,  on:true, byGpu:true},
+  {k:'gpu_review_required',      p:'GPU', t:'점검 필요 GPU 수',            u:'대', sev:'주의', op:'초과', th:0,  on:true},
+  {k:'gpu_sram_exceeded',        p:'GPU', t:'SRAM 임계 초과',             u:'', sev:'주의', op:'초과', th:0,  on:true},
+  {k:'gpu_fabric_health',        p:'GPU', t:'패브릭 상태 이상',            u:'', sev:'주의', op:'초과', th:0,  on:true},
   {k:'npu_util',       p:'NPU',      t:'NPU 사용률',     u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room', nocrit:true},
   {k:'npu_temp',       p:'NPU',      t:'NPU 온도',       u:'°C', sev:'오류', op:'초과', th:85,   on:true},
   {k:'npu_throttle',   p:'NPU',      t:'NPU 스로틀링 발생', u:'회', sev:'주의', op:'초과', th:0,   on:true, hb:'over', nocrit:true},
-  {k:'ttft_p95_ms',    p:'엔진',      t:'첫 토큰 지연 P95', u:'ms', sev:'주의', op:'초과', th:3000, on:true, hb:'over'},
-  {k:'tpot_p99_ms',    p:'엔진',      t:'토큰당 지연 P99', u:'ms', sev:'주의', op:'초과', th:200,  on:true, hb:'over'},
-  {k:'kv_cache_usage', p:'엔진',      t:'KV 캐시 사용률',  u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room'},
-  {k:'latency_p99_ms', p:'엔진',      t:'P99 응답 지연',  u:'ms', sev:'주의', op:'초과', th:2000, on:true},
-  {k:'queue_depth',    p:'엔진',      t:'대기 요청 큐',    u:'건', sev:'주의', op:'초과', th:50,   on:true, hb:'over', nocrit:true},
-  {k:'preempt',        p:'엔진',      t:'선점 증가',       u:'회', sev:'주의', op:'초과', th:20,   on:true, hb:'over', nocrit:true},
+  {k:'ttft_p95_ms',    p:'추론 엔진',   t:'첫 토큰 지연 P95', u:'ms', sev:'주의', op:'초과', th:3000, on:true, hb:'over'},
+  {k:'tpot_p99_ms',    p:'추론 엔진',   t:'토큰당 지연 P99', u:'ms', sev:'주의', op:'초과', th:200,  on:true, hb:'over'},
+  {k:'kv_cache_usage', p:'추론 엔진',   t:'KV 캐시 사용률',  u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room'},
+  {k:'latency_p99_ms', p:'추론 엔진',   t:'P99 응답 지연',  u:'ms', sev:'주의', op:'초과', th:2000, on:true},
+  {k:'queue_depth',    p:'추론 엔진',   t:'대기 요청 큐',    u:'건', sev:'주의', op:'초과', th:50,   on:true, hb:'over', nocrit:true},
+  {k:'preempt',        p:'추론 엔진',   t:'선점 증가',       u:'회', sev:'주의', op:'초과', th:20,   on:true, hb:'over', nocrit:true},
   {k:'gw_error_rate',  p:'게이트웨이',  t:'서버 오류율(5xx)', u:'%', sev:'주의', op:'초과', th:5,    on:true, hb:'over'},
   {k:'node_mem',       p:'노드',      t:'노드 메모리 사용률', u:'%', sev:'주의', op:'초과', th:85,   on:true}
 ];
@@ -3334,7 +3395,23 @@ const metricName=(k)=>{ const p=catItem(k); return p? p.t : k; };
 const metricUnit=(k)=>{ const p=catItem(k); return p? p.u : ''; };
 const isXid=(k)=>{ const p=catItem(k); return !!(p && p.xid); };
 
-const CHANNELS=['slack-ai-alert','slack-infra','ops-webhook'];
+const CHANNELS=['slack-ai-alert','slack-infra','ops-webhook','운영팀 메일'];
+/* 채널 속성 — 연동 및 알림에서 등록한 값이다(SET-INTEG-L01 7.4 · 7.5). ws 가 없으면 전역 채널. 값은 데모용이다.
+   규칙 폼은 그 규칙의 워크스페이스 채널과 전역 채널만 보인다. 다른 워크스페이스 채널로는 보내지 않는다(알림 정책 6.2) */
+const CHMETA={
+  'slack-ai-alert':{type:'Slack', ws:'ai-service-team', min:'모두'},
+  'slack-infra':   {type:'Slack', ws:null, min:'모두'},
+  'ops-webhook':   {type:'웹훅', ws:null, min:'오류만'},
+  '운영팀 메일':    {type:'이메일', ws:'ai-service-team', min:'주의 이상'}
+};
+const SEVRANK={'정보':0,'주의':1,'오류':2}, MINRANK={'모두':0,'주의 이상':1,'오류만':2};
+function rfChans(){ const w=rfWs(); return CHANNELS.filter(function(c){ const m=CHMETA[c]; return !m || !m.ws || m.ws===w; }); }
+/* 규칙 심각도가 채널 최소 심각도보다 낮으면 그 채널로 가지 않는다. Xid 표준 등급은 코드마다 등급이 달라 막지 않는다 */
+function chBlocked(c){
+  const m=CHMETA[c]; if(!m) return false;
+  if(RF.metric==='gpu_xid' && RF.xmode==='표준 등급') return false;
+  return (SEVRANK[RF.sev]||0) < (MINRANK[m.min]||0);
+}
 
 /* 상태 배지 색 — 시스템 용어집 5.3 */
 const SLOTB={'사용 중':'ok','유휴':'mu','확인 불가':'wa'};
@@ -3467,6 +3544,15 @@ function depPick(){
    +   '<div class="depdd" id="depDd"></div>'
    + '</div>'
    + '</div>';
+}
+/* Grafana 열기 — 고른 배포의 Grafana 대시보드를 새 탭으로 연다(모니터링 정책 5.4 · REQ-MON-089).
+   열람 권한은 백엔드가 판정해 역할로 가르지 않는다. 배포 상태로도 가르지 않는다.
+   지표 · 추적 수집을 사용하지 않는 배포는 대시보드가 없어 비활성으로 두고 사유를 단다.
+   이 화면에서 조치할 수 없어 상태만 말한다. 비활성 버튼은 제 title 이 뜨지 않아 감싼 요소에 단다(개발룸 목업 웹 IDE 접속과 같다) */
+function grafanaBtn(){
+  const ok = curDep().obs!==false;
+  const b = '<button class="btn ghost sm"'+(ok? ' onclick="act(\'Grafana 대시보드를 새 탭으로 엽니다.\')"' : ' disabled')+'>Grafana 열기</button>';
+  return ok? b : '<span class="disw" title="지표 · 추적 수집을 사용하지 않는 배포입니다.">'+b+'</span>';
 }
 function tgDep(e){
   e.stopPropagation();
@@ -4565,7 +4651,7 @@ function drawPerf(el){
   h += '<h4>배포 상세</h4>';
   /* 어느 배포를, 어느 시간 범위로 볼지 — 아래 전부가 이 둘에 따라 값이 바뀐다.
      셸의 헤더 컨트롤 자리에 둔다 */
-  h += '<div class="rangerow">'+depPick()+rangeSeg()+'</div>';
+  h += '<div class="rangerow">'+depPick()+grafanaBtn()+rangeSeg()+'</div>';
 
   /* 확인 필요 항목은 이제 탭 줄 위(#monTrouble)에서 탭과 무관하게 그린다.
      여기서 다시 그리지 않는다(기획 판단, 2026-08-28) */
@@ -4592,10 +4678,12 @@ function drawPerf(el){
     let hb, hd;
     if(noPods){ hb='<span class="stbadge mu">-</span>'; hd=''; }
     else if(srcBad()){ hb='<span class="stbadge mu">'+SRC[src][0]+'</span>'; hd=SRC[src][1]; }
+    else if(noSeries()){ hb='<span class="stbadge '+(HB['위험']||'cr')+'">위험</span>'; hd=NOSERIES_TXT; }
     /* 오류 배포는 서버가 배포 상태로 위험을 준다. 지표로 판정한 것이 아니라 값별 설명(지표가 기준을 …)을 붙이지 않는다 —
        붙이면 아래 진단 박스의 「지표를 수집하지 못하고 있습니다」와 어긋난다. 사유는 진단 박스가 밝힌다 */
     else { hb='<span class="stbadge '+(HB[m.label]||'mu')+'">'+m.label+'</span>'; hd= nom? '' : (reasonLines(m)[0]||''); }
-    const rl= nom? [] : reasonLines(m);
+    /* 지표를 받지 못하면(수집 대기 · 수집 불가 · 미설정 · 5분 뒤 값 없음) 지표 판정 사유가 없어 안내 박스를 두지 않는다 */
+    const rl= (nom || srcBad() || noSeries())? [] : reasonLines(m);
     /* 주의·위험이면 안내 박스(모니터링 정책 5.2 · REQ-MON-044). 첫 줄은 가장 심각한 사유, 나머지는 박스 안 버튼으로 그 자리에서 펼친다.
        사유 순서는 백엔드가 보낸 순서(심각도 높은 순)다. 값은 백엔드 판정값을 그대로 쓴다 */
     const multi = rl.length>1;
@@ -4612,6 +4700,8 @@ function drawPerf(el){
       ? '<div class="alertbox '+sev+' rsbox"><div class="atx"><div class="rshead">'+hb+'<b>지표가 기준을 벗어났습니다.</b>'+btn+'</div>'+body+miss+'</div></div>' : '';
     h+='<div class="depsub"><h4>건전성'+tip('배포가 잘 돌고 있는지 지표로 판정한 결과입니다.')+'</h4>'
       + (box? box : '<div class="hline">'+hb+(hd? '<span class="hdesc">'+hd+'</span>' : '')+'</div>'
+          /* 5분 뒤 지표 없음은 사유가 배포 상세로 보내므로 갈 길을 준다(모니터링 정책 5.1 이동 표 · REQ-MON-047) */
+          + (noSeries()? goDepBtn() : '')
           /* 안정이어도 측정하지 못한 지표가 있으면 라벨 아래 한 줄로 둔다. 정상이라 안정인 것과 재지 못해 안정인 것을 가른다(정책 5.2 · REQ-MON-044).
              라벨이 있는 배포(정상 · 오류)에만 둔다. `-` · 소스 상태 배지 자리에는 두지 않는다 */
           + ((!noPods && !srcBad() && m.label==='안정' && m.missing && m.missing.length)
@@ -4677,7 +4767,7 @@ function drawPerf(el){
   /* 계층별 지표도 고른 배포의 값이다. 값이 없으면 `-` 로 두고 사유를 밝힌다 */
   const bind=function(items, vals){
     return items.map(function(x,ix){
-      const v = srcBad()? null : vals[ix];
+      const v = (srcBad() || noSeries())? null : vals[ix];
       return Object.assign({}, x, {v: v===null? '-' : v, nodata: v===null || x.nodata});
     });
   };
@@ -4948,7 +5038,7 @@ function perfSec(title, note, items, sub){
        게이트웨이도 이제 배포별 값을 갖게 돼(gw) 그 배포가 안 도는 게 진짜 이유다
        (기획 판단, 2026-08-28) */
     + (nodata
-       ? '<p class="secnote">'+(srcBad()? SRC[src][1] : (dm().why || '값이 수집되지 않았습니다.'))+'</p>'
+       ? '<p class="secnote">'+(srcBad()? SRC[src][1] : noSeries()? NOSERIES_TXT : (dm().why || '값이 수집되지 않았습니다.'))+'</p>'
        : '')
     + '</div>';
 }
@@ -5231,6 +5321,8 @@ function metPick(){
             + '<span class="depitem-n">'+c.t+'</span>'
             /* 건전성 판정에 쓰이는 메트릭. 상태가 아니라 분류라 색 없는 분류 배지(.vbadge)를 쓴다(정책 6.3 · REQ-MON-081 · 공통정책 1.9) */
             + (c.hb? '<span class="vbadge">건전성 반영</span>' : '')
+            /* 운영 상태(복구 검토 · 긴급 조사)도 항목마다 고정인 분류라 같은 분류 배지를 쓴다. 심각도 색과 섞이지 않게 색을 두지 않는다(정책 6.3 · REQ-MON-088) */
+            + (c.ops? '<span class="vbadge">'+c.ops+'</span>' : '')
             + (c.on? '' : '<span class="stbadge mu">수집되지 않음</span>')
             + (c.k===RF.metric? '<span class="wck">✓</span>' : '')+'</button>';
         }).join('');
@@ -5455,16 +5547,22 @@ function drawRuleForm(){
     +   tip('이 규칙의 알림을 인앱 알림과 함께 보낼 외부 채널입니다.')+'</h4>'
     /* 등록된 채널만 고를 수 있다. 없으면 그 자리에서 등록 화면을 가리킨다 —
        목록 아래 안내문으로 두면 정작 고르는 자리에서는 보이지 않는다 */
-    +   (CHANNELS.length ? '' : '<div class="emptyline">등록된 채널이 없습니다. 플랫폼 설정 &gt; 연동 및 알림에서 먼저 등록해 주세요.</div>')
+    +   (rfChans().length ? '' : '<div class="emptyline">등록된 채널이 없습니다. 플랫폼 설정 &gt; 연동 및 알림에서 먼저 등록해 주세요.</div>')
     +   '<div class="fld"><div class="chks">'
-    +     CHANNELS.map(function(c){
-            return '<label class="chk"><input type="checkbox"'+(RF.ch.indexOf(c)>=0?' checked':'')
+    /* 채널 이름만으로는 어디로 가는지 모른다. 유형과 최소 심각도를 함께 보인다(SET-INTEG-L01 7.4).
+       규칙 심각도가 채널 최소 심각도보다 낮으면 그 채널로 가지 않아 고를 수 없게 두고 사유를 붙인다.
+       권한이 아니라 조건 때문에 막히는 것이라 미노출이 아니라 비활성이다(공통정책 7.10) */
+    +     rfChans().map(function(c){
+            const m=CHMETA[c]||{}, off=chBlocked(c);
+            if(off){ const k=RF.ch.indexOf(c); if(k>=0) RF.ch.splice(k,1); }
+            return '<label class="chk"'+(off?' style="opacity:.55;cursor:default"':'')+'><input type="checkbox"'+(RF.ch.indexOf(c)>=0?' checked':'')+(off?' disabled':'')
               + ' onchange="rfToggleCh(\'' + c + '\')"><span class="cbx"></span>'
-              + '<span class="cbt">'+c+'</span></label>';
+              + '<span class="cbt">'+c+' <span style="color:var(--muted-foreground)">· '+(m.type||'')+(m.ws?'':' · 전역')+(m.min&&m.min!=='모두'?' · '+m.min:'')+'</span></span></label>';
           }).join('')
     +   '</div>'
+    +   (rfChans().some(chBlocked) ? '<div class="hint">흐리게 표시한 채널은 최소 심각도가 이 규칙보다 높아 알림이 가지 않습니다.</div>' : '')
     /* 비워 두면 목록 전체로 보낸다(알림 정책 7.3). 직관과 반대라 툴팁이 아니라 늘 보이는 hint 로 둔다 */
-    +   (CHANNELS.length ? '<div class="hint">기본으로 목록의 모든 채널에 보냅니다. 채널을 고르면 고른 채널에만 보냅니다.</div>' : '')
+    +   (rfChans().length ? '<div class="hint">기본으로 목록의 모든 채널에 보냅니다. 채널을 고르면 고른 채널에만 보냅니다.</div>' : '')
     +   '</div></div>';
   document.getElementById('ruleSave').disabled = !ruleValid();
   drawXidList();
@@ -5498,29 +5596,52 @@ function isHealthRule(metric, op, sev){
   return !!(c && c.hb) && op==='초과' && sev!=='정보';
 }
 function numFmt(v){ return (Math.round(v*10)/10).toLocaleString('ko-KR'); }
-/* 위험 기준 안내. 판정 유형(정책 5.2)으로 계산한다. 초과형은 2배, 여유형은 남은 여유의 절반을 더한 값이다.
-   위험이 없는 지표는 주의까지만 판정한다고 알린다. 가속기 온도는 규칙 심각도가 등급이라 계산값을 두지 않는다 */
+/* 위험 기준 안내. 같은 범위에 오류 규칙이 있으면 그 임계값이 위험 기준이고, 없으면 판정 유형(정책 5.2)으로 계산한다.
+   초과형은 2배, 여유형은 남은 여유의 절반을 더한 값이다. 오류 규칙 임계값이 주의 규칙 이하이면 위험 기준으로 쓰지 않고 계산값을 쓴다
+   (정책 5.2 · 6.3 · 결정 사항 댓글 3502866648). 위험이 없는 지표는 주의까지만 판정한다고 알린다.
+   가속기 온도는 규칙 심각도가 등급이라 계산값을 두지 않는다. 범위는 워크스페이스 · 대상 범위가 같은 것이다 */
 function healthHint(){
   if(!isHealthRule(RF.metric, RF.op, RF.sev)) return '';
   const c=catItem(RF.metric);
   if(c.hb==='temp') return '규칙 심각도가 그대로 건전성 등급이 됩니다.';
-  /* 한 범위에 주의 규칙과 오류 규칙이 함께 있으면 주의 규칙이 기준이고 오류 규칙은 알림만 보낸다.
-     주의 규칙이 없으면 오류 규칙의 임계값이 주의 기준이다(정책 5.2 · 6.3). 범위는 워크스페이스 · 대상 범위가 같은 것이다 */
-  if(RF.sev==='오류' && sibWarn()) return '건전성 기준은 같은 범위의 주의 규칙을 따릅니다. 이 규칙은 알림만 보냅니다.';
+  const t=String(RF.th).trim();
+  const num = (t==='' || isNaN(+t)) ? null : +t;
+  const calc=function(v){ return c.hb==='room' ? v + (100 - v)/2 : v*2; };
+  if(RF.sev==='오류'){
+    const w=sibRule('주의');
+    if(w){
+      /* 위험이 없는 지표는 주의 규칙이 기준이고 이 규칙은 알림만 보낸다 */
+      if(c.hb==='na' || c.nocrit) return '이 지표는 주의까지만 판정해 이 규칙은 알림만 보냅니다.';
+      if(num===null) return '';
+      if(num <= +w.th) return '같은 범위 주의 규칙('+numFmt(+w.th)+c.u+')보다 크지 않아 위험 기준으로 쓰지 않습니다. 위험 기준은 '+numFmt(calc(+w.th))+c.u+'입니다.';
+      return '이 값이 건전성 위험 기준입니다. 주의 기준은 같은 범위 주의 규칙의 '+numFmt(+w.th)+c.u+'입니다.';
+    }
+  }
+  /* 같은 범위에 주의 규칙 없이 오류 규칙만 있으면 이 값이 위험 기준이고 주의 기준은 거꾸로 계산한다.
+     초과형은 절반, 여유형은 상한까지 남은 여유가 2배인 지점이다(정책 5.2 · BE health_rules.fill_limit) */
+  if(RF.sev==='오류' && c.hb!=='na' && num!==null){
+    /* 여유형에서 계산한 값이 위험 기준의 절반보다 낮으면 절반으로 둔다. 위험 기준이 50% 이하면 거꾸로 계산한 값이
+       0 이하가 되어 값이 있기만 해도 늘 주의가 된다(정책 5.2) */
+    const wv = c.hb==='room' ? Math.max(100 - (100 - num)*2, num/2) : num/2;
+    if(c.nocrit) return '같은 범위에 주의 규칙이 없어 건전성 주의 기준은 '+numFmt(wv)+c.u+'입니다. 이 지표는 주의까지만 판정합니다.';
+    return '같은 범위에 주의 규칙이 없어 이 값이 건전성 위험 기준입니다. 주의 기준은 '+numFmt(wv)+c.u+'입니다.';
+  }
   const pre = RF.sev==='오류' ? '같은 범위에 주의 규칙이 없어 ' : '';
   /* 판정 유형이 정해지지 않은 지표는 위험 기준을 계산하지 않는다 */
   if(c.hb==='na') return pre+'이 값이 건전성 주의 기준입니다.';
   if(c.nocrit) return pre+'이 값이 건전성 주의 기준입니다. 이 지표는 주의까지만 판정합니다.';
-  const t=String(RF.th).trim();
-  if(t==='' || isNaN(+t)) return '';
-  const v = c.hb==='room' ? +t + (100 - +t)/2 : +t*2;
-  return pre+'이 값이 건전성 주의 기준입니다. 위험 기준은 '+numFmt(v)+c.u+'입니다.';
+  if(num===null) return '';
+  if(RF.sev==='주의'){
+    const e=sibRule('오류');
+    if(e && +e.th > num) return '이 값이 건전성 주의 기준입니다. 위험 기준은 같은 범위 오류 규칙의 '+numFmt(+e.th)+c.u+'입니다.';
+  }
+  return pre+'이 값이 건전성 주의 기준입니다. 위험 기준은 '+numFmt(calc(num))+c.u+'입니다.';
 }
-/* 같은 범위 · 메트릭의 사용 중인 주의 규칙이 있는지. 중지한 규칙은 판정에서 빠져 세지 않는다(정책 6.4) */
-function sibWarn(){
+/* 같은 범위 · 메트릭 · 심각도의 사용 중인 초과 규칙. 중지한 규칙은 판정에서 빠져 세지 않는다(정책 6.4) */
+function sibRule(sev){
   const w=rfWs();
-  return RULES.some(function(r,i){
-    return i!==ruleIdx && !r.off && r.ws===w && r.scope===RF.scope && r.metric===RF.metric && r.sev==='주의' && r.op==='초과';
+  return RULES.find(function(r,i){
+    return i!==ruleIdx && !r.off && r.ws===w && r.scope===RF.scope && r.metric===RF.metric && r.sev===sev && r.op==='초과';
   });
 }
 /* 임계값 입력 중에는 안내만 다시 쓴다. 폼 전체를 다시 그리면 입력이 끊긴다 */
@@ -6328,14 +6449,15 @@ function demoGoneRule(){
   const i=RULES.findIndex(function(r){ return r.off==='대상 없음'; });
   if(i>=0) resumeRule(i);
 }
-/* 실제 화면에는 없는 검토용 처리다. ai-service-team 에 대기 요청 오류 규칙을 새로 쓰는 폼을 연다. 같은 범위에 주의 규칙이 있어 알림만 보낸다는 안내가 나온다(정책 5.2 · 6.3) */
+/* 실제 화면에는 없는 검토용 처리다. llama-3-2-1b-prod 에 첫 토큰 지연 오류 규칙을 새로 쓰는 폼을 연다.
+   같은 범위에 주의 규칙(3,500ms)이 있어 이 값이 위험 기준이라는 안내가 나온다(정책 5.2 · 6.3) */
 function demoErrHint(){
   demoBase(true);
   tab=2; render();
   openRule(-1);
-  RF.n='대기 요청 과다'; RF.ws='ai-service-team'; RF.scope='전체';
-  pickMetric('queue_depth');
-  RF.sev='오류'; drawRuleForm();
+  RF.n='첫 토큰 지연 위험'; RF.ws='ai-service-team'; RF.scope='llama-3-2-1b-prod';
+  pickMetric('ttft_p95_ms');
+  RF.sev='오류'; RF.th=7000; drawRuleForm();
 }
 /* 실제 화면에는 없는 검토용 처리다. llama-3-2-1b-prod 판정 사유를 펼쳐 기준 출처 링크 · 도움말을 보인다(REQ-MON-086) */
 function demoSrcLink(){
@@ -6344,6 +6466,13 @@ function demoSrcLink(){
   src='ok'; document.querySelectorAll('#demoBar .sr').forEach(function(b){ b.classList.toggle('on', b.textContent==='정상'); });
   tab=1; dep='llama-3-2-1b-prod'; rsOpen=true; render();
   const t=document.querySelector('.rstbl'); if(t && t.scrollIntoView) t.scrollIntoView({block:'center'});
+}
+
+/* 실제 화면에는 없는 검토용 처리다. 지표 · 추적 수집을 사용하지 않는 배포를 골라 Grafana 열기 비활성을 보인다(모니터링 정책 5.4) */
+function demoGrafanaOff(){
+  demoBase(false);
+  tab=1; dep='solar-open-100b-paused'; rsOpen=false; render();
+  const r=document.querySelector('.rangerow'); if(r && r.scrollIntoView) r.scrollIntoView({block:'center'});
 }
 
 drawWsBtn();
