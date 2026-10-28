@@ -1,6 +1,20 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 인프라 자원 목업 v0.13 (2026-10-23)
+  콘체르토 매니저 — 플랫폼 설정 | 인프라 자원 목업 v0.14 (2026-10-27)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.14 추가 (2026-10-27) ─────────────────────
+  · 데모 바 `라이선스 사용` 에 `한도 초과` 를 더했다. NPU 18장(한도 16장)으로 잔여 `0` 과 `초과 2 장` 을 본다. 검토용 처리이며 실제 화면에는 없다.
+  SET-INFRA-L01 v0.14 와 같은 버전이다. 근거는 SET-INFRA-L01 5.2 · 7.3 · 알림 정책 3.4 · 라이선스 키 적용 가이드 1장(만료 뒤 유예 30일).
+  · 라이선스 탭 위에 만료 안내를 두었다. 만료 30일 이내는 주의, 유예 중 · 유예 종료는 오류 안내 박스다(REQ-SET-INFRA-023).
+    갱신은 이 화면에서 할 수 없어 발급처 문의만 안내한다. 같은 내용이 최고 관리자에게 알림으로도 간다.
+  · 유예 중이면 기본 정보 만료일 옆에 유예 종료일을 함께 보인다.
+  · 4.0은 만료 · 유예 종료 뒤에도 자원 사용을 막지 않는다(알림 정책 3.4 · 결정 10-27, pageId 3506110653).
+    안내 박스는 상태와 발급처 문의만 알리고, 사용 현황 잔여는 상한 − 사용 그대로 보인다.
+  · 에디션 · 만료일의 확인 대상 표시를 지웠다. 둘 다 라이선스 키에 담긴 값이다. 영구 라이선스는 만료일이 - 다.
+  · 데모 바 `라이선스` 로 정상 · 30일 이내 · 유예 중 · 유예 종료 · 영구를 본다. 실제 화면에는 없는 검토용 처리다.
+  · 사용이 상한을 넘으면 잔여 0 과 오류 색 `초과 {n} {단위}` 를 함께 보인다(SET-INFRA-L01 7.3). 4.0은 넘어도 막지 않는다.
+  · 사용 현황 항목을 vRAM · NPU 로 바꿨다. 라이선스 한도가 vRAM 총량과 NPU 장수라서다(SET-INFRA-L01 7.3 · 워크스페이스 정책 5.4).
+    종전 `가속기` 장수 행은 라이선스 한도가 아니라 뺐다. 사용은 워크스페이스에 할당한 양이다. NPU 행은 계약에 NPU 개수 조항이 있을 때만 둔다.
 
   ── v0.13 추가 (2026-10-23) ─────────────────────
   SET-INFRA-L01 v0.13 과 같은 버전이다. 근거는 노드 그룹 검토 문서(pageId 3493134511) 5장 영향 범위
@@ -2121,7 +2135,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <!-- ══════════ 채널 추가 모달 ══════════ -->
   <div class="mdbg" id="mdCh">
     <div class="modal">
-      <div class="mdhead"><h3>알림 채널 추가</h3></div>
+      <div class="mdhead"><h3>알림 채널 등록</h3></div>
       <div class="mdbody">
         <div class="fld"><label>채널명<span class="req">*</span></label>
           <input class="inp" placeholder="예) MLOps Core Slack"></div>
@@ -2208,6 +2222,17 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <span class="dgrp"><span class="demo-label">노드 그룹:</span>
   <button class="ngd on" onclick="setNgDemo(true,this)">3개</button>
   <button class="ngd" onclick="setNgDemo(false,this)">없음</button></span>
+  <!-- 라이선스 만료 상태(v0.14). 실제 화면에는 없는 검토용 처리다 -->
+  <span class="dgrp"><span class="demo-label">라이선스:</span>
+  <button class="lc on" onclick="setLic('ok',this)">정상</button>
+  <button class="lc" onclick="setLic('soon',this)">30일 이내</button>
+  <button class="lc" onclick="setLic('grace',this)">유예 중</button>
+  <button class="lc" onclick="setLic('ended',this)">유예 종료</button>
+  <button class="lc" onclick="setLic('perpetual',this)">영구</button></span>
+  <!-- 라이선스 한도 초과(v0.14). 4.0은 할당을 막지 않아 사용이 한도를 넘을 수 있다. 실제 화면에는 없는 검토용 처리다 -->
+  <span class="dgrp"><span class="demo-label">라이선스 사용:</span>
+  <button class="lu on" onclick="setLicUse('in',this)">한도 안</button>
+  <button class="lu" onclick="setLicUse('over',this)">한도 초과</button></span>
   <span class="dgrp"><span class="demo-label">테마:</span>
   <button onclick="document.body.classList.remove('dark')">라이트</button>
   <button onclick="document.body.classList.add('dark')">다크</button></span>
@@ -2406,6 +2431,24 @@ function setConn(v,btn){
   EXT.harbor.engine = v? 'llm-runtime' : '';
   editSec='';
   render();
+}
+/* 실제 화면에는 없는 검토용 처리다. 라이선스 상태를 바꾸고 라이선스 탭을 연다 */
+function setLic(v,btn){
+  document.querySelectorAll('#demoBar .lc').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  LIC.st=v;
+  if(v==='soon'){ LIC.until='2026-11-20'; LIC.daysLeft=24; }
+  else if(v==='grace'){ LIC.until='2026-10-20'; LIC.graceEnd='2026-11-19'; }
+  else if(v==='ended'){ LIC.until='2026-09-10'; LIC.graceEnd='2026-10-10'; }
+  else { LIC.until='2027-06-30'; }
+  sTab=2; if(typeof go==='function') go('sys'); drawSys();
+}
+/* 한도 초과는 NPU 18장(한도 16장)으로 둔다. 잔여 `0` 과 `초과 2 장` 이 함께 보인다. 실제 화면에는 없는 검토용 처리다 */
+function setLicUse(v,btn){
+  document.querySelectorAll('#demoBar .lu').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  LIC.items[1].use = v==='over'? 18 : 12;
+  sTab=2; if(typeof go==='function') go('sys'); drawSys();
 }
 function setState(v,btn){
   document.querySelectorAll('#demoBar .st').forEach(function(b){ b.classList.remove('on'); });
@@ -3309,29 +3352,41 @@ function nowMin(){
 
 /* ══════════ 라이선스 ══════════ */
 /* 라이선스는 설치 시 정해지고 화면에서는 조회만 한다. 클러스터와 같다.
-   ⚠ 산정 항목이 확정되지 않았다. 8/10 회의 2.2 가 말하는 것은 가속기뿐이다 —
-     `라이선스가 vRAM 1GB 단가로 산정되므로 총 용량 정보가 필요하다`.
-     단가 기준을 vRAM → 가속기 장수로 바꾸는 안이 검토 중이라 둘을 함께 둔다.
-     CPU·Memory·워크스페이스 수가 대상인지는 문서에 없어 넣지 않았다 */
-/* ⚠ 에디션·만료일은 근거 없이 넣은 값이다. 기술문서에 라이선스 서술이 없고
-   회의록 셋뿐이다(8/10 2.2 vRAM 단가 · 2.3 최종 제한 · 8/12 1.6 최고 관리자 전용).
-   담을 항목이 정해지면 기본 정보 카드를 만든다 — 확인 요청 항목 1·2번 */
+   라이선스 한도는 vRAM 총량과 NPU 장수다(10-27 결정 pageId 3506110653 · 워크스페이스 정책 5.4).
+   사용은 워크스페이스에 할당한 양이다. vRAM 은 할당한 가속기의 vRAM 합계, NPU 는 할당한 NPU 장수다.
+   NPU 행은 계약에 NPU 개수 조항이 있을 때만 둔다. 종전 가속기 장수 행은 라이선스 한도가 아니라 뺐다.
+   CPU·Memory·워크스페이스 수는 라이선스 한도가 아니라 넣지 않았다 */
+/* 에디션 · 만료일은 라이선스 키에 담긴 값이다(SET-INFRA-L01 7.3). 영구 라이선스는 만료일이 없다.
+   만료일이 지나면 유예 30일이다. 4.0은 만료 · 유예 종료 뒤에도 할당을 막지 않는다(알림 정책 3.4).
+   st: ok · soon · grace · ended · perpetual. 데모 바로 바꾼다 */
 const LIC={
-  edition:'Enterprise', until:'2027-06-30',
+  edition:'Enterprise', until:'2027-06-30', st:'ok', daysLeft:0, graceEnd:'',
   items:[
-    {n:'가속기', use:14, cap:30, unit:'장'},
-    {n:'vRAM', use:1842, cap:4230, unit:'GB'}
+    {n:'vRAM', use:1842, cap:4230, unit:'GB'},
+    {n:'NPU', use:12, cap:16, unit:'장'}
   ]
 };
 function licPane(){
-  /* 안 바뀌는 계약 조건과 지금 쓰는 양을 나눈다. 다른 화면도 같은 축으로 가른다.
-     ⚠ 기본 정보에 담을 항목이 미정이다 — 에디션·만료일은 근거 없이 넣은 값이다
-       (확인 요청 항목 1·2번) */
+  /* 안 바뀌는 계약 조건과 지금 쓰는 양을 나눈다. 다른 화면도 같은 축으로 가른다 */
+  const ended = LIC.st==='ended';
+  /* 만료 안내 — 알림을 놓쳐도 탭에서 상태가 보여야 한다(SET-INFRA-L01 5.2 · REQ-SET-INFRA-023).
+     갱신은 화면 밖 일이라 발급처 문의만 둔다 */
+  const notice =
+      LIC.st==='soon'  ? alertBox('warn','라이선스가 '+LIC.daysLeft+'일 뒤 만료됩니다.',
+          '만료일은 '+LIC.until+'입니다. 라이선스 갱신은 발급처에 문의해 주세요.','',false)
+    : LIC.st==='grace' ? alertBox('crit','라이선스가 만료되었습니다.',
+          '유예 기간은 '+LIC.graceEnd+'까지입니다. 라이선스 갱신은 발급처에 문의해 주세요.','',false)
+    : ended            ? alertBox('crit','라이선스 유예 기간이 끝났습니다.',
+          '라이선스 갱신은 발급처에 문의해 주세요.','',false)
+    : '';
   /* return 뒤에 줄을 바꾸면 자동으로 세미콜론이 붙어 undefined 가 반환된다 */
-  return '<div class="ssec"><h4>기본 정보</h4>'
+  return notice
+    + '<div class="ssec"><h4>기본 정보</h4>'
     + '<dl class="dl two">'
     +   '<dt>에디션</dt><dd>'+LIC.edition+'</dd>'
-    +   '<dt>만료일</dt><dd>'+LIC.until+'</dd>'
+    /* 영구 라이선스는 만료일이 없다(1.7). 유예 중 · 유예 종료면 유예 종료일을 함께 둔다 */
+    +   '<dt>만료일</dt><dd>'+(LIC.st==='perpetual'? '<span class="dash">-</span>' : LIC.until
+          + ((LIC.st==='grace'||ended)? ' <span class="sub">유예 종료 '+LIC.graceEnd+'</span>' : ''))+'</dd>'
     + '</dl></div>'
     /* 테이블은 `.tblwrap` 이 테두리를 가지므로 카드로 또 감싸지 않는다.
        테이블 위에는 제목을 두지 않는다 */
@@ -3339,11 +3394,14 @@ function licPane(){
     + '<th>항목</th><th>사용</th><th>상한</th><th>잔여</th>'
     + '</tr></thead><tbody>'
     + LIC.items.map(function(x){
-        const free=x.cap-x.use;
+        /* 4.0은 유예가 끝나도 할당을 막지 않아 잔여는 상한 − 사용 그대로다(알림 정책 3.4) */
+        const free= x.cap-x.use;
+        /* 넘으면 잔여는 0으로 두고 넘은 양을 오류 색으로 함께 보인다(SET-INFRA-L01 7.3). 음수 잔여는 쓰지 않는다(용어집 5장 잔여) */
+        const over= free<0 ? -free : 0;
         return '<tr><td><span class="rname">'+x.n+'</span></td>'
          + '<td class="num">'+x.use+' '+x.unit+'</td>'
          + '<td class="num">'+x.cap+' '+x.unit+'</td>'
-         + '<td class="num">'+free.toFixed(free%1?1:0)+' '+x.unit+'</td></tr>';
+         + '<td class="num">'+(over? '0 '+x.unit+' <span style="color:var(--destructive);margin-left:6px">초과 '+over.toFixed(over%1?1:0)+' '+x.unit+'</span>' : free.toFixed(free%1?1:0)+' '+x.unit)+'</td></tr>';
       }).join('')
     + '</tbody></table></div>';
 }
@@ -3426,8 +3484,8 @@ function drawChans(){
       + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'
       +   '<path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>'
       + '<h3>등록된 채널이 없습니다.</h3>'
-      + '<p>채널을 추가하면 플랫폼에서 발생한 일을 알립니다.</p>'
-      + '<button class="btn" onclick="openCh()">채널 추가</button></div>';
+      + '<p>채널을 등록하면 플랫폼에서 발생한 일을 알립니다.</p>'
+      + '<button class="btn" onclick="openCh()">채널 등록</button></div>';
     return;
   }
 
@@ -3446,13 +3504,13 @@ function drawChans(){
    + '<button class="cbtn" title="다운로드" onclick="dlChans()">'
    +   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">'
    +   '<path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg></button>'
-   + '<button class="btn" onclick="openCh()">채널 추가</button></div>'
+   + '<button class="btn" onclick="openCh()">채널 등록</button></div>'
    + (list.length
       ? '<div class="tblwrap"><table class="tbl"><thead><tr>'
         + sortTh('ch','n','채널명')
         + '<th class="thcell">'+chFilter('cst','상태',['정상','실패','미확인'],cSt,'tgCSt2','chst')+'</th>'
         + '<th class="thcell">'+chFilter('cty','유형',['Slack','이메일','웹훅'],cTy,'tgCTy')+'</th>'
-        + '<th>범위</th><th>주소</th>'
+        + '<th>범위</th><th>수신 대상</th>'
         + sortTh('ch','sent','마지막 발송')
         + sortTh('ch','at','등록일시')
         + '<th style="width:64px">작업</th>'
