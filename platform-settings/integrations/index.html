@@ -1,6 +1,41 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.17 (2026-10-26)
+  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.18 (2026-10-27)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.18 (2026-10-27, CON-960 · CON-961 · CON-962) ──
+  · 목록 칸 이름을 `수신 대상` 으로 정했다(용어집 5장). 이메일 입력란과 같은 말이고, 이메일은 그 값을, Slack · 웹훅은 `등록됨` 을 보인다.
+    `발송 대상` 은 모니터링 기획서에서 규칙이 보내는 채널이라는 다른 뜻으로 쓰고 있어 쓰지 않는다.
+  · 메일 서버: 전송 보안 툴팁(SSL 465 · STARTTLS 587), 발신자 주소 힌트를 두었다. 서버를 비우면 인라인 에러 `서버를 입력해 주세요.` 로 저장을 막는다(공통정책 7.8).
+  · 메일 서버 탭을 새로 두었다(기획서 7.7 · REQ-050 · 051). 단일 로그인과 알림 채널 사이다 —
+    이메일 채널은 메일 서버가 있어야 등록할 수 있어 앞에 둔다. 앞 네 탭이 설정 하나짜리 폼, 알림 채널만 목록이다.
+    · 다른 연결 탭과 같은 규격이다. 카드 안에서 수정하고, 연결 확인 결과는 폼 위 알림으로 남긴다(REQ-004).
+      비밀번호는 `등록됨` 배지와 `변경` · `삭제`(REQ-003). 저장하면 `메일 서버 설정을 저장했습니다.`
+    · 계정 · 비밀번호는 선택이다. 인증 없이 받는 사내 메일 서버가 있다.
+    · 포트(1~65535) · 발신자 주소(이메일 형식)는 저장할 때 인라인 에러로 막고 첫 오류 필드로 포커스한다(공통정책 7.8).
+    · 연결 확인 실패 사유 코드는 아직 정해지지 않아 공통 문구로 낸다(기획서 5.2 공통 행).
+  · 채널 추가를 유형별 입력으로 바꿨다(기획서 7.5 · REQ-052~054).
+    · Slack은 주소, 웹훅은 주소와 선택 입력인 서명 키 · 인증 헤더(이름 기본 Authorization, 값 비우면 보내지 않음),
+      이메일은 주소 대신 수신 대상 `관리자만`(기본) · `전체 멤버`. 전역 채널이면 수신 대상은 `최고 관리자` 고정 문구다.
+    · 전역 채널이 아니면 워크스페이스를 고른다. 문서에 없던 칸이고 프론트 구현에 있다.
+    · 메일 서버가 없으면 이메일을 골랐을 때 안내를 두고 `등록` 을 비활성으로 둔다(기획서 5.2).
+    · 등록 시 채널명 · 주소 · 워크스페이스를 인라인으로 검증하고 첫 오류 필드로 포커스한다(공통정책 7.8).
+  · 목록 `주소` 칸에 이메일 채널은 수신 대상을 보인다(기획서 7.4).
+  · 이메일 채널 테스트 발송은 실행한 관리자 본인 이메일로 1통 보내고 성공 토스트에 받는 주소를 밝힌다(기획서 5.1).
+  · 데모 바 `메일 서버` 로 설정됨 · 설정 안 됨을 본다. 검토용 처리이며 실제 화면에는 없다.
+  · 채널 수정을 두었다(기획서 REQ-056 · 5.1). 행 메뉴 `수정` 이 채널 추가 모달을 저장된 값으로 연다.
+    수신 대상만 바꾸려 해도 지웠다 다시 만들면 그 채널을 지정한 알림 규칙이 중지된다(모니터링 정책 6.4).
+    · 유형 · 범위 · 워크스페이스는 값만 보인다. 바꾸면 그 채널을 지정한 규칙이 알림을 보내는 곳이 달라진다.
+    · 비밀값(Slack · 웹훅 주소 · 서명 키 · 인증 헤더 값)은 `등록됨` 과 `변경`, 선택 입력인 서명 키 · 헤더 값은 `삭제` 도 둔다(REQ-003).
+    · 변경이 있어야 `저장` 이 켜진다(공통정책 7.1). 주소를 바꾸면 상태를 미확인으로 되돌린다. 토스트 `알림 채널을 저장했습니다.`
+  · 최소 심각도를 채널 추가 · 수정과 목록에 두었다(기획서 REQ-057 · 알림 정책 6.2). 모두(기본) · 주의 이상 · 오류만.
+  · 목록 `주소` 칸을 `수신 대상` 으로 바꿨다(기획서 7.4 · 용어집 5장). Slack · 웹훅 주소는 저장 후 조회할 수 없어 `등록됨` 배지로,
+    이메일은 수신 대상으로 보인다. 검색은 채널명 · 수신 대상 문구 · 워크스페이스로 한다(REQ-041).
+  · 진입 버튼 · 모달 제목을 `채널 등록` · `알림 채널 등록` 으로 고쳤다(용어집 7 — 알림 채널은 등록). 실행 버튼 · 토스트와 동사가 갈려 있었다.
+  · 수정 저장 토스트는 `알림 채널 설정을 저장했습니다.` 다(용어집 7 저장).
+  · 이메일 테스트 발송 성공 토스트는 용어집 7 `테스트(이메일 채널)` 행이다.
+  · 상태 헤더 도움말에 판정 기준을 적었다(기획서 5.1 채널 상태). 이메일의 정상은 메일 서버로 보냈다는 뜻이다.
+  · 이메일 채널 테스트 발송 실패 문구는 `테스트 발송에 실패했습니다. 메일 서버 설정을 확인해 주세요.` 다. 이메일은 주소를 받지 않아 고칠 곳이 메일 서버다.
+  · 메일 서버 없이 이메일을 고를 때의 안내는 에러 색이 아닌 힌트다. 입력 오류가 아니라 선행 조건이다(발급자 주소 변경 제한과 같은 규격).
 
   ── v0.17 (2026-10-26, CON-840) ──
   · 스토리지 시크릿 키 · 단일 로그인 클라이언트 시크릿에 `삭제` 를 더했다(기획서 REQ-003 · 3장).
@@ -301,8 +336,8 @@
   동사는 대상의 성격으로 가른다(용어집 7) — 만드는 것은 `생성`, 외부에서 가져오는
   것은 `등록`. 사용자 계정은 새로 만드므로 `생성`, 알림 채널은 외부 주소를 가져오므로
   `등록` 이다.
-  ⚠ 진입 버튼·모달 제목이 아직 `사용자 추가` · `알림 채널 추가` · `채널 추가` 다.
-    실행 버튼과 동사가 갈린다 — 확인 대상.
+  ⚠ 진입 버튼·모달 제목이 아직 `사용자 추가` 다. 실행 버튼과 동사가 갈린다 — 확인 대상.
+    알림 채널은 v0.18 에서 `채널 등록` · `알림 채널 등록` 으로 고쳤다.
   ⚠ 동기 완료 토스트는 공통정책 7.7 형식(`{작업명}이(가) 완료되었습니다.`)을 따랐다.
     용어집 7 장 `만들기` 행 토스트는 비동기 접수형 하나뿐이라 동기 생성에 쓸 문구가
     표에 없다 — 확인 대상.
@@ -2202,26 +2237,12 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <!-- ══════════ 채널 추가 모달 ══════════ -->
   <div class="mdbg" id="mdCh">
     <div class="modal">
-      <div class="mdhead"><h3>알림 채널 추가</h3></div>
-      <div class="mdbody">
-        <div class="fld"><label>채널명<span class="req">*</span></label>
-          <input class="inp" placeholder="예) MLOps Core Slack"></div>
-        <div class="fgrid" style="margin-top:16px">
-          <div class="fld"><label>유형<span class="req">*</span></label>
-            <select class="inp"><option>Slack</option><option>이메일</option><option>웹훅</option></select></div>
-          <div class="fld"><label>주소<span class="req">*</span></label>
-            <input class="inp" placeholder="https://"></div>
-        </div>
-        <!-- 전역이면 모든 워크스페이스가 쓴다 -->
-        <div class="fsec"><h4>범위</h4>
-          <label class="chk"><input type="checkbox"><span class="cbx"></span>
-            <span class="cbt">전역 채널로 설정</span></label>
-          <p class="segnote">전역으로 두면 모든 워크스페이스가 이 채널을 사용합니다. 끄면 등록한 워크스페이스에서만 사용합니다.</p>
-        </div>
-      </div>
+      <div class="mdhead"><h3 id="chTitle">알림 채널 등록</h3></div>
+      <!-- 유형에 따라 받는 값이 갈린다(기획서 7.5). 본문은 chDraw 가 그린다 -->
+      <div class="mdbody" id="chBody"></div>
       <div class="mdfoot">
         <button class="btn ghost" onclick="closeCh()">취소</button>
-        <button class="btn" onclick="closeCh();act('알림 채널을 등록했습니다.')">등록</button>
+        <button class="btn" id="chOk" onclick="chSubmit()">등록</button>
       </div>
     </div>
   </div>
@@ -2268,6 +2289,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <span class="dgrp"><span class="demo-label">연동:</span>
     <button class="cn on" onclick="setConn(true,this)">설정됨</button>
     <button class="cn" onclick="setConn(false,this)">설정 안 됨</button></span>
+  <!-- v0.18 메일 서버 설정 여부. 검토용 처리이며 실제 화면에는 없다 -->
+  <span class="dgrp"><span class="demo-label">메일 서버:</span>
+    <button class="ml on" onclick="setMail(true,this)">설정됨</button>
+    <button class="ml" onclick="setMail(false,this)">설정 안 됨</button></span>
   <span class="dgrp"><span class="demo-label">SSO 전용 계정:</span>
     <button class="pw on" onclick="setPwless(3,this)">있음</button>
     <button class="pw" onclick="setPwless(0,this)">없음</button></span>
@@ -2384,11 +2409,14 @@ const COMPS=[
 /* 웹훅 주소가 바뀌거나 토큰이 만료되면 알림이 조용히 사라진다.
    마지막 발송 결과를 상태로 두어 끊긴 채널을 드러낸다 */
 const CHANS=[
-  {n:'MLOps Core Slack', type:'Slack', global:true, url:'https://hooks.slack.com/services/T00/B00/xxxx',
+  /* Slack · 웹훅 주소는 저장 후 조회할 수 없다. 응답에는 등록 여부(url_set)만 온다(기획서 7.4).
+     url 은 데모에서 수정 변경 여부를 판정하려고 들고 있는 값이고 화면에는 보이지 않는다 */
+  {n:'MLOps Core Slack', type:'Slack', global:true, url:'https://hooks.slack.com/services/T00/B00/xxxx', min:'오류만',
    st:'정상', sent:'2026-08-20 09:12:40', at:'2026-07-20 10:04:12'},
-  {n:'운영팀 메일', type:'이메일', global:false, ws:'ai-service-team', url:'ops@okestro.com',
+  /* 이메일 채널은 주소를 받지 않고 수신 대상을 고른다. 계정 이메일로 보낸다(알림 정책 6.1 · CON-962) */
+  {n:'운영팀 메일', type:'이메일', global:false, ws:'ai-service-team', rcpt:'관리자만', min:'주의 이상',
    st:'실패', sent:'2026-08-19 22:05:11', at:'2026-08-02 14:20:33'},
-  {n:'보안 알림 웹훅', type:'웹훅', global:true, url:'https://hooks.okestro.com/security',
+  {n:'보안 알림 웹훅', type:'웹훅', global:true, url:'https://hooks.okestro.com/security', min:'모두', sk:true, hv:false,
    st:'미확인', sent:'', at:'2026-08-21 15:40:02'}
 ];
 const CHST={'정상':'ok','실패':'cr','미확인':'mu'};
@@ -2398,8 +2426,14 @@ const EXT={
   s3:{ url:'http://concerto-minio.concerto.svc.cluster.local:9000', key:'minioadmin', secret:true },
   harbor:{ url:'http://192.168.102.131:30002', robot:'robot$concerto-admin', secret:true,
            model:'model-registry', engine:'llm-runtime' },
-  hf:{ url:'', proxy:false, token:true }
+  hf:{ url:'', proxy:false, token:true },
+  /* 메일 서버 — 설치 때 넣은 값이 처음 값이다(CON-961). 값은 데모용이다 */
+  mail:{ host:'smtp.okestro.com', port:'587', sec:'STARTTLS', user:'concerto-noti', secret:true, from:'concerto@okestro.com' }
 };
+/* 채널 등록의 워크스페이스 선택지 — 데모용 값이다 */
+const WSLIST=['ai-service-team','ml-research'];
+/* 테스트 메일을 받는 주소 — 실행한 관리자 본인 계정 이메일. 데모용 값이다 */
+const ME_MAIL='yj.seong@okestro.com';
 /* pwless 는 SSO 로그인만 쓰는 계정 수다. 발급자 주소 변경 제한과 연결 해제 차단 조건에 쓴다(공통정책 7.5).
    실제 화면에서는 백엔드 응답으로 받는다 — 데모라 값을 고정해 둔다.
    on 은 EXT 와 같은 설정됨 상태로 둔다. 데모 바 `연동: 설정됨` 이 켜진 채 이 값만 false 면
@@ -2657,7 +2691,7 @@ const COLDEF={
     +'<dt>주의</dt><dd>동작하고 있으나 응답이 느리거나 지연이 있습니다.</dd>'
     +'<dt>오류</dt><dd>동작하지 않습니다. 이 구성 요소를 쓰는 기능이 막힙니다.</dd>'
     +'<dt>확인 불가</dt><dd>상태를 조회하지 못했습니다.</dd></dl>',
-  chst:'마지막 발송이 닿았는지를 나타냅니다. 주소가 바뀌거나 토큰이 만료되면 알림이 조용히 사라집니다.'
+  chst:'마지막 발송이 닿았는지를 나타냅니다. 테스트 발송과 실제 발송 모두 반영됩니다. 이메일은 받는 사람 중 한 명에게라도 보냈으면 정상입니다.'
     +'<dl><dt>정상</dt><dd>마지막 발송이 성공했습니다.</dd>'
     +'<dt>실패</dt><dd>마지막 발송이 닿지 않았습니다. 주소와 인증 정보를 확인해 주세요.</dd>'
     +'<dt>미확인</dt><dd>아직 보낸 적이 없습니다. 테스트 발송으로 확인할 수 있습니다.</dd></dl>',
@@ -3492,7 +3526,11 @@ function testCh(i){
   const c=CHANS[i];
   c.st = c.st==='정상'? '실패' : '정상';
   c.sent = nowStr();
-  if(c.st==='정상') toast('ok','테스트 알림을 보냈습니다. 채널에서 수신을 확인해 주세요.');
+  /* 이메일 채널은 실행한 관리자 본인 이메일로 1통만 보낸다. 받는 주소를 밝힌다(기획서 5.1 · CON-962) */
+  if(c.st==='정상' && c.type==='이메일') toast('ok','테스트 메일을 '+ME_MAIL+jo(ME_MAIL,'으로')+' 보냈습니다. 받은편지함에서 확인해 주세요.');
+  else if(c.st==='정상') toast('ok','테스트 알림을 보냈습니다. 채널에서 수신을 확인해 주세요.');
+  /* 이메일 채널은 주소를 받지 않는다. 고칠 곳은 메일 서버다 */
+  else if(c.type==='이메일') toast('cr','테스트 발송에 실패했습니다. 메일 서버 설정을 확인해 주세요.');
   else toast('cr','테스트 발송에 실패했습니다. 주소와 인증 정보를 확인해 주세요.');
   drawChans();
 }
@@ -3525,7 +3563,8 @@ function chList(){
   return (dstate==='empty'? [] : CHANS).filter(function(c){
     if(cSt.length && cSt.indexOf(c.st)<0) return false;
     if(cTy.length && cTy.indexOf(c.type)<0) return false;
-    return !q || [c.n, c.url, c.ws||''].some(function(x){
+    /* 주소는 저장 후 조회할 수 없어 검색 대상이 아니다(REQ-041) */
+    return !q || [c.n, c.rcpt||'', c.ws||''].some(function(x){
       return String(x).toLowerCase().indexOf(q)>=0; });
   });
 }
@@ -3540,8 +3579,8 @@ function drawChans(){
       + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'
       +   '<path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>'
       + '<h3>등록된 채널이 없습니다.</h3>'
-      + '<p>채널을 추가하면 플랫폼에서 발생한 일을 알립니다.</p>'
-      + '<button class="btn" onclick="openCh()">채널 추가</button></div>';
+      + '<p>채널을 등록하면 플랫폼에서 발생한 일을 알립니다.</p>'
+      + '<button class="btn" onclick="openCh()">채널 등록</button></div>';
     return;
   }
 
@@ -3560,13 +3599,13 @@ function drawChans(){
    + '<button class="cbtn" title="다운로드" onclick="dlChans()">'
    +   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">'
    +   '<path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg></button>'
-   + '<button class="btn" onclick="openCh()">채널 추가</button></div>'
+   + '<button class="btn" onclick="openCh()">채널 등록</button></div>'
    + (list.length
       ? '<div class="tblwrap"><table class="tbl"><thead><tr>'
         + sortTh('ch','n','채널명')
         + '<th class="thcell">'+chFilter('cst','상태',['정상','실패','미확인'],cSt,'tgCSt2','chst')+'</th>'
         + '<th class="thcell">'+chFilter('cty','유형',['Slack','이메일','웹훅'],cTy,'tgCTy')+'</th>'
-        + '<th>범위</th><th>주소</th>'
+        + '<th>범위</th><th>최소 심각도</th><th>수신 대상</th>'
         + sortTh('ch','sent','마지막 발송')
         + sortTh('ch','at','등록일시')
         + '<th style="width:64px">작업</th>'
@@ -3583,13 +3622,16 @@ function drawChans(){
              + '<td>'+(c.global
                  ? '<span class="stbadge"><span class="d"></span>전역</span>'
                  : (c.ws || '<span class="dash">-</span>'))+'</td>'
-             + '<td class="wcell"><span class="epcell">'+esc(c.url)+'</span></td>'
+             /* 이메일 채널은 주소가 없다. 누구에게 가는지(수신 대상)를 보인다(기획서 7.4) */
+             + '<td>'+(c.min||'모두')+'</td>'
+             + '<td class="wcell">'+(c.type==='이메일'? esc(c.global? '최고 관리자' : c.rcpt) : '<span class="stbadge ok">등록됨</span>')+'</td>'
              + '<td>'+(c.sent? c.sent : '<span class="dash">-</span>')+'</td>'
              + '<td>'+c.at+'</td>'
              + '<td><div class="more" id="cm'+i+'"><button class="morebtn" onclick="tgMore(event,\'cm'+i+'\')">⋯</button>'
              /* 등록된 주소로 고정 문구를 보내므로 입력할 것이 없다. 작성 화면을 두지 않는다.
                 결과는 상태·마지막 발송 컬럼에 남는다 */
              +   '<div class="rowmenu"><button onclick="event.stopPropagation();testCh('+i+')">테스트 발송</button>'
+             +   '<button onclick="event.stopPropagation();openCh('+i+')">수정</button>'
              +   '<hr><button class="d" onclick="delCh('+i+')">삭제</button></div></div></td>'
              + '</tr>';
           }).join('')
@@ -3607,7 +3649,155 @@ function delCh(i){
     function(){ CHANS.splice(i,1); drawChans(); act('채널을 삭제했습니다.'); }, '삭제', null, c.n);
 }
 
-function openCh(){ $('mdCh').classList.add('on'); }
+/* 채널 추가 — 유형별 입력(기획서 7.5 · REQ-052~054 · CON-960 · CON-962).
+   Slack은 주소, 웹훅은 주소와 선택 입력인 서명 키 · 인증 헤더, 이메일은 수신 대상이다.
+   전역이 아니면 워크스페이스를 고른다. 메일 서버가 없으면 이메일 채널은 등록할 수 없다 */
+let CD={};
+function chField(id){ return (($(id)||{}).value||'').trim(); }
+function chKeep(){
+  if(!$('chType')) return;
+  CD.n=chField('chName'); CD.type=$('chType').value; CD.url=chField('chUrl');
+  CD.global=!!($('chGlobal')||{}).checked; CD.ws=chField('chWs');
+  CD.hn=($('chHn')? $('chHn').value : CD.hn); CD.sk=chField('chSk'); CD.hv=chField('chHv');
+  const r=document.querySelector('input[name=chRcpt]:checked'); if(r) CD.rcpt=r.value;
+  if($('chMin')) CD.min=$('chMin').value;
+  if($('chUrl')) CD.url=chField('chUrl');
+}
+/* 수정에서 비밀값 자리 — 등록돼 있으면 `등록됨` 과 `변경`(선택 입력이면 `삭제` 도). 바꾸려면 새 값을 받는다(REQ-003) */
+function chSecret(id,label,set,opt,ph){
+  const key=id.slice(2).toLowerCase();
+  if(CD.edit && set && !CD['ed_'+key])
+    return '<div class="credbox"><span class="stbadge ok">등록됨</span><span class="credact">'
+      + '<button class="btn ghost sm" onclick="chKeep();CD.ed_'+key+'=true;chDraw()">변경</button>'
+      + (opt? '<button class="btn danger-line sm" onclick="chKeep();CD.del_'+key+'=true;CD.'+key+'Set=false;chDraw();chDirty()">삭제</button>' : '')
+      + '</span></div>';
+  return '<input class="inp" type="password" id="'+id+'" value="'+esc(CD[key]||'')+'"'+(ph?' placeholder="'+ph+'"':'')+' oninput="chDirty()">';
+}
+function chDraw(){
+  const t=CD.type, mailOff = t==='이메일' && !EXT.mail.host;
+  let h='<div class="fld"><label>채널명<span class="req">*</span></label>'
+   + '<input class="inp" id="chName" value="'+esc(CD.n)+'" placeholder="예) MLOps Core Slack" onblur="chBlur(\'n\')">'
+   + '<div class="errmsg" id="chNameErr"></div></div>'
+   + '<div class="fld" style="margin-top:16px"><label>유형<span class="req">*</span></label>'
+   /* 수정에서는 유형을 바꾸지 않는다. 다른 채널이 된다 */
+   + (CD.edit
+      ? '<input class="inp" id="chType" value="'+t+'" disabled>'
+      : '<select class="inp" id="chType" onchange="chKeep();chDraw()">'
+        + ['Slack','이메일','웹훅'].map(function(o){ return '<option'+(t===o?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>')
+   /* 메일 서버가 없으면 이 자리에서 막는다. 조치는 같은 화면의 메일 서버 탭이다(기획서 5.2) */
+   /* 입력 오류가 아니라 선행 조건이라 에러 색을 쓰지 않는다. 발급자 주소 변경 제한 · 연결 해제 차단의 사유 안내와 같은 힌트 자리다 */
+   + (mailOff? '<div class="hint">메일 서버가 설정되지 않아 이메일 채널을 등록할 수 없습니다. 메일 서버 탭에서 먼저 설정해 주세요.</div>' : '')
+   + '</div>';
+  if(t!=='이메일'){
+    h+='<div class="fld" style="margin-top:16px"><label>주소<span class="req">*</span></label>'
+     + (CD.edit && !CD.ed_url
+        ? chSecret('chUrl','주소',true,false)
+        : '<input class="inp" id="chUrl" value="'+esc(CD.edit? '' : CD.url)+'" placeholder="https://" onblur="chBlur(\'url\')" oninput="chDirty()">')
+     + '<div class="errmsg" id="chUrlErr"></div></div>';
+  }
+  if(t==='웹훅'){
+    /* 받는 쪽이 요청을 확인하거나 인증을 요구할 때만 쓴다. 비워도 등록된다. 저장한 뒤 다시 볼 수 없다 */
+    h+='<div class="fsec"><h4>인증 (선택)</h4>'
+     + '<div class="fld"><label>서명 키</label>'
+     + chSecret('chSk','서명 키',CD.skSet,true)
+     + '<div class="hint">받는 쪽에서 요청이 이 플랫폼에서 왔는지 확인할 때 씁니다.</div></div>'
+     + '<div class="fgrid" style="margin-top:12px">'
+     + '<div class="fld"><label>인증 헤더 이름</label><input class="inp" id="chHn" value="'+esc(CD.hn)+'" oninput="chDirty()"></div>'
+     + '<div class="fld"><label>인증 헤더 값</label>'+chSecret('chHv','인증 헤더 값',CD.hvSet,true)
+     + '<div class="hint">비워 두면 헤더를 보내지 않습니다.</div></div>'
+     + '</div></div>';
+  }
+  if(t==='이메일'){
+    /* 주소를 받지 않는다. 계정에 등록된 이메일로 보낸다(알림 정책 6.1).
+       전역 채널은 최고 관리자에게 보내 고를 것이 없다 */
+    h+='<div class="fsec"><h4>수신 대상</h4>'
+     + (CD.global
+        ? '<p class="segnote" style="margin-top:0">최고 관리자에게 보냅니다.</p>'
+        : '<div class="fgrid">'
+          + ['관리자만','전체 멤버'].map(function(o){
+              return '<label class="optcard'+(CD.rcpt===o?' on':'')+'"><input type="radio" name="chRcpt" value="'+o+'"'+(CD.rcpt===o?' checked':'')
+               + ' onchange="chKeep();chDraw();chDirty()"><div><div class="oc-t">'+o+'</div><div class="oc-d">'
+               + (o==='관리자만'? '이 워크스페이스의 관리자에게 보냅니다.' : '멤버마다 받는 알림만 보냅니다.')+'</div></div></label>';
+            }).join('')
+          + '</div>')
+     + '<p class="segnote">계정에 등록된 이메일로 보냅니다. 테스트 메일은 실행한 관리자 본인 이메일로 1통 보냅니다.</p></div>';
+  }
+  /* 이 심각도보다 낮은 알림은 이 채널로 보내지 않는다(알림 정책 6.2) */
+  h+='<div class="fld" style="margin-top:16px"><label>최소 심각도<span class="req">*</span></label>'
+   + '<select class="inp" id="chMin" onchange="chKeep();chDirty()">'
+   + ['모두','주의 이상','오류만'].map(function(o){ return '<option'+(CD.min===o?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>'
+   + '<div class="hint">이보다 낮은 심각도의 알림은 이 채널로 보내지 않습니다.</div></div>';
+  /* 수정에서는 범위를 바꾸지 않는다. 바꾸면 그 채널을 지정한 규칙이 알림을 보내는 곳이 달라진다 */
+  if(CD.edit){
+    h+='<div class="fsec"><h4>범위</h4><p class="segnote" style="margin-top:0">'
+     + (CD.global? '전역 채널' : esc(CD.ws)+' 워크스페이스 채널')+'입니다. 범위는 바꿀 수 없습니다.</p></div>';
+    $('chBody').innerHTML=h;
+    $('chTitle').textContent='알림 채널 수정'; $('chOk').textContent='저장';
+    chDirty(); return;
+  }
+  $('chTitle').textContent='알림 채널 등록'; $('chOk').textContent='등록';
+  /* 전역이면 모든 워크스페이스가 쓴다. 아니면 어느 워크스페이스 채널인지 고른다 */
+  h+='<div class="fsec"><h4>범위</h4>'
+   + '<label class="chk"><input type="checkbox" id="chGlobal"'+(CD.global?' checked':'')+' onchange="chKeep();chDraw()"><span class="cbx"></span>'
+   + '<span class="cbt">전역 채널로 설정</span></label>'
+   + '<p class="segnote">전역으로 두면 모든 워크스페이스가 이 채널을 사용합니다. 끄면 고른 워크스페이스에서만 사용합니다.</p>'
+   + (CD.global? '' : '<div class="fld" style="margin-top:12px"><label>워크스페이스<span class="req">*</span></label>'
+       + '<select class="inp" id="chWs" onchange="chKeep();chBlur(\'ws\')"><option value="">워크스페이스를 선택해 주세요.</option>'
+       + WSLIST.map(function(w){ return '<option'+(CD.ws===w?' selected':'')+'>'+w+'</option>'; }).join('')+'</select>'
+       + '<div class="errmsg" id="chWsErr"></div></div>')
+   + '</div>';
+  $('chBody').innerHTML=h;
+  $('chOk').disabled = mailOff;
+}
+function chMsg(k){
+  if(k==='n') return chField('chName')? '' : '채널명을 입력해 주세요.';
+  if(k==='url'){ if(CD.edit && !$('chUrl')) return ''; return /^https?:\/\/[^\s/]+\.[^\s]+$/.test(chField('chUrl'))? '' : '올바른 주소 형식이 아닙니다.'; }
+  if(k==='ws') return chField('chWs')? '' : '워크스페이스를 선택해 주세요.';
+  return '';
+}
+function chBlur(k){ ssoShow({n:'chNameErr',url:'chUrlErr',ws:'chWsErr'}[k], chMsg(k)||null); }
+function chSubmit(){
+  chKeep();
+  const keys=['n'].concat(CD.type!=='이메일'?['url']:[]).concat(CD.global||CD.edit?[]:['ws']);
+  const bad=keys.filter(function(k){ const m=chMsg(k); chBlur(k); return !!m; });
+  if(bad.length){ $({n:'chName',url:'chUrl',ws:'chWs'}[bad[0]]).focus(); return; }
+  if(CD.edit){
+    const c=CHANS[CD.i];
+    /* 주소를 바꾸면 이전 발송 결과가 새 주소의 것이 아니라 미확인으로 되돌린다 */
+    if(CD.ed_url && chField('chUrl')){ c.url=chField('chUrl'); c.st='미확인'; }
+    c.n=CD.n; c.min=CD.min; if(c.type==='이메일') c.rcpt=CD.rcpt;
+    if(c.type==='웹훅'){ c.sk=CD.skSet || !!CD.sk; c.hv=CD.hvSet || !!CD.hv; }
+    /* 알림 규칙 연결은 그대로다. 지웠다 다시 만들 때와 달리 규칙이 중지되지 않는다 */
+    closeCh(); drawChans(); act('알림 채널 설정을 저장했습니다.');
+    return;
+  }
+  CHANS.unshift({n:CD.n, type:CD.type, global:CD.global, ws:CD.global? '' : CD.ws,
+    url:CD.type==='이메일'? '' : CD.url, rcpt:CD.type==='이메일'? CD.rcpt : '', min:CD.min,
+    sk:!!CD.sk, hv:!!CD.hv, st:'미확인', sent:'', at:nowStr()});
+  closeCh(); drawChans(); act('알림 채널을 등록했습니다.');
+}
+/* 수정은 바뀐 것이 있어야 저장할 수 있다(공통정책 7.1) */
+function chDirty(){
+  if(!CD.edit) return;
+  chKeep();
+  const o=CD.orig;
+  const changed = CD.n!==o.n || CD.min!==o.min || (CD.type==='이메일' && CD.rcpt!==o.rcpt)
+    || (CD.ed_url && !!chField('chUrl')) || (CD.type==='웹훅' && (CD.hn!==o.hn || !!CD.sk || !!CD.hv || !!CD.del_sk || !!CD.del_hv));
+  $('chOk').disabled=!changed;
+}
+function openCh(i){
+  if(typeof i==='number'){
+    const c=CHANS[i];
+    CD={edit:true, i:i, n:c.n, type:c.type, url:'', global:c.global, ws:c.ws||'', rcpt:c.rcpt||'관리자만',
+        min:c.min||'모두', hn:'Authorization', sk:'', hv:'', skSet:!!c.sk, hvSet:!!c.hv};
+    CD.orig={n:CD.n, min:CD.min, rcpt:CD.rcpt, hn:CD.hn};
+    document.querySelectorAll('.rowmenu').forEach(function(m){ m.parentNode.classList.remove('on'); });
+  } else {
+    CD={n:'', type:'Slack', url:'', global:false, ws:'', rcpt:'관리자만', min:'모두', hn:'Authorization', sk:'', hv:''};
+  }
+  chDraw();
+  $('mdCh').classList.add('on');
+}
 function closeCh(){ $('mdCh').classList.remove('on'); }
 
 /* ══════════ 외부 연동 ══════════ */
@@ -3620,6 +3810,8 @@ let eTab=0;
 const ETABS=[['스토리지','모델 가중치와 실험 산출물을 저장합니다. 모델을 등록할 때 여기서 파일을 읽습니다.'],
              ['모델 저장소','모델 산출물과 서빙 엔진 이미지를 저장합니다. 배포할 때 여기서 이미지를 받습니다.'],
              ['단일 로그인','기업 계정으로 로그인하도록 연결합니다. 연결하면 계정을 따로 만들지 않아도 됩니다.'],
+             /* 알림 채널보다 앞에 둔다. 이메일 채널은 메일 서버가 있어야 등록할 수 있다(기획서 1장) */
+             ['메일 서버','이메일 알림을 보낼 메일 서버를 연결합니다. 이메일 채널은 이 서버로 보냅니다.'],
              ['알림 채널','플랫폼에서 발생한 일을 보낼 채널을 관리합니다.']];
 function setETab(i){ eTab=i; drawExt(); }
 
@@ -3636,7 +3828,7 @@ function drawExt(){
   $('extTabAct').innerHTML = '';
   $('extAct').innerHTML = '';
   $('extBody').innerHTML = eTab===0? extStorage() : eTab===1? extModel()
-                        : eTab===2? ssoPane() : notiPane();
+                        : eTab===2? ssoPane() : eTab===3? extMail() : notiPane();
 }
 
 /* 저장한 비밀값은 다시 보여주지 않는다. 바꿀 때만 새로 받는다 */
@@ -3675,7 +3867,7 @@ function secDel(k){
       /* 다시 그려도 입력 중이던 다른 값은 남긴다 */
       const box = k==='sso'? $('ssoForm') : $('extBody');
       const keep = [].map.call(box.querySelectorAll('input.inp:not([type=password])'), function(i){ return i.value; });
-      if(k==='sso'){ SSO.sec=false; drawSsoForm(); } else { EXT.s3.secret=false; drawExt(); }
+      if(k==='sso'){ SSO.sec=false; drawSsoForm(); } else if(k==='mail'){ EXT.mail.secret=false; drawExt(); } else { EXT.s3.secret=false; drawExt(); }
       [].forEach.call(box.querySelectorAll('input.inp:not([type=password])'), function(i,n){ if(keep[n]!==undefined) i.value=keep[n]; });
       if(k==='sso') ssoChk();
       toast('ok','비밀값을 삭제했습니다.');
@@ -3703,7 +3895,10 @@ function secActs(key, title, done){
    /* 수정·취소·저장을 같은 자리에 둔다. 어디를 눌러야 할지 옮겨 다니지 않는다 */
    + (editSec===key
       ? '<button class="btn ghost sm" onclick="tgEdit(\''+key+'\')">취소</button>'
-        + '<button class="btn sm" onclick="tgEdit(\''+key+'\');act(\''+title+' 설정을 저장했습니다.\')">저장</button>'
+        + (key==='mail'
+           /* 메일 서버는 포트 · 발신자 주소 형식을 저장할 때 검증한다(기획서 7.7 · 공통정책 7.8) */
+           ? '<button class="btn sm" onclick="mailSave()">저장</button>'
+           : '<button class="btn sm" onclick="tgEdit(\''+key+'\');act(\''+title+' 설정을 저장했습니다.\')">저장</button>')
       /* 설정 전에는 확인할 값이 없다. 결과는 토스트가 아니라 폼 위 알림으로 남긴다 —
          실패 사유를 읽고 값을 고쳐야 하는데 토스트는 사라진다 */
       : '<button class="btn ghost sm"'+(done?'':' disabled title="먼저 값을 입력해 주세요."')
@@ -3796,6 +3991,84 @@ function extStorage(){
            + '<h3>이 설치에서는 전역 저장소를 사용하지 않습니다.</h3>'
            + '<p>S3 소스로 모델을 등록할 수 없습니다. Hugging Face 등록과 빌드된 모델 서빙은 그대로 사용할 수 있습니다.</p></div>'))
    + '</div>';
+}
+
+/* 메일 서버 — 이메일 알림을 보내는 서버(기획서 7.7 · CON-961).
+   다른 연결 탭과 같은 규격이다. 카드 안에서 수정하고 연결 확인 결과는 폼 위 알림으로 남긴다 */
+function extMail(){
+  const on = editSec==='mail', m=EXT.mail;
+  const opt=function(v){ return '<option'+(m.sec===v?' selected':'')+'>'+v+'</option>'; };
+  return connBox('mail')
+   + '<div class="ssec"><div class="ssechd"><div><h4>메일 서버 (SMTP)</h4></div>'
+   +   (m.host || on? '<div class="secbtns">'+secActs('mail','메일 서버', !!m.host)+'</div>' : '')
+   + '</div>'
+   + (on
+      ? '<div class="fgrid">'
+        + '<div class="fld"><label>서버<span class="req">*</span></label>'
+        +   '<input class="inp" id="mlHost" value="'+esc(m.host)+'" placeholder="smtp.example.com" onblur="mailBlur(\'host\')">'
+        +   '<div class="errmsg" id="mlHostErr"></div></div>'
+        + '<div class="fld"><label>포트<span class="req">*</span></label>'
+        +   '<input class="inp" id="mlPort" value="'+esc(m.port)+'" inputmode="numeric" onblur="mailBlur(\'port\')">'
+        +   '<div class="errmsg" id="mlPortErr"></div></div>'
+        + '</div>'
+        + '<div class="fgrid" style="margin-top:16px">'
+        /* 포트와 짝이 맞지 않으면 연결 확인이 실패한다. 465 · 587은 메일 표준(RFC 8314 · 6409)의 기본 포트다 */
+        + '<div class="fld"><label>전송 보안<span class="req">*</span>'+'<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">SSL은 보통 465, STARTTLS는 587 포트를 씁니다. 메일 서버 관리자에게 받은 값을 고릅니다.</span></span>'+'</label>'
+        +   '<select class="inp" id="mlSec">'+opt('SSL')+opt('STARTTLS')+opt('사용 안 함')+'</select></div>'
+        + '<div class="fld"><label>발신자 주소<span class="req">*</span></label>'
+        +   '<input class="inp" id="mlFrom" value="'+esc(m.from)+'" placeholder="noreply@example.com" onblur="mailBlur(\'from\')">'
+        +   '<div class="errmsg" id="mlFromErr"></div>'
+        +   '<div class="hint">알림 메일의 보낸 사람으로 표시되는 주소입니다.</div></div>'
+        + '</div>'
+        + '<div class="fgrid" style="margin-top:16px">'
+        /* 계정 · 비밀번호는 선택이다. 인증 없이 받는 사내 메일 서버가 있다 */
+        + '<div class="fld"><label>계정</label>'
+        +   '<input class="inp" id="mlUser" value="'+esc(m.user)+'">'
+        +   '<div class="hint">인증이 없는 메일 서버면 비워 둡니다.</div></div>'
+        +   secretField('비밀번호', m.secret, '', '', '', 'mail')
+        + '</div>'
+      : (m.host
+         ? dl([['서버', m.host],
+               ['포트', m.port],
+               ['전송 보안', m.sec],
+               ['계정', m.user || '<span class="dash">-</span>'],
+               ['비밀번호', secretRead(m.secret)],
+               ['발신자 주소', m.from]])
+         : '<div class="state">'
+           + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'
+           +   '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>'
+           + '<h3>메일 서버가 설정되지 않았습니다.</h3>'
+           + '<p>설정하면 이메일 알림을 보낼 수 있습니다.</p>'
+           + '<button class="btn" onclick="tgEdit(\'mail\')">메일 서버 연결</button></div>'))
+   + '</div>';
+}
+const ML_ID={host:'mlHost',port:'mlPort',from:'mlFrom'};
+function mailMsg(k){
+  const v=(($(ML_ID[k])||{}).value||'').trim();
+  /* 서버는 필수다. 비우고 저장하면 인라인 에러(공통정책 7.8) */
+  if(k==='host') return v? '' : '서버를 입력해 주세요.';
+  if(k==='port') return (/^\d+$/.test(v) && +v>=1 && +v<=65535)? '' : '1~65535 사이의 숫자를 입력해 주세요.';
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)? '' : '올바른 이메일 형식이 아닙니다.';
+}
+function mailBlur(k){ ssoShow(ML_ID[k]+'Err', mailMsg(k)||null); }
+function mailSave(){
+  /* 화면 순서상 첫 오류 칸으로 포커스한다 — 서버 → 포트 → 발신자 주소(공통정책 7.8) */
+  const bad=['host','port','from'].filter(function(k){ const m=mailMsg(k); ssoShow(ML_ID[k]+'Err', m||null); return !!m; });
+  if(bad.length){ $(ML_ID[bad[0]]).focus(); return; }
+  EXT.mail.host=$('mlHost').value.trim(); EXT.mail.port=$('mlPort').value.trim();
+  EXT.mail.sec=$('mlSec').value; EXT.mail.from=$('mlFrom').value.trim(); EXT.mail.user=$('mlUser').value.trim();
+  const pw=document.querySelector('#extBody input[type=password]');
+  if(pw && pw.value) EXT.mail.secret=true;
+  editSec=''; drawExt(); act('메일 서버 설정을 저장했습니다.');
+}
+/* 데모 — 메일 서버 설정 여부. 실제 화면에는 없는 검토용 처리다 */
+function setMail(v,btn){
+  document.querySelectorAll('#demoBar .ml').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  EXT.mail = v? { host:'smtp.okestro.com', port:'587', sec:'STARTTLS', user:'concerto-noti', secret:true, from:'concerto@okestro.com' }
+              : { host:'', port:'', sec:'STARTTLS', user:'', secret:false, from:'' };
+  /* 앞서 본 연결 확인 결과는 다른 설정의 것이라 지운다 */
+  delete connRes.mail; editSec=''; eTab=3; drawExt();
 }
 
 function extModel(){
