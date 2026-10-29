@@ -4,6 +4,9 @@
 
   ── v0.19 변경 (2026-10-27) ─────────────────────
   SET-AUDIT-L01 v0.19 와 같은 버전이다. 근거는 감사로그 정책 v0.19 3.3 WORKSPACE · SYSTEM.
+  · 10-28 보완(10-28 목업 묶음과 함께 커밋 — 기획서 변경 없음). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다).
+    연결 확인 비활성 사유를 title 대신 라이브러리 v0.25 사유 툴팁(.dis-tip)으로(공통정책 7.10). 단일 로그인 탭 설명을 `계정을 따로 등록하지 않아도` 로,
+    연결 탭 복사본의 `산출물` 을 `실험 결과` · `모델` 로(연동 및 알림 목업 v0.19 와 같게).
   · 작업값에 운영룸 다시 생성과 알림 채널 수정을 더했다. 정책 v0.19 에서 기록 대상에 넣었고 라벨이 없으면 원시값으로 나올 자리다(REQ-SET-AUDIT-009).
     운영룸 다시 생성 키 ROOM_REISSUE 는 구현 값이다(room_reissue). 알림 채널 수정 키는 가안이다. 지금 구현은 채널 수정을 기록하지 않는다.
   · 데모 기록을 더했다. 운영룸 다시 생성(워크스페이스 갈래, 다시 연결한 배포 수), 알림 채널 수정(시스템 갈래, 바뀐 항목 전후).
@@ -2033,6 +2036,20 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 /* 비활성 사유 툴팁 — 라이브러리 .tip 과 같은 값(목업 공통 처리) */
 .distip{position:fixed;z-index:200;display:none;background:var(--flyout);color:var(--foreground);border:1px solid var(--border-strong);font-size:12px;font-weight:400;line-height:1.5;padding:8px 11px;border-radius:7px;box-shadow:0 6px 18px var(--shadow);max-width:340px;white-space:normal;text-align:left;pointer-events:none}
 
+/* 비활성 사유 툴팁 — 컴포넌트 라이브러리 v0.25 .dis-tip 그대로(공통정책 4.7 · 7.10).
+   비활성 버튼은 호버 · 포커스를 받지 않아 감싼 요소를 앵커로 두고 tabindex="0" 을 준다. title 은 쓰지 않는다 */
+.tip-anchor.dis-tip{margin-left:0;cursor:not-allowed;border-radius:8px}
+.dis-tip:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
+.dis-tip > :disabled{pointer-events:none}
+.dis-tip .tip{white-space:normal;width:max-content;max-width:280px;left:0;transform:translateY(4px)}
+.dis-tip:hover .tip,.dis-tip:focus-within .tip{transform:translateY(0)}
+.dis-tip .tip::after{left:14px;transform:none}
+/* 오른쪽 끝 버튼은 툴팁이 화면 밖으로 나가지 않게 오른쪽 기준으로 연다(라이브러리 v0.25 .dis-tip.flip) */
+.dis-tip.flip .tip{left:auto;right:0}
+.dis-tip.flip .tip::after{left:auto;right:14px}
+/* 행 더보기 메뉴 안에서는 감싼 요소가 줄 전체를 차지한다 — 메뉴 항목 폭이 그대로다 */
+.rowmenu .tip-anchor.dis-tip{display:flex}
+.rowmenu .tip-anchor.dis-tip > button{flex:1}
 </style><body class="dark">
 <div class="app">
 
@@ -2270,6 +2287,23 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 </div>
 
 <script>
+/* 비활성 사유 툴팁(라이브러리 v0.25 .dis-tip). 사유 문구는 HTML 로 넣지 않는다 */
+function disTipEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function disTipIf(inner, why){ return why? disTip(inner, why) : inner; }
+function disTip(inner, why){ return '<span class="tip-anchor dis-tip" tabindex="0">'+inner+'<span class="tip">'+disTipEsc(why)+'</span></span>'; }
+function disTipFit(e){
+  const a=e.target && e.target.closest && e.target.closest('.dis-tip'); if(!a) return;
+  const t=a.querySelector('.tip'); if(!t) return;
+  a.classList.remove('flip'); t.style.left=''; t.style.right='';
+  const r=a.getBoundingClientRect(), w=Math.min(280,t.scrollWidth), vw=window.innerWidth;
+  if(r.left+w+8<=vw) return;
+  /* 화면별 툴팁 위치 규칙이 left 를 덮어쓰는 자리가 있어 인라인으로 둔다 */
+  if(r.right-w>=8){ a.classList.add('flip'); t.style.left='auto'; t.style.right='0'; return; }
+  /* 양쪽 다 모자라면(좁은 화면) 화면 안 8px 여백에 맞춘다 */
+  t.style.left=Math.max(8-r.left, vw-8-w-r.left)+'px';
+}
+document.addEventListener('focusin', disTipFit, true);
+document.addEventListener('mouseover', disTipFit, true);
 
 /* ══════════ 데이터 ══════════
    현행 화면 명세 6장 관측값을 옮긴다. 값은 데모용이고 구조가 근거다 */
@@ -2500,7 +2534,7 @@ const AUDIT=[
    ⚠ 값이 평균인지 직전 건인지, 임계값이 무엇인지 미정 — 확인 요청 항목 14번 */
 const COMPS=[
   {n:'Harbor', role:'모델·엔진 이미지 저장', st:'정상', v:'v2.9.1', ms:42},
-  {n:'MinIO', role:'모델 가중치·산출물 저장', st:'정상', v:'RELEASE.2026-05', ms:18},
+  {n:'MinIO', role:'모델 가중치·실험 결과 저장', st:'정상', v:'RELEASE.2026-05', ms:18},
   {n:'Tempo', role:'추론 트레이스 수집', st:'주의', v:'v2.4.0', ms:12400},
   {n:'Prometheus', role:'지표 수집', st:'정상', v:'v2.51.0', ms:8},
   {n:'Loki', role:'로그 수집', st:'정상', v:'v3.0.0', ms:25},
@@ -2665,7 +2699,7 @@ function errBox(){
    +   '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>'
    + '<h3>데이터를 불러오지 못했습니다.</h3>'
    + '<p>잠시 후 다시 시도해 주세요.</p>'
-   + '<button class="btn ghost" onclick="setState(\'default\',null);document.querySelectorAll(\'#demoBar .st\')[0].classList.add(\'on\')">다시 시도</button></div>';
+   + '<button class="btn ghost" onclick="setState(\'default\',null);document.querySelectorAll(\'#demoBar .st\')[0].classList.add(\'on\')">재시도</button></div>';
 }
 
 function render(){
@@ -3576,9 +3610,9 @@ let eTab=0;
    기술명은 라벨에 괄호로 둔다 — 연결할 대상을 알아야 값을 넣을 수 있다 */
 /* 탭은 단어 하나로 둔다(문구 스킬 6.1). `S3` · `Harbor` 는 제품명이라 라벨에 두지 않고
    폼 안에서 확인한다(문구 스킬 3 — 시스템 명칭 노출 금지) */
-const ETABS=[['스토리지','모델 가중치와 실험 산출물을 저장합니다. 모델을 등록할 때 여기서 파일을 읽습니다.'],
-             ['모델 저장소','모델 산출물과 서빙 엔진 이미지를 저장합니다. 배포할 때 여기서 이미지를 받습니다.'],
-             ['단일 로그인','기업 계정으로 로그인하도록 연결합니다. 연결하면 계정을 따로 만들지 않아도 됩니다.'],
+const ETABS=[['스토리지','모델 가중치와 실험 결과를 저장합니다. 모델을 등록할 때 여기서 파일을 읽습니다.'],
+             ['모델 저장소','모델과 서빙 엔진 이미지를 저장합니다. 배포할 때 여기서 이미지를 받습니다.'],
+             ['단일 로그인','기업 계정으로 로그인하도록 연결합니다. 연결하면 계정을 따로 등록하지 않아도 됩니다.'],
              ['알림 채널','플랫폼에서 발생한 일을 보낼 채널을 관리합니다.']];
 function setETab(i){ eTab=i; drawExt(); }
 
@@ -3626,8 +3660,9 @@ function secActs(key, title, done){
         + '<button class="btn sm" onclick="tgEdit(\''+key+'\');act(\''+title+' 설정을 저장했습니다.\')">저장</button>'
       /* 설정 전에는 확인할 값이 없다. 결과는 토스트가 아니라 폼 위 알림으로 남긴다 —
          실패 사유를 읽고 값을 고쳐야 하는데 토스트는 사라진다 */
-      : '<button class="btn ghost sm"'+(done?'':' disabled title="먼저 값을 입력해 주세요."')
-        + ' onclick="testConn(\''+key+'\')">연결 확인</button>'
+      /* 비활성 사유는 title 대신 사유 툴팁이다(라이브러리 v0.25 .dis-tip · 공통정책 7.10) — 연동 및 알림 목업과 같다 */
+      : disTipIf('<button class="btn ghost sm"'+(done?'':' disabled')
+        + ' onclick="testConn(\''+key+'\')">연결 확인</button>', done?'':'먼저 값을 입력해 주세요.')
         + '<button class="btn ghost sm" onclick="tgEdit(\''+key+'\')">수정</button>');
 }
 /* 연결 확인 결과 — 성공·실패를 폼 위에 남긴다. 데모는 번갈아 보인다 */
@@ -3680,7 +3715,7 @@ function extStorage(){
            + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'
            +   '<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>'
            + '<h3>연결된 스토리지가 없습니다.</h3>'
-           + '<p>모델 가중치와 실험 산출물을 저장할 스토리지를 연결해 주세요.</p>'
+           + '<p>모델 가중치와 실험 결과를 저장할 스토리지를 연결해 주세요.</p>'
            + '<button class="btn" onclick="tgEdit(\'s3\')">스토리지 연결</button></div>'))
    + '</div>';
 }
@@ -3719,7 +3754,7 @@ function extModel(){
            + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'
            +   '<rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V5a2 2 0 012-2h6a2 2 0 012 2v3"/></svg>'
            + '<h3>연결된 모델 저장소가 없습니다.</h3>'
-           + '<p>모델 산출물과 서빙 엔진 이미지를 저장할 레지스트리를 연결해 주세요.</p>'
+           + '<p>모델과 서빙 엔진 이미지를 저장할 레지스트리를 연결해 주세요.</p>'
            + '<button class="btn" onclick="tgEdit(\'harbor\')">모델 저장소 연결</button></div>'))
    /* 여기서 정한 값이 배포에서 어떻게 쓰이는지 보여준다 */
    + (EXT.harbor.url
