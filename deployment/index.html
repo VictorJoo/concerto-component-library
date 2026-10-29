@@ -1,8 +1,69 @@
 <!--
-  콘체르토 매니저 · 배포 화면 목업 v0.39 (2026-10-27)
+  콘체르토 매니저 · 배포 화면 목업 v0.40 (2026-10-28)
   색·컴포넌트 규격은 워크스페이스 목업 v0.33 를 그대로 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
 
   ── 변경 ────────────────────────────────────────
+  ── v0.40 (2026-10-28) ──
+  · 동작 확인 API Key(댓글 3510272146(2026-10-28) ① · 배포 정책 6장 · DEP-L01 5.1 · 5.3 · 6장 · 7.8 · REQ-DEP-096).
+    API Key 인증을 켠 자체 배포에만 `API Key` 칸(가림 표시)을 둔다. 플레이스홀더 `API Key를 입력해 주세요.`, 힌트 `입력한 키는 저장하지 않습니다.`
+    비우고 보내면 칸 아래 인라인 에러 `API Key를 입력해 주세요.` 와 칸 포커스(공통정책 7.8). 보내기는 요청 칸만 보고 켜 둔다(공통정책 7.1).
+    게이트웨이가 키를 거절하면 응답 자리에 `API Key가 올바르지 않거나 이 배포를 호출할 수 없는 키입니다. 키를 확인해 주세요.`
+    키는 상세를 다시 열면 비운다 — 저장하지 않는다. 인증을 끈 배포 · 외부 배포는 칸이 없다.
+    동작 확인은 운영룸 게이트웨이를 거치고 프리필·디코드 분리 배포도 보낼 수 있다(배포 정책 6장 「경로」, 백엔드 10-28 045531dc).
+    데모 바 `v0.40 동작 확인: 키 거절` 은 다음 보내기 한 번을 거절로 돌려준다. 실제 화면에는 없는 검토용 처리다.
+  · 삭제 확정 지연 · 강제 삭제(댓글 3510272146(2026-10-28) ② ③ · 배포 정책 2.5 · 2.7 · 3.2 · 3.3 · 9장 · DEP-L01 5.1 · 5.2 · 5.3 · REQ-DEP-097~099).
+    종료 알럿을 확인하면 행이 `삭제 중` 으로 남는다(종료 토스트는 종전 접수형 그대로). 자원 정리가 확인되면 목록에서 사라진다 — 목업은 사라지는 시점을 두지 않는다.
+    자원 정리가 30분 넘게 지연된 삭제 중 배포(검토용 샘플 gemma-4-12b-it-old)는 상태 배지 도움말 · 패널 안내 · 상세 안내에 사유를 둔다.
+    최고 관리자 · WS 관리자에게는 `자원 정리가 늦어지고 있습니다. 관리자가 강제 삭제할 수 있습니다.`, 그 밖에는 `자원 정리가 늦어지고 있습니다. 관리자에게 문의해 주세요.`
+    강제 삭제는 지연 사유가 붙은 행에만, 최고 관리자 · WS 관리자에게만 행 메뉴(구분선 아래, 위험 항목)와 상세 액션(.btn.danger-line)으로 둔다.
+    편집자 · 뷰어 · 지연 사유가 없는 삭제 중에는 두지 않는다(공통정책 7.10 — 비활성이 아니라 미노출).
+    확인 알럿 제목 `{배포} 강제 삭제`, 배포명 재입력 뒤에만 최종 `강제 삭제`(.btn.danger)가 켜진다(공통정책 7.5). 실행하면 `{배포}을(를) 강제 삭제했습니다.` 와 함께 목록에서 지운다.
+    생성 03 게이트웨이에서 삭제 중인 배포와 같은 이름으로 중복 확인하면 배포명 칸 인라인 에러
+    `같은 이름의 배포를 삭제하는 중입니다. 삭제가 끝난 뒤 다시 만들거나 다른 이름을 입력해 주세요.` 와 포커스, 04 검수 배포 전 검사도 같은 문구로 ✕.
+    샘플 행 · 30분 판정은 검토용 값이다. 30분은 지금 백엔드 값이며 실측 뒤 바뀔 수 있다.
+  · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다). 벤치마크 결과 모달의 조회 오류도 같다.
+  · KServe 범용 준비 상태 확인이 누를 때마다 준비됨 · 준비 안 됨을 번갈아 보인다(DEP-L01 6장 결과 둘). 데모 바 외부 배포에 `기타` 를 더했다.
+  · 설정 변경 모달 부제를 `{배포}의 설정을 수정합니다.` 로 — 구간(용량 · 엔진 설정 · 수집 · 병렬 처리 · 접근 설정)에 묶이지 않게.
+  · 10-28 재검증 정정(2차). 운영룸 배정 가속기 0장 안내 · 사유의 `배분된` 을 `배정된` 으로(운영룸 배정 — 워크스페이스 정책 5장).
+    이 문구와 외부 배포 가져오기 미선택 문구 `가져올 워크로드를 선택해 주세요.` 를 DEP-L01 5.3 에 올렸다. .dis-tip.flip 은 라이브러리 v0.25 에 들어가 주석을 고쳤다.
+  · 10-28 검증 정정(문구 검수 · 용어).
+    · 비활성 사유를 브라우저 title 대신 라이브러리 v0.25 .dis-tip(감싼 요소 앵커 · tabindex · 포커스로 열림)으로 —
+      Grafana 열기 · 행 더보기 메뉴 · 상세 헤더 액션 · 벤치마크 실행 · 배포 생성 · 마법사 배포 버튼 · 가져오기 선택 체크박스(공통정책 4.7 · 7.10).
+    · `헬스` 를 `건전성` 으로(모니터링 탭 카드 · 상세 스펙 라벨과 도움말, 용어집 4장 · 배포 정책 3.4 · DEP-L01 같이 고침).
+    · 외부 배포 유형 도움말 · 가져오기 안내를 `조회 · 동작 확인 · 등록 해제만 제공합니다.` 로 통일(DEP-L01 3장 · 5.1).
+    · 패널 생성 실패 안내를 `{사유} 설정 변경과 다시 시도는 상세 화면에서 합니다.` 로 — 패널은 조회 전용이다(DEP-L01 5.3 같이 고침).
+    · 가속기 잔여 표기에 종류 이름을 붙였다(`{가속기} 잔여 N장`). 운영룸 배정은 종류별이다(워크스페이스 정책 5.4).
+      표본 워크스페이스는 배정이 한 종류라 합계가 곧 그 종류의 잔여다.
+    · 엔드포인트 빈 값을 `기동하면 표시됩니다.` 로(발급은 API Key · 임시 비밀번호에만 쓴다, 용어집 7장).
+    · 가속기 메모리 사용률 hint 범위 표기를 에러 문구와 같은 `0.1~1.0` 으로.
+    · 벤치마크 전용 저장소 실패 · 결과 내려받기 실패의 `관리자에게 문의` 를 역할별로 — 전용 저장소를 설정하는 역할에게는 연동 탭 확인,
+      그 밖에는 워크스페이스 관리자(공용은 최고 관리자) 문의(워크스페이스 정책 2.4 · 6.1 · DEP-L01 5.3 같이 고침).
+        · 외부 배포 가져오기 `가져오기` 를 선택 여부와 무관하게 활성으로 둔다(공통정책 7.1). 고른 워크로드 없이 누르면
+          하단의 `가져올 워크로드를 선택해 주세요.` 를 인라인 에러로 바꿔 보이고 첫 연결할 모델 선택으로 포커스한다(7.8).
+          배포 생성 마법사의 `배포` 는 검수 결과에 막힘이 있으면 비활성인 종전 처리를 그대로 둔다(공통정책 7.1 마법사 ·
+          배포 정책 2.3 · REQ-DEP-079). 설정 변경 `저장` 은 종전부터 변경이 없을 때만 비활성이다.
+          동작 확인 `보내기` 는 폼 제출이 아니라 입력란 하나의 전송이라 그대로 둔다.
+        · 외부 배포 엔진 종류(LLM · 임베딩 · OCR · KServe 범용 · 기타)를 두었다(배포 정책 2.2 · DEP-L01 7.5).
+          가져오기 표에 엔진 종류 열을 두고 기본을 LLM으로 둔다. 패널 모델 옆 · 상세 스펙에 엔진 종류를 보인다.
+          외부 배포 상세에 동작 확인을 엔진 종류별로 둔다. LLM은 자체 배포와 같은 요청 · 응답, 임베딩은 차원 수 · 입력 토큰,
+          KServe 범용은 준비 상태 확인, OCR · 기타는 지원하지 않는다는 안내만 둔다(배포 정책 6장 · DEP-L01 6장).
+          확인 불가 · 연결 불가 외부 배포는 상태를 알리고 요청을 막는다. 외부 배포는 호출 예시와 API Key 안내를 두지 않는다(종전과 같다).
+          엔진 종류가 LLM이 아닌 외부 배포는 모니터링 탭에 처리량 · 응답 지연 · 대기 요청 수 · 처리량 추이를 두지 않는다(모니터링 정책 5.3).
+        · 설정 변경 모달에 지표 · 추적 수집을 두었다. 재기동 필요 구간이다(배포 정책 2.6 · DEP-L01 7.7).
+          바꿔 저장하면 재기동 경고 · 접수형 토스트가 나오고, 다시 기동된 배포의 Grafana 열기가 값에 따라 켜지거나 꺼진다.
+        · Grafana 열기 비활성 사유: 설정 변경 권한이 있는 역할(편집자 이상)에게 `설정 변경에서 켤 수 있습니다.` 를 붙인다.
+          뷰어는 상태만 둔다(모니터링 정책 5.4 · DEP-L01 7.6).
+        · 데모 바에 v0.40 확인 버튼(외부 배포 엔진 종류 넷)을 두었다. 실제 화면에는 없는 검토용 처리다.
+        · 도움말 문구 검수(UI 문구 규칙 · 용어집). 외부 배포 유형 도움말의 `등록한 것` 을 `가져온 것` 으로, 삭제 실패 도움말 · 운영룸 미생성 · 생성 실패 비활성 사유에서
+          이 화면에서 할 수 없는 조치 요청을 뺐다.
+        · 서빙 엔진이 Furiosa-LLM인 배포는 고급 설정에 최대 컨텍스트 길이 · 프리픽스 캐싱 · 배치 토큰 수만 둔다
+          (배포 정책 5.3 · DEP-L01 5.1 · 7.3 · 7.7 · REQ-DEP-095). 가속기 메모리 사용률과 그 밖의 엔진 인자,
+          목록 밖 인자 직접 입력을 두지 않는다. 엔진은 모델에 지정된 계열, 없으면 고른 가속기로 정한다(배포 정책 2.3).
+          엔진이 Furiosa-LLM으로 바뀌면 그 전에 넣은 다른 인자 · 직접 입력은 지운다 — 보내도 엔진이 받지 않는다.
+          설정 변경 모달도 같은 배포에서는 가속기 메모리 사용률을 두지 않는다. 생성 마법사에서 Furiosa 모델을 고르면 본다.
+        · 엔진 인자 목록에서 `--swap-space` 를 뺐다. 신형 vLLM에서 없어진 인자다. 4개 그룹 26개 인자다(DEP-L01 7.3).
+        · 등록 해제 확인 알럿에서 `다시 가져오려면 외부 배포 가져오기를 사용해 주세요.` 를 뺐다. 등록 해제는 편집자 이상(배포 정책 9장)이고 가져오기는 최고 관리자만이라 할 수 없는 사람에게 요청하게 된다.
+        · 운영룸 `배분 가능` 표기를 `잔여` 로 고쳤다(용어집 5장 · 배포 정책 4장 · DEP-L01 v0.40). 배분 가능은 워크스페이스 생성 · 할당량 화면에서만 쓴다.
   ── v0.39 (2026-10-27) ──
         · 기획서 DEP-L01 전체 대조로 고쳤다.
           목록: 검색을 모든 항목으로 넓히고(공통정책 3.3), 기본 정렬을 최근 변경일시 내림차순으로 했다(REQ-DEP-006). 일시를 초까지 쓴다(7.1 · 7.4).
@@ -2121,6 +2182,18 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 @keyframes sp{to{transform:rotate(360deg)}}
 .rsmore{border-bottom:1px dotted currentColor;cursor:default;white-space:nowrap}
 .tip-anchor:hover .tip,.tip-anchor:focus-within .tip{display:block}
+
+/* 비활성 사유 툴팁 — 컴포넌트 라이브러리 v0.25 .dis-tip 그대로(공통정책 4.7 · 7.10).
+   비활성 버튼은 호버 · 포커스를 받지 않아 감싼 요소를 앵커로 두고 tabindex="0" 을 준다. title 은 쓰지 않는다 */
+.tip-anchor.dis-tip{margin-left:0;cursor:not-allowed;border-radius:8px}
+.dis-tip:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
+.dis-tip > :disabled{pointer-events:none}
+.dis-tip .tip{white-space:normal;width:max-content;max-width:280px;left:0;transform:translateY(4px)}
+.dis-tip:hover .tip,.dis-tip:focus-within .tip{transform:translateY(0)}
+.dis-tip .tip::after{left:14px;transform:none}
+/* 오른쪽 끝 버튼은 툴팁이 화면 밖으로 나가지 않게 오른쪽 기준으로 연다(라이브러리 v0.25 .dis-tip.flip) */
+.dis-tip.flip .tip{left:auto;right:0}
+.dis-tip.flip .tip::after{left:auto;right:14px}
 </style><body class="dark">
 <div class="app">
 
@@ -2329,11 +2402,37 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <!-- 검토용 처리. 실제 화면에는 없다 -->
   <span class="demo-label" style="margin-left:12px;">v0.39 확인:</span>
   <button onclick="demoGrafanaOff()">Grafana 비활성</button>
+  <span class="demo-label" style="margin-left:12px;">v0.40 외부 배포:</span>
+  <button onclick="demoExtKind('LLM')">LLM</button>
+  <button onclick="demoExtKind('임베딩')">임베딩</button>
+  <button onclick="demoExtKind('KServe 범용')">KServe 범용</button>
+  <button onclick="demoExtKind('OCR')">OCR</button>
+  <button onclick="demoExtKind('기타')">기타</button>
+  <!-- v0.40 · 검토용 처리. 실제 화면에는 없다 -->
+  <span class="demo-label" style="margin-left:12px;">v0.40 동작 확인:</span>
+  <button onclick="demoKeyReject()">키 거절</button>
   <span class="demo-label" style="margin-left:12px;">테마:</span>
   <button onclick="document.body.classList.remove('dark')">라이트</button>
   <button onclick="document.body.classList.add('dark')">다크</button>
 </div>
 <script>
+/* 비활성 사유 툴팁(라이브러리 v0.25 .dis-tip). 사유 문구는 HTML 로 넣지 않는다 */
+function disTipEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function disTip(inner, why){ return '<span class="tip-anchor dis-tip" tabindex="0">'+inner+'<span class="tip">'+disTipEsc(why)+'</span></span>'; }
+function disTipFit(e){
+  const a=e.target && e.target.closest && e.target.closest('.dis-tip'); if(!a) return;
+  const t=a.querySelector('.tip'); if(!t) return;
+  a.classList.remove('flip'); t.style.left=''; t.style.right='';
+  const r=a.getBoundingClientRect(), w=Math.min(280,t.scrollWidth), vw=window.innerWidth;
+  if(r.left+w+8<=vw) return;
+  /* 화면별 툴팁 위치 규칙이 left 를 덮어쓰는 자리가 있어 인라인으로 둔다 */
+  if(r.right-w>=8){ a.classList.add('flip'); t.style.left='auto'; t.style.right='0'; return; }
+  /* 양쪽 다 모자라면(좁은 화면) 화면 안 8px 여백에 맞춘다 */
+  t.style.left=Math.max(8-r.left, vw-8-w-r.left)+'px';
+}
+document.addEventListener('focusin', disTipFit, true);
+document.addEventListener('mouseover', disTipFit, true);
+
 /* ===== 데이터 =====
    상태값은 관측(§4.1 `Ready`)과 워크스페이스 목업의 룸 상태 체계를 준용한 안이다.
    원천값 전수는 미확인이므로 확인 항목으로 남긴다 */
@@ -2399,8 +2498,8 @@ function wsGoBox(msg){
 }
 function prodMsg(ws){
   const st=prodOf(ws);
-  if(st==='미생성') return ws+' 워크스페이스에 운영룸이 없어 배포할 수 없습니다. 워크스페이스에서 운영룸을 만들어 주세요.';
-  if(st==='생성 실패') return ws+' 워크스페이스의 운영룸 생성에 실패했습니다. 워크스페이스에서 다시 시도해 주세요.';
+  if(st==='미생성') return ws+' 워크스페이스에 운영룸이 없어 배포할 수 없습니다.';
+  if(st==='생성 실패') return ws+' 워크스페이스의 운영룸 생성에 실패해 배포할 수 없습니다.';
   return '';
 }
 function gpuTotal(ws){ const w=WSQ[ws]; return w? w.gpu : 0; }
@@ -2466,6 +2565,14 @@ const DEPS=[
   ep:'https://gw.ai-service.concerto.io/v1',
   gw:true, host:'gw.ai-service.concerto.io', tls:true, auth:true, obs:false, keys:[]},
 
+ /* v0.40 · 삭제 지연 샘플(배포 정책 2.7 · DEP-L01 5.3). 종료를 요청했으나 자원 정리가 30분 넘게 확인되지 않은 배포다.
+    상태는 삭제 중 그대로이고 stalled 는 지연 사유가 붙었다는 표시다. 검토용 값이다 */
+ {n:'gemma-4-12b-it-old', ws:'ai-service-team', model:'gemma-4-12b-it', mver:'1.0.0',
+  type:'자체 배포', st:'삭제 중', stalled:true, rep:1, tgt:1, acc:'nvidia-h200-mig', gpu:1, topo:'단일',
+  owner:'성유진(yj.seong)', at:'2026-07-28 10:12:44', upd:'2026-10-28 09:02:15', health:'-',
+  ep:'https://gw.ai-service.concerto.io/v1',
+  gw:true, host:'gw.ai-service.concerto.io', tls:true, auth:true, obs:true, keys:[]},
+
  {n:'gemma-4-31b-fp8-failed', ws:'test-npu', model:'gemma-4-31b-it-fp8-block', mver:'1.0.0',
   type:'자체 배포', st:'생성 실패', rep:0, tgt:1, acc:'nvidia-h200', gpu:4, topo:'단일', reason:'ImagePullBackOff' /* 검토용 값 */,
   owner:'유지현(jh.yu)', at:'2026-08-17 13:07:41', upd:'2026-08-17 16:07:58', health:'-',
@@ -2481,13 +2588,13 @@ const DEPS=[
   type:'외부 배포', st:'확인 불가', rep:null, tgt:null, acc:'furiosa-rngd', gpu:8, topo:'-',
   owner:'-', at:'2026-07-07 18:34:15', upd:'2026-07-07 21:34:32', health:'-',
   ep:'https://biz-prod.internal/furiosa-gpt-oss-120b/v1',
-  gw:false, host:'', tls:false, auth:false, obs:false, keys:[]},
+  gw:false, host:'', tls:false, auth:false, obs:false, kind:'LLM', keys:[]},
 
  {n:'gpt-oss-20b-081valid', ws:'공용 워크스페이스', model:'-', mver:'-',
   type:'외부 배포', st:'연결 불가', rep:null, tgt:null, acc:'nvidia-h200', gpu:2, topo:'-',
   owner:'-', at:'2026-07-07 18:36:49', upd:'2026-07-07 21:36:06', health:'-',
   ep:'https://081valid.internal/gpt-oss-20b/v1',
-  gw:false, host:'', tls:false, auth:false, obs:false, keys:[]}
+  gw:false, host:'', tls:false, auth:false, obs:false, kind:'LLM', keys:[]}
 ];
 
 /* 상태 → 배지 등급. 생성·삭제의 진행은 로딩 표기를 함께 쓴다 */
@@ -2560,6 +2667,14 @@ const FAILR={
   CreateContainerConfigError:'기동 설정이 잘못되어 기동하지 못했습니다.', CreateContainerError:'기동 설정이 잘못되어 기동하지 못했습니다.'
 };
 function failText(d){ return FAILR[d.reason] || '기동 중 문제가 생겼습니다.'; }
+/* v0.40 · 삭제 지연(배포 정책 2.7 · DEP-L01 5.3). 새 상태가 아니라 삭제 중에 붙는 사유다. 사유 값은 화면에 쓰지 않는다(공통정책 7.9).
+   강제 삭제는 최고 관리자 · 워크스페이스 관리자만(배포 정책 9장). 할 수 없는 역할에는 조치 대신 문의를 안내한다(UI 문구 규칙 2) */
+function stalled(d){ return !!d && d.st==='삭제 중' && !!d.stalled; }
+function canForce(){ return role==='super' || role==='admin'; }
+function stallText(){
+  return canForce()? '자원 정리가 늦어지고 있습니다. 관리자가 강제 삭제할 수 있습니다.'
+                   : '자원 정리가 늦어지고 있습니다. 관리자에게 문의해 주세요.';
+}
 
 const ST_DESC={
  '생성 중':'배포를 기동하는 중입니다. 모델 이미지를 내려받는 동안 시간이 걸릴 수 있습니다.',
@@ -2569,7 +2684,7 @@ const ST_DESC={
  '중지됨':'사용자가 일시중지했습니다. 자원을 점유하지 않습니다.',
  '생성 실패':'기동하지 못했습니다. 설정을 확인하고 다시 시도할 수 있습니다.',
  '삭제 중':'배포를 제거하는 중입니다.',
- '삭제 실패':'제거하지 못했습니다. 원인을 확인한 뒤 다시 시도해 주세요.',
+ '삭제 실패':'제거하지 못했습니다. 다시 시도할 수 있습니다.',
  '확인 불가':'외부 배포의 상태를 확인할 주소가 없습니다.',
  '연결 불가':'외부 배포의 워크로드에 연결할 수 없습니다.'
 };
@@ -2619,7 +2734,7 @@ const FDEF=[
 /* 컬럼 도움말 — 값별 의미를 목록으로 함께 표시한다 */
 const COLDEF={
   st:'배포의 현재 상태입니다.<dl>'+ST_ALL.map(function(s){return '<dt>'+s+'</dt><dd>'+ST_DESC[s]+'</dd>';}).join('')+'</dl>',
-  type:'배포를 누가 기동했는지에 따라 제어할 수 있는 범위가 달라집니다.<dl><dt>자체 배포</dt><dd>콘체르토가 기동한 추론 서비스입니다. 자원과 설정을 모두 조정할 수 있습니다.</dd><dt>외부 배포</dt><dd>콘체르토 밖에서 이미 돌고 있던 워크로드를 목록에 등록한 것입니다. 자원과 라우팅을 콘체르토가 관리하지 않아 조회와 등록 해제만 제공합니다.</dd></dl>',
+  type:'배포를 누가 기동했는지에 따라 제어할 수 있는 범위가 달라집니다.<dl><dt>자체 배포</dt><dd>콘체르토가 기동한 추론 서비스입니다. 자원과 설정을 모두 조정할 수 있습니다.</dd><dt>외부 배포</dt><dd>콘체르토 밖에서 이미 돌고 있던 워크로드를 목록에 가져온 것입니다. 자원과 라우팅을 콘체르토가 관리하지 않아 조회 · 동작 확인 · 등록 해제만 제공합니다.</dd></dl>',
   rep:'현재 기동된 레플리카 수와 목표 수입니다. 호출이 없으면 0으로 내려갑니다. 외부 배포는 콘체르토가 스케일링을 관리하지 않아 관측된 수만 표시합니다.',
   model:'배포가 서비스하는 모델입니다. 외부 배포는 콘체르토 밖에서 기동한 것이라 모델 대신 호출 주소를 표시합니다.',
   impacc:'이 워크로드가 점유하고 있는 가속기입니다. 가져와도 콘체르토가 자원을 관리하지 않아 워크스페이스 한도에 잡히지 않습니다.',
@@ -2628,6 +2743,8 @@ const COLDEF={
     +'<dt>완료</dt><dd>TTFT(첫 토큰까지 걸린 시간)와 TPS(초당 출력 토큰 수)를 표시합니다. 행을 누르면 결과 리포트를 엽니다.</dd>'
     +'<dt>실패</dt><dd>-로 표시합니다. 행을 누르면 사유를 확인합니다.</dd></dl>',
   impmatch:'어떤 모델을 서비스하는 워크로드인지 연결합니다. 자동으로 연결된 것도 바꿀 수 있으며, 연결하지 않으면 가져오지 않습니다.',
+  /* v0.40 · 엔진 종류(배포 정책 2.2) */
+  impkind:'워크로드가 서비스하는 모델의 종류입니다. 종류에 따라 동작 확인 방식과 보이는 지표가 달라집니다.',
   imploc:'워크로드가 실행되고 있는 클러스터 내 구획입니다. 콘체르토가 만든 것이 아니라 이미 있던 이름이며, 어느 워크로드인지 대조할 때 씁니다.',
   /* 지금 화면에서 쓰지 않는 도움말이다(헬스는 목록에 두지 않는다). 남겨 두되 값 뜻은 배포 정책 3.4 표와 같은 문장으로 맞춘다.
      v0.36 · 주의는 일반 문장을 두고 사유 코드(UNDER_UTILIZATION)의 경우를 한 줄 더한다(모니터링 정책 5.2) */
@@ -2716,7 +2833,7 @@ function render(keepPanel){
       `전체` 는 판정 대상이 없어 그대로 둔다 — 마법사 02 에서 고를 때 걸린다 */
    + (canDeploy()
        ? (wsCur && wsCur!=='전체' && prodBlocks(wsCur)
-          ? '<button class="btn" disabled title="'+prodMsg(wsCur)+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>배포 생성</button>'
+          ? disTip('<button class="btn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>배포 생성</button>', prodMsg(wsCur))
           : '<button class="btn" onclick="openWiz()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>배포 생성</button>')
        : '');
 
@@ -2724,7 +2841,7 @@ function render(keepPanel){
     el.innerHTML = '<div class="tblwrap" style="padding:14px">'+Array(5).fill('<div class="skrow" style="margin:13px 0"></div>').join('')+'</div>';
     return; }
   if(state==='error'){ pg.style.display='none';
-    el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p><button class="btn ghost" onclick="setState(\'default\')">다시 시도</button></div>';
+    el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p><button class="btn ghost" onclick="setState(\'default\')">재시도</button></div>';
     return; }
   if(state==='empty'){ pg.style.display='none';
     el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 15c-1.5 1.5-2 4-2 4s2.5-.5 4-2m3-1l7-7M13 5s4 0 6 2 2 6 2 6l-9 5-4-4 5-9z"/></svg>'
@@ -2760,8 +2877,10 @@ function userRef(txt){
    + '<span class="tip">삭제된 계정입니다.</span></span>';
 }
 
-function stBadge(st, withTip){
+function stBadge(st, withTip, d){
   const b='<span class="stbadge '+(RB[st]||'mu')+'">'+st+'</span>';
+  /* v0.40 · 삭제 지연 사유는 목록에서도 배지 도움말로 보인다(DEP-L01 5.3) */
+  if(stalled(d)) return '<span class="tip-anchor stwrap">'+b+'<span class="tip">'+ST_DESC[st]+' '+stallText()+'</span></span>';
   /* 정상은 사유를 붙이지 않는다. 문제 없는 값에 설명을 달면 볼 것이 없는데 열게 된다
      (워크스페이스 목업이 활성일 때 툴팁을 붙이지 않는 것과 같은 기준) */
   if(!withTip || st==='정상' || !ST_DESC[st]) return b;
@@ -2798,7 +2917,7 @@ function tableView(d){
        const i=DEPS.indexOf(x);
        return '<tr id="row'+i+'" onclick="openPanel('+i+')">'
         + '<td><a class="mname" onclick="event.stopPropagation();openPanel('+i+')">'+x.n+'</a></td>'
-        + '<td>'+stBadge(x.st)+'</td>'
+        + '<td>'+stBadge(x.st, false, x)+'</td>'
         + '<td>'+x.type+'</td>'
         + '<td>'+x.ws+'</td>'
         + '<td>'+(x.type==='외부 배포'
@@ -2822,7 +2941,8 @@ function rowMore(i){
   const b=busy(d);
   const why='지금은 '+d.st+' 상태라 실행할 수 없습니다.';
   function mi(label,fn,dis,cls){
-    return '<button'+(cls?' class="'+cls+'"':'')+(dis?' disabled title="'+why+'"':' onclick="event.stopPropagation();'+fn+'"')+'>'+label+'</button>';
+    const bt='<button'+(cls?' class="'+cls+'"':'')+(dis?' disabled':' onclick="event.stopPropagation();'+fn+'"')+'>'+label+'</button>';
+    return dis? disTip(bt, why) : bt;
   }
   const head='<div class="more" id="mo'+i+'"><button class="morebtn" onclick="tgMore(event,\'mo'+i+'\')">⋯</button><div class="rowmenu">';
   /* 외부 배포는 콘체르토가 기동·자원을 관리하지 않아 제어 액션을 두지 않는다.
@@ -2852,6 +2972,8 @@ function rowMore(i){
    + mi('설정 변경','openCfg('+i+')', b)
    + '<hr>'
    + mi('종료','delDep('+i+')', b, 'd')
+   /* v0.40 · 강제 삭제 — 지연 사유가 붙은 삭제 중에만, 최고 관리자 · WS 관리자에게만(배포 정책 3.3 · 9장 · 공통정책 7.10) */
+   + (stalled(d) && canForce()? mi('강제 삭제','forceDel('+i+')', false, 'd') : '')
    + '</div></div>';
 }
 
@@ -2884,7 +3006,7 @@ function openPanel(i){
      배포는 이름 자체가 식별이다. 엔드포인트는 운영룸 배포가 함께 쓰는 주소라 식별이 되지 않는다(배포 정책 2.5) */
   const de=document.getElementById('pnDesc');
   if(de) de.style.display='none';
-  document.getElementById('pnTags').innerHTML = stBadge(d.st, true)+'<span class="vtag">'+d.type+'</span>';
+  document.getElementById('pnTags').innerHTML = stBadge(d.st, true, d)+'<span class="vtag">'+d.type+'</span>';
   /* 패널은 조회 전용이다. 편집 · 제어 액션을 두지 않는다(REQ-DEP-018 · 7.2 · 공통정책 4.2.2). 제어는 목록 행 메뉴와 상세에서 한다 */
   document.getElementById('pnMenu').innerHTML = '';
   document.getElementById('pnMore').style.display = 'none';
@@ -2894,8 +3016,11 @@ function openPanel(i){
   if(d.st==='오류')
     b.push(alertBox('crit','요청을 처리하지 못하고 있습니다.','조치는 상세 화면에서 확인합니다.',
       '<button class="btn ghost sm" onclick="openDetail()">상세 열기</button>', false));
+  /* v0.40 · 삭제 지연. 강제 삭제는 상세 · 행 메뉴에서 한다 — 패널은 조회 전용이다 */
+  if(stalled(d))
+    b.push(alertBox('warn','',stallText(), canForce()? '<button class="btn ghost sm" onclick="openDetail()">상세 열기</button>' : '', false));
   if(d.st==='생성 실패')
-    b.push(alertBox('crit','배포를 기동하지 못했습니다.',failText(d)+' 설정을 확인한 뒤 다시 시도해 주세요.',
+    b.push(alertBox('crit','배포를 기동하지 못했습니다.',failText(d)+' 설정 변경과 다시 시도는 상세 화면에서 합니다.',
       '<button class="btn ghost sm" onclick="openDetail()">상세 열기</button>', false));
 
   /* 생성일시만으로는 마지막 상태 변경 시점을 알 수 없다(8/19 회의 3.2).
@@ -2912,10 +3037,12 @@ function openPanel(i){
      — 워크스페이스·개발룸·모델 목업이 모두 헤더에만 둔다 */
   b.push(sec('모델·자원', dl([
     /* 모델은 다른 리소스라 링크로 둔다(공통정책 2.1) */
-    ['모델', d.model==='-'
+    ['모델', (d.model==='-'
        ? '<span class="dash">-</span>'
        : '<a class="mname" onclick="event.stopPropagation();act(\''+d.model+' 모델 화면으로 이동합니다.\')">'+d.model+'</a>'
-         +(d.mver==='-'?'':'('+d.mver+')')],
+         +(d.mver==='-'?'':'('+d.mver+')'))
+       /* v0.40 · 외부 배포는 모델 옆에 엔진 종류(DEP-L01 7.2) */
+       + (d.type==='외부 배포'? ' <span class="mver" style="margin:0">'+(d.kind||'LLM')+'</span>' : '')],
     ['서빙 방식'+tip('단일은 같은 구성의 레플리카로 서비스합니다. 프리필·디코드 분리는 프롬프트 분석과 토큰 생성을 나누어 배치합니다.'), d.topo],
     /* 표기는 상세와 같게 둔다. 같은 값을 화면마다 다르게 쓰면 대조가 안 된다 */
     ['가속기', d.gpu
@@ -2927,7 +3054,7 @@ function openPanel(i){
     ['레플리카', repCell(d)]
   /* 헬스(안정·주의·위험)는 4.0 범위다(v0.35 · 배포 정책 3.4). 점수는 4.1 범위라 두지 않는다 */
   ].concat([
-    ['헬스'+tip('배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 상태가 떠 있는지를 말한다면 헬스는 잘 도는지를 말합니다.'),
+    ['건전성'+tip('배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 상태가 떠 있는지를 말한다면 건전성은 잘 도는지를 말합니다.'),
       /* v0.36 · 배지 아래 설명 문장. 주의는 사유 코드가 있으면 사유 문장이다(모니터링 정책 5.2).
          소스 상태 배지일 때는 판정 값이 아니라 두지 않는다 */
       healthBadge(d)
@@ -2953,7 +3080,7 @@ function openPanel(i){
     dl([
       ['엔드포인트', d.ep
          ? '<span class="eprow"><span class="path">'+d.ep+'</span>'+copyBtn('엔드포인트')+'</span>'
-         : '<span class="dash">기동 후 발급됩니다.</span>'],
+         : '<span class="dash">기동하면 표시됩니다.</span>'],
       /* API Key 는 두지 않는다(8/19 회의 3.4). 계정 단위로 발급되어 워크스페이스에서
          통합 관리하며, 배포에서 의미가 있으려면 어떤 요청에 쓰였는지를 봐야 하는데
          그것은 모니터링 영역이다 */
@@ -2995,7 +3122,8 @@ function rowMenuItems(i){
   const d=DEPS[i], b=busy(d);
   const why='지금은 '+d.st+' 상태라 실행할 수 없습니다.';
   function mi(label,fn,dis,cls){
-    return '<button'+(cls?' class="'+cls+'"':'')+(dis?' disabled title="'+why+'"':' onclick="event.stopPropagation();'+fn+'"')+'>'+label+'</button>';
+    const bt='<button'+(cls?' class="'+cls+'"':'')+(dis?' disabled':' onclick="event.stopPropagation();'+fn+'"')+'>'+label+'</button>';
+    return dis? disTip(bt, why) : bt;
   }
   /* 외부 배포는 콘체르토가 기동·자원을 관리하지 않아 제어 액션을 두지 않는다.
      목록에서 빼는 것이라 라벨도 종료가 아니라 등록 해제다 */
@@ -3012,7 +3140,8 @@ function rowMenuItems(i){
    /* 상태별로 가능한 액션만 둔다(5.2). 오류는 일시중지가 없고 중지됨은 다시 시작이 재시작을 대신한다 */
    + (d.st==='중지됨'? '' : mi('재시작','restartDep('+i+')', b||!restartable(d)))
    + mi('설정 변경','openCfg('+i+')', b)
-   + '<hr>' + mi('종료','delDep('+i+')', b, 'd');
+   + '<hr>' + mi('종료','delDep('+i+')', b, 'd')
+   + (stalled(d) && canForce()? mi('강제 삭제','forceDel('+i+')', false, 'd') : '');
 }
 
 /* ===== 상세 DEP-L01.D01 ===== */
@@ -3028,8 +3157,8 @@ function syncWsCtx(){
   if(cur && cur.d && wsBack===null) wsBack=wsCur;
   if(cur && cur.d && wsCur!==cur.d.ws){ wsCur=cur.d.ws; drawWsBtn(); }
 }
-function openDetailAt(i){ rsOpen=false; BM_ERR=''; BM_TOOL='AIPerf'; cur={d:DEPS[i],i:i}; view='detail'; dTab=0; closePanel(); syncWsCtx(); syncView(); drawDetail(); vwBtn(1); }
-function openDetail(){ if(!cur) return; rsOpen=false; BM_ERR=''; BM_TOOL='AIPerf'; view='detail'; dTab=0; closePanel(); syncWsCtx(); syncView(); drawDetail(); vwBtn(1); }
+function openDetailAt(i){ TST.key=''; TST.keyErr=''; rsOpen=false; BM_ERR=''; BM_TOOL='AIPerf'; cur={d:DEPS[i],i:i}; view='detail'; dTab=0; closePanel(); syncWsCtx(); syncView(); drawDetail(); vwBtn(1); }
+function openDetail(){ if(!cur) return; TST.key=''; TST.keyErr=''; rsOpen=false; BM_ERR=''; BM_TOOL='AIPerf'; view='detail'; dTab=0; closePanel(); syncWsCtx(); syncView(); drawDetail(); vwBtn(1); }
 /* 생성 완료·가져오기 완료·작성 취소 뒤 목록으로 — 스위처는 그대로 둔다(종전 동작) */
 function backToList(){ wsBack=null; view='list'; cur=null; syncView(); render(); vwBtn(0); }
 /* 상세에서 뒤로가기·브레드크럼으로 목록에 돌아올 때만 진입 전 범위로 되돌린다 */
@@ -3046,9 +3175,10 @@ function drawDetail(){
      같은 대상에 같은 조건인데 자리마다 할 수 있는 것이 다르면 어느 쪽이 맞는지 알 수 없다.
      상태로 막히는 것은 미노출이 아니라 비활성 + 사유다(공통정책 7.10 과 구분) */
   function dbtn(label, fn, disabled, cls){
-    return '<button class="btn '+(cls||'ghost')+'"'
-      + (disabled ? ' disabled title="지금은 '+d.st+' 상태라 실행할 수 없습니다."' : ' onclick="'+fn+'"')
+    const bt='<button class="btn '+(cls||'ghost')+'"'
+      + (disabled ? ' disabled' : ' onclick="'+fn+'"')
       + '>'+label+'</button>';
+    return disabled? disTip(bt, '지금은 '+d.st+' 상태라 실행할 수 없습니다.') : bt;
   }
   const b = busy(d);
   const acts = !canDeploy() ? ''
@@ -3065,19 +3195,23 @@ function drawDetail(){
           : d.st==='오류'? '' : dbtn('일시중지','pauseDep('+i+')', b||!running(d)))
         + (d.st==='중지됨'? '' : dbtn('재시작','restartDep('+i+')', b||!restartable(d)))
         + dbtn('설정 변경','openCfg('+i+')', b)
-        + dbtn('종료','delDep('+i+')', b, 'danger-line');
+        + dbtn('종료','delDep('+i+')', b, 'danger-line')
+        /* v0.40 · 강제 삭제 진입은 외곽선(.btn.danger-line), 최종 실행만 채움(.btn.danger) */
+        + (stalled(d) && canForce()? dbtn('강제 삭제','forceDel('+i+')', false, 'danger-line') : '');
 
   const tabs=['개요','모니터링','벤치마크'];
   document.getElementById('detailBody').innerHTML =
      '<div class="dhead">'
    +   '<button class="back" onclick="detailBack()" title="배포 목록으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>'
-   +   '<div class="dinfo"><h1>'+d.n+stBadge(d.st, true)+'</h1>'
+   +   '<div class="dinfo"><h1>'+d.n+stBadge(d.st, true, d)+'</h1>'
    +     '<div class="dmeta"><span class="vtag">'+d.type+'</span>'
    +       '<a class="mname" onclick="act(\''+d.ws+' 워크스페이스로 이동합니다.\')">'+d.ws+'</a>'
    +       '<span class="dash">'+d.owner+' · '+d.at+'</span></div></div>'
    +   '<div class="dact">'+acts+'</div>'
    + '</div>'
    + (needDiag(d)? diagBox(d) : '')
+   /* v0.40 · 삭제 지연 안내(DEP-L01 5.3) */
+   + (stalled(d)? '<div style="margin-bottom:14px">'+alertBox('warn','',stallText(),'',false)+'</div>' : '')
    /* 요약 카드 — 상세에 들어와 탭을 열기 전에 알아야 하는 것만 둔다.
       무엇을 서비스하나 · 어디로 호출하나 · 몇 개 떠 있나.
       아래 본문에서 같은 값을 다시 쓰지 않는다 */
@@ -3096,7 +3230,7 @@ function drawDetail(){
         /* 엔드포인트는 복사 버튼과 함께 둔다(REQ-DEP-022). 패널 연관 리소스와 같은 값 · 표기다 */
         ['엔드포인트', d.ep
            ? '<span class="eprow"><span class="path">'+d.ep+'</span>'+copyBtn('엔드포인트')+'</span>'
-           : '<span class="dash">기동 후 발급됩니다.</span>'],
+           : '<span class="dash">기동하면 표시됩니다.</span>'],
         ['담당자', userRef(d.owner)],
         ['생성일시', d.at]
       ])
@@ -3150,12 +3284,17 @@ function tstBlock(d){
     case '생성 실패': return failText(d)+' 설정을 확인해 주세요.';
     case '삭제 중':   return '삭제 중인 배포에는 요청을 보낼 수 없습니다.';
     case '삭제 실패': return '삭제에 실패한 배포에는 요청을 보낼 수 없습니다.';
+    /* v0.40 · 외부 배포 상태(DEP-L01 6장) */
+    case '확인 불가': return '상태를 확인할 수 없어 요청을 보낼 수 없습니다.';
+    case '연결 불가': return '배포에 연결할 수 없어 요청을 보낼 수 없습니다.';
     default:          return '요청을 보낼 수 없는 상태입니다.';
   }
 }
 
 /* 동작 확인 상태 — 보낼 때마다 응답을 갈아 끼운다. 쌓지 않는다 */
-let TST={q:'', a:'', err:'', ms:0, ti:0, to:0};
+let TST={q:'', a:'', err:'', ms:0, ti:0, to:0, dim:0, rdy:'', key:'', keyErr:''};
+/* v0.40 · 키 거절 데모 — 다음 보내기 한 번을 게이트웨이 거절로 돌려준다. 실제 화면에는 없는 검토용 처리다 */
+let TST_REJECT=false;
 /* 예시 — 무엇을 넣으면 되는지 보여준다. 누르면 입력란에 들어간다 */
 const TSTEX=['안녕하세요','한국의 수도는?','다음 문장을 영어로 번역해 줘: 오늘 날씨가 좋다'];
 /* 동작 확인은 상세 개요 탭에 있다. 목록 render 가 아니라 상세를 다시 그려야 입력 · 응답이 보인다 */
@@ -3169,10 +3308,72 @@ function tstOn(el){
 /* 처리 중 표시는 목업 관행인 runSync 를 쓴다. 스피너를 직접 붙이면 끝난 뒤에도 남는다 */
 function tstSend(){
   if(!TST.q.trim()) return;
-  /* 시안이라 정해진 응답을 돌려준다. 실제로는 엔드포인트를 부른다 */
+  /* v0.40 · API Key 인증을 켠 배포는 키가 있어야 보낸다. 비우면 칸 아래 인라인 에러와 포커스(DEP-L01 5.3 · 공통정책 7.8) */
+  const d=cur && cur.d;
+  if(d && d.type!=='외부 배포' && d.auth && !TST.key.trim()){
+    TST.keyErr='API Key를 입력해 주세요.'; TST.a=''; TST.err=''; tstRedraw();
+    const k=document.getElementById('tstKey'); if(k) k.focus();
+    return;
+  }
+  TST.keyErr='';
+  /* 게이트웨이가 키를 거절하면 응답 자리에 안내한다. 원문 오류는 보이지 않는다(공통정책 7.9) */
+  if(TST_REJECT && d && d.auth){
+    TST_REJECT=false; TST.a=''; TST.err='API Key가 올바르지 않거나 이 배포를 호출할 수 없는 키입니다. 키를 확인해 주세요.'; tstRedraw(); return;
+  }
+  /* 시안이라 정해진 응답을 돌려준다. 실제로는 운영룸 게이트웨이를 거쳐 엔드포인트를 부른다 */
   TST.err=''; TST.a='안녕하세요. 무엇을 도와드릴까요?';
   TST.ms=845; TST.ti=12; TST.to=28;
   tstRedraw();
+}
+function tstKeyOn(el){ TST.key=el.value; }
+/* 실제 화면에는 없는 검토용 처리다. 인증을 켠 정상 자체 배포의 개요를 열고 다음 보내기 한 번을 거절로 돌려준다 */
+function demoKeyReject(){
+  const sb=document.querySelector('#demoBar .st'); setState('default', sb);
+  if(!canDeploy()) setRole('editor');
+  const i=DEPS.findIndex(function(x){ return x.type==='자체 배포' && x.st==='정상' && x.auth; });
+  TST_REJECT=true; openDetailAt(i);
+  TST.q='안녕하세요'; TST.key='sk-demo-key'; TST.a=''; TST.err=''; drawDetail();
+}
+/* v0.40 · 외부 배포 동작 확인 — 엔진 종류별로 다르다(배포 정책 2.2 · 6장 · DEP-L01 6장 · REQ-DEP-093).
+   게이트웨이를 거치지 않아 실패해도 원인은 짚지 않는다. 호출 예시 · API Key 안내는 두지 않는다(외부 배포는 인증 · 라우팅이 콘체르토 것이 아니다) */
+function tstEmbed(){
+  if(!TST.q.trim()) return;
+  /* 시안이라 정해진 결과를 돌려준다. 실제로는 /v1/embeddings 1건을 부른다 */
+  TST.err=''; TST.dim=1024; TST.ti=6; tstRedraw();
+}
+function tstReady(){
+  /* 시안이라 누를 때마다 준비됨 · 준비 안 됨을 번갈아 돌려준다 — DEP-L01 6장 KServe 범용 결과 둘을 모두 보이려는 검토용 처리다.
+     실제로는 모델 조회와 준비 상태를 확인한다 */
+  TST.rdy = TST.rdy==='요청을 받을 준비가 되었습니다.'? '아직 요청을 받을 준비가 되지 않았습니다.' : '요청을 받을 준비가 되었습니다.'; tstRedraw();
+}
+function extTest(d){
+  const k=d.kind||'LLM';
+  let b;
+  if(!running(d)) b='<div class="emptyline">'+tstBlock(d)+'</div>';
+  else if(k==='LLM') b='<div class="tst">'
+      + '<p class="tstlead">모델에 요청을 보내 응답이 오는지 확인합니다.</p>'
+      + (d.st==='오류'? '<div class="emptyline">요청을 처리하지 못하고 있습니다.</div>' : '')
+      + '<div class="tstf"><label>요청</label>'
+      +   '<textarea class="inp tstin" id="tstIn" rows="2" placeholder="보낼 내용을 입력해 주세요." oninput="tstOn(this)">'+(TST.q||'')+'</textarea>'
+      +   '<div class="tstex">예시'+TSTEX.map(function(x){ return '<button class="exbtn" onclick="tstPick(\''+x+'\')">'+x+'</button>'; }).join('')+'</div></div>'
+      + '<div class="tstact"><button class="btn sm" id="tstGo"'+(TST.q?'':' disabled')+' onclick="runSync(this,tstSend)">보내기</button></div>'
+      + (TST.a ? '<div class="tstf"><label>응답</label><div class="tstout">'+TST.a+'</div>'
+                 + '<div class="tstmeta">응답 시간 '+TST.ms+'ms · 입력 '+TST.ti+' · 출력 '+TST.to+' 토큰</div></div>' : '')
+      + '</div>';
+  else if(k==='임베딩') b='<div class="tst">'
+      + '<p class="tstlead">문장을 보내 임베딩 결과가 오는지 확인합니다.</p>'
+      + '<div class="tstf"><label>문장</label>'
+      +   '<textarea class="inp tstin" id="tstIn" rows="2" placeholder="보낼 문장을 입력해 주세요." oninput="tstOn(this)">'+(TST.q||'')+'</textarea></div>'
+      + '<div class="tstact"><button class="btn sm" id="tstGo"'+(TST.q?'':' disabled')+' onclick="runSync(this,tstEmbed)">보내기</button></div>'
+      + (TST.dim ? '<div class="tstf"><label>결과</label><div class="tstmeta" style="margin:0">차원 수 '+TST.dim+' · 입력 '+TST.ti+' 토큰</div></div>' : '')
+      + '</div>';
+  else if(k==='KServe 범용') b='<div class="tst">'
+      + '<p class="tstlead">모델이 요청을 받을 준비가 됐는지 확인합니다.</p>'
+      + '<div class="tstact" style="justify-content:flex-start"><button class="btn sm ghost" onclick="runSync(this,tstReady)">준비 상태 확인</button></div>'
+      + (TST.rdy ? '<div class="tstf"><label>결과</label><div class="tstout">'+TST.rdy+'</div></div>' : '')
+      + '</div>';
+  else b='<div class="emptyline">이 엔진 종류는 동작 확인을 지원하지 않습니다.</div>';
+  return '<div class="dsec"><h4>동작 확인</h4>'+b+'</div>';
 }
 function dOverview(d){
   const curl='curl -X POST '+(d.ep||'{엔드포인트}')+'/chat/completions \\\n'
@@ -3194,8 +3395,8 @@ function dOverview(d){
       대화 이력을 두지 않는다. 쌓이면 채팅으로 보이고, 이전 대화가 맥락으로 들어가면
       동작 확인이 아니라 대화 테스트가 된다(8/19 회의 5.1).
       파라미터 조정도 두지 않는다 — 배포 설정에서 정한 값으로 도는지 보는 자리다 */
-   /* 외부 배포 제외 — 배포 정책 6장. 확인 항목 9 */
-   + (d.type==='외부 배포' ? '' :
+   /* v0.40 · 외부 배포는 엔진 종류별 동작 확인(extTest) — 배포 정책 2.2 · 6장 */
+   + (d.type==='외부 배포' ? extTest(d) :
      '<div class="dsec"><h4>동작 확인</h4>'
    /* 상태마다 다음에 할 일이 달라 문구를 나눈다(공통정책 4.1).
       `배포 상태를 확인해 주세요` 로 묶으면 무엇을 해야 하는지 사라진다.
@@ -3216,6 +3417,14 @@ function dOverview(d){
                return '<button class="exbtn" onclick="tstPick(\''+x+'\')">'+x+'</button>';
              }).join('')
         +   '</div></div>'
+        /* v0.40 · API Key 인증을 켠 배포에만 둔다. 가림 표시, 저장하지 않는다(배포 정책 6장 · DEP-L01 7.8) */
+        + (d.auth
+          ? '<div class="tstf"><label>API Key</label>'
+            + '<input class="inp'+(TST.keyErr?' err':'')+'" id="tstKey" type="password" autocomplete="off" placeholder="API Key를 입력해 주세요."'
+            + ' value="'+disTipEsc(TST.key)+'" oninput="tstKeyOn(this)">'
+            + (TST.keyErr? '<p class="ferr">'+TST.keyErr+'</p>' : '<div class="hint">입력한 키는 저장하지 않습니다.</div>')
+            + '</div>'
+          : '')
         + '<div class="tstact">'
         +   '<button class="btn sm" id="tstGo"'+(TST.q?'':' disabled')
         +     ' onclick="runSync(this,tstSend)">보내기</button>'
@@ -3252,7 +3461,7 @@ function dOverview(d){
           ? (d.gpu*(d.tgt||d.rep))+'장 <span class="mver" style="margin:0">레플리카 '+(d.tgt||d.rep)+'개 × '+d.gpu+'장</span>'
           : '<span class="dash">-</span>'],
        ['지표·추적 수집', d.obs? '사용' : '사용 안 함']
-     ])
+     ].concat(d.type==='외부 배포'? [['엔진 종류', d.kind||'LLM']] : []))
    + (d.type==='외부 배포'
       ? '<div class="secnote">콘체르토 밖에서 기동된 배포입니다. 자원과 엔진 설정을 콘체르토에서 변경할 수 없습니다.</div>'
       : '')
@@ -3299,6 +3508,8 @@ function dMonitor(d){
   const sb = srcBadge(d);
   const ns = noSeries(d);
   const on = d.st==='정상' && !sb && !ns;
+  /* v0.40 · 엔진 종류가 LLM이 아닌 외부 배포는 엔진 지표를 두지 않는다(모니터링 정책 5.3 · DEP-L01 7.6) */
+  const eng = !(d.type==='외부 배포' && (d.kind||'LLM')!=='LLM');
   const mv=function(t,v,u,help){ return '<div class="mcard"><div class="mt">'+t+(help?tip(help):'')+'</div><div class="mv">'+v+'</div>'+(u?'<div class="mu">'+u+'</div>':'')+'</div>'; };
   const bars=Array.from({length:34},function(){ return '<div class="bar" style="height:'+(on? 18+Math.round(Math.random()*70) : 2)+'%"></div>'; }).join('');
   /* 주요 이벤트 — 배포의 상태가 바뀐 일만 남긴다(정책 8.4).
@@ -3322,23 +3533,23 @@ function dMonitor(d){
   return '<div class="mgrid">'
    /* 4.0 범위 지표는 지금 수집되는 것만 싣는다(DEP-L01 7.6 · 모니터링 정책 5.1).
       처리량은 초당 요청 수와 초당 처리 토큰 수 두 값이다. 값이 없으면 0 이 아니라 - 로 둔다 */
-   + mv('처리량', on? (lo?'<b>0.1</b><small> req/s · </small><b>6</b><small> tok/s</small>':'<b>4.2</b><small> req/s · </small><b>182</b><small> tok/s</small>') : '<b>-</b>','최근 1시간 평균')
+   + (!eng? '' : mv('처리량', on? (lo?'<b>0.1</b><small> req/s · </small><b>6</b><small> tok/s</small>':'<b>4.2</b><small> req/s · </small><b>182</b><small> tok/s</small>') : '<b>-</b>','최근 1시간 평균')
    + mv('P99 지연 시간','<b>'+(on?(lo?'410':'640'):'-')+'</b>'+(on?'<small> ms</small>':''),'최근 1시간 최대')
-   + mv('대기 중인 요청','<b>'+(on?(lo?'0':'3'):'-')+'</b>','실시간')
+   + mv('대기 중인 요청','<b>'+(on?(lo?'0':'3'):'-')+'</b>','실시간'))
    + mv('가속기 사용률','<b>'+(on?(lo?'3.1':'74.2'):'-')+'</b>'+(on?'<small> %</small>':''),'최근 1시간 평균')
    + mv('메모리 사용량','<b>'+(on?'62.4':'-')+'</b>'+(on?'<small> / '+(d.gpu?parseInt(accVram(d.acc)):0)+' GB</small>':''),'실시간')
    /* 헬스 카드는 4.0 범위다(v0.35 · 배포 정책 3.4). 점수·구성 지표는 4.1 범위라 안내하지 않는다.
       지표를 받지 못하면 헬스도 판정되지 않는다. 그 자리에 소스 상태 배지와 사유를 둔다 — 값이 왜 - 인지가
       이 카드 한 곳에서 읽힌다(모니터링 정책 5.3) */
    + (sb
-      ? mv('헬스','<span class="stbadge mu">'+sb[0]+'</span>',sb[1],
+      ? mv('건전성','<span class="stbadge mu">'+sb[0]+'</span>',sb[1],
            '배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 배포 상태와 다른 축입니다.')
       /* v0.36 · 부제 자리에 설명 문장을 둔다. 주의는 사유 코드가 있으면 사유 문장이다(모니터링 정책 5.2) */
       /* 아래 사유 박스가 있으면 카드에는 라벨만 둔다 — 같은 사유가 두 번 나오지 않게 */
       : ns
-      ? mv('헬스',healthBadge(d),NOSERIES_TXT_DT,
+      ? mv('건전성',healthBadge(d),NOSERIES_TXT_DT,
            '배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 배포 상태와 다른 축입니다.')
-      : mv('헬스','<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>',(on && reasonBox(d))? '' : healthDesc(d),
+      : mv('건전성','<span class="stbadge '+(HB[d.health]||'mu')+'">'+d.health+'</span>',(on && reasonBox(d))? '' : healthDesc(d),
            '배포가 잘 돌고 있는지 지표로 판정한 결과입니다. 배포 상태와 다른 축입니다.'))
    + '</div>'
    /* 주의 · 위험이면 카드 아래 전체 폭에 판정 사유 박스(모니터링 정책 5.2) */
@@ -3346,17 +3557,22 @@ function dMonitor(d){
    /* 깊은 분석은 모니터링 화면 소관이다(현행 명세 5.2 오버뷰 대시보드).
       거기에는 게이트웨이·엔진·GPU 3계층 차트 9개와 인프라 건전성 점수가 있고
       배포를 골라 보는 드롭다운이 있다. 여기서는 이 배포가 지금 어떤지만 보여주고 넘긴다 */
-   + '<div class="dsec"><h4>처리량 추이'+tip('최근 1시간입니다. 시간 범위를 바꾸거나 게이트웨이·엔진·가속기 지표를 나눠 보려면 모니터링 화면에서 확인합니다.')+'</h4>'
-   /* 값이 없으면 낮은 막대로 채우지 않는다. 작았던 값으로 읽힌다 */
-   + (on ? '<div class="chart">'+bars+'</div>' : '<div class="emptyline">아직 값이 들어오지 않습니다.</div>')
+   /* v0.40 · 엔진 종류가 LLM이 아닌 외부 배포는 처리량 추이를 두지 않고 이동 버튼만 남긴다(모니터링 정책 5.3) */
+   + (eng
+      ? '<div class="dsec"><h4>처리량 추이'+tip('최근 1시간입니다. 시간 범위를 바꾸거나 게이트웨이·엔진·가속기 지표를 나눠 보려면 모니터링 화면에서 확인합니다.')+'</h4>'
+        /* 값이 없으면 낮은 막대로 채우지 않는다. 작았던 값으로 읽힌다 */
+        + (on ? '<div class="chart">'+bars+'</div>' : '<div class="emptyline">아직 값이 들어오지 않습니다.</div>')
+      : '<div class="dsec">')
    + '<div class="secact" style="margin-top:14px">'
    +   '<button class="btn ghost sm" onclick="act(\'모니터링 화면의 배포 성능 탭으로 이동합니다.\')">상세 지표<span class="ar">→</span></button>'
    /* Grafana 열기 — 이 배포의 Grafana 대시보드를 새 탭으로 연다(모니터링 정책 5.4 · DEP-L01 7.6).
       열람 권한은 백엔드가 판정해 역할로 가르지 않고 배포 상태로도 가르지 않는다.
-      지표 · 추적 수집을 사용하지 않는 배포는 대시보드가 없어 비활성으로 두고 사유를 단다. 이 화면에서 조치할 수 없어 상태만 말한다 */
+      지표 · 추적 수집을 사용하지 않는 배포는 대시보드가 없어 비활성으로 두고 사유를 단다.
+      v0.40 · 지표 · 추적 수집을 설정 변경에서 바꿀 수 있게 되어, 설정 변경 권한이 있는 역할(편집자 이상)에게는 켜는 곳을 함께 말한다.
+      뷰어와 외부 배포(설정 변경이 없다)는 상태만 말한다(모니터링 정책 5.4 · DEP-L01 7.6) */
    +   (d.obs
         ? '<button class="btn ghost sm" onclick="act(\'Grafana 대시보드를 새 탭으로 엽니다.\')">Grafana 열기</button>'
-        : '<span class="disw" title="지표 · 추적 수집을 사용하지 않는 배포입니다."><button class="btn ghost sm" disabled>Grafana 열기</button></span>')
+        : disTip('<button class="btn ghost sm" disabled>Grafana 열기</button>', '지표 · 추적 수집을 사용하지 않는 배포입니다.'+((canDeploy() && d.type!=='외부 배포')? ' 설정 변경에서 켤 수 있습니다.' : '')))
    + '</div></div>'
    + '<div class="dsec"><h4>주요 이벤트'+tip('배포에 일어난 일만 모아 보여줍니다.')+'</h4>'
    /* 주요 이벤트는 지표가 아니라 배포에 일어난 일이라 소스 상태와 무관하게 보인다 */
@@ -3412,7 +3628,14 @@ function benchFailMsg(code){ return BENCH_FAIL[code] || '벤치마크를 완료�
    토크나이저 출처를 정하지 못한 경우와 S3에서 토크나이저를 찾지 못한 경우가 같은 문구다. 원문 오류는 노출하지 않는다(공통정책 7.9) */
 const BENCH_START_TOK='이 배포는 토크나이저를 찾을 수 없어 벤치마크를 실행할 수 없습니다.';
 /* 전용 저장소 주소가 허용되지 않아 결과를 저장할 수 없는 경우 · 그 밖의 시작 거절(DEP-L01 5.3 · 배포 정책 7.3) */
-const BENCH_START_BYOB='워크스페이스 전용 저장소에 결과를 저장할 수 없어 벤치마크를 시작하지 못했습니다. 관리자에게 문의해 주세요.';
+/* 문의 대상은 전용 저장소를 설정하는 역할이다 — 일반 워크스페이스는 워크스페이스 관리자, 공용은 최고 관리자(워크스페이스 정책 2.4 · 6.1 · WKSP-L01 7.8).
+   설정할 수 있는 역할에게는 문의 대신 설정 자리를 알린다(UI 문구 규칙 2) */
+function storeAsk(){
+  const ws=(cur && cur.d && cur.d.ws) || wsCur;
+  if(isSysWs(ws)) return role==='super'? '워크스페이스 연동 탭에서 전용 저장소 설정을 확인해 주세요.' : '최고 관리자에게 문의해 주세요.';
+  return (role==='super' || role==='admin')? '워크스페이스 연동 탭에서 전용 저장소 설정을 확인해 주세요.' : '워크스페이스 관리자에게 문의해 주세요.';
+}
+const BENCH_START_BYOB_HEAD='워크스페이스 전용 저장소에 결과를 저장할 수 없어 벤치마크를 시작하지 못했습니다.';
 const BENCH_START_ETC='벤치마크를 시작하지 못했습니다.';
 let BM_TOOL='AIPerf', BM_ERR='';
 /* 검토용: 시작 응답 분기. 'ok' 접수 · 'tok' 토크나이저 없음. 실제 화면에는 없다 */
@@ -3437,7 +3660,7 @@ function setBmStart(k,btn){
 function bmToolChange(v){ BM_TOOL=v; }
 function runBench(){
   if(BM_START==='tok'){ toast('cr', BENCH_START_TOK); return; }
-  if(BM_START==='byob'){ toast('cr', BENCH_START_BYOB); return; }
+  if(BM_START==='byob'){ toast('cr', BENCH_START_BYOB_HEAD+' '+storeAsk()); return; }
   if(BM_START==='etc'){ toast('cr', BENCH_START_ETC); return; }
   BM_ERR='';
   toast('ok','벤치마크를 시작했습니다. 진행 상황은 실행 이력에서 확인합니다.');
@@ -3485,7 +3708,8 @@ function dBench(d){
          ['표준편차','<input class="inp" value="0">']
        ])
    + '</div></details>'
-   + '<div class="secact" style="margin-top:16px"><button class="btn"'+(benchable(d)?'':' disabled title="정상 상태인 배포만 실행할 수 있습니다."')+' onclick="runBench()">벤치마크 실행</button></div>'
+   + '<div class="secact" style="margin-top:16px">'+(benchable(d)? '<button class="btn" onclick="runBench()">벤치마크 실행</button>'
+        : disTip('<button class="btn" disabled>벤치마크 실행</button>', '정상 상태인 배포만 실행할 수 있습니다.'))+'</div>'
    + '</div>' : '')
    /* 이력 컬럼은 상태·엔진·실행자·시작 일시·진행·결과·작업(DEP-L01 7.4).
       실행하면 결과가 쌓이므로 조회 대상이 된다 */
@@ -3543,7 +3767,7 @@ function setBmRep(k,btn){
 }
 /* 결과를 저장한 전용 저장소 설정이 지워졌거나 바뀌면 내려받지 못한다(DEP-L01 5.3 · 배포 정책 7.3) */
 function bmDownload(){
-  if(BM_REP==='dlfail'){ toast('cr','결과를 내려받지 못했습니다. 관리자에게 문의해 주세요.'); return; }
+  if(BM_REP==='dlfail'){ toast('cr','결과를 내려받지 못했습니다. '+storeAsk()); return; }
   act('벤치마크 결과를 내려받습니다.');
 }
 /* TPOT 정의가 바뀌기 전 이력은 값을 비교할 수 없어 - 로 둔다(DEP-L01 7.4 · 배포 정책 7.3) */
@@ -3557,7 +3781,7 @@ function openBmRep(ix){
     document.getElementById('bmBody').innerHTML = BM_REP==='loading'
       ? Array(6).fill('<div class="skrow" style="margin:12px 0"></div>').join('')
       : '<div class="state" style="padding:28px 0"><h3>결과를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p>'
-        + '<button class="btn ghost" onclick="BM_REP=\'ok\';openBmRep('+ix+')">다시 시도</button></div>';
+        + '<button class="btn ghost" onclick="BM_REP=\'ok\';openBmRep('+ix+')">재시도</button></div>';
     document.getElementById('mdBm').classList.add('on');
     return;
   }
@@ -3716,8 +3940,6 @@ const EARGS=[
   x:'KV 캐시를 어떤 타입으로 저장할지 정합니다. 낮추면 더 많이 담습니다.'},
  {s:'메모리·캐시', k:'--block-size',            t:'num',
   x:'KV 캐시를 나누는 단위 크기입니다.'},
- {s:'메모리·캐시', k:'--swap-space',            t:'num', u:'GiB',
-  x:'가속기 메모리가 모자랄 때 쓸 CPU 메모리 크기입니다.'},
  {s:'메모리·캐시', k:'--enable-prefix-caching', t:'flag',
   x:'앞부분이 같은 요청의 계산 결과를 재사용합니다.'},
  {s:'메모리·캐시', k:'--kv-cache-memory-bytes', t:'num',
@@ -3784,6 +4006,25 @@ const RESERVED_ARGS=['--model','--served-model-name','--tensor-parallel-size',
 /* 시스템이 직접 설정하는 인자 — 차트가 컨테이너 인자로 싣는다. 넣으면 두 번 실려 서버가 거절한다(CON-931) */
 const SYSTEM_ARGS=['--kv-transfer-config','--kv-events-config','--disable-log-requests',
   '--otlp-traces-endpoint','--collect-detailed-traces'];
+
+/* v0.40 · 서빙 엔진이 Furiosa-LLM인 배포가 받는 엔진 인자(배포 정책 5.3 · REQ-DEP-095).
+   모델 설정의 최대 컨텍스트 길이와 아래 둘만 둔다. 가속기 메모리 사용률 · 그 밖의 인자 · 직접 입력은 두지 않는다 */
+const FURIOSA_ARGS=['--enable-prefix-caching','--max-num-batched-tokens'];
+/* 엔진은 고르지 않는다(배포 정책 2.3). 모델이 NPU 계열이거나, 계열이 없는 모델에 NPU 가속기를 고르면 Furiosa-LLM 이다 */
+function wFuriosa(){
+  const m=MODELS.find(function(x){ return x.n===WF.model; });
+  return (m && m.kind==='npu') || (!(m && m.kind) && accOf(WF.acc).kind==='npu');
+}
+function depFuriosa(d){
+  const m=MODELS.find(function(x){ return x.n===d.model; });
+  return (m && m.kind==='npu') || accOf(d.acc).kind==='npu';
+}
+/* 엔진이 Furiosa-LLM 으로 정해지면 받지 않는 인자와 직접 입력을 지운다. 남겨 두면 검수 요약에 보내지 않을 값이 나온다 */
+function furiosaPrune(){
+  if(!wFuriosa()) return;
+  Object.keys(WF.args).forEach(function(k){ if(FURIOSA_ARGS.indexOf(k)<0) delete WF.args[k]; });
+  WF.customArgs=[];
+}
 
 /* 목록에 없는 인자 — 키·값 둘 다 직접 입력. TUI 도 list + custom entry 구조라
    같은 방식으로 둔다. 예약어만 걸러내고 값이 맞는지는 서버가 판정한다 */
@@ -3904,6 +4145,17 @@ function openWiz(){
    ⚠ 인자명은 화면 라벨로 바꿔 보인다(공통정책 7.9) */
 let DRY = null;      /* null 미실행 · 'run' 검사 중 · 객체 결과 */
 let dryKey = '';     /* 어떤 입력으로 돌렸는지. 값이 바뀌면 다시 돌린다 */
+const NAME_TERM='같은 이름의 배포를 삭제하는 중입니다. 삭제가 끝난 뒤 다시 만들거나 다른 이름을 입력해 주세요.';
+function nameTerminating(n){ return DEPS.some(function(x){ return x.n===n && x.st==='삭제 중'; }); }
+/* 중복 확인 — 서버가 같은 이름의 삭제 중 배포를 거절하는 경우를 보인다. 목업은 DEPS 로 판정한다 */
+function chkName(){
+  if(nameTerminating(WF.name.trim())){
+    WF.nameChecked=false; WF.nameTerm=true; wShown['name']=true; drawWiz();
+    const el=document.querySelector('#wizBody input[oninput*="WF.name="]'); if(el) el.focus();
+    return;
+  }
+  WF.nameTerm=false; WF.nameChecked=true; wBlur('name'); toast('ok','사용할 수 있는 배포명입니다.');
+}
 function drySnap(){
   return [WF.model,WF.acc,WF.topo,WF.rep,WF.gpu,WF.preRep,WF.preGpu,WF.maxLen,WF.name].join('|');
 }
@@ -3915,13 +4167,16 @@ function dryRun(){
     if(dryKey !== drySnap()) return;   /* 그새 값이 바뀌었으면 버린다 */
     const rows = [];
     rows.push({t:'ok', m:'설정 확인'});
+    /* v0.40 · 같은 이름의 배포가 삭제 중이면 ✕(배포 정책 2.5 · DEP-L01 5.3) */
+    if(nameTerminating(WF.name.trim())){ WF.nameTerm=true; rows.push({t:'err', m:NAME_TERM}); }
     /* 자원 초과는 화면도 잡지만 여기서는 클러스터 잔여 기준으로 다시 본다 */
     const need = wTotalGpu(), free = WF.ws? gpuFree(WF.ws) : 0;
     /* 워크스페이스를 고르지 않았으면 자원을 판정하지 않는다. 배정이 0장이면 줄여도 풀리지 않아 상태만 쓴다(5.3 · 공통정책 7.9) */
-    if(WF.ws && need > free) rows.push({t:'warn', m:'요청 가속기 '+need+'장 · 배분 가능 '+free+'장',
+    /* 운영룸 배정은 가속기 종류별이다(워크스페이스 정책 5.4). 표본 워크스페이스는 운영룸 배정이 한 종류라 합계가 곧 그 종류의 잔여다 */
+    if(WF.ws && need > free) rows.push({t:'warn', m:'요청 '+accOf(WF.acc).n+' '+need+'장 · '+accOf(WF.acc).n+' 잔여 '+free+'장',
       d: gpuTotal(WF.ws)===0
-        ? '이 워크스페이스에 배분된 가속기가 없어 배포할 수 없습니다.'
-        : '배분 가능한 가속기를 넘습니다. 레플리카 수나 레플리카당 가속기 수를 줄여 주세요.'});
+        ? '이 워크스페이스에 배정된 가속기가 없어 배포할 수 없습니다.'
+        : accOf(WF.acc).n+' 잔여를 넘습니다. 레플리카 수나 레플리카당 가속기 수를 줄여 주세요.'});
     /* 모델 배포 조건. 화면이 이미 막으므로 마지막 확인이다(배포 정책 2.3) */
     const q=modelReq(WF.model)||{}, wm=wModelOf();
     /* 계열 불일치는 백엔드 거절 코드가 없어 검사 항목에 두지 않는다. 화면이 02 자원에서 막는다 */
@@ -4017,11 +4272,13 @@ function wErrs(){
      어느 한쪽을 지목할 수 없고, 분리 배치면 필드가 넷이 되어 붙일 자리가 없어진다.
      사유는 총 사용량 영역이 맡고 여기서는 배포 버튼을 막는 역할만 한다 */
   if(WF.ws && !isSysWs(WF.ws) && wTotalGpu()>gpuFree(WF.ws))
-    e.push({step:1, m:WF.ws+' 운영룸의 배분 가능한 가속기는 '+gpuFree(WF.ws)+'장입니다. 지금 '+wTotalGpu()+'장을 요청하고 있습니다.'});
+    e.push({step:1, m:WF.ws+' 운영룸의 잔여 가속기는 '+gpuFree(WF.ws)+'장입니다. 지금 '+wTotalGpu()+'장을 요청하고 있습니다.'});
 
   const nm=WF.name.trim();
   if(!nm) e.push({step:2, f:'name', m:'배포명을 입력해 주세요.'});
   else if(!/^[a-z0-9-]+$/.test(nm)) e.push({step:2, f:'name', m:'영문 소문자·숫자·하이픈만 사용할 수 있습니다.'});
+  /* v0.40 · 같은 이름의 배포가 삭제 중이면 중복 확인 · 배포 전 검사에서 막는다(배포 정책 2.5 · DEP-L01 5.3) */
+  else if(WF.nameTerm) e.push({step:2, f:'name', m:NAME_TERM});
   else if(!WF.nameChecked) e.push({step:2, f:'name', m:'중복 확인이 필요합니다.'});
   if(!WF.ws) e.push({step:1, f:'ws', m:'워크스페이스를 선택해 주세요.'});
   /* 운영룸 미생성·생성 실패면 배포할 수 없다(회의 4.1) */
@@ -4042,6 +4299,7 @@ function wErrOf(f){
 
 /* ── 렌더 ──────────────────────────────────────────── */
 function drawWiz(){
+  furiosaPrune();
   const errs=wErrs();
   const el=document.getElementById('wizBody'); if(!el) return;
 
@@ -4214,7 +4472,8 @@ function paneModel(){
    (extraArgs 와 다른 층이라 엔진 인자 목록에 섞지 않는다).
    현행도 Advanced Engine Options 안에 두므로 고급에 두되 별도 블록으로 나눈다 */
 function paneModelAdv(){
-  const list=EARGS.filter(function(a){ return a.s===argCat; });
+  const fur=wFuriosa();
+  const list=EARGS.filter(function(a){ return fur ? FURIOSA_ARGS.indexOf(a.k)>=0 : a.s===argCat; });
 
   function row(a){
     const v = WF.args[a.k]!==undefined ? WF.args[a.k] : '';
@@ -4276,12 +4535,17 @@ function paneModelAdv(){
         (modelReq(WF.model)||{}).ctx
           ? '이 모델의 최대 컨텍스트 길이는 '+ctxN(modelReq(WF.model).ctx)+' 토큰입니다.'
           : '한 번에 처리할 토큰 수입니다.')
-   +   fld('가속기 메모리 사용률','gpuUtil',
+   /* v0.40 · Furiosa-LLM 배포에는 가속기 메모리 사용률을 두지 않는다(배포 정책 5.3) */
+   +   (fur ? '' : fld('가속기 메모리 사용률','gpuUtil',
         selBox('gpuUtil',['0.80','0.85','0.90','0.95'],WF.gpuUtil),
-        '높이면 더 많은 요청을 담지만 남는 메모리가 줄어듭니다.')
+        '높이면 더 많은 요청을 담지만 남는 메모리가 줄어듭니다.'))
    + '</div>'
    + '<h4 class="advsub">엔진 인자</h4>'
-   + '<p class="advnote">비워 두면 이 인자를 넣지 않습니다. 넣지 않은 인자는 엔진 자체 값을 따릅니다.</p>'
+   + (fur
+      /* 둘뿐이라 그룹 탐색 없이 한 목록으로 둔다. 목록 밖 인자 직접 입력도 두지 않는다 */
+      ? '<p class="advnote">이 배포는 Furiosa-LLM 엔진으로 실행되어 아래 인자만 넣을 수 있습니다. 비워 두면 엔진 자체 값을 따릅니다.</p>'
+        + '<div class="alist">'+out+'</div>'
+      : '<p class="advnote">비워 두면 이 인자를 넣지 않습니다. 넣지 않은 인자는 엔진 자체 값을 따릅니다.</p>'
    + '<div class="catwrap"><div class="catnav">'
    +   ESECS.map(function(sec){
          const n=argCatCount(sec);
@@ -4292,7 +4556,7 @@ function paneModelAdv(){
        }).join('')
    + '</div><div class="catbody"><div class="alist">'+out+'</div>'
    +   customArgsBlock()
-   + '</div></div>';
+   + '</div></div>');
 }
 /* 잠긴 인자의 현재 값 — 앞 단계 입력에서 가져온다 */
 function lockVal(k){
@@ -4346,7 +4610,7 @@ function paneRes(){
         selBox('ws', [{v:'',t:'선택해 주세요'}].concat(
           WSLIST.filter(function(w){ return isSuper() || w==='공용 워크스페이스' || (MYWS[role]||[]).indexOf(w)>=0; })
                 .map(function(w){return {v:w,t:w};})), WF.ws),
-        WF.ws? '운영룸 배분 가능 '+gpuFree(WF.ws)+'장' : '자원을 배분받을 워크스페이스입니다.', true)
+        WF.ws? '운영룸 잔여 '+gpuFree(WF.ws)+'장' : '자원을 배분받을 워크스페이스입니다.', true)
    + '</div>'
    /* 조건에 따라 나타나고 조치가 필요한 안내는 알림 박스로 둔다(컴포넌트 라이브러리).
       종전에는 이 화면에만 있던 `.roomwarn` 을 썼다 — 라이브러리에 `.alertbox` 가 있어
@@ -4365,7 +4629,7 @@ function paneRes(){
          증액은 관리자 신청이다(워크스페이스 정책 2.4). 운영룸 생성도 같은 구조라
          여기서는 문서를 따라 이동 경로만 둔다. 확인 항목 */
    + (WF.ws && !isSysWs(WF.ws) && !prodBlocks(WF.ws) && gpuTotal(WF.ws)===0
-      ? wsGoBox('<b>'+WF.ws+' 운영룸에 배분된 가속기가 없습니다.</b>'
+      ? wsGoBox('<b>'+WF.ws+' 운영룸에 배정된 가속기가 없습니다.</b>'
                 +'배포에 쓸 자원이 없어 생성할 수 없습니다.')
       : '')
    + '<div class="fsec"><h4>가속기 종류</h4>'
@@ -4427,16 +4691,16 @@ function paneRes(){
       /* 배포는 운영룸에 뜬다. 개발룸에 이관한 만큼은 쓸 수 없다(워크스페이스 정책 5.2) */
       ? (isSysWs(WF.ws)
          ? '<span class="rs">'+WF.ws+' 는 배정값 없이 남은 자원을 사용합니다</span>'
-         : '<span class="rs">'+WF.ws+' 운영룸 배분 가능 '+free+'장 / 전체 '+gpuTotal(WF.ws)+'장</span>')
-      : '<span class="rs">워크스페이스를 선택하면 배분 가능한 양이 표시됩니다.</span>')
+         : '<span class="rs">'+WF.ws+' 운영룸 '+(WF.acc? accOf(WF.acc).n+' ' : '')+'잔여 '+free+'장 / 전체 '+gpuTotal(WF.ws)+'장</span>')
+      : '<span class="rs">워크스페이스를 선택하면 잔여가 표시됩니다.</span>')
    /* 총량이 빨갛게 서는 자리라 왜 그런지 같은 자리에 둔다. 위 경고 블록과 멀리 떨어져 있어
       스크롤하면 보이지 않는다. 두 자리는 역할이 다르다 —
       위는 무엇이 문제이고 어디로 가야 하는지, 여기는 이 숫자가 왜 넘치는지다.
       배정이 0 장이면 줄여도 풀리지 않으므로 조치를 요청하지 않고 상태만 쓴다(공통정책 7.9).
       줄여서 풀리는 경우만 조치를 적고, 대상은 필드 라벨 그대로 둘 다 적는다(1.1) */
    +   (over? '<div class="rmsg">'+(gpuTotal(WF.ws)===0
-          ? '이 워크스페이스에 배분된 가속기가 없어 배포할 수 없습니다.'
-          : '배분 가능한 가속기를 넘습니다. 레플리카 수나 레플리카당 가속기 수를 줄여 주세요.')+'</div>':'')
+          ? '이 워크스페이스에 배정된 가속기가 없어 배포할 수 없습니다.'
+          : accOf(WF.acc).n+' 잔여를 넘습니다. 레플리카 수나 레플리카당 가속기 수를 줄여 주세요.')+'</div>':'')
    + '</div>'
 
    /* 분리 배치일 때만 둔다. 단일은 풀이 하나라 보여줄 흐름이 없고
@@ -4476,10 +4740,10 @@ function paneGw(){
    +   fld('배포명','name',
         '<div class="inline">'
         + inp('name','value="'+WF.name+'" placeholder="영문 소문자·숫자·하이픈"'
-          +' oninput="WF.name=this.value;WF.nameChecked=false;wSetQuiet(\'name\',this.value)"'
+          +' oninput="WF.name=this.value;WF.nameChecked=false;WF.nameTerm=false;wSetQuiet(\'name\',this.value)"'
           +' onblur="wBlur(\'name\')"')
         + '<button class="btn ghost sm"'+(nm?'':' disabled')
-        +   ' onclick="runSync(this,function(){ WF.nameChecked=true;wBlur(\'name\');toast(\'ok\',\'사용할 수 있는 배포명입니다.\'); })">중복 확인</button>'
+        +   ' onclick="runSync(this,chkName)">중복 확인</button>'
         + '</div>',
         WF.nameChecked? '사용할 수 있는 배포명입니다.' : '나중에 바꿀 수 없습니다.', true)
    + '</div>'
@@ -4718,11 +4982,10 @@ function wFoot(errs){
    /* 첫 단계에는 돌아갈 데가 없어 이전을 두지 않는다 */
    +   (wStep>0? '<button class="btn ghost" onclick="wShown[\'_v\'+wStep]=true;wGo('+(wStep-1)+')">이전</button>' : '')
    +   (last
-     ? '<button class="btn"'
-       + (errs.length? ' disabled title="확인이 필요한 항목이 있습니다."'
-          : dryHasErr()? ' disabled title="배포 전 검사에서 오류가 있습니다."'
-          : DRY==='run'? ' disabled title="배포 전 검사를 진행하고 있습니다."' : '')
-       + ' onclick="submitWiz()">배포</button>'
+     ? (function(){
+         const wy = errs.length? '확인이 필요한 항목이 있습니다.' : dryHasErr()? '배포 전 검사에서 오류가 있습니다.' : DRY==='run'? '배포 전 검사를 진행하고 있습니다.' : '';
+         return wy? disTip('<button class="btn" disabled>배포</button>', wy) : '<button class="btn" onclick="submitWiz()">배포</button>';
+       })()
      : '<button class="btn" onclick="wShown[\'_v\'+wStep]=true;wGo('+(wStep+1)+')">다음</button>')
    + '</span></div>';
 }
@@ -4760,7 +5023,7 @@ function delDep(i){
      워크로드 자체는 클러스터에 그대로 남으므로 그 사실을 밝힌다 */
   if(d.type==='외부 배포'){
     openConfirm('등록 해제',
-      '<b>'+d.n+'</b>'+jo(d.n,'을')+' 목록에서 제거합니다. 실제 워크로드는 클러스터에 그대로 남으며 호출도 계속됩니다. 다시 가져오려면 외부 배포 가져오기를 사용해 주세요.',
+      '<b>'+d.n+'</b>'+jo(d.n,'을')+' 목록에서 제거합니다. 실제 워크로드는 클러스터에 그대로 남으며 호출도 계속됩니다.',
       function(){ toast('ok','등록을 해제했습니다.'); }, '등록 해제', null, d.n);
     return;
   }
@@ -4769,7 +5032,27 @@ function delDep(i){
   const extra = '';
   openConfirm('배포 종료',
     '<b>'+d.n+'</b>'+jo(d.n,'을')+' 종료하면 이 배포로 가는 호출이 중단되고 복구할 수 없습니다. '+extra+'모델과 가중치는 남습니다.',
-    function(){ toast('ok','배포 종료를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.'); }, '종료', null, d.n);
+    function(){
+      /* v0.40 · 종료를 요청하면 삭제 중으로 남고 자원 정리가 확인된 뒤 목록에서 사라진다(배포 정책 2.7 · DEP-L01 5.1).
+         목업은 사라지는 시점을 두지 않는다 */
+      d.st='삭제 중'; d.stalled=false; d.upd=nowStr();
+      if(view==='detail') drawDetail(); else render(true);
+      toast('ok','배포 종료를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.');
+    }, '종료', null, d.n);
+}
+/* v0.40 · 강제 삭제(배포 정책 3.3 · DEP-L01 5.1 · REQ-DEP-097). 되돌릴 수 없어 배포명을 다시 받는다(공통정책 7.5).
+   응답으로 바로 끝나는 작업이라 완료형 토스트다(공통정책 7.7) */
+function forceDel(i){
+  const d=DEPS[i];
+  if(!stalled(d) || !canForce()) return;
+  openConfirm(d.n+' 강제 삭제',
+    '자원 정리를 기다리지 않고 목록에서 지웁니다. 클러스터에 남은 자원이 가속기를 계속 점유할 수 있어 직접 정리해야 할 수 있습니다.',
+    function(){
+      const n=d.n, k=DEPS.indexOf(d);
+      if(k>=0) DEPS.splice(k,1);
+      if(view==='detail') detailBack(); else { closePanel(); cur=null; render(true); }
+      toast('ok', n+jo(n,'을')+' 강제 삭제했습니다.');
+    }, '강제 삭제', null, d.n);
 }
 
 /* ===== 화면 전환 ===== */
@@ -4803,6 +5086,21 @@ function demoGrafanaOff(){
   const i=DEPS.findIndex(function(x){ return x.n==='solar-open-100b-paused'; });
   openDetailAt(i); setDTab(1);
   const e=document.querySelector('.secact'); if(e && e.scrollIntoView) e.scrollIntoView({block:'center'});
+}
+/* 실제 화면에는 없는 검토용 처리다. 정상 외부 배포 하나를 두고 엔진 종류를 바꿔 상세 개요(동작 확인)를 연다(배포 정책 2.2 · 6장) */
+function demoExtKind(k){
+  const sb=document.querySelector('#demoBar .st'); setState('default', sb);
+  let i=DEPS.findIndex(function(x){ return x.n==='ext-demo-workload'; });
+  if(i<0){
+    DEPS.push({n:'ext-demo-workload', ws:'공용 워크스페이스', model:'-', mver:'-',
+      type:'외부 배포', st:'정상', rep:1, tgt:null, acc:'nvidia-h200', gpu:1, topo:'-',
+      owner:'-', at:'2026-10-28 09:10:00', upd:'2026-10-28 09:10:00', health:'안정',
+      ep:'https://ext-demo.internal/ext-demo-workload/v1',
+      gw:false, host:'', tls:false, auth:false, obs:false, kind:'LLM', keys:[]});
+    i=DEPS.length-1;
+  }
+  DEPS[i].kind=k; TST={q:'', a:'', err:'', ms:0, ti:0, to:0, dim:0, rdy:''};
+  openDetailAt(i);
 }
 /* 소스 상태는 정상 배포의 헬스 자리(상세 모니터링 탭 · 패널)에 나온다.
    어느 화면에서 눌러도 정상 자체 배포의 상세 모니터링 탭으로 옮겨 바로 보이게 한다. 실제 화면에는 없는 검토용 처리다 */
@@ -4960,7 +5258,7 @@ function openConfirm(title,body,onOk,okLabel,cancelLabel,confirmName){
   document.getElementById('cfBody').innerHTML=body;
   const ok=document.getElementById('cfOk');
   ok.textContent=okLabel||'확인';
-  ok.className='btn'+(['삭제','종료','취소','중단','일시중지','해제','등록 해제'].indexOf(okLabel)>=0?' danger':'');
+  ok.className='btn'+(['삭제','종료','취소','중단','일시중지','해제','등록 해제','강제 삭제'].indexOf(okLabel)>=0?' danger':'');
   ok.style.display=onOk?'':'none';
   ok.onclick=function(){ closeConfirm(); if(onOk) onOk(); };
   document.querySelector('#mdConfirm .btn.ghost').textContent = cancelLabel || (onOk?'취소':'닫기');
@@ -5027,7 +5325,9 @@ function cfgDef(d){
     maxLen: String(d.maxLen||''), gpuUtil: String(d.gpuUtil||'0.9'),
     auth: d.auth!==false,
     /* v0.36 · 키 없는 요청 분당 한도(배포 정책 5.5 · CON-866 9항). 재기동 없음 구간이다 */
-    anon: String(anonOf(d))
+    anon: String(anonOf(d)),
+    /* v0.40 · 지표 · 추적 수집. 재기동 필요 구간이다(배포 정책 2.6 · DEP-L01 7.7) */
+    obs: !!d.obs
   };
 }
 /* 검토용: 저장 시 서버가 배포 조건으로 거절하는 경우. 실제 화면에는 없다 */
@@ -5057,7 +5357,7 @@ function cfgChg(){
   const o=cfgDef(cur.d);
   return {
     live: ['temp','topP','sysPrompt'].some(function(k){ return CFG[k]!==o[k]; }),
-    rest: ['auto','minRep','maxRep','rep','cpu','mem','maxLen','gpuUtil'].some(function(k){ return CFG[k]!==o[k]; }),
+    rest: ['auto','minRep','maxRep','rep','cpu','mem','maxLen','gpuUtil','obs'].some(function(k){ return CFG[k]!==o[k]; }),
     /* 인증은 재기동이 따르지 않는다. 끄던 것을 켜면 기존 호출이 막히므로 그때만 알린다 */
     /* v0.36 · 인증을 끈 채 한도만 바꿔도 저장할 수 있다. 재기동 판정(rest)에는 넣지 않는다 */
     auth: CFG.auth!==o.auth || (!CFG.auth && CFG.anon!==o.anon),
@@ -5117,13 +5417,22 @@ function drawCfg(){
    + cfgRow('maxLen','최대 컨텍스트 길이','inputmode="numeric" placeholder="'+(((modelReq(d.model)||{}).ctx)||'모델 기본값')+'"'+(CFG.err? ' id="cfgMaxLen" style="border-color:var(--destructive)"':' id="cfgMaxLen"'),'한 번에 처리할 토큰 수입니다. 비우면 모델 기본값을 사용합니다.')
    /* 모델 상한을 넘으면 저장 시 인라인 에러(REQ-DEP-089 · DEP-L01 5.3) */
    + (CFG.err? '<p class="ferr" style="text-align:right">'+CFG.err+'</p>' : '')
-   + cfgStep('gpuUtil','가속기 메모리 사용률','',0.1,1.0,0.1,'높이면 더 많은 요청을 담지만 남는 메모리가 줄어듭니다. 0.1 ~ 1.0 사이로 지정합니다.','id="cfgGpuUtil"',!!CFG.utilErr)
-   + (CFG.utilErr? '<p class="ferr" style="text-align:right">'+CFG.utilErr+'</p>' : '')
+   /* v0.40 · Furiosa-LLM 배포에는 가속기 메모리 사용률을 두지 않는다(배포 정책 5.3 · DEP-L01 7.7) */
+   + (depFuriosa(d) ? ''
+      : cfgStep('gpuUtil','가속기 메모리 사용률','',0.1,1.0,0.1,'높이면 더 많은 요청을 담지만 남는 메모리가 줄어듭니다. 0.1~1.0 사이로 지정합니다.','id="cfgGpuUtil"',!!CFG.utilErr)
+        + (CFG.utilErr? '<p class="ferr" style="text-align:right">'+CFG.utilErr+'</p>' : ''))
    + '</div>';
 
   /* ⚠ 추론 기본값(temperature · top_p · 시스템 프롬프트)은 두지 않는다.
      현행 Configure 모달 내용이 관측되지 않았고 TUI · 차트에도 없다.
      vLLM 은 이 값들을 호출 시 파라미터로 받으므로 배포 설정에 둘 값이 아닐 수 있다 */
+
+  /* v0.40 · 지표 · 추적 수집. 생성 04 검수에서 정하던 값을 여기서도 바꾼다. 재기동 필요 구간이다(배포 정책 2.6 · DEP-L01 7.7 · REQ-DEP-094) */
+  h+='<div class="cfggrp"><div class="gh"><h5>수집</h5><span class="gtag rst">재기동 필요</span></div>'
+   + '<div class="gd">저장하면 배포가 다시 기동됩니다.</div>'
+   + '<div class="cfgrow"><label>지표 · 추적 수집'+tip('끄면 이 배포의 지표와 추적을 모으지 않고 Grafana 대시보드를 열 수 없습니다.')+chgMark('obs')+'</label>'
+   +   '<span class="sw'+(CFG.obs?' on':'')+'" onclick="cSet(\'obs\',!CFG.obs)"></span></div>'
+   + '</div>';
 
   /* 구간 순서는 재기동 필요 → 변경 불가 → 재기동 없음이다(DEP-L01 7.7).
      바꿀 수 없는 값도 자리를 둔다 — 없으면 어디서 바꾸는지 찾아 헤맨다 */
@@ -5160,7 +5469,8 @@ function drawCfg(){
    + '<b>인증</b><span>지금까지 키 없이 호출하던 요청은 더 이상 처리되지 않습니다.</span></div>';
 
   document.getElementById('cfgBody').innerHTML=h;
-  document.getElementById('cfgSub').textContent = d.n+'의 용량과 엔진 설정을 수정합니다.';
+  /* 구간(용량 · 엔진 설정 · 수집 · 병렬 처리 · 접근 설정)에 묶이지 않는 문장으로 둔다 — 구간이 늘어도 고칠 필요가 없다(DEP-L01 7.7) */
+  document.getElementById('cfgSub').textContent = d.n+'의 설정을 수정합니다.';
   document.getElementById('cfgSave').disabled = !(chg.live || chg.rest || chg.auth);
 }
 
@@ -5178,7 +5488,7 @@ function submitCfg(){
     : (q.ctx && ml && (parseInt(ml)||0)>q.ctx)
     ? '이 모델의 최대 컨텍스트 길이는 '+ctxN(q.ctx)+' 토큰입니다. '+ctxN(q.ctx)+' 이하로 입력해 주세요.' : '';
   const gu=String(CFG.gpuUtil).trim(), guN=Number(gu);
-  CFG.utilErr = (gu==='' || isNaN(guN) || guN<0.1 || guN>1) ? '0.1~1.0 사이의 값을 입력해 주세요.' : '';
+  CFG.utilErr = (!depFuriosa(d) && (gu==='' || isNaN(guN) || guN<0.1 || guN>1)) ? '0.1~1.0 사이의 값을 입력해 주세요.' : '';
   CFG.anonErr = (!CFG.auth && !anonOk(CFG.anon)) ? '1~1,000,000 사이의 정수를 입력해 주세요.' : '';
   /* 검토용: 화면 검증을 지나도 서버가 배포 조건으로 거절하면 모달 상단에 사유 한 문장을 둔다(DEP-L01 5.3). 모달과 입력값은 그대로 둔다 */
   if(CFG_REJ && !(CFG.repErr || CFG.utilErr || CFG.anonErr)){
@@ -5200,7 +5510,7 @@ function submitCfg(){
   if(chg.rest){
     d.auto=CFG.auto; d.maxRep=parseInt(CFG.maxRep)||d.maxRep;
     d.tgt=parseInt(CFG.auto? CFG.minRep : CFG.rep)||d.tgt;
-    d.maxLen=CFG.maxLen; d.gpuUtil=CFG.gpuUtil;
+    d.maxLen=CFG.maxLen; d.gpuUtil=CFG.gpuUtil; d.obs=CFG.obs;
     /* 엔드포인트는 운영룸 호스트로 정해져 재기동해도 바뀌지 않는다(5.1). 최근 변경일시를 갱신한다(5.1) */
     d.st='생성 중'; d.rep=0; d.upd=nowStr();
     toast('ok','설정 변경을 요청했습니다. 다시 기동되면 알림으로 안내됩니다.');
@@ -5255,13 +5565,14 @@ function openImport(){
   /* 매칭 결과는 화면을 열 때마다 다시 받는다 */
   /* 선택은 연결할 모델이 있을 때만 할 수 있다(DEP-L01 7.5). 자동 연결한 행은 선택해 둔다 */
   IMP = FOUND.map(function(f){ return { pick: f.match||'', auto: f.auto, sel: !!f.match }; });
+  impErr=false;
   view='imp'; cur=null; closePanel(); syncView(); drawImport(); vwBtn(3);
 }
 function impSet(i,v){ IMP[i].pick=v; IMP[i].sel=!!v; drawImport(); }
 function impSel(i,v){ if(!IMP[i].pick) return; IMP[i].sel=v; drawImport(); }
 /* 연결한 것이 있으면 확인받는다. 자동 연결분은 화면이 채워 준 것이라 세지 않는다 */
 function impQuit(){
-  const touched = IMP.some(function(x,i){ return x.pick !== (FOUND[i].match||'') || x.sel !== !!FOUND[i].match; });
+  const touched = IMP.some(function(x,i){ return x.pick !== (FOUND[i].match||'') || x.sel !== !!FOUND[i].match || (x.kind && x.kind!=='LLM'); });
   if(touched){
     openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.',
       function(){ backToList(); }, '취소', '계속 작성');
@@ -5270,6 +5581,7 @@ function impQuit(){
   backToList();
 }
 function impPicked(){ return IMP.filter(function(x){ return x.pick && x.sel; }).length; }
+let impErr=false;   /* 고른 것 없이 누른 뒤에만 에러로 보인다(공통정책 7.8) */
 
 function drawImport(){
   const picked=impPicked();
@@ -5280,25 +5592,29 @@ function drawImport(){
    + '<div class="dmeta"><span class="dash">클러스터에서 찾은 추론 워크로드를 배포 목록에 등록합니다.</span></div></div></div>';
 
   /* 등록 뒤에 무엇이 달라지는지 먼저 알린다. 되돌리려면 등록을 해제해야 한다 */
-  h+=alertBox('info','가져온 배포는 조회만 할 수 있습니다.',
+  h+=alertBox('info','가져온 배포는 조회 · 동작 확인 · 등록 해제만 제공합니다.',
     '콘체르토 밖에서 기동된 워크로드라 자원 한도가 적용되지 않고, 게이트웨이 연결과 설정 변경은 제공하지 않습니다. '
    + '워크스페이스는 행마다 고릅니다. 운영룸 구획에 있는 워크로드는 그 워크스페이스를 미리 골라 두고, 그 밖에는 공용 워크스페이스로 둡니다.','',false);
 
   h+='<div class="dsec"><h4>찾은 워크로드 <span style="font-weight:400;color:var(--muted-foreground)">'+FOUND.length+'건</span></h4>'
    + '<div class="tblwrap"><table class="tbl"><thead><tr>'
-   /* 열 순서는 선택 → 워크로드 → 위치 → 상태 → 가속기 → 연결할 모델 → 워크스페이스다(DEP-L01 7.5) */
+   /* 열 순서는 선택 → 워크로드 → 위치 → 상태 → 가속기 → 연결할 모델 → 엔진 종류 → 워크스페이스다(DEP-L01 7.5).
+      v0.40 · 엔진 종류를 더했다. 기본 LLM. 동작 확인과 엔진 지표 범위가 정해진다(배포 정책 2.2) */
    +   '<th style="width:40px"></th>'
    +   '<th>워크로드</th>'
    +   '<th class="thcell" style="width:150px">'+thHelp('imploc','위치')+'</th>'
    +   '<th style="width:104px">상태</th>'
    +   '<th class="thcell" style="width:160px">'+thHelp('impacc','가속기')+'</th>'
    +   '<th class="thcell" style="width:260px">'+thHelp('impmatch','연결할 모델')+'</th>'
+   +   '<th class="thcell" style="width:140px">'+thHelp('impkind','엔진 종류')+'</th>'
    +   '<th style="width:150px">워크스페이스</th>'
    + '</tr></thead><tbody>'
    + FOUND.map(function(f,i){
        const on=!!IMP[i].pick;
        return '<tr'+(on?' class="imppick"':'')+'>'
-        + '<td><input type="checkbox" aria-label="선택"'+(IMP[i].sel?' checked':'')+(IMP[i].pick?'':' disabled title="연결할 모델을 고르면 선택할 수 있습니다."')+' onchange="impSel('+i+',this.checked)"></td>'
+        + '<td>'+(IMP[i].pick
+            ? '<input type="checkbox" aria-label="선택"'+(IMP[i].sel?' checked':'')+' onchange="impSel('+i+',this.checked)">'
+            : disTip('<input type="checkbox" aria-label="선택" disabled>', '연결할 모델을 고르면 선택할 수 있습니다.'))+'</td>'
         + '<td>'+f.pod+'</td>'
         + '<td class="dash">'+f.ns+'</td>'
         + '<td><span class="stbadge '+(f.st==='절전'?'mu':'ok')+'">'+f.st+'</span></td>'
@@ -5317,6 +5633,9 @@ function drawImport(){
       후보 목록에는 가속기를 쓰는 LLM 워크로드가 오른다 */
    + (IMP[i].auto && IMP[i].pick? '<div class="hint">모델 명칭과 메타데이터로 연결했습니다. 맞는지 확인해 주세요.</div>':'')
         + '</td>'
+       + '<td><select class="inp" onchange="IMP['+i+'].kind=this.value">'
+       +   ['LLM','임베딩','OCR','KServe 범용','기타'].map(function(k){ return '<option'+((IMP[i].kind||'LLM')===k?' selected':'')+'>'+k+'</option>'; }).join('')
+       + '</select></td>'
        /* 귀속 워크스페이스는 가져올 때 정한다. 서버는 요청마다 받은 워크스페이스에 두고, 없으면 공용 워크스페이스에 둔다(CON-866 4항).
           운영룸 구획에 있는 워크로드는 그 워크스페이스를 미리 골라 둔다(DEP-L01 7.5) */
        + '<td><select class="inp" onchange="IMP['+i+'].ws=this.value">'
@@ -5328,16 +5647,23 @@ function drawImport(){
    + '</tbody></table></div></div>';
 
   h+='<div class="formfoot">'
-   + '<span class="dash" style="margin-right:auto;font-size:12.5px">'
+   + '<span class="'+((impErr && !picked)?'errmsg':'dash')+'" style="margin:0 auto 0 0;font-size:12.5px">'
    +   (picked? picked+'건을 가져옵니다.' : '가져올 워크로드를 선택해 주세요.')+'</span>'
    + '<button class="btn ghost" onclick="impQuit()">취소</button>'
-   + '<button class="btn"'+(picked?'':' disabled')+' onclick="submitImport()">가져오기</button>'
+   /* 고른 것이 없어도 누를 수 있다. 누르면 아래 submitImport 가 알린다(공통정책 7.1) */
+   + '<button class="btn" onclick="submitImport()">가져오기</button>'
    + '</div>';
 
   document.getElementById('impBody').innerHTML=h;
 }
 
 function submitImport(){
+  if(!impPicked()){
+    impErr=true; drawImport();
+    const el=document.querySelector('#pgImp td select');
+    if(el) el.focus();
+    return;
+  }
   const add=[];
   FOUND.forEach(function(f,i){
     if(!(IMP[i].pick && IMP[i].sel)) return;
@@ -5346,7 +5672,7 @@ function submitImport(){
       acc:f.acc, gpu:f.gpu, topo:'-',
       owner:'-', at:'2026-08-18 10:40:39', upd:'2026-08-18 13:40:56', health:'안정',
       ep:'https://'+f.ns+'.internal/'+f.pod+'/v1',
-      gw:false, host:'', tls:false, auth:false, obs:false, keys:[] });
+      gw:false, host:'', tls:false, auth:false, obs:false, kind:IMP[i].kind||'LLM', keys:[] });
   });
   add.reverse().forEach(function(d){ DEPS.unshift(d); });
   backToList();
