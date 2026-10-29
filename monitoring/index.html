@@ -1,8 +1,43 @@
 <!--
-  콘체르토 매니저 — 모니터링 목업 v0.29 (2026-10-27)
+  콘체르토 매니저 — 모니터링 목업 v0.31 (2026-10-29)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다 —
   필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
 
+  ── v0.31 (2026-10-29) ──────────────────────
+  · 배포 성능 탭 인프라 차트 계열 정정(모니터링 정책 5.1 · MON-L01 REQ-MON-090). 둘째 계열을 VRAM에서 KV 캐시 사용률로.
+    VRAM은 서빙 엔진이 기동할 때 미리 잡아 늘 높고 평평해 추이가 보이지 않는다(정책 5.2). VRAM은 카드로만 둔다.
+    KV 캐시 사용률은 서빙 엔진 지표지만 가속기 사용률과 같은 단위(%)라 한 축에서 연산과 메모리 부하를 함께 읽는다. 서빙 엔진 계층은 그대로다.
+
+  ── v0.30 (2026-10-28) ──────────────────────
+  · 10-28 VRAM 기준 재정정(6차, CON-963 · 모니터링 정책 6.4). 시스템 기본 규칙 VRAM은 배분받은 VRAM 대비 사용률이 90%를 넘는 상태가 1분 이어지면 오류다.
+    평균이 아니라 지속 조건이다(백엔드 10-28 92f089c5 시드 규칙). 배분받은 VRAM은 장치 총량 × 가속기 메모리 사용률이다.
+    메트릭 카탈로그 라벨을 `VRAM 사용률` 로(괄호 표기 삭제). 아래 4차 줄의 괄호 표기도 같이 고쳤다.
+  · 10-28 중지 표시 정정(5차). 중지된 알림 규칙은 이름 아래 흐린 글씨 `중지` 만 두고, 꺼진 사유는 툴팁으로 보인다(포커스로도 열림).
+    사용자 및 역할 목업 v0.17 의 삭제된 계정 표시(`삭제됨` + 툴팁)와 같은 형식이다(.tip-anchor · .sub · .tip). 사유별 배지(`중지 · 채널 삭제` 등)는 쓰지 않는다
+    (모니터링 정책 6.4 · MON-L01 REQ-MON-075 · 7.2). 사유는 직접 중지 · 채널 삭제 · 대상 배포 없음 · 같은 범위 · 심각도의 사용자 규칙 있음 넷이다.
+    툴팁 문구는 이 목업에만 둔다(사유별 한 문장 — 대상 배포 없음만 조치를 붙인다. 그 화면에서 할 수 있는 조치라서다).
+  · 10-28 CON-963 반영(4차). 시스템 기본 규칙 VRAM을 사용량 75GB에서 VRAM 사용률 90% 초과(1분 지속)로(정책 6.4). 샘플 원본 · 복제본 셋의 메트릭을 vram_pct · 단위 % 로.
+    메트릭 카탈로그 GPU 묶음에 `VRAM 사용률`(%) 추가, `VRAM 사용량`(GB)은 그대로 둔다. v0.28 에 기준표에 없어 뺀 `VRAM 점유율(%)` 을 기본 규칙 지표로 다시 둔 것이다.
+    꺼진 사유 배지 `중지 · 같은 규칙 있음` 과 배지 도움말 추가(REQ-MON-075 · 7.2) — 5차에서 `중지` + 툴팁 사유로 바꿨다. 샘플: ai-service-team `VRAM 사용률 초과` 복제본(사용자 규칙 `VRAM 사용률 높음` 이 있어 꺼짐).
+  · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다).
+  · 데모 바 `Grafana 비활성` 이 지금 고른 역할을 유지한다 — 뷰어를 고르고 누르면 앞 문장만 보인다(REQ-MON-089).
+    엔진 종류가 LLM이 아닌 외부 배포의 서빙 엔진 계층 제외는 종전대로 배포 목업 v0.40 데모 바로 본다.
+  · 10-28 재검증 정정(2차). 슬롯 패널 CDE 점유 문구를 `CDE가 점유하고 있습니다.` 로(「개발환경」은 쓰지 않는 말 — MON-L01 5.2 도 같이 고쳤다).
+    .dis-tip.flip 은 라이브러리 v0.25 에 들어가 주석을 고쳤다.
+  · 10-28 검증 정정. Grafana 열기 비활성 사유를 title 대신 라이브러리 v0.25 .dis-tip(포커스로 열림)으로.
+    알림 규칙 메트릭 묶음 이름 `추론 엔진` 을 `서빙 엔진` 으로(용어집 5장 · 모니터링 정책 6.3 · MON-L01 7.3 같이 고침).
+    메트릭 이름(P2P 드레인 등)은 수집 원천 지표명이라 그대로 둔다(모니터링 정책 6.3 표). `점검 필요 GPU 수` 단위를 `장` 으로(용어집 1 · 5장).
+    진단 로그 피드 이름 `헬스체크`(/healthz 응답 로그)를 `상태 확인 요청` 으로 — 「헬스」는 쓰지 않는 말이고 배포 건전성과 다른 것이다(용어집 4장).
+  · 알림 규칙 추가 `저장` 을 입력 상태와 무관하게 활성으로 둔다(공통정책 7.1). 누르면 이름 · 메트릭 · 임계값(Xid 는 코드) ·
+    지속 시간 · 워크스페이스를 모두 검증해 실패한 칸마다 인라인 에러를 보이고 첫 오류 칸으로 포커스한다(7.8).
+    문구: `규칙 이름을 입력해 주세요.` · `2자 이상 입력해 주세요.` · `메트릭을 선택해 주세요.` · `임계값을 입력해 주세요.` ·
+    `코드를 1개 이상 선택해 주세요.` · `워크스페이스를 선택해 주세요.` · 지속 시간은 기존 `1 이상의 정수를 입력해 주세요.`.
+    규칙 수정은 변경이 없을 때만 비활성이다. 대상 배포가 사라진 범위(scopeGone)는 기존 인라인 에러를 그대로 쓴다.
+  · Grafana 열기 비활성 사유에 켜는 곳을 붙였다. 지표 · 추적 수집을 배포 설정 변경에서 바꿀 수 있게 되어(배포 정책 2.6),
+    설정 변경 권한이 있는 역할에게는 `지표 · 추적 수집을 사용하지 않는 배포입니다. 배포 상세의 설정 변경에서 켤 수 있습니다.` 를,
+    뷰어에게는 앞 문장만 둔다(모니터링 정책 5.4 · MON-L01 REQ-MON-089). 이 목업의 역할 중 최고 관리자 · 워크스페이스 관리자가 앞쪽이다.
+    외부 배포는 설정 변경이 없어 상태만 둔다. 이 목업에는 지표 · 추적 수집을 쓰지 않는 외부 배포 샘플이 없다.
+  · 엔진 종류가 LLM이 아닌 외부 배포는 서빙 엔진 계층을 두지 않는다(모니터링 정책 5.3 · 배포 정책 2.2). 이 목업에는 그런 샘플을 두지 않았다 — 배포 목업 v0.40 데모 바로 본다.
   ── v0.29 (2026-10-27) ──────────────────────
   · 메트릭 묶음을 카탈로그 다섯 묶음(GPU · NPU · 추론 엔진 · 게이트웨이 · 노드)으로 고쳤다(모니터링 정책 6.3 · MON-L01 7.3).
     묶음은 카탈로그가 내려 주며 수집 출처로 갈린다. GPU 건전성 묶음을 없앴다. 배포 건전성(정책 5장)과 이름이 겹치고, 그 항목 대부분이 건전성에 반영되지 않는다.
@@ -764,6 +799,9 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 /* 페이지 타이틀 툴팁 — 화면 상단이라 아래로 펼침(잘림 방지) */
 /* 모달 안에서는 아래로 연다. 위로 열면 모달 상단 경계에서 잘린다.
    모달은 overflow:auto 라 밖으로 나갈 수 없다 */
+.tip-anchor.offtip{margin-left:0}
+/* 중지 표시 — 사용자 및 역할 목업 .sub 와 같은 흐린 글씨. 배지 글자 크기(.stbadge 12px)에 맞춘다 */
+.offtip .sub{color:var(--muted-foreground);font-size:12px}
 .tip-anchor.below .tip,.modal .tip-anchor .tip{top:calc(100% + 8px);bottom:auto;left:0;transform:translateX(0) translateY(-4px)}
 .modal .tip-anchor:hover .tip,.modal .tip-anchor:focus-within .tip{transform:translateX(0) translateY(0)}
 .modal .tip-anchor .tip::after{top:auto;bottom:100%;left:14px;transform:none;border-top-color:transparent;border-bottom-color:var(--flyout)}
@@ -2522,6 +2560,18 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
      글꼴만 바꿔 장치를 다루는 화면이라는 느낌을 준다. 가속기 탭에 우선 적용한다
      (기획 판단, 2026-08-28). 값 잦은 자리는 숫자 폭도 맞춘다(tabular-nums) */
   .mono{font-family:ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+/* 비활성 사유 툴팁 — 컴포넌트 라이브러리 v0.25 .dis-tip 그대로(공통정책 4.7 · 7.10).
+   비활성 버튼은 호버 · 포커스를 받지 않아 감싼 요소를 앵커로 두고 tabindex="0" 을 준다. title 은 쓰지 않는다 */
+.tip-anchor.dis-tip{margin-left:0;cursor:not-allowed;border-radius:8px}
+.dis-tip:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
+.dis-tip > :disabled{pointer-events:none}
+.dis-tip .tip{white-space:normal;width:max-content;max-width:280px;left:0;transform:translateY(4px)}
+.dis-tip:hover .tip,.dis-tip:focus-within .tip{transform:translateY(0)}
+.dis-tip .tip::after{left:14px;transform:none}
+/* 오른쪽 끝 버튼은 툴팁이 화면 밖으로 나가지 않게 오른쪽 기준으로 연다(라이브러리 v0.25 .dis-tip.flip) */
+.dis-tip.flip .tip{left:auto;right:0}
+.dis-tip.flip .tip::after{left:auto;right:14px}
 </style><body class="dark">
 <div class="app">
 
@@ -2710,6 +2760,23 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 </div>
 
 <script>
+/* 비활성 사유 툴팁(라이브러리 v0.25 .dis-tip). 사유 문구는 HTML 로 넣지 않는다 */
+function disTipEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function disTip(inner, why){ return '<span class="tip-anchor dis-tip" tabindex="0">'+inner+'<span class="tip">'+disTipEsc(why)+'</span></span>'; }
+function disTipFit(e){
+  const a=e.target && e.target.closest && e.target.closest('.dis-tip'); if(!a) return;
+  const t=a.querySelector('.tip'); if(!t) return;
+  a.classList.remove('flip'); t.style.left=''; t.style.right='';
+  const r=a.getBoundingClientRect(), w=Math.min(280,t.scrollWidth), vw=window.innerWidth;
+  if(r.left+w+8<=vw) return;
+  /* 화면별 툴팁 위치 규칙이 left 를 덮어쓰는 자리가 있어 인라인으로 둔다 */
+  if(r.right-w>=8){ a.classList.add('flip'); t.style.left='auto'; t.style.right='0'; return; }
+  /* 양쪽 다 모자라면(좁은 화면) 화면 안 8px 여백에 맞춘다 */
+  t.style.left=Math.max(8-r.left, vw-8-w-r.left)+'px';
+}
+document.addEventListener('focusin', disTipFit, true);
+document.addEventListener('mouseover', disTipFit, true);
+
 /* ══════════════════════════════════════════════════════════
    콘체르토 매니저 — 모니터링 목업 v0.1 (2026-08-27)
    색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 여기서 새 값을 만들지 않는다.
@@ -3152,6 +3219,15 @@ function depBad(d){
 }
 /* 저활용 주의 — 요청이 적어 가속기를 거의 쓰지 않는 배포(모니터링 정책 5.2 UNDER_UTILIZATION).
    저활용은 사용자가 일부러 띄워 둔 배포라 확인 필요에 올리지 않는다(모니터링 정책 4.4). 개요 건수도 같은 기준이다 */
+/* 중지 사유별 툴팁 문구(목업에만 둔다 — 도움말은 목업 소관). 키는 검토용 샘플 값이다 */
+const OFF_TIP={'직접 중지':'직접 중지한 규칙입니다.',
+  '채널 삭제':'지정한 알림 채널이 모두 삭제되어 중지되었습니다.',
+  '대상 없음':'감시하던 배포가 없어 중지되었습니다. 수정에서 대상 범위를 바꾼 뒤 재개할 수 있습니다.',
+  '같은 규칙 있음':'같은 범위 · 심각도의 사용자 규칙이 있어 중지되었습니다.'};
+function offMark(off){
+  return '<span class="tip-anchor below offtip"><span class="sub" tabindex="0">중지</span>'
+    + '<span class="tip">'+(OFF_TIP[off]||OFF_TIP['직접 중지'])+'</span></span>';
+}
 function underUsed(m){ return !!m && m.label==='주의' && m.reason==='UNDER_UTILIZATION'; }
 /* 가속기 탭이 다루는 노드 — 가속기가 없는 노드는 두지 않는다(모니터링 정책 4.5 · REQ-MON-035 정정).
    노드 목록·건수·전체 펼침·확인 필요 항목이 모두 이 목록을 쓴다 */
@@ -3287,7 +3363,7 @@ let RULES=[
   {n:'첫 토큰 지연', metric:'ttft_p95_ms', op:'초과', th:3500, dur:1, sev:'주의',
    ws:'ai-service-team', scope:'llama-3-2-1b-prod', ch:[], by:'임승주(sj.lim)', at:'2026-10-21 10:02:14', fires:[]},
   /* 대상 배포(qwen3-8b-eval)가 종료되어 시스템이 중지한 규칙. 지우지 않고 남겨 대상 범위를 바꿔 다시 쓸 수 있다(정책 6.4).
-     ⚠ 중지 사유 값(채널 삭제의 CHANNEL_DELETED 같은 값)은 구현 확인 대상이다. 검토용 값이다 */
+     대상 배포 없음은 아직 구현에 사유 값이 없다(배포가 지워지면 규칙도 지워진다). 꺼 두고 사유 값을 더하도록 요청했다(CON-963 2026-10-28). 검토용 값이다 */
   {n:'첫 토큰 지연 평가', metric:'ttft_p95_ms', op:'초과', th:4000, dur:1, sev:'주의',
    ws:'ai-service-team', scope:'qwen3-8b-eval', ch:['slack-ai-alert'], by:'임승주(sj.lim)', at:'2026-09-30 14:20:11',
    fires:[], off:'대상 없음', offAt:'2026-10-19 18:02:40'},
@@ -3297,7 +3373,7 @@ let RULES=[
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:'성유진(yj.seong)', at:'2026-10-20 16:40:02', fires:[]},
   /* 시스템 기본 규칙 4종의 원본. 공용 워크스페이스에 속한 전역 규칙이고 최고 관리자만 고친다(모니터링 정책 6.1 · 6.4). 시스템이 만들어 등록자가 없다.
      gid 는 원본과 복제본을 잇는 검토용 키다. 연결된 복제본(linked)은 원본의 임계값 · 연산자 · 심각도 · 채널을 따른다(정책 6.4) */
-  {n:'VRAM 초과', metric:'vram_gb', op:'초과', th:75, dur:1, sev:'오류',
+  {n:'VRAM 사용률 초과', metric:'vram_pct', op:'초과', th:90, dur:1, sev:'오류',
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g1'},
   {n:'첫 토큰 지연 증가', metric:'ttft_p95_ms', op:'초과', th:3000, dur:1, sev:'주의',
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g2'},
@@ -3305,10 +3381,14 @@ let RULES=[
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g3'},
   {n:'가속기 온도 주의', metric:'gpu_temp', op:'초과', th:80, dur:1, sev:'주의',
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g4'},
-  /* ai-service-team 의 복제본. 손대지 않은 셋은 연결되어 있다. `가속기 온도 오류` 복제본은 지웠다 —
-     사용자 규칙 `가속기 온도 이상` 이 같은 범위 · 메트릭 · 심각도라 함께 둘 수 없다(정책 6.3 중복). 지운 복제본의 지표는 전역 규칙으로 판정한다(정책 6.4) */
-  {n:'VRAM 초과', metric:'vram_gb', op:'초과', th:75, dur:1, sev:'오류',
-   ws:'ai-service-team', scope:'전체', ch:[], by:null, at:'2026-08-20 10:00:00', fires:[], linked:true, gid:'g1'},
+  /* ai-service-team 의 복제본. `첫 토큰 지연 증가` · `가속기 온도 주의` 는 연결되어 있다. `가속기 온도 오류` 복제본은 지웠다 —
+     사용자 규칙 `가속기 온도 이상` 이 같은 범위 · 메트릭 · 심각도라 함께 둘 수 없다(정책 6.3 중복). 지운 복제본의 지표는 전역 규칙으로 판정한다(정책 6.4).
+     `VRAM 사용률 초과` 복제본은 기본 규칙을 VRAM 사용률로 옮길 때 같은 범위 · 심각도에 켜진 사용자 규칙 `VRAM 사용률 높음` 이 있어
+     꺼진 채 남은 예다. 이름 아래 `중지`, 툴팁 사유는 같은 범위 · 심각도의 사용자 규칙 있음(정책 6.4 · REQ-MON-075 · CON-963). 시스템이 끈 것이라 연결은 풀려 있다. 시각은 검토용이다 */
+  {n:'VRAM 사용률 초과', metric:'vram_pct', op:'초과', th:90, dur:1, sev:'오류',
+   ws:'ai-service-team', scope:'전체', ch:[], by:null, at:'2026-08-20 10:00:00', fires:[], gid:'g1', off:'같은 규칙 있음', offAt:'2026-10-28 09:00:00'},
+  {n:'VRAM 사용률 높음', metric:'vram_pct', op:'초과', th:85, dur:1, sev:'오류',
+   ws:'ai-service-team', scope:'전체', ch:['slack-ai-alert'], by:'성유진(yj.seong)', at:'2026-10-22 10:14:05', fires:[]},
   {n:'첫 토큰 지연 증가', metric:'ttft_p95_ms', op:'초과', th:3000, dur:1, sev:'주의',
    ws:'ai-service-team', scope:'전체', ch:[], by:null, at:'2026-08-20 10:00:00', fires:[], linked:true, gid:'g2'},
   {n:'가속기 온도 주의', metric:'gpu_temp', op:'초과', th:80, dur:1, sev:'주의',
@@ -3317,7 +3397,7 @@ let RULES=[
      linked 가 true 면 전역 규칙에 연결된 상태다. 규칙명 아래 `전역 기본` 배지를 둔다.
      임계값 · 연산자 · 심각도 · 채널 · 사용 여부 중 하나를 바꾸면 연결이 풀려 워크스페이스 규칙이 되고 배지를 지운다. 중지도 사용 여부를 바꾼 것이다.
      `가속기 온도 주의` 는 워크스페이스에서 임계값을 80°C 에서 78°C 로 고쳐 연결이 풀린 예다. 규칙 이름 · 시각은 검토용이다 */
-  {n:'VRAM 초과', metric:'vram_gb', op:'초과', th:75, dur:1, sev:'오류',
+  {n:'VRAM 사용률 초과', metric:'vram_pct', op:'초과', th:90, dur:1, sev:'오류',
    ws:'ml-research', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], linked:true, gid:'g1'},
   {n:'첫 토큰 지연 증가', metric:'ttft_p95_ms', op:'초과', th:3000, dur:1, sev:'주의',
    ws:'ml-research', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:['2026-10-21 13:22:05'], linked:true, gid:'g2'},
@@ -3330,7 +3410,7 @@ let RULES=[
 /* 메트릭 카탈로그: 백엔드가 가진다. 프로파일 순서로 묶는다(정책 6.3).
    sev·op·th 는 메트릭을 고를 때 채우는 표준값이다. on:false 는 수집되지 않는 메트릭이다.
    ⚠ 항목과 값은 데모다. 실제로는 카탈로그 응답을 따른다 */
-const PROFILES=['GPU','NPU','추론 엔진','게이트웨이','노드'];
+const PROFILES=['GPU','NPU','서빙 엔진','게이트웨이','노드'];
 /* hb: 건전성 판정 유형(모니터링 정책 5.2 · 6.3). 백엔드가 카탈로그 항목마다 내려준다(결정 사항 댓글 3493658729 결정(안) 3).
      over 초과형(위험 = 기준값의 2배) · room 여유형(위험 = 기준값 + 상한까지 남은 여유의 절반) · temp 규칙 심각도가 등급.
    nocrit: 위험이 없어 주의까지만 판정하는 지표다.
@@ -3338,6 +3418,9 @@ const PROFILES=['GPU','NPU','추론 엔진','게이트웨이','노드'];
    NPU 스로틀링 발생은 건전성 반영(열 · 전력 제한, Furiosa) · `0 초과` 주의다(결정 사항 댓글 3493265556 알림 항목 표). 주의까지만 판정한다(모니터링 정책 5.2 표 밖의 판정) */
 const CATALOG=[
   {k:'gpu_util',       p:'GPU',      t:'가속기 사용률',   u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room', nocrit:true},
+  /* VRAM은 장치마다 메모리 크기가 달라 시스템 기본 규칙은 사용률(%)로 본다. 배분받은 VRAM 대비다(정책 6.4 · CON-963).
+     사용량(GB)은 카탈로그에 남아 사용자가 직접 규칙을 만들 수 있다. 창은 `PCIe 재전송(1시간)` 처럼 이름 뒤 괄호로 적는다 */
+  {k:'vram_pct',       p:'GPU',      t:'VRAM 사용률', u:'%', sev:'오류', op:'초과', th:90, on:true},
   {k:'vram_gb',        p:'GPU',      t:'VRAM 사용량',    u:'GB', sev:'오류', op:'초과', th:75,   on:true},
   {k:'gpu_temp',       p:'GPU',      t:'가속기 온도',     u:'°C', sev:'오류', op:'초과', th:85,   on:true, hb:'temp'},
   {k:'gpu_power',      p:'GPU',      t:'가속기 전력',     u:'W',  sev:'주의', op:'초과', th:650,  on:true},
@@ -3358,18 +3441,18 @@ const CATALOG=[
   {k:'gpu_pcie_link_degraded',   p:'GPU', t:'PCIe 링크 저하(10분 지속)',   u:'', sev:'주의', op:'초과', th:0,  on:true, byGpu:true},
   {k:'gpu_pcie_replay_1h',       p:'GPU', t:'PCIe 재전송(1시간)',         u:'건', sev:'주의', op:'초과', th:10, on:true, byGpu:true},
   {k:'gpu_p2p_not_ok',           p:'GPU', t:'GPU 간 P2P 이상',            u:'', sev:'주의', op:'초과', th:0,  on:true, byGpu:true},
-  {k:'gpu_review_required',      p:'GPU', t:'점검 필요 GPU 수',            u:'대', sev:'주의', op:'초과', th:0,  on:true},
+  {k:'gpu_review_required',      p:'GPU', t:'점검 필요 GPU 수',            u:'장', sev:'주의', op:'초과', th:0,  on:true},
   {k:'gpu_sram_exceeded',        p:'GPU', t:'SRAM 임계 초과',             u:'', sev:'주의', op:'초과', th:0,  on:true},
   {k:'gpu_fabric_health',        p:'GPU', t:'패브릭 상태 이상',            u:'', sev:'주의', op:'초과', th:0,  on:true},
   {k:'npu_util',       p:'NPU',      t:'NPU 사용률',     u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room', nocrit:true},
   {k:'npu_temp',       p:'NPU',      t:'NPU 온도',       u:'°C', sev:'오류', op:'초과', th:85,   on:true},
   {k:'npu_throttle',   p:'NPU',      t:'NPU 스로틀링 발생', u:'회', sev:'주의', op:'초과', th:0,   on:true, hb:'over', nocrit:true},
-  {k:'ttft_p95_ms',    p:'추론 엔진',   t:'첫 토큰 지연 P95', u:'ms', sev:'주의', op:'초과', th:3000, on:true, hb:'over'},
-  {k:'tpot_p99_ms',    p:'추론 엔진',   t:'토큰당 지연 P99', u:'ms', sev:'주의', op:'초과', th:200,  on:true, hb:'over'},
-  {k:'kv_cache_usage', p:'추론 엔진',   t:'KV 캐시 사용률',  u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room'},
-  {k:'latency_p99_ms', p:'추론 엔진',   t:'P99 응답 지연',  u:'ms', sev:'주의', op:'초과', th:2000, on:true},
-  {k:'queue_depth',    p:'추론 엔진',   t:'대기 요청 큐',    u:'건', sev:'주의', op:'초과', th:50,   on:true, hb:'over', nocrit:true},
-  {k:'preempt',        p:'추론 엔진',   t:'선점 증가',       u:'회', sev:'주의', op:'초과', th:20,   on:true, hb:'over', nocrit:true},
+  {k:'ttft_p95_ms',    p:'서빙 엔진',   t:'첫 토큰 지연 P95', u:'ms', sev:'주의', op:'초과', th:3000, on:true, hb:'over'},
+  {k:'tpot_p99_ms',    p:'서빙 엔진',   t:'토큰당 지연 P99', u:'ms', sev:'주의', op:'초과', th:200,  on:true, hb:'over'},
+  {k:'kv_cache_usage', p:'서빙 엔진',   t:'KV 캐시 사용률',  u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room'},
+  {k:'latency_p99_ms', p:'서빙 엔진',   t:'P99 응답 지연',  u:'ms', sev:'주의', op:'초과', th:2000, on:true},
+  {k:'queue_depth',    p:'서빙 엔진',   t:'대기 요청 큐',    u:'건', sev:'주의', op:'초과', th:50,   on:true, hb:'over', nocrit:true},
+  {k:'preempt',        p:'서빙 엔진',   t:'선점 증가',       u:'회', sev:'주의', op:'초과', th:20,   on:true, hb:'over', nocrit:true},
   {k:'gw_error_rate',  p:'게이트웨이',  t:'서버 오류율(5xx)', u:'%', sev:'주의', op:'초과', th:5,    on:true, hb:'over'},
   {k:'node_mem',       p:'노드',      t:'노드 메모리 사용률', u:'%', sev:'주의', op:'초과', th:85,   on:true}
 ];
@@ -3548,11 +3631,13 @@ function depPick(){
 /* Grafana 열기 — 고른 배포의 Grafana 대시보드를 새 탭으로 연다(모니터링 정책 5.4 · REQ-MON-089).
    열람 권한은 백엔드가 판정해 역할로 가르지 않는다. 배포 상태로도 가르지 않는다.
    지표 · 추적 수집을 사용하지 않는 배포는 대시보드가 없어 비활성으로 두고 사유를 단다.
-   이 화면에서 조치할 수 없어 상태만 말한다. 비활성 버튼은 제 title 이 뜨지 않아 감싼 요소에 단다(개발룸 목업 웹 IDE 접속과 같다) */
+   v0.30 · 지표 · 추적 수집은 배포 상세 설정 변경에서 켠다(배포 정책 2.6). 설정 변경 권한이 있는 역할에게는 켜는 곳을 함께 말하고,
+   뷰어 · 외부 배포는 상태만 말한다(모니터링 정책 5.4). 비활성 버튼은 제 툴팁이 뜨지 않아 감싼 요소에 단다(라이브러리 v0.25 .dis-tip) */
 function grafanaBtn(){
-  const ok = curDep().obs!==false;
+  const d = curDep(), ok = d.obs!==false;
   const b = '<button class="btn ghost sm"'+(ok? ' onclick="act(\'Grafana 대시보드를 새 탭으로 엽니다.\')"' : ' disabled')+'>Grafana 열기</button>';
-  return ok? b : '<span class="disw" title="지표 · 추적 수집을 사용하지 않는 배포입니다.">'+b+'</span>';
+  const how = (role!=='viewer' && d.type!=='외부 배포') ? ' 배포 상세의 설정 변경에서 켤 수 있습니다.' : '';
+  return ok? b : disTip(b, '지표 · 추적 수집을 사용하지 않는 배포입니다.'+how);
 }
 function tgDep(e){
   e.stopPropagation();
@@ -4788,7 +4873,7 @@ function drawPerf(el){
 const SERIES2 = {
   '게이트웨이': ['들어온 요청','나간 응답'],
   '서빙 엔진':  ['TTFT','TPOT'],
-  '인프라':     ['사용률','VRAM']
+  '인프라':     ['사용률','KV 캐시 사용률']  /* v0.31 · VRAM은 미리 잡혀 늘 평평해 카드로만 둔다(정책 5.1 · 5.2 · REQ-MON-090) */
 };
 
 /* 데모 값 — 제목마다 같은 모양이 나오게 고정한다. 새로 그릴 때마다 흔들리면
@@ -5174,13 +5259,13 @@ function drawRules(el){
         const hasFire = r.fires && r.fires.length;
         const open = ruleOpen===i;
         return '<tr'+(hasFire?' style="cursor:pointer" onclick="toggleRuleFire('+i+')"':'')+'>'
-          /* 중지된 규칙은 이름 아래 배지를 둔다. 직접 중지(사유 없음 포함)는 `중지`, 채널 삭제로 꺼진 것은 `중지 · 채널 삭제`,
-             대상 배포가 종료되어 꺼진 것은 `중지 · 대상 없음`(정책 6.4). 툴팁에 숨기지 않는다.
-             배지 이름은 노드 상태 `중지`(정책 4.5)와 같은 말이다 */
+          /* 중지된 규칙은 이름 아래 흐린 글씨 `중지` 만 둔다. 꺼진 사유는 툴팁으로 보인다(정책 6.4 · REQ-MON-075 · 7.2).
+             사용자 및 역할 목업의 삭제된 계정 표시와 같은 형식이고, 포커스로도 열린다(tabindex). 사유 없음(이전부터 꺼져 있던 규칙)은 직접 중지로 본다.
+             `중지` 는 노드 상태 `중지`(정책 4.5)와 같은 말이다 */
           + '<td><span class="rname">'+r.n+'</span>'
-          +   (r.off? '<br><span class="stbadge mu">'+(r.off==='채널 삭제'? '중지 · 채널 삭제' : r.off==='대상 없음'? '중지 · 대상 없음' : '중지')+'</span>' : '')
-          /* 전역 규칙에 연결된 시스템 기본 규칙 복제본은 `전역 기본` 배지를 둔다. 중지 배지와 같은 자리 · 같은 규격이다(정책 6.4 · REQ-MON-084).
-             중지하면 연결이 풀려 두 배지가 함께 놓이지 않는다 */
+          +   (r.off? '<br>'+offMark(r.off) : '')
+          /* 전역 규칙에 연결된 시스템 기본 규칙 복제본은 `전역 기본` 배지를 둔다. 중지 표시와 같은 자리다(정책 6.4 · REQ-MON-084).
+             중지하면 연결이 풀려 `중지` 와 `전역 기본` 이 함께 놓이지 않는다 */
           +   (r.linked? '<br><span class="stbadge mu">전역 기본</span>' : '')+'</td>'
           + '<td>'+sevBadge(r.sev)+'</td>'
           /* Xid 규칙은 임계값이 없다. 고른 코드 수와 `고른 코드 발생` 으로 적는다(정책 6.3) */
@@ -5277,6 +5362,7 @@ function openRule(i){
       sev: r.sev || '주의', xids:(r.xids||[]).slice(), xmode:r.xmode||'표준 등급',
       ws: r.ws || (wsCur==='전체'? (opts[0]||'') : wsCur), dupErr:false};
   document.getElementById('ruleTitle').textContent = i<0? '알림 규칙 추가' : '알림 규칙 수정';
+  RF.shown=false; rfInit=rfSnap();
   drawRuleForm();
   document.getElementById('mdRule').classList.add('on');
 }
@@ -5328,7 +5414,7 @@ function metPick(){
         }).join('');
   }).join('');
   return '<div class="depwrap" id="metWrap">'
-    + '<button type="button" class="depbtn'+(RF.dupErr?' err':'')+'" id="metBtn" style="width:100%" onclick="tgMet(event)">'
+    + '<button type="button" class="depbtn'+(RF.dupErr||(RF.shown&&!RF.metric)?' err':'')+'" id="metBtn" style="width:100%" onclick="tgMet(event)">'
     +   '<span class="depbtn-n">'+(cur? cur.t : '<span style="color:var(--muted-foreground)">메트릭을 선택해 주세요.</span>')+'</span>'
     +   '<span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span>'
     + '</button>'
@@ -5376,7 +5462,7 @@ function drawXidList(){
   if(f) f.innerHTML='<b>'+RF.xids.length+'</b>개 선택 · 전체 '+XIDS.length+'개';
   const b=document.getElementById('xidAllBtn');
   if(b) b.textContent = RF.xids.length===XIDS.length ? '전체 해제' : '전체 선택';
-  const sv=document.getElementById('ruleSave'); if(sv) sv.disabled=!ruleValid();
+  const sv=document.getElementById('ruleSave'); if(sv) sv.disabled=ruleBtnOff();
 }
 function xidGrp(g,on){
   XIDS.forEach(function(x){
@@ -5416,7 +5502,24 @@ function rfDur(el){
   const bad=durBad();
   el.classList.toggle('err', bad);
   document.getElementById('durErr').style.display = bad? '' : 'none';
-  document.getElementById('ruleSave').disabled=!ruleValid();
+  document.getElementById('ruleSave').disabled=ruleBtnOff();
+}
+/* 추가는 입력 상태와 무관하게 활성, 수정은 변경이 없을 때만 비활성이다(공통정책 7.1) */
+let rfInit='';
+function rfSnap(){ return JSON.stringify([RF.n,RF.metric,RF.op,RF.th,RF.dur,RF.scope,RF.ch,RF.sev,RF.xids,RF.xmode,RF.ws]); }
+function ruleBtnOff(){ return ruleIdx>=0 && rfSnap()===rfInit; }
+/* 누른 뒤의 칸별 에러 문구(공통정책 7.8). 누르기 전에는 빈 값이다 */
+function ruleMsgs(){
+  const m={};
+  if(!RF.shown) return m;
+  const n=RF.n.trim();
+  if(!n) m.n='규칙 이름을 입력해 주세요.'; else if(n.length<2) m.n='2자 이상 입력해 주세요.';
+  if(!RF.metric) m.metric='메트릭을 선택해 주세요.';
+  else if(isXid(RF.metric)){ if(!RF.xids.length) m.xids='코드를 1개 이상 선택해 주세요.'; }
+  else if(String(RF.th).trim()==='') m.th='임계값을 입력해 주세요.';
+  if(String(RF.dur).trim()==='' || durBad()) m.dur='1 이상의 정수를 입력해 주세요.';
+  if(wsCur==='전체' && ruleIdx<0 && !RF.ws) m.ws='워크스페이스를 선택해 주세요.';
+  return m;
 }
 function ruleValid(){
   if(wsCur==='전체' && !RF.ws) return false;
@@ -5449,7 +5552,7 @@ function ruleWsOpts(){
 }
 
 function drawRuleForm(){
-  const u=metricUnit(RF.metric), xid=isXid(RF.metric);
+  const u=metricUnit(RF.metric), xid=isXid(RF.metric), rm=ruleMsgs();
   const linked = ruleIdx>=0 && !!RULES[ruleIdx].linked;
   const kids = ruleIdx>=0 ? linkedKids(RULES[ruleIdx]).length : 0;
   document.getElementById('ruleBody').innerHTML =
@@ -5459,9 +5562,10 @@ function drawRuleForm(){
       + (kids? alertBox('info','','워크스페이스 규칙 '+kids+'개가 이 전역 규칙에 연결되어 있습니다. 임계값 · 조건 · 심각도 · 채널을 바꾸면 연결된 규칙에도 같은 값이 반영됩니다.') : '')
       /* 이름은 2~30자다(공통정책 1.1). 초과 입력을 막고 실시간 카운터를 둔다(7.1) */
     + '<div class="fld"><label>규칙 이름<span class="req">*</span></label>'
-    +   '<input class="inp" maxlength="30" value="'+RF.n+'" placeholder="무엇을 감시하는지 적어 주세요."'
+    +   '<input class="inp'+(rm.n?' err':'')+'" id="rfName" maxlength="30" value="'+RF.n+'" placeholder="무엇을 감시하는지 적어 주세요."'
     +   ' oninput="RF.n=this.value;document.getElementById(\'rnCnt\').textContent=this.value.length+\'/30\';'
-    +   'document.getElementById(\'ruleSave\').disabled=!ruleValid()">'
+    +   'document.getElementById(\'ruleSave\').disabled=ruleBtnOff()">'
+    +   (rm.n? '<p class="ferr">'+rm.n+'</p>' : '')
     +   '<div class="hint" id="rnCnt">'+RF.n.length+'/30</div></div>'
 
     /* 심각도: 알림 정책 4.1 의 세 값을 쓴다. 메트릭을 고르면 그 메트릭의 표준 심각도로
@@ -5477,6 +5581,7 @@ function drawRuleForm(){
     +   '<div class="fgrid">'
     +     '<div class="fld"><label>메트릭<span class="req">*</span></label>'
     +       metPick()
+    +       (rm.metric? '<p class="ferr">'+rm.metric+'</p>' : '')
     /* 같은 범위 · 메트릭 · 심각도의 건전성 반영 규칙이 이미 있으면 저장하지 않고 인라인 에러를 둔다(공통정책 7.8 · 정책 6.3 · REQ-MON-083) */
     +       (RF.dupErr? '<p class="ferr" id="metErr">같은 대상 범위에 이 메트릭과 심각도로 만든 규칙이 이미 있습니다. 기존 규칙을 수정해 주세요.</p>' : '')
     +       '<div class="hint">고르면 심각도와 조건에 표준값이 채워집니다. 채운 값은 바꿀 수 있습니다.</div></div>'
@@ -5491,10 +5596,11 @@ function drawRuleForm(){
           : '<div class="fld"><label>조건<span class="req">*</span></label>'
             + '<div class="inline">'
             +   selBox('op', [{v:'초과',t:'초과'},{v:'미만',t:'미만'}], RF.op)
-            +   '<input class="inp" style="width:110px" value="'+RF.th+'" placeholder="임계값"'
-            +   ' oninput="RF.th=this.value;drawHealthHint();document.getElementById(\'ruleSave\').disabled=!ruleValid()">'
+            +   '<input class="inp'+(rm.th?' err':'')+'" id="rfTh" style="width:110px" value="'+RF.th+'" placeholder="임계값"'
+            +   ' oninput="RF.th=this.value;drawHealthHint();document.getElementById(\'ruleSave\').disabled=ruleBtnOff()">'
             +   (u? '<span class="unit">'+u+'</span>' : '')
             + '</div>'
+            + (rm.th? '<p class="ferr">'+rm.th+'</p>' : '')
             /* 건전성 반영 메트릭이면 이 임계값이 건전성 주의 기준이고 위험 기준이 얼마인지 안내한다. 임계값을 바꾸면 다시 계산한다(정책 5.2 · 6.3 · REQ-MON-082) */
             + '<div class="hint" id="hHint"'+(healthHint()? '' : ' style="display:none"')+'>'+healthHint()+'</div>'
             + '</div>')
@@ -5502,13 +5608,14 @@ function drawRuleForm(){
     +     '<div class="fld"><label>지속 시간<span class="req">*</span></label>'
     /* 1 이상의 정수만 받는다. 형식이 틀리면 입력 중에 인라인 에러를 두고 저장을 막는다(공통정책 7.8).
        상한은 문서에 없어 두지 않는다 */
-    +       '<div class="inline"><input class="inp'+(durBad()?' err':'')+'" id="rfDur" style="width:110px" value="'+RF.dur+'"'
+    +       '<div class="inline"><input class="inp'+(durBad()||rm.dur?' err':'')+'" id="rfDur" style="width:110px" value="'+RF.dur+'"'
     +       ' inputmode="numeric" oninput="rfDur(this)">'
     +       '<span class="unit">분</span></div>'
-    +       '<p class="ferr" id="durErr"'+(durBad()?'':' style="display:none"')+'>1 이상의 정수를 입력해 주세요.</p>'
+    +       '<p class="ferr" id="durErr"'+(durBad()||rm.dur?'':' style="display:none"')+'>1 이상의 정수를 입력해 주세요.</p>'
     +       '<div class="hint">조건이 이 시간 동안 이어지면 알립니다. 1분마다 확인합니다.</div></div>'
     +   '</div>'
     +   (xid ? '<div class="fld" style="margin-top:14px"><label>코드<span class="req">*</span></label>'+xidPick()
+          +   (rm.xids? '<p class="ferr" id="xidErr">'+rm.xids+'</p>' : '')
           +   '<div class="hint">등급 제목을 체크하면 그 등급의 코드를 모두 고릅니다. 나중에 추가되는 코드는 들어가지 않습니다.</div></div>' : '')
     + '</div>'
 
@@ -5527,7 +5634,8 @@ function drawRuleForm(){
             + '<div class="ro">'+RF.ws+'</div>'
             + '<div class="hint">만든 뒤에는 바꿀 수 없습니다.</div></div>'
           : '<div class="fld"><label>워크스페이스<span class="req">*</span></label>'
-            + selBox('ws', ruleWsOpts().map(function(w){ return {v:w, t:w}; }), RF.ws)
+            + selBox('ws', ruleWsOpts().map(function(w){ return {v:w, t:w}; }), RF.ws, !!rm.ws)
+            + (rm.ws? '<p class="ferr">'+rm.ws+'</p>' : '')
             + '<div class="hint">고른 워크스페이스의 대상만 감시합니다.</div></div>')
     /* 대상 범위는 그 워크스페이스 안에서 전체인지 특정 배포인지다 —
        `워크스페이스 전체` 로 적으면 같은 말이 두 번 나온다 */
@@ -5564,7 +5672,7 @@ function drawRuleForm(){
     /* 비워 두면 목록 전체로 보낸다(알림 정책 7.3). 직관과 반대라 툴팁이 아니라 늘 보이는 hint 로 둔다 */
     +   (rfChans().length ? '<div class="hint">기본으로 목록의 모든 채널에 보냅니다. 채널을 고르면 고른 채널에만 보냅니다.</div>' : '')
     +   '</div></div>';
-  document.getElementById('ruleSave').disabled = !ruleValid();
+  document.getElementById('ruleSave').disabled = ruleBtnOff();
   drawXidList();
 }
 /* 판정 사유 기준 출처 칸(REQ-MON-086). 배포 · 워크스페이스 규칙은 그 배포를 보는 사람이 목록에서 볼 수 있어 링크로 알림 규칙 탭을 열고
@@ -5660,6 +5768,17 @@ function dupRule(ws){
   });
 }
 function saveRule(){
+  /* 제출 시 전체 검증 — 칸마다 인라인 에러, 화면 순서상 첫 오류 칸으로 포커스(공통정책 7.8) */
+  if(!ruleValid()){
+    RF.shown=true; drawRuleForm();
+    const m=ruleMsgs();
+    const first = m.n? 'rfName' : m.metric? 'metBtn' : m.th? 'rfTh' : m.dur? 'rfDur' : null;
+    const el = first? document.getElementById(first)
+      : m.xids? document.querySelector('#ruleBody .mselect input')
+      : document.querySelector('#ruleBody select.err, #ruleBody .err');
+    if(el) el.focus();
+    return;
+  }
   /* 스위처가 `전체` 면 폼에서 고른 값을, 아니면 지금 보고 있는 워크스페이스를 쓴다.
      수정이면 원래 소속을 지킨다 — 만든 뒤에는 옮기지 않는다 */
   const xr=isXid(RF.metric);
@@ -5977,7 +6096,7 @@ const LOGS={
     {t:'09:13:58.410', f:'k8s',  lv:'정보', m:'레플리카가 2개로 조정되었습니다.'}
   ],
   'furiosa-qwen3-32b-npu':[
-    {t:'09:12:04.882', f:'sys',  lv:'오류', m:'엔드포인트가 응답하지 않습니다. 헬스체크 3회 연속 실패.'},
+    {t:'09:12:04.882', f:'sys',  lv:'오류', m:'엔드포인트가 응답하지 않습니다. 상태 확인 요청이 3회 연속 실패했습니다.'},
     {t:'09:12:02.310', f:'k8s',  lv:'오류', m:'파드가 준비 상태로 전환되지 못했습니다. (CrashLoopBackOff)'},
     {t:'09:12:01.774', f:'ctn',  lv:'오류', m:'Failed to initialize NPU device: driver not found'},
     {t:'09:11:58.120', f:'k8s',  lv:'정보', m:'컨테이너가 시작되었습니다.'}
@@ -6024,7 +6143,7 @@ function drawLogs(el){
     /* 헬스체크는 몇 초마다 찍혀 다른 줄을 밀어낸다. 기본으로 감춘다(기술문서 10.4) */
     + '<label class="chk"><input type="checkbox"'+(hideHc?' checked':'')
     +   ' onchange="tgHc(this.checked)"><span class="cbx"></span>'
-    +   '<span class="cbt">헬스체크 감추기</span></label>'
+    +   '<span class="cbt">상태 확인 요청 감추기</span></label>'
     + '</div>';
 
   if(!rows.length){
@@ -6053,7 +6172,7 @@ function drawLogs(el){
   el.innerHTML=h;
 }
 function feedName(k){
-  if(k==='hc') return '헬스체크';
+  if(k==='hc') return '상태 확인 요청';
   const p=FEEDS.find(function(x){ return x[0]===k; });
   return p? p[1] : k;
 }
@@ -6141,7 +6260,7 @@ function openSlot(nodeName, no){
     +   (x.cde
         /* CDE 점유 — 링크·가져오기 안내를 두지 않는다. 등록되지 않은 워크로드가 아니다(CON-865 · 모니터링 정책 4.2) */
         ? '<dl class="dl"><dt>점유</dt><dd>'+cdeText(x)+'</dd></dl>'
-          + '<div class="secnote">개발 환경(CDE)이 점유하고 있습니다.</div>'
+          + '<div class="secnote">CDE가 점유하고 있습니다.</div>'
         : byList(x).length
         ? '<dl class="dl">'
           + x.by.map(function(d){
@@ -6307,7 +6426,7 @@ function errBox(){
     + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">'
     + '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>'
     + '<h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p>'
-    + '<button class="btn ghost" onclick="setState(\'default\')">다시 시도</button></div>';
+    + '<button class="btn ghost" onclick="setState(\'default\')">재시도</button></div>';
 }
 
 /* 확인 알럿 · 토스트 — 배포 목업과 같은 규격 */
@@ -6388,11 +6507,12 @@ function setRole(r,btn){
 /* ── v0.28 데모 바 바로 가기 ──────────────────────
    실제 화면에는 없는 검토용 처리다. 누르면 그 상태가 보이는 화면으로 바로 옮긴다.
    데이터 상태는 기본, 워크스페이스는 전체로 돌리고 필요한 역할 · 범위를 맞춘다 */
-function demoBase(needSuper){
+function demoBase(needSuper, keepRole){
   state='default';
   document.querySelectorAll('#demoBar .st').forEach(function(b){ b.classList.toggle('on', b.textContent==='기본'); });
   if(needSuper && !isSuper()) setRole('super', document.querySelector('#demoBar .rl'));
-  if(role==='viewer') setRole('super', document.querySelector('#demoBar .rl'));
+  /* keepRole: 역할에 따라 문구가 갈리는 분기를 보일 때는 지금 고른 역할을 그대로 둔다 */
+  if(role==='viewer' && !keepRole) setRole('super', document.querySelector('#demoBar .rl'));
   wsCur='전체'; mineOnly=false; drawWsBtn(); closeRule(); closeConfirm(); closeSlot();
 }
 /* 실제 화면에는 없는 검토용 처리다. 배포 성능 탭에서 MIG 배포를 고른다(안정 + 측정하지 못한 지표 · 인프라 제목 줄 MIG 표기) */
@@ -6470,7 +6590,9 @@ function demoSrcLink(){
 
 /* 실제 화면에는 없는 검토용 처리다. 지표 · 추적 수집을 사용하지 않는 배포를 골라 Grafana 열기 비활성을 보인다(모니터링 정책 5.4) */
 function demoGrafanaOff(){
-  demoBase(false);
+  /* 사유 문구가 역할에 따라 갈린다(편집자 이상은 켜는 곳까지, 뷰어는 앞 문장만 — MON-L01 REQ-MON-089).
+     역할을 먼저 고르고 누르면 그 역할로 보인다 */
+  demoBase(false, true);
   tab=1; dep='solar-open-100b-paused'; rsOpen=false; render();
   const r=document.querySelector('.rangerow'); if(r && r.scrollIntoView) r.scrollIntoView({block:'center'});
 }
