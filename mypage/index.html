@@ -5,7 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>콘체르토 매니저 · 마이페이지</title>
 <!--
-  콘체르토 매니저 · 마이페이지 화면 목업 v0.25 (2026-10-20)
+  콘체르토 매니저 · 마이페이지 화면 목업 v0.27 (2026-10-28)
+
+  ── v0.27 (2026-10-28) ──
+  · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다). 프로필 팝오버 계정 정보에 아이디를 더해 공통 레이아웃 v0.13 과 같게(이름 · 아이디 · 이메일, REQ-CM-LAYOUT-021).
+  · 10-28 재검증 정정(2차). 이름 최소 길이 문구를 `2자 이상 입력해 주세요.` 로(계정 정책 2.4 · 기획서 5.1 — 같은 반영본에서 띄어쓰기를 고쳤다).
+  · 수정 화면 `저장` 은 변경분이 없을 때만 비활성으로 둔다(공통정책 7.1). 이름 · 이메일 · 본인 확인이
+    유효하지 않아도 누를 수 있고, 누르면 기존 saveMp 가 셋을 모두 검증해 실패한 필드마다 인라인 에러를 보이고
+    첫 오류 필드로 포커스한다(7.8). 본인 확인을 마치지 않았으면 현재 비밀번호 필드에 `확인이 필요합니다.` 가 뜬다.
+    종전에는 셋이 모두 통과해야 켜져 본인 확인 미완료 같은 사유를 볼 수 없었다.
+  · 현재 비밀번호 `확인` 버튼은 제출 버튼이 아니라 수동 검증 버튼이라 값이 없을 때 비활성을 그대로 둔다.
+
+  ── v0.26 (2026-10-27) ──
+  · 기획서 용어 정정(수신처 → 알림을 받는 주소) — 화면 변경 없음
 
   ── v0.25 (2026-10-20) ──
   · 플랫폼 설정 플라이아웃을 5메뉴로 맞췄다(사용자 및 역할 · 보안 및 감사 · 인프라 자원 · 카탈로그 ·
@@ -55,7 +67,7 @@
   v0.2  기본 정보 수정에 본인 확인(현재 비밀번호) 섹션을 추가했다.
         백엔드가 사용자 정보 변경 시 current_password 를 받고 있어 화면에 맞췄다.
         이름·이메일을 가리지 않고 받는다 — 두 값 모두 계정을 식별하는 정보이고,
-        세션이 탈취된 상태에서 이메일이 바뀌면 알림 수신처가 다른 곳으로 간다.
+        세션이 탈취된 상태에서 이메일이 바뀌면 알림을 받는 주소가 다른 곳으로 간다.
         섹션은 바꾼 항목이 생겼을 때만 나타난다. 저장은 변경분이 있어야 활성되므로,
         처음부터 두면 확인만 마치고 저장이 왜 안 되는지 알 수 없다(7.1).
         확인 버튼은 배포명 중복 확인과 같은 수동 검증이다(7.1).
@@ -404,7 +416,7 @@
         <div class="pmenu">
           <div class="pm-head">
             <span class="av">유</span>
-            <div class="pm-who"><b>성유진</b><span>yj.seong@okestro.com</span></div>
+            <div class="pm-who"><b>성유진</b><span>yj.seong</span><span>yj.seong@okestro.com</span></div>
           </div>
           <hr>
           <a href="#" onclick="go('mypage');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0114 0"/></svg>마이페이지</a>
@@ -651,7 +663,7 @@ function $mp(id){return document.getElementById(id);}
 function showMpErr(inp,errEl,msg){ if(msg){inp.classList.add('has-error');errEl.textContent=msg;errEl.classList.add('show');return false;} inp.classList.remove('has-error');errEl.classList.remove('show');return true; }
 function nameMsg(){ var el=$mp('mpName'); if(!el) return ''; var v=el.value.trim();
   if(!v) return '이름을 입력해 주세요.';
-  if(v.length<2) return '2자 이상 입력해주세요.';   /* 계정정책 2.4 길이 2~50자 */
+  if(v.length<2) return '2자 이상 입력해 주세요.';   /* 계정정책 2.4 길이 2~50자 */
   if(el.value.length>50) return '50자까지 입력할 수 있습니다.';
   /* 공백은 허용 문자 문구로 덮는다. 정책 표에 공백 전용 행이 없다(공통정책 7.9) */
   if(!/^[가-힣a-zA-Z0-9ぁ-んァ-ンー一-龥,.\-_]+$/.test(el.value)) return '한글·영문·숫자와 특수문자(, . - _)만 사용할 수 있습니다.';
@@ -752,7 +764,8 @@ function refreshSave(){
     if(!changed && pwChecked){ pwChecked=false; showPwOk(false); }
     if(!changed){ var pw=$mp('mpPw'); if(pw && pw.value){ pw.value=''; showMpErr(pw,$mp('mpPwErr'),''); } }
   }
-  b.disabled=!(nameMsg()===''&&emailMsg()===''&&changed&&pwMsg()===''); }
+  /* 수정 화면은 변경분이 없을 때만 비활성(공통정책 7.1). 검증은 누를 때 saveMp 가 한다(7.8) */
+  b.disabled=!changed; }
 function onMp(){
   if($mp('mpName').classList.contains('has-error')&&nameMsg()==='') vName(true);
   if($mp('mpEmail').classList.contains('has-error')&&emailMsg()==='') vEmail(true);
@@ -848,7 +861,7 @@ function drawMpState(){
     ? '<div class="mp-state"><div class="mp-spin"></div><p>계정 정보를 불러오고 있습니다.</p></div>'
     : '<div class="mp-state"><h3>계정 정보를 불러오지 못했습니다.</h3>'
       + '<p>잠시 후 다시 시도해 주세요.</p>'
-      + '<button class="btn2 pri" onclick="setState(\'default\',document.querySelectorAll(\'#demoBar .st\')[0])">다시 시도</button></div>';
+      + '<button class="btn2 pri" onclick="setState(\'default\',document.querySelectorAll(\'#demoBar .st\')[0])">재시도</button></div>';
 }
 /* 화면 전환 — 조회 / 수정 */
 function goDemo(key,btn){
