@@ -1,5 +1,45 @@
 <!--
-  콘체르토 매니저 · 워크스페이스 화면 목업 v0.62 (2026-10-27)
+  콘체르토 매니저 · 워크스페이스 화면 목업 v0.63 (2026-10-28)
+
+  ── v0.63 (2026-10-28) ──
+  · 10-28 4차. 운영룸 삭제 실패의 `운영룸 삭제` 확인 알럿 본문에 배포 건수를 넣었다 — `배포 {N}건이 함께 제거되어 모델 호출이 중단됩니다.`
+    일반 운영룸 삭제 알럿과 같은 문장이다(워크스페이스 정책 3.4 「확인 알럿에 배포 건수를 명시한다」 · WKSP-L01 5.1). 배포가 없으면 그 문장을 뺀다.
+    상세 환경 섹션의 삭제 실패 안내도 같은 건수로 적는다.
+  · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다).
+  · 운영룸 생성 실패의 `다시 생성` 은 오류 운영룸 다시 생성과 같은 확인 알럿 · 토스트를 쓴다(askReissue — WKSP-L01 3장).
+    룸 삭제 실패 알럿 제목을 진입 버튼과 같은 `{룸} 삭제` 로, 운영룸 삭제 실패 본문은 배포가 함께 제거된다는 문장으로(워크스페이스 정책 3.4).
+    개발룸 다시 생성 · 룸 삭제 실패 재실행의 알럿 · 토스트 문구를 WKSP-L01 5.1 「룸 다시 생성 · 삭제」 행에 올렸다.
+  · 할당량 수정 폼 위 경고 상자를 걷었다 — 같은 오류를 인라인과 다른 문구로 한 번 더 알렸다. 빈 칸은 점유 미만으로 읽지 않는다(공통정책 7.8).
+  · 낡은 원칙 주석(카드에서 룸 다시 시도)을 상세 환경 섹션 기준으로 고쳤다.
+  · 10-28 재검증 정정(2차). 생성 실패 룸의 재실행 이름을 「다시 생성」 하나로 맞췄다 — 환경 칸 상태 도움말의 `다시 시도하거나 삭제할 수 있습니다` 를 빼고,
+    카드 · 환경 칸 사유(roomMsg)는 모든 역할이 보므로 상태만 쓴다(`생성에 실패했습니다.`, 문서 반영 절차 5.4). 재실행 접수 토스트도
+    `{룸} 다시 생성을 요청했습니다.` 로(워크스페이스 정책 3.5 · WKSP-L01 3장 · 5.1). 배분 가능 0 · 칸 상한에 단위를 붙였고,
+    API Key 접근 허용 모델 선택에서 고를 수 없는 행의 사유를 title 대신 사유 툴팁으로(개발룸 목업과 같다). 가속기 칸 소수 문구를
+    `가속기 수는 정수로 입력해 주세요.` 로(「장수」는 뜻이 모호하다). .dis-tip.flip 은 라이브러리 v0.25 에 들어가 주석을 고쳤다.
+  · 10-28 검증 정정. 비활성 사유를 title 대신 라이브러리 v0.25 .dis-tip 으로(카드 룸 버튼 · 멤버 제외 · 수정 · 삭제).
+    카드의 룸 미생성은 만들 권한이 없으면 버튼이 아니라 상태 표시만 둔다(공통정책 7.10). 워크스페이스 작업 중이라 막힌 경우만 비활성 + 사유.
+    운영룸 다시 생성 확인 알럿 제목을 명사형 `운영룸 다시 생성` 으로, 차단 안내 모달 제목(역할 변경 · 멤버 제외)을 평서형으로(용어집 7장). 생성 실패 안내의 같은 동작을 `다시 생성` 하나로 부르고,
+    카드 룸 상태 사유도 `다시 생성` 으로 맞췄다. 역할 분기를 오류 안내와 같게 했다 — 최고 관리자 버튼 · 워크스페이스 관리자 요청 안내 · 편집자 · 뷰어 문의 안내(REQ-WKSP-107 · 5.1).
+    할당량 칸 검증을 빈 값 `값을 입력해 주세요.` · 숫자 아님 · 음수 `0 이상의 숫자를 입력해 주세요.` 로 갈랐다(개발룸 목업 · 개발룸 기획서 5.1 과 같은 문구).
+    가속기 행 단위를 `장` 으로(배분 가능 · 상한 · 하한 문구). 저장 시점 범위 초과(QFAIL)는 토스트 없이 넘는 칸 인라인 에러 + 첫 오류 칸 포커스(WKSP-L01 5.2).
+    패널 연관 리소스 `개발환경` 을 `CDE` 로(용어집 3장). API Key 발급 결과 모달 종결 통일, 빈 상태 발급 요청은 발급 권한이 있을 때만.
+    상태 도움말 `미생성` 을 `아직 만들지 않았습니다.` 로 통일, 개발룸 열 도움말에 공용 워크스페이스의 생성 주체를 더했다.
+  · 도움말 문구 검수(UI 문구 규칙 · 용어집 · 공통정책 7.9). 화면 구조는 그대로다.
+    네임스페이스 · 쿠버네티스 · 논리 레코드를 문구에서 뺐다(생성 중 룸 상태 · 운영룸 열 · 상태 열 · 워크스페이스명 툴팁).
+    관리자 열 도움말의 `담당자` 를 `관리자` 로, 공용 워크스페이스 멤버 `자동 등록` 을 `자동 추가` 로 고쳤다(용어집 1 · 7장).
+    개발룸 열 도움말을 `워크스페이스 관리자가 만듭니다.` 로, 미생성 값을 `아직 만들어지지 않았습니다.` 로 고쳤다(개발룸은 승인 대상이 아니다).
+    공유 볼륨 툴팁을 개발룸 목업과 같게 `생성 시에 정하며 이후에는 바꿀 수 없습니다.` 로 고쳤다.
+    외부 모델 툴팁의 `외부 상용 AI API` 를 `외부 모델` 로, 가속기 툴팁의 `모델마다` 를 `가속기 종류마다` 로 고쳤다.
+    멤버 초대 힌트의 `이미 소속된 사용자` 를 `이미 멤버인 사용자` 로 고쳤다.
+  · 생성 · 등록 버튼을 입력 상태와 무관하게 활성으로 둔다(공통정책 7.1). 누르면 전체를 검증해 실패한 필드마다
+    인라인 에러를 보이고 첫 오류 필드로 포커스한다(7.8). 대상: 워크스페이스 생성 · 신청, 할당량 증액 신청, 멤버 초대,
+    API Key 발급, 외부 모델 등록. 기존 검증 함수와 문구(nameErr · ownerErr · rsnErr · qErrs · kLimBad · xErr)를 쓰고,
+    자리가 없던 것만 더했다 — 중복 미확인 `워크스페이스명 중복 확인을 해 주세요.`(기본 정보 수정과 같은 문구),
+    할당량 행 형식 오류(개발룸 자원 검증과 같은 문구), 전용 S3 빈 항목 `{항목}을(를) 입력해 주세요.`,
+    초대 `사용자를 선택해 주세요.`, 발급 `접근 허용 모델을 1개 이상 선택해 주세요.`, 증액 신청 `늘릴 자원을 입력해 주세요.`
+    (종전 비활성 사유 title 문구를 인라인 에러로 옮김).
+    수정 화면(할당량 수정 · 기본 정보 수정 · 한도 수정 · 저장소 설정)은 변경이 없을 때만 비활성이다.
+    초대할 수 있는 사용자가 없을 때 · 발급할 수 있는 모델이 없을 때의 비활성은 입력값이 아니라 상태 때문이라 둔다(WKSP-L01 6장).
 
   ── v0.62 (2026-10-27) ──
   · 기획서 4 · 7 · 8장 재대조로 고쳤다.
@@ -452,7 +492,7 @@
     권한 없는 기능의 미노출(9.4)과 구분한다 — 권한은 영구, 상태는 곧 풀린다
   · 운영룸·개발룸 모두 생성 폼에서 선택한다. 워크스페이스는 논리 공간이라
     룸 없이도 성립한다. 기본값으로 대부분의 경우를 흡수한다
-  · 생성·삭제에 실패한 룸은 카드에서 바로 다시 시도할 수 있다
+  · 생성·삭제에 실패한 룸은 워크스페이스 상세 환경 섹션에서 다시 생성 · 삭제한다. 카드 · 패널에는 상태만 둔다(WKSP-L01 5.1)
   · 워크스페이스는 논리 레코드라 생성 관련 상태가 없다. 삭제 중·삭제 실패에만 배지를 둔다
   · 룸은 인프라 리소스라 생성·삭제의 진행과 실패를 상태로 관리한다.
     두 룸 모두 별도로 만들고 지우므로 상태값이 같다
@@ -1694,6 +1734,18 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 /* 비활성 사유 툴팁 — 라이브러리 .tip 과 같은 값(목업 공통 처리) */
 .distip{position:fixed;z-index:200;display:none;background:var(--flyout);color:var(--foreground);border:1px solid var(--border-strong);font-size:12px;font-weight:400;line-height:1.5;padding:8px 11px;border-radius:7px;box-shadow:0 6px 18px var(--shadow);max-width:340px;white-space:normal;text-align:left;pointer-events:none}
 
+
+/* 비활성 사유 툴팁 — 컴포넌트 라이브러리 v0.25 .dis-tip 그대로(공통정책 4.7 · 7.10).
+   비활성 버튼은 호버 · 포커스를 받지 않아 감싼 요소를 앵커로 두고 tabindex="0" 을 준다. title 은 쓰지 않는다 */
+.tip-anchor.dis-tip{margin-left:0;cursor:not-allowed;border-radius:8px}
+.dis-tip:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
+.dis-tip > :disabled{pointer-events:none}
+.dis-tip .tip{white-space:normal;width:max-content;max-width:280px;left:0;transform:translateY(4px)}
+.dis-tip:hover .tip,.dis-tip:focus-within .tip{transform:translateY(0)}
+.dis-tip .tip::after{left:14px;transform:none}
+/* 오른쪽 끝 버튼은 툴팁이 화면 밖으로 나가지 않게 오른쪽 기준으로 연다(라이브러리 v0.25 .dis-tip.flip) */
+.dis-tip.flip .tip{left:auto;right:0}
+.dis-tip.flip .tip::after{left:auto;right:14px}
 </style><body class="dark">
 <div class="app">
 
@@ -1833,6 +1885,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
       <div class="f">
         <label>사용자<span class="req">*</span></label>
         <select class="inp" id="iUser" onchange="iValid()"></select>
+        <div class="errmsg" id="iUserErr">사용자를 선택해 주세요.</div>
         <div class="hint" id="iHint"></div>
       </div>
       <div class="f" style="margin-bottom:0">
@@ -1870,6 +1923,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
       <div class="f" id="kScopeWrap">
         <label>접근 허용 모델<span class="req">*</span></label>
         <div class="mselect" id="kScope"></div>
+        <div class="errmsg" id="kScopeErr">접근 허용 모델을 1개 이상 선택해 주세요.</div>
       </div>
       <!-- 사용 한도 — 발급 시 정하고 발급 후에도 수정할 수 있다(정책 7장 수정 행 · 한도 수정 모달 M02).
            적용 단위는 키가 접근하는 배포마다다. 인증을 끈 배포에는 걸리지 않고, 그 배포에 정한
@@ -1894,7 +1948,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     </div>
     <div class="mdfoot">
       <button class="btn ghost" onclick="closeKey()">취소</button>
-      <button class="btn" id="kSubmit" disabled onclick="runSync(this,submitKey)">발급</button>
+      <button class="btn" id="kSubmit" onclick="runSync(this,submitKey)">발급</button>
     </div>
   </div>
 </div>
@@ -1980,13 +2034,17 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
       <!-- 전용 S3 를 켜면 접속 정보를 받는다(워크스페이스 정책 2.4 · CON-492). 버킷은 기본값이 없어 필수다 -->
       <div id="byobFields" style="display:none;margin-top:14px">
         <div class="f"><label>엔드포인트 URL<span class="req">*</span></label>
-          <input class="inp" id="byUrl" placeholder="https://s3.example.com" oninput="byobValid()"></div>
+          <input class="inp" id="byUrl" placeholder="https://s3.example.com" oninput="byobValid()">
+          <div class="errmsg" id="byUrlErr">엔드포인트 URL을 입력해 주세요.</div></div>
         <div class="f"><label>버킷<span class="req">*</span></label>
-          <input class="inp" id="byBucket" oninput="byobValid()"></div>
+          <input class="inp" id="byBucket" oninput="byobValid()">
+          <div class="errmsg" id="byBucketErr">버킷을 입력해 주세요.</div></div>
         <div class="f"><label>액세스 키<span class="req">*</span></label>
-          <input class="inp" id="byKey" oninput="byobValid()"></div>
+          <input class="inp" id="byKey" oninput="byobValid()">
+          <div class="errmsg" id="byKeyErr">액세스 키를 입력해 주세요.</div></div>
         <div class="f" style="margin-bottom:0"><label>시크릿 키<span class="req">*</span></label>
-          <div id="bySecBox"></div></div>
+          <div id="bySecBox"></div>
+          <div class="errmsg" id="bySecErr">시크릿 키를 입력해 주세요.</div></div>
 </div>
     </div>
     <div class="mdfoot">
@@ -2062,7 +2120,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <div class="modal" style="width:520px">
     <div class="mdhead">
       <h3>외부 모델 등록</h3>
-      <p>외부 상용 AI API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.</p>
+      <p>외부 모델을 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.</p>
     </div>
     <div class="mdbody">
       <div class="f">
@@ -2092,7 +2150,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     </div>
     <div class="mdfoot">
       <button class="btn ghost" onclick="closeExt()">취소</button>
-      <button class="btn" id="xSubmit" disabled onclick="runSync(this,submitExt)">등록</button>
+      <button class="btn" id="xSubmit" onclick="runSync(this,submitExt)">등록</button>
     </div>
   </div>
 </div>
@@ -2147,6 +2205,23 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <button onclick="document.body.classList.add('dark')">다크</button></span>
 </div>
 <script>
+/* 비활성 사유 툴팁(라이브러리 v0.25 .dis-tip). 사유 문구는 HTML 로 넣지 않는다 */
+function disTipEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function disTip(inner, why){ return '<span class="tip-anchor dis-tip" tabindex="0">'+inner+'<span class="tip">'+disTipEsc(why)+'</span></span>'; }
+function disTipFit(e){
+  const a=e.target && e.target.closest && e.target.closest('.dis-tip'); if(!a) return;
+  const t=a.querySelector('.tip'); if(!t) return;
+  a.classList.remove('flip'); t.style.left=''; t.style.right='';
+  const r=a.getBoundingClientRect(), w=Math.min(280,t.scrollWidth), vw=window.innerWidth;
+  if(r.left+w+8<=vw) return;
+  /* 화면별 툴팁 위치 규칙이 left 를 덮어쓰는 자리가 있어 인라인으로 둔다 */
+  if(r.right-w>=8){ a.classList.add('flip'); t.style.left='auto'; t.style.right='0'; return; }
+  /* 양쪽 다 모자라면(좁은 화면) 화면 안 8px 여백에 맞춘다 */
+  t.style.left=Math.max(8-r.left, vw-8-w-r.left)+'px';
+}
+document.addEventListener('focusin', disTipFit, true);
+document.addEventListener('mouseover', disTipFit, true);
+
 /* ===== 데이터 =====
    DEV·PROD는 물리 분리된 환경이며 자원 한도를 각각 책정한다(기술문서 워크스페이스 절).
    개발룸에 할당하고 남은 유휴 쿼터가 운영룸으로 자동 스케줄링된다(현행 운영룸 안내). */
@@ -2444,30 +2519,30 @@ const FDEF=[
   {k:'st', l:'상태',opts:['활성','삭제 중','삭제 실패']},
   {k:'env',l:'환경',opts:['정상','오류','생성 중','미생성','생성 실패','삭제 중','삭제 실패']}];
 const COLDEF={
-  st:'워크스페이스의 상태입니다. 논리 레코드라 생성은 즉시 완료되며 삭제 관련 상태만 갖습니다.'
+  st:'워크스페이스의 상태입니다. 생성은 즉시 완료되며 삭제 관련 상태만 갖습니다.'
     +'<dl><dt>활성</dt><dd>사용할 수 있는 상태입니다.</dd>'
     +'<dt>삭제 중</dt><dd>룸과 하위 자원을 제거하고 있습니다. 시간이 걸립니다.</dd>'
     +'<dt>삭제 실패</dt><dd>삭제에 실패했습니다. 배지에서 사유를 확인할 수 있습니다.</dd></dl>',
   env:'워크스페이스 안의 두 환경 상태입니다. 운영룸은 게이트웨이, 개발룸은 게이트웨이와 공유 볼륨으로 판정합니다.'
     +'<dl><dt>미생성</dt><dd>아직 만들지 않았습니다.</dd>'
-    +'<dt>생성 중</dt><dd>네임스페이스와 게이트웨이를 만들고 있습니다.</dd>'
+    +'<dt>생성 중</dt><dd>게이트웨이를 만들고 있습니다.</dd>'
     +'<dt>정상</dt><dd>사용할 수 있습니다.</dd>'
     +'<dt>오류</dt><dd>게이트웨이 동작에 실패했습니다.</dd>'
-    +'<dt>생성 실패</dt><dd>생성에 실패했습니다. 다시 시도하거나 삭제할 수 있습니다.</dd>'
+    +'<dt>생성 실패</dt><dd>생성에 실패했습니다.</dd>'
     +'<dt>삭제 중</dt><dd>개발룸을 삭제하고 있습니다.</dd>'
     +'<dt>삭제 실패</dt><dd>삭제에 실패했습니다.</dd></dl>'
     +'<p>두 룸 모두 별도로 만들고 지울 수 있어 상태값이 같습니다.</p>',
   prod:'모델을 서비스하는 환경입니다. 워크스페이스 할당량에서 개발룸 몫을 뺀 나머지입니다.'
     +'<dl><dt>정상</dt><dd>배포를 기동하고 서비스할 수 있습니다.</dd>'
     +'<dt>오류</dt><dd>게이트웨이 생성 또는 동작에 실패했습니다.</dd>'
-    +'<dt>생성 중</dt><dd>네임스페이스와 자원을 준비하고 있습니다.</dd></dl>',
-  dev:'멤버가 개발·실험에 사용하는 환경입니다. 자원은 관리자 승인 후 할당됩니다.'
+    +'<dt>생성 중</dt><dd>자원을 준비하고 있습니다.</dd></dl>',
+  dev:'멤버가 개발·실험에 사용하는 환경입니다. 워크스페이스 관리자가 만들고, 공용 워크스페이스는 최고 관리자가 만듭니다.'
     +'<dl><dt>정상</dt><dd>CDE를 신청하고 사용할 수 있습니다.</dd>'
     +'<dt>오류</dt><dd>게이트웨이 생성 또는 동작에 실패했습니다.</dd>'
-    +'<dt>미생성</dt><dd>자원이 할당되지 않아 사용할 수 없습니다. 할당량을 수정하면 사용할 수 있습니다.</dd></dl>',
+    +'<dt>미생성</dt><dd>아직 만들지 않았습니다.</dd></dl>',
   quota:'할당량 대비 현재 점유한 양입니다. 배포·CDE가 요청해 잡아둔 양이며 실제 처리량과는 다릅니다.'
     +'<dl><dt>가속기</dt><dd>개수 단위로 점유되어 비율로 나누지 않습니다.</dd></dl>',
-  adm:'이 워크스페이스를 관리하는 담당자입니다. 멤버 초대와 설정 변경을 수행합니다. 관리자가 여러 명이면 최초 지정된 담당자와 인원수를 표시합니다.',
+  adm:'이 워크스페이스의 관리자입니다. 멤버 초대와 설정 변경을 수행합니다. 관리자가 여러 명이면 최초 지정된 관리자와 인원수를 표시합니다.',
   dkey:'이 배포를 호출할 수 있는 API Key입니다. 키 하나에 여러 배포를 연결할 수 있고 배포 하나에 여러 키를 연결할 수도 있습니다. 전체 목록은 API Key 탭에서 확인합니다.',
   mem:'이 워크스페이스에 소속된 멤버 수입니다.'
 };
@@ -2607,7 +2682,7 @@ function render(){
       : '<div class="tblwrap" style="padding:14px">'+Array(4).fill('<div class="skrow" style="margin:13px 0"></div>').join('')+'</div>';
     return;}
   if(state==='error'){pg.style.display='none';
-    el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p><button class="btn ghost" onclick="setState(\'default\')">다시 시도</button></div>';return;}
+    el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p><button class="btn ghost" onclick="setState(\'default\')">재시도</button></div>';return;}
   if(state==='empty'){pg.style.display='none';
     el.innerHTML='<div class="state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg>'
       +'<h3>워크스페이스가 없습니다.</h3>'
@@ -2642,8 +2717,11 @@ function roomBtn(m,idx,kind){
         ? '<button class="roombtn add" onclick="event.stopPropagation();goDevRoom()">＋ 개발룸 생성</button>'
         : '<button class="roombtn add" onclick="event.stopPropagation();openRoom('+idx+',\''+kind+'\')">＋ '+lb+' 생성</button>';
     }
-    return '<button class="roombtn off" disabled title="'+(wsBusy? busyMsg(m) : lb+'은 '+(isSysWs(m)?'최고 관리자':'워크스페이스 관리자')+'가 만듭니다.')+'">'
-     + '<span class="rdot mu"></span>'+lb+' 미생성</button>';
+    /* 만들 권한이 없으면 버튼이 아니라 상태 표시만 둔다(공통정책 7.10 — 권한 없는 기능은 미노출).
+       권한은 있으나 워크스페이스 작업이 진행 중이라 막힌 경우만 비활성 + 사유 툴팁이다(라이브러리 v0.25 .dis-tip) */
+    if(wsBusy && canMakeRoom(m))
+      return disTip('<button class="roombtn off" disabled><span class="rdot mu"></span>'+lb+' 미생성</button>', busyMsg(m));
+    return '<span class="roombtn off" style="cursor:default"><span class="rdot mu"></span>'+lb+' 미생성</span>';
   }
   /* 실패한 룸의 다시 시도는 더보기 메뉴에 둔다.
      카드의 룸 버튼은 진입 수단이므로 실행 액션을 섞지 않는다 */
@@ -2651,15 +2729,16 @@ function roomBtn(m,idx,kind){
   const why = wsBusy? busyMsg(m) : roomMsg(st, isDev? m.devFail : m.prodFail);
   /* 개발룸은 개발룸 화면으로 보낸다. CDE·작업 이력·설정이 그쪽 소관이다 */
   const go = isDev ? 'goDevRoom()' : 'openRoom('+idx+',\''+kind+'\')';
-  return '<button class="roombtn'+(canEnter?'':' off')+'"'
-   + (canEnter? ' onclick="event.stopPropagation();'+go+'"' : ' disabled title="'+why+'"')
+  const rb='<button class="roombtn'+(canEnter?'':' off')+'"'
+   + (canEnter? ' onclick="event.stopPropagation();'+go+'"' : ' disabled')
    + '><span class="rdot '+(DOT[st]||'mu')+'"></span>'+lb+' '+st+'</button>';
+  return canEnter? rb : disTip(rb, why);
 }
 /* 룸 생성·삭제 다시 시도 */
 /* 실패한 룸 안내 — 상세 환경 섹션 상단에 둔다.
    무엇이 실패했는지 알리고 그 자리에서 다시 실행한다 */
 function roomFailAlert(m,kind){
-  if(m.st!=='활성' || !canEditQuota()) return '';
+  if(m.st!=='활성') return '';
   const isDev = kind==='dev';
   const st = isDev? m.dev : m.prod;
   const lb = isDev? '개발룸' : '운영룸';
@@ -2674,14 +2753,19 @@ function roomFailAlert(m,kind){
   const code = isDev? m.devFail : m.prodFail;
   /* 운영룸 생성 실패의 다시 시도는 다시 생성과 같은 동작이라 최고 관리자만 한다(워크스페이스 정책 3.5).
      워크스페이스 관리자에게는 버튼 없이 요청 안내를 둔다 */
+  /* 역할 분기는 운영룸 오류 안내와 같다 — 최고 관리자는 다시 생성 버튼, 워크스페이스 관리자는 요청 안내,
+     편집자 · 뷰어는 문의 안내(REQ-WKSP-107). 같은 동작은 「다시 생성」 한 이름으로 부른다(UI 문구 규칙 6) */
   if(!isDev && !del && !isSuper()){
-    return alertBox('warn', lb+' 생성에 실패했습니다.', '최고 관리자에게 운영룸 다시 시도를 요청해 주세요.', '', false);
+    return alertBox('warn', lb+' 생성에 실패했습니다.',
+      canEditQuota(m)? '최고 관리자에게 운영룸 다시 생성을 요청해 주세요.' : '워크스페이스 관리자에게 문의해 주세요.', '', false);
   }
+  /* 개발룸 생성 실패 · 룸 삭제 실패의 다시 실행은 워크스페이스 관리자 이상이다. 그 밖에는 상태만 알리지 않고 두지 않는다(종전과 같다) */
+  if((isDev || del) && !canEditQuota(m)) return '';
   return alertBox('warn', lb+' '+(del?'삭제':'생성')+'에 실패했습니다.',
-    del ? roomDelFailMsg(code)+' CDE와 공유 볼륨이 함께 제거되고 자원은 운영룸으로 반환됩니다.'
-        : '원인을 확인한 뒤 다시 생성해 주세요. 워크스페이스 할당량에서 자원을 배정합니다.',
+    del ? roomDelFailMsg(code)+(isDev? ' CDE와 공유 볼륨이 함께 제거되고 자원은 운영룸으로 반환됩니다.' : ((m.deps||[]).length? ' 배포 '+(m.deps||[]).length+'건이 함께 제거됩니다.' : ''))
+        : (isDev? '다시 생성하면 워크스페이스 할당량에서 자원을 다시 배정합니다.' : '다시 생성하면 게이트웨이를 현재 설정으로 다시 적용합니다.'),
     '<button class="btn '+(del?'danger-line':'ghost')+' sm" onclick="askRetryRoom('+idx+',\''+kind+'\')">'
-      + lb+' '+(del?'삭제':'생성')+'</button>', false);
+      + (del? lb+' 삭제' : '다시 생성')+'</button>', false);
 }
 /* 사용자가 마지막에 정한 호스트 — 적용 대기 값이 있으면 그것, 없으면 적용 중인 값 */
 function redrawRoomViews(){
@@ -2702,7 +2786,7 @@ function hostPendBox(m){
 /* 운영룸 다시 생성. 최고 관리자만 연다(워크스페이스 정책 3.5). 그 룸의 배포가 새 게이트웨이에 다시 연결되어 확인을 받는다(공통정책 7.5) */
 function askReissue(i){
   const m=WS[i]; if(!m || !isSuper()) return;
-  openConfirm('운영룸을 다시 생성할까요?',
+  openConfirm('운영룸 다시 생성',
     '게이트웨이를 현재 설정으로 다시 적용하고, 이 운영룸의 배포를 새 게이트웨이에 다시 연결합니다. 끝날 때까지 운영룸은 생성 중으로 표시됩니다.',
     function(){
       m.prod='생성 중'; redrawRoomViews(); toast('ok','운영룸 다시 생성을 요청했습니다. 준비가 끝나면 알림으로 안내됩니다.');
@@ -2737,11 +2821,17 @@ function askRetryRoom(i,kind){
   const isDev = kind==='dev';
   const lb = isDev? '개발룸' : '운영룸';
   const del = (isDev? m.dev : m.prod)==='삭제 실패';
-  openConfirm(lb+'을 다시 '+(del?'삭제':'생성')+'할까요?',
-    del ? 'CDE와 공유 볼륨이 함께 제거되고 배정된 자원은 운영룸으로 반환됩니다. 이전 실패 원인이 해소되지 않으면 다시 실패할 수 있습니다.'
+  /* 운영룸 생성 실패의 다시 생성은 오류 운영룸 다시 생성과 같은 동작이라 같은 알럿 · 토스트를 쓴다(WKSP-L01 3장 · 5.1 룸 다시 생성 · 삭제 행) */
+  if(!isDev && !del){ askReissue(i); return; }
+  /* 삭제 실패의 알럿 제목은 진입 버튼과 같은 `{룸} 삭제` 다 — 같은 동작을 한 이름으로 부른다(UI 문구 규칙 6).
+     운영룸을 지우면 배포가 함께 제거된다. 확인 알럿에 배포 건수를 밝힌다 — 일반 운영룸 삭제 알럿과 같은 문장이다(워크스페이스 정책 3.4).
+     배포가 없으면 그 문장을 뺀다. CDE · 공유 볼륨은 개발룸에만 있다 */
+  const depCnt=(m.deps||[]).length;
+  openConfirm(del? lb+' 삭제' : lb+' 다시 생성',
+    del ? (isDev? 'CDE와 공유 볼륨이 함께 제거되고 배정된 자원은 운영룸으로 반환됩니다. ' : (depCnt? '배포 '+depCnt+'건이 함께 제거되어 모델 호출이 중단됩니다. ' : ''))+'이전 실패 원인이 해소되지 않으면 다시 실패할 수 있습니다.'
         : '워크스페이스 할당량에서 자원을 배정합니다. 이전 실패 원인이 해소되지 않으면 다시 실패할 수 있습니다.',
     function(){ retryRoom(i,kind); },
-    (del?'삭제':'생성'));
+    (del?'삭제':'다시 생성'));
 }
 function retryRoom(i,kind){
   const m=WS[i]; if(!m) return;
@@ -2751,7 +2841,8 @@ function retryRoom(i,kind){
   if(isDev) m.dev = del? '삭제 중' : '생성 중';
   else      m.prod = del? '삭제 중' : '생성 중';
   refresh();
-  toast('ok',(isDev?'개발룸':'운영룸')+' '+(del?'삭제를':'생성을')+' 다시 요청했습니다. '+(del?'자원 회수가':'준비가')+' 끝나면 알림으로 안내됩니다.');
+  /* 생성 실패의 재실행은 운영룸 · 개발룸 모두 「다시 생성」이다 — 버튼 · 확인 제목과 같은 이름으로 알린다 */
+  toast('ok',(isDev?'개발룸':'운영룸')+' '+(del?'삭제를 다시 요청했습니다. 자원 회수가':'다시 생성을 요청했습니다. 준비가')+' 끝나면 알림으로 안내됩니다.');
 }
 function cardView(d){
   return '<div class="cardgrid">'+d.map(function(m){
@@ -2763,11 +2854,11 @@ function cardView(d){
         +(m.st==='삭제 실패'
          ?'<button onclick="retryWs('+idx+')">다시 시도</button>'
          : isBusy(m)
-           ?'<button disabled title="'+busyMsg(m)+'">수정</button>'
+           ?disTip('<button disabled>수정</button>', busyMsg(m))
            :'<button onclick="openEditAt('+idx+')">수정</button>')
         +(canCreateWs()&&!m.sys
-           ?'<hr><button class="d"'+(delBlocked(m)?' disabled title="'+busyMsg(m)+'"':'')
-            +' onclick="delWs(\''+m.n+'\')">삭제</button>':'')
+           ?'<hr>'+(delBlocked(m)? disTip('<button class="d" disabled>삭제</button>', busyMsg(m))
+            : '<button class="d" onclick="delWs(\''+m.n+'\')">삭제</button>'):'')
         +'</div></div>':'')
      /* 상태는 대상의 속성이므로 헤더 이름 옆에 고정한다.
         테이블 상태 컬럼과 같은 순서다(공통정책 2.2).
@@ -2830,11 +2921,11 @@ function tableView(d){
           +((m.st==='삭제 실패')
          ?'<button onclick="retryWs('+idx+')">다시 시도</button>'
          : isBusy(m)
-           ?'<button disabled title="'+busyMsg(m)+'">수정</button>'
+           ?disTip('<button disabled>수정</button>', busyMsg(m))
            :'<button onclick="openEditAt('+idx+')">수정</button>')
             +(canCreateWs()&&!m.sys
-             ?'<hr><button class="d"'+(delBlocked(m)?' disabled title="'+busyMsg(m)+'"':'')
-              +' onclick="delWs(\''+m.n+'\')">삭제</button>':'')
+             ?'<hr>'+(delBlocked(m)? disTip('<button class="d" disabled>삭제</button>', busyMsg(m))
+              : '<button class="d" onclick="delWs(\''+m.n+'\')">삭제</button>'):'')
           +'</div></div></td>' : '<td></td>';
       return '<tr'+(m.sys?' class="pinrow"':'')+' data-i="'+idx+'" onclick="openPanel('+idx+')">'
         /* 이름과 설명을 한 셀에 겹치면 행 높이가 달라져 스캔이 어렵다. 별도 컬럼으로 둔다 */
@@ -2916,7 +3007,7 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape') closePanel
 /* ===== 패널 WKSP-L01.P01 ===== */
 const ITEMDEF={
   prod:'모델을 서비스하는 환경입니다. 워크스페이스 할당량에서 개발룸 몫을 뺀 나머지입니다.',
-  dev:'멤버가 개발·실험에 사용하는 환경입니다. 자원은 관리자 승인 후 할당됩니다.',
+  dev:'멤버가 개발·실험에 사용하는 환경입니다. 워크스페이스 관리자가 만들고, 공용 워크스페이스는 최고 관리자가 만듭니다.',
   vol:'개발룸 멤버가 함께 사용하는 볼륨입니다. 실험 데이터와 가중치를 공유합니다.'
 };
 function help(k){const d=ITEMDEF[k]; return d?tip(d):'';}
@@ -2961,12 +3052,12 @@ function openPanel(i){
       ((m.st==='삭제 실패')
       ? '<button onclick="retryWs('+WS.indexOf(m)+')">다시 시도</button>'
       : isBusy(m)
-        ? '<button disabled title="'+busyMsg(m)+'">수정</button>'
+        ? disTip('<button disabled>수정</button>', busyMsg(m))
         : '<button onclick="openEdit()">수정</button>')
     /* 공용은 지우면 공용 서빙이 중단되므로 삭제를 노출하지 않는다 */
     + (canCreateWs()&&!m.sys
-        ?'<hr><button class="d"'+(delBlocked(m)?' disabled title="'+busyMsg(m)+'"':'')
-         +' onclick="delWs(\''+m.n+'\')">삭제</button>':'');
+        ?'<hr>'+(delBlocked(m)? disTip('<button class="d" disabled>삭제</button>', busyMsg(m))
+         : '<button class="d" onclick="delWs(\''+m.n+'\')">삭제</button>'):'');
 
   const cp=pct(m.use.cpu,m.quota.cpu), rp=pct(m.use.ram,m.quota.ram), gp=pct(m.use.gpu,m.quota.gpu);
   let h='';
@@ -2996,7 +3087,7 @@ function openPanel(i){
       '<dl class="dl">'
     + '<dt>모델</dt><dd>'+m.models.length+'건 <a href="#" class="mname" style="margin-left:6px" onclick="event.preventDefault();act(\'모델 화면으로 이동합니다.\')">모델 화면으로 이동</a></dd>'
     + '<dt>배포</dt><dd>'+m.deps.length+'건 <a href="#" class="mname" style="margin-left:6px" onclick="event.preventDefault();act(\'배포 화면으로 이동합니다.\')">배포 화면으로 이동</a></dd>'
-    + '<dt>개발환경</dt><dd>'+cdeCnt(m)+'건'+(m.dev==='미생성'?'':' <a href="#" class="mname" style="margin-left:6px" onclick="event.preventDefault();goDevRoom()">개발룸으로 이동</a>')+'</dd>'
+    + '<dt>CDE</dt><dd>'+cdeCnt(m)+'건'+(m.dev==='미생성'?'':' <a href="#" class="mname" style="margin-left:6px" onclick="event.preventDefault();goDevRoom()">개발룸으로 이동</a>')+'</dd>'
     + '</dl>', 'res');
 
   /* 구성원은 이동 대상이 아니라 조회 목록이므로 링크 카드가 아닌 표로 둔다.
@@ -3121,9 +3212,10 @@ function roomDelFailMsg(code){
    삭제 실패는 그 룸의 사유 값(code)으로 문구를 고른다 */
 function roomMsg(st,code){
   if(st==='미생성')    return '아직 만들지 않았습니다.';
-  if(st==='생성 중')   return '네임스페이스와 게이트웨이를 만들고 있습니다.';
+  if(st==='생성 중')   return '게이트웨이를 만들고 있습니다.';
   if(st==='오류')      return '게이트웨이 동작에 실패했습니다. 개발룸은 공유 볼륨도 함께 판정합니다.';
-  if(st==='생성 실패') return '생성에 실패했습니다. 다시 시도하거나 삭제할 수 있습니다.';
+  /* 카드 · 환경 칸은 모든 역할이 본다. 다시 생성 · 삭제는 상세 환경 섹션에서 역할에 따라 갈려 여기서는 상태만 쓴다(문서 반영 절차 5.4) */
+  if(st==='생성 실패') return '생성에 실패했습니다.';
   if(st==='삭제 중')   return '개발룸을 삭제하고 있습니다.';
   /* 종전 `원인을 확인한 뒤` 는 확인할 화면이 없어 뺐다(WKSP-L01 5.2 · 워크스페이스 정책 3.5) */
   if(st==='삭제 실패') return roomDelFailMsg(code);
@@ -3295,11 +3387,11 @@ function drawDetail(){
      +((m.st==='삭제 실패')
         ? '<button class="btn ghost" onclick="retryWs('+WS.indexOf(m)+')">다시 시도</button>'
         : isBusy(m)
-          ? '<button class="btn ghost" disabled title="'+busyMsg(m)+'">수정</button>'
+          ? disTip('<button class="btn ghost" disabled>수정</button>', busyMsg(m))
           : '<button class="btn ghost" onclick="openEdit()">수정</button>')
      +(canCreateWs()&&!m.sys
-        ?'<button class="btn danger-line"'+(delBlocked(m)?' disabled title="'+busyMsg(m)+'"':'')
-         +' onclick="delWs(\''+m.n+'\')">삭제</button>':'')+'</div>':'')
+        ?(delBlocked(m)? disTip('<button class="btn danger-line" disabled>삭제</button>', busyMsg(m))
+         : '<button class="btn danger-line" onclick="delWs(\''+m.n+'\')">삭제</button>'):'')+'</div>':'')
    + '</div>';
 
   /* 섹션 순서 — 식별·귀속 → 상태·현황 → 연관 리소스 → 설정(탭).
@@ -3420,7 +3512,7 @@ function drawDetail(){
      /* 공용은 초대·제외 진입점이 없어 그 이유를 밝힌다. 조치가 없는 정보이므로
         알럿이 아니라 섹션 도움말에 둔다(공통정책 4.7 · 개정 제안 7.10).
         알럿은 조치가 딸릴 때만 쓴다 — 아래 `관리자가 1명입니다` 가 그 경우다 */
-     + (isSysWs(m)? tip('승인·활성 계정이 자동으로 등록됩니다. 역할만 변경할 수 있습니다.') : '')
+     + (isSysWs(m)? tip('승인·활성 계정이 자동으로 추가됩니다. 역할만 변경할 수 있습니다.') : '')
      + (canChangeMembership(m)?'<span class="secbtns"><button class="btn sm" onclick="openInvite()">멤버 초대</button></span>':'')
      + '</h4>'
      /* 공용은 제외·나가기를 두지 않아 `작업` 열 자체를 빼고 3열로 둔다(정책 6.2).
@@ -3451,7 +3543,7 @@ function drawDetail(){
               /* 행 작업은 개수와 무관하게 더보기 메뉴로 둔다(공통정책 3.6 · REQ-WKSP-084) */
               ? '<td><div class="more" id="mm'+i+'"><button class="morebtn" aria-label="작업" onclick="tgMore(event,\'mm'+i+'\')">⋯</button><div class="rowmenu">'
                 + (isLastAdmin(m,i)
-                 ? '<button class="d" disabled title="이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 제외할 수 있습니다.">제외</button>'
+                 ? disTip('<button class="d" disabled>제외</button>', '이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 제외할 수 있습니다.')
                  : '<button class="d" onclick="rmMember('+i+')">'+(u.id==='yj.seong'?'나가기':'제외')+'</button>')
                 + '</div></div></td>'
               : '')+'</tr>';
@@ -3521,7 +3613,8 @@ function drawDetail(){
              +'<button class="d" onclick="revokeKey(\''+k.n+'\')">폐기</button></div></div>'
            :'')+'</td></tr>').join('')
          + '</tbody></table></div>'
-       : '<div class="emptyline">API Key가 없습니다. 외부 앱에서 배포 모델을 호출하려면 키를 발급해 주세요.</div>')
+       /* 발급 권한이 없는 사람에게 발급을 요청하지 않는다(공통정책 7.10 · UI 문구 규칙 2) */
+       : '<div class="emptyline">API Key가 없습니다.'+(canIssueKey()? ' 외부 앱에서 배포 모델을 호출하려면 키를 발급해 주세요.' : '')+'</div>')
      + '</div>';
   }
 
@@ -3714,7 +3807,7 @@ function roomTab(m){
      배포 화면의 `외부 배포`(클러스터 워크로드 가져오기)와 다른 대상이다 */
   const ext=m.ext||[];
   h+='<div class="dsec"><h4>외부 모델'
-   +   tip('외부 상용 AI API를 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.')
+   +   tip('외부 모델을 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.')
    +   ' <span style="font-weight:400;color:var(--muted-foreground)">'+ext.length+'건</span>'
    + (canManageExt(m)?'<button class="btn sm" style="margin-left:auto" onclick="openExt()">외부 모델 등록</button>':'')+'</h4>'
    + (ext.length
@@ -3826,7 +3919,8 @@ function qErrs(){
     CLUSTER.gpu.filter(function(g){return accRows.indexOf(g.k)>=0;}).map(function(g){ return [accKey(g), g.n, false]; })
   ).forEach(function(p){
     const v=num(p[0]);
-    if(isNaN(v)||v<0) e.push(p[1]+' 값을 정확히 입력해 주세요.');
+    if(NF[p[0]]===''||NF[p[0]]===undefined) e.push(p[1]+' 값을 입력해 주세요.');
+    else if(isNaN(v)||v<0) e.push(p[1]+'에 0 이상의 숫자를 입력해 주세요.');
     else if(!p[2] && v%1!==0) e.push(p[1]+'는 정수로 입력해 주세요.');
     else if(p[2] && (v*2)%1!==0) e.push(p[1]+'는 0.5 단위로 입력해 주세요.');
   });
@@ -3976,7 +4070,7 @@ function devRoomFields(){
    + qRow('devCpu','CPU',cpuCap,cpuCap,0,0,'Cores','워크스페이스 할당량에서 옮겨집니다. 남는 만큼이 운영룸 몫입니다.')
    + qRow('devRam','Memory',ramCap,ramCap,0,0,'Gi','')
    + qRow('devGpu','가속기',gpuCap,gpuCap,0,0,'장','')
-   + qRow('devVol','공유 볼륨',volCap,volCap,0,0,'GB','개발룸 멤버가 함께 쓰는 볼륨입니다. 관리자가 개발룸 설정에서 변경합니다.')
+   + qRow('devVol','공유 볼륨',volCap,volCap,0,0,'GB','개발룸 멤버가 함께 쓰는 볼륨입니다. 생성 시에 정하며 이후에는 바꿀 수 없습니다.')
    /* 비었을 때의 처리가 설치 값으로 갈린다(워크스페이스 정책 1.1·3.3 · CON-596 G-1).
       문구는 개발룸 목업과 같은 문장을 쓴다(공통정책 1.1) */
    + '<div class="f" style="margin-bottom:0"><label>Egress 허용 도메인'+tip(egressTip())+'</label>'
@@ -3984,7 +4078,13 @@ function devRoomFields(){
    +   '<div class="hint">'+egressHint()+'</div></div>'
    + '</div>';
 }
-function drawFormValidOnly(){ const b=document.getElementById('fSubmit'); if(b) b.disabled=!formValid(); }
+/* 생성·신청 버튼은 입력 상태와 무관하게 활성이다(공통정책 7.1). 검증은 누를 때 submitForm 이 한다(7.8) */
+function drawFormValidOnly(){ const b=document.getElementById('fSubmit'); if(b) b.disabled=false; }
+/* 제출 실패 뒤 첫 오류 필드로 포커스한다(공통정책 7.8). 화면 순서대로 찾는다 */
+function focusFirstErr(){
+  const el=document.querySelector('#formBody input.err, #formBody textarea.err, #formBody .err input');
+  if(el) el.focus();
+}
 
 /* 필수 항목은 라벨 뒤 * 로 표시한다. 통용되는 표기라 별도 안내를 두지 않고,
    선택 항목에도 라벨을 붙이지 않는다(라이브러리 규격) */
@@ -4030,7 +4130,7 @@ function drawForm(){
    +   '<div class="icopick">'
    +     icoKeys().map(function(k){ return '<button type="button" class="'+(NF.ico===k?'on':'')+'" title="'+WSICO[k].l+'" onclick="NF.ico=\''+k+'\';drawForm()">'+wsIcon(k)+'</button>'; }).join('')
    +   '</div></div>'
-   + '<div class="f"><label>워크스페이스명<span class="req">*</span>'+tip('쿠버네티스 네임스페이스명으로 사용됩니다.')+'</label>'
+   + '<div class="f"><label>워크스페이스명<span class="req">*</span>'+tip('시스템 내부 이름으로도 사용됩니다.')+'</label>'
    /* 중복 확인은 값을 여러 번 고치며 만드는 항목이라 버튼 방식이다(정책 2.2) */
    +   '<div style="display:flex;gap:8px">'
    +     '<input class="inp'+(eName||fDupMsg?' err':'')+'" id="f_name" value="'+NF.name+'" placeholder="ai-service-team" oninput="fSet(\'name\',this.value)" oncompositionstart="onComposeStart()" oncompositionend="onComposeEnd(function(v){fSet(\'name\',v);},this)" onblur="fBlur(\'name\')">'
@@ -4118,10 +4218,11 @@ function drawForm(){
      +   '<div><div class="oc-t">전용 S3 저장소 사용</div><div class="oc-d">이 워크스페이스만 사용할 저장소를 따로 연결합니다. 사용하지 않으면 전역 저장소를 사용합니다.</div></div></div></div>'
      /* 켜면 접속 정보를 받는다(정책 2.4 · CON-492). 연동 탭 저장소 설정과 같은 항목이다 */
      + (NF.byob? '<div class="devbox" style="margin-top:12px">'
-         + '<div class="f"><label>엔드포인트 URL<span class="req">*</span></label><input class="inp" placeholder="https://s3.example.com" value="'+(NF.s3url||'')+'" oninput="NF.s3url=this.value;drawFormValidOnly()"></div>'
-         + '<div class="f"><label>버킷<span class="req">*</span></label><input class="inp" value="'+(NF.s3bucket||'')+'" oninput="NF.s3bucket=this.value;drawFormValidOnly()"></div>'
-         + '<div class="f"><label>액세스 키<span class="req">*</span></label><input class="inp" value="'+(NF.s3key||'')+'" oninput="NF.s3key=this.value;drawFormValidOnly()"></div>'
-         + '<div class="f" style="margin-bottom:0"><label>시크릿 키<span class="req">*</span></label><input class="inp" type="password" placeholder="시크릿 키를 입력해 주세요." oninput="NF.s3sec=this.value;drawFormValidOnly()"></div>'
+         /* 비어 있으면 제출 시 인라인 에러를 보인다(공통정책 7.8). 입력 전에는 띄우지 않는다 */
+         + '<div class="f"><label>엔드포인트 URL<span class="req">*</span></label><input class="inp'+s3E('s3url')+'" placeholder="https://s3.example.com" value="'+(NF.s3url||'')+'" oninput="NF.s3url=this.value;drawFormValidOnly()">'+s3M('s3url','엔드포인트 URL을 입력해 주세요.')+'</div>'
+         + '<div class="f"><label>버킷<span class="req">*</span></label><input class="inp'+s3E('s3bucket')+'" value="'+(NF.s3bucket||'')+'" oninput="NF.s3bucket=this.value;drawFormValidOnly()">'+s3M('s3bucket','버킷을 입력해 주세요.')+'</div>'
+         + '<div class="f"><label>액세스 키<span class="req">*</span></label><input class="inp'+s3E('s3key')+'" value="'+(NF.s3key||'')+'" oninput="NF.s3key=this.value;drawFormValidOnly()">'+s3M('s3key','액세스 키를 입력해 주세요.')+'</div>'
+         + '<div class="f" style="margin-bottom:0"><label>시크릿 키<span class="req">*</span></label><input class="inp'+s3E('s3sec')+'" type="password" placeholder="시크릿 키를 입력해 주세요." oninput="NF.s3sec=this.value;drawFormValidOnly()">'+s3M('s3sec','시크릿 키를 입력해 주세요.')+'</div>'
          + '</div>' : '')
      + '</div>';
   }
@@ -4134,7 +4235,7 @@ function drawForm(){
   }
 
   h+='<div class="formfoot"><button class="btn ghost" onclick="cancelForm()">취소</button>'
-   + '<button class="btn" id="fSubmit" '+(formValid()?'':'disabled')+' onclick="submitForm()">'+(isNew?'생성':'신청')+'</button></div>';
+   + '<button class="btn" id="fSubmit" onclick="submitForm()">'+(isNew?'생성':'신청')+'</button></div>';
   h+='</div>';
   document.getElementById('formBody').innerHTML=h;
 }
@@ -4143,15 +4244,11 @@ function drawForm(){
    줄이는 값은 받지 않는다. 감액은 즉시 반영이라 신청 대상이 아니다(정책 2.3) */
 /* 자원 입력 상태는 폼을 그릴 때 계산한다. 사유만 바뀌면 그 값과 합쳐 버튼만 켠다 */
 let rqState={any:false, err:false};
+/* 버튼은 막지 않는다(공통정책 7.1). 사유를 적으면 사유 에러만 거둔다 */
 function rqSyncBtn(){
-  const b=document.getElementById('rqSubmit'); if(!b) return;
-  const rsn=(NF.rqRsn||'').trim();
-  const ok = rqState.any && !rqState.err && rsn;
-  b.disabled=!ok;
-  b.title = ok? ''
-    : rqState.err? '입력값을 확인해 주세요.'
-    : !rqState.any? '늘릴 자원을 입력해 주세요.'
-    : '요청 사유를 입력해 주세요.';
+  if(!(NF.rqRsn||'').trim()) return;
+  const t=document.getElementById('rqRsn'), e=document.getElementById('rqRsnErr');
+  if(t) t.classList.remove('err'); if(e) e.remove();
 }
 
 /* 증액만 받으므로 하한은 현재 값이다. 비어 있으면 현재 값을 기준으로 올린다 */
@@ -4186,7 +4283,7 @@ function drawQuotaReqForm(){
        배정받지 않은 유형의 0 도 같다 — 필수가 아니므로 오류로 보지 않는다 */
     if(v===''||v===undefined) return '';
     if(+v===cur) return '';
-    if(isNaN(+v)) return '값을 정확히 입력해 주세요.';
+    if(isNaN(+v) || +v<0) return '0 이상의 숫자를 입력해 주세요.';
     if(intOnly && +v%1!==0) return '정수로 입력해 주세요.';
     if(+v<=cur) return cur>0
       ? '현재 할당량 '+cur+' '+unit+'보다 큰 값을 입력해 주세요.'
@@ -4274,6 +4371,8 @@ function drawQuotaReqForm(){
             }).join('')
         + '</span>'
         + '</div></div>')
+   /* 늘린 항목 없이 신청하면 요청 자원 아래에 알린다(공통정책 7.1 · 7.8) */
+   + ((shownF.q && !any)? '<div class="errmsg" style="display:block">늘릴 자원을 입력해 주세요.</div>' : '')
    + '</div>';
 
   /* 값이 어디 쓰이는지는 항목 설명이라 툴팁에 둔다. 개발룸 CDE 신청과 같은 자리다 */
@@ -4282,26 +4381,22 @@ function drawQuotaReqForm(){
    + '<div class="f" style="margin-bottom:0">'
    /* 입력할 때마다 폼을 다시 그리면 포커스와 커서가 날아간다 —
       값만 담고 제출 버튼 상태만 따로 갱신한다 */
-   +   '<textarea class="inp" rows="3" style="resize:vertical" placeholder="예) CDE 신청이 자원 부족으로 반려되고 있습니다."'
+   +   '<textarea class="inp'+((shownF.rsn && !rsn)?' err':'')+'" id="rqRsn" rows="3" style="resize:vertical" placeholder="예) CDE 신청이 자원 부족으로 반려되고 있습니다."'
    +     ' oninput="NF.rqRsn=this.value;rqSyncBtn()">'+(NF.rqRsn||'')+'</textarea>'
+   +   ((shownF.rsn && !rsn)? '<div class="errmsg" id="rqRsnErr" style="display:block">요청 사유를 입력해 주세요.</div>' : '')
    + '</div></div>';
 
   h+='<div class="formfoot"><button class="btn ghost" onclick="cancelForm()">취소</button>'
-   /* 왜 못 누르는지 알려준다(공통정책 7.10) — 인라인 에러는 잘못 적었을 때만 뜨고
-      아직 안 적은 상태는 표시할 자리가 없다 */
-   + '<button class="btn" id="rqSubmit"'
-   +   ((any && !errs.length && rsn)? ''
-      : ' disabled title="'+(errs.length? '입력값을 확인해 주세요.'
-          : !any? '늘릴 자원을 입력해 주세요.'
-          : '요청 사유를 입력해 주세요.')+'"')
-   +   ' onclick="submitQuotaReq()">신청</button></div>';
+   /* 입력 상태와 무관하게 활성이다. 누르면 늘릴 자원 · 형식 · 요청 사유를 검증해
+      그 자리에 인라인 에러를 보이고 첫 오류 필드로 포커스한다(공통정책 7.1 · 7.8) */
+   + '<button class="btn" id="rqSubmit" onclick="submitQuotaReq()">신청</button></div>';
   rqState={any:any, err:errs.length>0};
   h+='</div>';
   document.getElementById('formBody').innerHTML=h;
 }
 
 function drawQuotaForm(){
-  const m=cur.m, errs=qErrs();
+  const m=cur.m;
   let h='';
   h+='<div class="dhead">'
    + '<button class="back" onclick="cancelForm()" title="워크스페이스 상세로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>'
@@ -4319,10 +4414,11 @@ function drawQuotaForm(){
    + accBlock(m)
    + qRow('vol','전체 저장소 용량',CLUSTER.vol.total,CLUSTER.vol.free,m.quota.vol,0,CLUSTER.vol.unit,'개발룸 공유 볼륨과 CDE 개인 볼륨이 이 안에서 나뉩니다.')
    + '</div>';
-  if(errs.length) h+='<div class="warnbox" style="margin-bottom:18px"><b>⚠</b><span>'+errs.map(x=>'<div>'+x+'</div>').join('')+'</span></div>';
+  /* 오류는 칸마다 인라인 에러 하나로 알린다. 폼 위에 같은 오류를 다른 문구로 모아 두지 않는다(공통정책 7.8 · WKSP-L01 FX-W1) */
   const req = formKind==='quotaReq';
   h+='<div class="formfoot"><button class="btn ghost" onclick="cancelForm()">취소</button>'
-   + '<button class="btn" id="fSubmit" '+(formValid()?'':'disabled')
+   /* 수정은 변경이 없을 때만 비활성이다(공통정책 7.1). 검증은 누를 때 submitQuota 가 한다(7.8) */
+   + '<button class="btn" id="fSubmit" '+((req || qDirty())?'':'disabled')
    +   ' onclick="'+(req?'submitQuotaReq()':'submitQuota()')+'">'+(req?'신청':'저장')+'</button></div>';
   h+='</div>';
   document.getElementById('formBody').innerHTML=h;
@@ -4330,6 +4426,16 @@ function drawQuotaForm(){
 /* 증액은 승인을 거친다 — 총량 선점형이라 한 워크스페이스를 늘리면 다른 곳 여유를
    가져간다. 값은 바로 반영하지 않고 최고 관리자가 내 작업함에서 처리한다 */
 function submitQuotaReq(){
+  /* 제출 시 전체 검증(공통정책 7.8). 형식 오류는 행 아래, 늘린 항목 없음은 요청 자원 아래, 사유는 사유 아래 */
+  if(rqState.err || !rqState.any || !(NF.rqRsn||'').trim()){
+    shownF.q=true; shownF.rsn=true; drawForm();
+    /* 화면 순서 — 요청 자원(형식 오류 칸, 없으면 늘린 항목 없음) → 요청 사유 */
+    const el = rqState.err? document.querySelector('#formBody .err input')
+      : !rqState.any? document.querySelector('#formBody .qrowbox input')
+      : document.querySelector('#formBody textarea.err');
+    if(el) el.focus();
+    return;
+  }
   view='detail'; wTab=1; syncView(); refresh();
   toast('ok','할당량 증액을 신청했습니다. 승인 결과는 알림으로 안내됩니다.');
 }
@@ -4341,6 +4447,8 @@ function qReqDirty(){
 function submitQuota(){
   /* 네임스페이스 정보는 메타데이터라 즉시 반영된다. 워크스페이스 상태는 바뀌지 않는다 */
   const m=cur.m;
+  /* 제출 시 검증 — 항목마다 인라인 에러, 첫 오류 필드로 포커스(공통정책 7.8) */
+  if(qErrs().length){ shownF.q=true; drawForm(); focusFirstErr(); return; }
   /* 저장 시점 배분 범위 초과(WKSP-L01 5.2). 입력 단계를 통과해도 그 사이 잔여가 줄면 저장에서 처음 드러난다.
      늘린 항목만 판정한다. 저장하지 않고 입력값을 둔 채 잔여를 다시 불러와 넘는 칸을 인라인으로 알린다.
      QFAIL 은 데모 바 `저장 시 범위 초과` 로 켜는 검토용 처리이며 실제 화면에는 없다 */
@@ -4350,7 +4458,8 @@ function submitQuota(){
     if(+NF.ram>m.quota.ram){ CLUSTER.ram.free=0; up.push(1); }
     /* 가속기도 늘린 유형만 본다. 이 워크스페이스의 현재 할당은 accBase 유형에만 있다 */
     CLUSTER.gpu.forEach(function(g){ const mine=(accBase===g.k)? m.quota.gpu : 0; if((+NF[accKey(g)]||0)>mine){ g.free=0; up.push(1); } });
-    if(up.length){ toast('cr','요청한 할당량이 지금 배분 가능한 범위를 넘습니다. 배분 가능한 양을 확인하고 값을 조정해 주세요.'); drawForm(); return; }
+    /* 넘는 칸이 늘 특정되어 인라인 에러로만 알린다. 같은 내용을 토스트로 겹치지 않는다(WKSP-L01 5.2 · 10-28 결정) */
+    if(up.length){ shownF.q=true; drawForm(); focusFirstErr(); return; }
   }
   m.quota.cpu=+NF.cpu; m.quota.ram=+NF.ram; m.quota.gpu=CLUSTER.gpu.reduce(function(a,g){ return a+(+NF[accKey(g)]||0); },0); m.quota.vol=+NF.vol;
   m.devq.cpu=+NF.devCpu; m.devq.ram=+NF.devRam; m.devq.gpu=+NF.devGpu;
@@ -4409,20 +4518,23 @@ function accBlock(m){
     const use  = (m && accBase===k)? m.use.gpu : 0;
     const cap  = g.free + mine;
     const v    = parseFloat(NF[key])||0;
-    const over = v>cap, under = v<use;
-    return '<div class="accrow'+(over||under?' err':'')+'">'
+    const fe   = qFmtErr(key,'장');
+    const blank = NF[key]===''||NF[key]===undefined;
+    const over = !fe && !blank && v>cap, under = !fe && !blank && v<use;
+    return '<div class="accrow'+(fe||over||under?' err':'')+'">'
      + '<div class="accline">'
      +   '<span class="accname">'+g.n+' '+g.vram+'GB</span>'
-     +   '<span class="stepper'+(over||under?' err':'')+'">'
+     +   '<span class="stepper'+(fe||over||under?' err':'')+'">'
      +     stepBtn(key,-1,1,use,cap)
      +     '<span class="stfield"><input class="inp" value="'+NF[key]+'" inputmode="numeric" oninput="NF.'+key+'=this.value;drawForm()"><span class="stunit">장</span></span>'
      +     stepBtn(key,1,1,use,cap)
      +   '</span>'
-     +   '<span class="qrcap">배분 가능 '+cap+'</span>'
+     +   '<span class="qrcap">배분 가능 '+cap+'장</span>'
      +   '<span class="qrdel"><button class="cbtn" title="제거" onclick="accDel(\''+k+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18M6 6l12 12"/></svg></button></span>'
      + '</div>'
-     + (over? '<div class="errmsg" style="display:block">배분 가능한 최대는 '+cap+'개입니다.</div>'
-        : under? '<div class="errmsg" style="display:block">현재 점유 중인 '+use+'개보다 작게 줄일 수 없습니다.</div>' : '')
+     + (fe? '<div class="errmsg" style="display:block">'+fe+'</div>'
+        : over? '<div class="errmsg" style="display:block">배분 가능한 최대는 '+cap+'장입니다.</div>'
+        : under? '<div class="errmsg" style="display:block">현재 점유 중인 '+use+'장보다 작게 줄일 수 없습니다.</div>' : '')
      + '</div>';
   }).join('');
 
@@ -4489,7 +4601,7 @@ function clusterCard(){
      + '<div class="clv">'+fm(free)+' <span class="clq">'+unit+'</span></div>'
      + '<div class="clbar"><div class="clfill '+(none?'cr':p>=90?'cr':p>=75?'wa':'')+'" style="width:'+Math.max(2,p)+'%"></div></div>'
      + '<div class="clsub">사용 '+fm(used)+' / 전체 '+fm(total)+' <span class="clpc">('+p+'%)</span></div>'
-     + (none?'<div class="clnote">배분 가능 0</div>':'')+'</div>';
+     + (none?'<div class="clnote">배분 가능 0 '+unit+'</div>':'')+'</div>';
   };
   /* 가속기는 종류가 계속 늘어난다. 카드로 흩뿌리면 줄이 넘치므로 한 블록에 목록으로 모은다 */
   const accList = CLUSTER.gpu.map(function(g){
@@ -4501,7 +4613,7 @@ function clusterCard(){
      + '<span class="caf">'+g.free+'<span class="clq"> 장</span></span>'
      + '<span class="cab"><span class="clbar"><span class="clfill '+(none?'cr':p>=90?'cr':p>=75?'wa':'')+'" style="width:'+Math.max(2,p)+'%"></span></span></span>'
      + '<span class="cas">사용 '+used+' / 전체 '+g.total+' <span class="clpc">('+p+'%)</span></span>'
-     + (none?'<span class="clnote">배분 가능 0</span>':'<span></span>')
+     + (none?'<span class="clnote">배분 가능 0장</span>':'<span></span>')
      + '</div>';
   }).join('');
 
@@ -4515,31 +4627,49 @@ function clusterCard(){
    +   cell('공유 볼륨',CLUSTER.vol.free,CLUSTER.vol.total,CLUSTER.vol.unit)
    + '</div>'
    + '<div class="clacctitle">가속기 배분 가능'
-   +   tip('가속기는 장치 단위로 배정됩니다. 한 장당 vRAM은 모델마다 고정되어 있습니다.')+'</div>'
+   +   tip('가속기는 장치 단위로 배정됩니다. 한 장당 vRAM은 가속기 종류마다 고정되어 있습니다.')+'</div>'
    + '<div class="clacclist">'+accList+'</div>'
    + '</div>';
 }
+/* 전용 S3 필수 항목 — 제출한 뒤 비어 있으면 에러 */
+function s3Bad(k){ return shownF.s3 && NF.byob && !(NF[k]||'').trim(); }
+function s3E(k){ return s3Bad(k)? ' err' : ''; }
+function s3M(k,msg){ return s3Bad(k)? '<div class="errmsg" style="display:block">'+msg+'</div>' : ''; }
+/* 형식 오류 — 제출한 뒤에만 보인다. 문구는 개발룸 자원 검증과 같다(공통정책 7.8) */
+function qFmtErr(key,unit){
+  if(!shownF.q) return '';
+  const raw=NF[key], v=+raw;
+  if(raw===''||raw===undefined) return '값을 입력해 주세요.';
+  if(isNaN(v)||v<0) return '0 이상의 숫자를 입력해 주세요.';
+  if(unit==='Cores') return (v*2)%1!==0? '0.5 단위로 입력해 주세요.' : '';
+  if(v%1!==0) return unit==='장'? '가속기 수는 정수로 입력해 주세요.' : '정수로 입력해 주세요.';
+  return '';
+}
 function qRow(key,label,total,free,curQuota,used,unit,desc,rm,sub){
+  const fe = qFmtErr(key,unit);
   const v = parseFloat(NF[key])||0;
   const others = Math.max(0, total - free - curQuota);
   const cap = free + curQuota;                 /* 이 워크스페이스가 가질 수 있는 최대 */
-  const over = v > cap, under = v < used;
+  /* 빈 칸은 점유 미만으로 읽지 않는다 — 빈 값은 제출 때 `값을 입력해 주세요.` 로 알린다(qFmtErr) */
+  const blank = NF[key]===''||NF[key]===undefined;
+  const over = !fe && !blank && v > cap, under = !fe && !blank && v < used;
   const step = (unit==='개'||unit==='장')?1 : unit==='GB'?10 : unit==='Gi'?8 : 0.5;
-  return '<div class="qrowbox'+(over||under?' err':'')+'">'
+  return '<div class="qrowbox'+(fe||over||under?' err':'')+'">'
    + '<div class="qrhead"><span class="qrlb">'
    +   '<span class="qrname">'+label+'<span class="req">*</span>'+(desc?tip(desc):'')+'</span>'
    /* 스펙은 이름이 아니라 그 항목의 속성이다. 라벨 아래 보조 텍스트로 둔다 */
    +   (sub?'<span class="qrsub">'+sub+'</span>':'')
    + '</span>'
-   +   '<span class="stepper'+(over||under?' err':'')+'">'
+   +   '<span class="stepper'+(fe||over||under?' err':'')+'">'
    +     stepBtn(key,-1,step,used,cap)
    +     '<span class="stfield"><input class="inp" value="'+NF[key]+'" inputmode="'+(unit==='Cores'?'decimal':'numeric')+'" oninput="NF.'+key+'=this.value;drawForm()"><span class="stunit">'+unit+'</span></span>'
    +     stepBtn(key,1,step,used,cap)
    +   '</span>'
-   +   '<span class="qrcap">배분 가능 '+cap.toFixed(cap%1?1:0)+'</span>'
+   +   '<span class="qrcap">배분 가능 '+cap.toFixed(cap%1?1:0)+(unit==='장'||unit==='개'? unit : ' '+unit)+'</span>'
    +   '<span class="qrdel">'+(rm?'<button class="cbtn" title="제거" onclick="'+rm+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18M6 6l12 12"/></svg></button>':'')+'</span>'
    + '</div>'
-   + (over? '<div class="errmsg" style="display:block">배분 가능한 최대는 '+cap.toFixed(cap%1?1:0)+' '+unit+'입니다.</div>'
+   + (fe? '<div class="errmsg" style="display:block">'+fe+'</div>'
+      : over? '<div class="errmsg" style="display:block">배분 가능한 최대는 '+cap.toFixed(cap%1?1:0)+' '+unit+'입니다.</div>'
       : under? '<div class="errmsg" style="display:block">현재 점유 중인 '+used+' '+unit+'보다 작게 줄일 수 없습니다.</div>'
       : '')
    + '</div>';
@@ -4560,9 +4690,11 @@ function cancelForm(){
   backToList();
 }
 function submitForm(){
-  if(!formValid()){ shownF={name:true,rsn:true,owner:true}; drawForm();
-    shownF.owner=true; drawForm();
-    const el=document.getElementById(nameErr()?'f_name':(ownerErr()?'f_owner':'f_rsn')); if(el) el.focus(); return; }
+  /* 제출 시 전체 검증. 실패한 필드마다 인라인 에러를 보이고 첫 오류 필드로 포커스한다(공통정책 7.1 · 7.8) */
+  if(!formValid()){
+    shownF={name:true,rsn:true,owner:true,q:true,s3:true};
+    if(!nameErr() && !(fDupOk && fDupName===NF.name.trim()) && !fDupMsg) fDupMsg='워크스페이스명 중복 확인을 해 주세요.';
+    drawForm(); focusFirstErr(); return; }
   if(formKind==='new'){
     /* 저장 시점 배분 범위 초과(WKSP-L01 5.2). 저장하지 않고 폼과 입력값을 그대로 둔다. 검토용 처리(QFAIL)다 */
     /* 생성도 수정과 같이 잔여를 다시 불러와 넘는 칸에 인라인 에러를 띄운다. 그래야 문구의 잔여를 그 자리에서 확인할 수 있다 */
@@ -4570,7 +4702,7 @@ function submitForm(){
       if(+NF.cpu>0) CLUSTER.cpu.free=0;
       if(+NF.ram>0) CLUSTER.ram.free=0;
       CLUSTER.gpu.forEach(function(g){ if((+NF[accKey(g)]||0)>0) g.free=0; });
-      toast('cr','요청한 할당량이 지금 배분 가능한 범위를 넘습니다. 배분 가능한 양을 확인하고 값을 조정해 주세요.'); drawForm(); return;
+      shownF.q=true; drawForm(); focusFirstErr(); return;
     }
     /* 워크스페이스는 논리 레코드라 즉시 만들어진다. 룸을 함께 만들면 룸이 생성 중이 된다 */
     WS.unshift({n:NF.name.trim(),sys:false,desc:NF.desc.trim(),st:'활성',
@@ -4608,15 +4740,22 @@ function openInvite(){
     '<option value="">선택해 주세요</option>'+cands.map(function(u){ return '<option>'+u+'</option>'; }).join('');
   document.getElementById('iUser').disabled = !cands.length;
   document.getElementById('iHint').textContent = cands.length
-    ? '이미 소속된 사용자는 목록에 표시되지 않습니다. 역할을 바꾸려면 멤버 목록에서 변경합니다.'
-    : '초대할 수 있는 사용자가 없습니다. 모든 사용자가 이미 이 워크스페이스에 소속되어 있습니다.';
+    ? '이미 멤버인 사용자는 목록에 표시되지 않습니다. 역할을 바꾸려면 멤버 목록에서 변경합니다.'
+    : '초대할 수 있는 사용자가 없습니다. 모든 사용자가 이미 이 워크스페이스의 멤버입니다.';
+  document.getElementById('iUser').classList.remove('err'); document.getElementById('iUserErr').classList.remove('show');
   iValid();
   document.getElementById('mdInvite').classList.add('on');
 }
 function closeInvite(){ document.getElementById('mdInvite').classList.remove('on'); }
-function iValid(){ document.getElementById('iSubmit').disabled=!document.getElementById('iUser').value; }
+/* 초대할 수 있는 사용자가 없을 때만 비활성이다(WKSP-L01 6장 Empty). 고르지 않은 것은 누를 때 알린다(공통정책 7.1 · 7.8) */
+function iValid(){
+  const u=document.getElementById('iUser');
+  document.getElementById('iSubmit').disabled=u.disabled;
+  if(u.value){ u.classList.remove('err'); document.getElementById('iUserErr').classList.remove('show'); }
+}
 function submitInvite(){
   const v=document.getElementById('iUser').value;
+  if(!v){ const u=document.getElementById('iUser'); u.classList.add('err'); document.getElementById('iUserErr').classList.add('show'); u.focus(); return; }
   const r=document.querySelector('input[name=irole]:checked').value;
   cur.m.members.push({n:v.split('(')[0],id:v.replace(/.*\(|\)/g,''),role:r});
   closeInvite(); refresh(); toast('ok','멤버를 초대했습니다.');
@@ -4630,12 +4769,12 @@ function chgRole(i,v){
      막으므로(400 WS_PUBLIC_WORKSPACE_ADMIN_SUPERADMIN_ONLY) 문구를 함께 둔다 */
   if(isSysWs(cur.m) && v==='관리자' && !isSuperAcct(cur.m.members[i].id)){
     drawDetail();
-    openConfirm('역할 변경 불가','공용 워크스페이스의 관리자는 최고 관리자에게만 부여할 수 있습니다.', null,'','확인');
+    openConfirm('역할을 변경할 수 없습니다','공용 워크스페이스의 관리자는 최고 관리자에게만 부여할 수 있습니다.', null,'','확인');
     return;
   }
   if(isLastAdmin(cur.m,i) && v!=='관리자'){
     drawDetail();
-    openConfirm('역할 변경 불가','이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 변경할 수 있습니다.', null,'','확인');
+    openConfirm('역할을 변경할 수 없습니다','이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 변경할 수 있습니다.', null,'','확인');
     return;
   }
   cur.m.members[i].role=v; refresh(); toast('ok','역할을 변경했습니다.');
@@ -4643,7 +4782,7 @@ function chgRole(i,v){
 function rmMember(i){
   const u=cur.m.members[i];
   if(isLastAdmin(cur.m,i)){
-    openConfirm('멤버 제외 불가','이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 제외할 수 있습니다.', null,'','확인');
+    openConfirm('멤버를 제외할 수 없습니다','이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 제외할 수 있습니다.', null,'','확인');
     return;
   }
   /* 본인을 제외하면 이 워크스페이스에 다시 들어올 수 없으므로 결과를 다르게 안내한다 */
@@ -4688,10 +4827,12 @@ function drawKScope(keepFocus){
       ? (hit.length
          ? '<div class="mslist">'+hit.map(function(d){
              const on=kSel.indexOf(d.n)>=0, usable=d.st==='정상';
-             return '<label class="msitem'+(usable?'':' off')+'"'+(usable?'':' title="정상 상태인 배포만 선택할 수 있습니다."')+'>'
+             /* 고를 수 없는 행의 사유는 상태 배지를 감싼 사유 툴팁으로 보인다(라이브러리 v0.25 .dis-tip — 개발룸 목업과 같다) */
+             return '<label class="msitem'+(usable?'':' off')+'">'
               + '<input type="checkbox" '+(on?'checked':'')+(usable?'':' disabled')+' onchange="kScopeTgl(\''+d.n+'\')">'
               + '<span class="mnm">'+d.n+'</span>'
-              + '<span class="stbadge '+RB[d.st]+'">'+d.st+'</span></label>';
+              + (usable? '<span class="stbadge '+RB[d.st]+'">'+d.st+'</span>'
+                  : disTip('<span class="stbadge '+RB[d.st]+'">'+d.st+'</span>', '정상 상태인 배포만 선택할 수 있습니다.'))+'</label>';
            }).join('')+'</div>'
          : '<div class="msempty">검색 결과가 없습니다.</div>')
       : '<div class="msempty">발급할 수 있는 모델이 없습니다.</div>')
@@ -4715,7 +4856,8 @@ function kScopeAll(on){
 function openKey(){
   kSel=[]; kQ='';
   document.getElementById('kName').value='';
-  document.getElementById('kNameErr').classList.remove('show');
+  document.getElementById('kNameErr').classList.remove('show'); document.getElementById('kName').classList.remove('err');
+  document.getElementById('kScopeErr').classList.remove('show');
   ['kRpm','kTok'].forEach(function(id){ document.getElementById(id).value=''; kLimShow(id,false); });
   document.getElementById('kTokWin').value='분'; document.getElementById('kTokAgg').value='전체';
   document.getElementById('kTokWin').disabled=true; document.getElementById('kTokAgg').disabled=true;
@@ -4749,15 +4891,25 @@ function kLimInput(id){
   }
   kValid();
 }
+/* 발급 버튼은 입력 상태와 무관하게 활성이다(공통정책 7.1). 발급할 수 있는 모델이 없을 때만 비활성이다(WKSP-L01 6장 Empty).
+   이름 · 접근 허용 모델 · 한도 형식은 누를 때 submitKey 가 검증한다(7.8) */
 function kValid(){
   const v=document.getElementById('kName').value.trim();
-  /* 접근 허용 배포를 1건 이상 골라야 하고, 한도 입력값이 형식에 맞아야 한다 */
-  document.getElementById('kSubmit').disabled = !v || !kSel.length || kLimBad('kRpm') || kLimBad('kTok');
-  if(v) document.getElementById('kNameErr').classList.remove('show');
+  document.getElementById('kSubmit').disabled = !myDeps().length;
+  if(v){ document.getElementById('kNameErr').classList.remove('show'); document.getElementById('kName').classList.remove('err'); }
+  if(kSel.length) document.getElementById('kScopeErr').classList.remove('show');
 }
 function kBlur(){ if(!document.getElementById('kName').value.trim()) document.getElementById('kNameErr').classList.add('show'); }
 function submitKey(){
   const v=document.getElementById('kName').value.trim();
+  /* 제출 시 전체 검증 — 필드마다 인라인 에러, 첫 오류 필드로 포커스(공통정책 7.8) */
+  const bad=[];
+  document.getElementById('kNameErr').classList.toggle('show',!v); document.getElementById('kName').classList.toggle('err',!v);
+  if(!v) bad.push(document.getElementById('kName'));
+  document.getElementById('kScopeErr').classList.toggle('show',!kSel.length);
+  if(!kSel.length) bad.push(document.querySelector('#kScope input'));
+  ['kRpm','kTok'].forEach(function(id){ const b=kLimBad(id); kLimShow(id,b); if(b) bad.push(document.getElementById(id)); });
+  if(bad.length){ if(bad[0]) bad[0].focus(); return; }
   const rpm=document.getElementById('kRpm').value.trim(), tk=document.getElementById('kTok').value.trim();
   cur.m.keys.push({n:v,type:'일반',exp:(function(){ const o=document.getElementById('kExp').value; if(o==='만료 없음') return '만료 없음'; const d=new Date(); d.setDate(d.getDate()+parseInt(o,10)); return d.toISOString().slice(0,10); })(),at:new Date().toISOString().slice(0,19).replace('T',' '),by:'성유진(yj.seong)',
     scope: kSel.slice(),
@@ -4768,7 +4920,7 @@ function submitKey(){
   /* 키 값은 발급 직후 한 번만 보인다. 닫으면 다시 볼 수 없다(WKSP-L01 REQ-WKSP-071 · 7.10) */
   const kv='ck-'+Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10);
   openConfirm('API Key를 발급했습니다',
-    '<p style="margin:0 0 10px">이 키 값은 지금 한 번만 볼 수 있습니다. 창을 닫으면 다시 조회할 수 없으니 복사해 두세요.</p>'
+    '<p style="margin:0 0 10px">이 키 값은 지금 한 번만 볼 수 있습니다. 창을 닫으면 다시 조회할 수 없습니다. 지금 복사해 주세요.</p>'
     +'<div style="display:flex;gap:8px;align-items:center"><code class="inp" style="flex:1;font-family:var(--font-mono,monospace);user-select:all">'+kv+'</code>'
     +'<button class="btn sm" onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+kv+'\');toast(\'ok\',\'키 값을 복사했습니다.\')">복사</button></div>',
     null,null,'닫기');
@@ -4776,7 +4928,7 @@ function submitKey(){
 /* ═══════════ 한도 수정 WKSP-L01.D01.T06.M02 ═══════════
    사용 한도만 바꾼다. 이름·만료일·접근 허용 모델은 바꾸지 않는다(정책 7장 수정 행).
    권한은 폐기와 같다. 편집자는 본인 키, 워크스페이스 관리자 이상은 전체(canRevoke).
-   현재 값으로 채워 열고, 바뀐 값이 있고 형식이 맞을 때만 저장을 켠다(공통정책 7.1) */
+   현재 값으로 채워 열고, 바뀐 값이 없을 때만 저장을 비활성으로 둔다. 형식은 누를 때 검증한다(공통정책 7.1 · 7.8) */
 let lmKey=null, lmInit='';
 function lmSnap(){
   return ['lmRpm','lmTok','lmTokWin','lmTokAgg'].map(function(id){ return document.getElementById(id).value.trim(); }).join('|');
@@ -4806,9 +4958,11 @@ function lmInput(id){
   lmValid();
 }
 function lmValid(){
-  document.getElementById('lmSubmit').disabled = kLimBad('lmRpm') || kLimBad('lmTok') || lmSnap()===lmInit;
+  document.getElementById('lmSubmit').disabled = lmSnap()===lmInit;
 }
 function submitKeyLim(){
+  const bad=['lmRpm','lmTok'].filter(function(id){ const b=kLimBad(id); kLimShow(id,b); return b; });
+  if(bad.length){ document.getElementById(bad[0]).focus(); return; }
   const rpm=document.getElementById('lmRpm').value.trim(), tk=document.getElementById('lmTok').value.trim();
   lmKey.rpm = rpm? Number(rpm) : null;
   lmKey.tok = tk? {n:Number(tk), win:document.getElementById('lmTokWin').value, agg:document.getElementById('lmTokAgg').value} : null;
@@ -4893,7 +5047,8 @@ function eChanged(){
       : '';
   }
   const btn=document.getElementById('eSubmit');
-  btn.disabled = !eDirty() || !!eNameErrMsg() || !eDupOk;
+  /* 수정은 변경이 없을 때만 비활성이다. 형식 · 중복 확인은 누를 때 submitEdit 가 본다(공통정책 7.1 · 7.8) */
+  btn.disabled = !eDirty();
   btn.textContent = changed? '워크스페이스명 변경 후 저장' : '저장';
 }
 function eDup(){
@@ -4905,13 +5060,15 @@ function eDup(){
   } else {
     el.classList.remove('show'); eDupOk=true; toast('ok','사용 가능한 워크스페이스명입니다.');
   }
-  document.getElementById('eSubmit').disabled = !eDirty() || !eDupOk;
+  document.getElementById('eSubmit').disabled = !eDirty();
 }
 /* 이름 변경 경고는 모달 안에 인라인으로 표시한다.
    모달 위에 확인 모달을 띄우면 어느 것을 조작하는지 알기 어렵다.
    경고를 미리 보여주고 저장 버튼 라벨로 결과를 알린다 */
 function submitEdit(){
   const v=document.getElementById('eName').value.trim();
+  /* 제출 시 검증 — 형식 오류 또는 중복 미확인이면 이름 아래 인라인 에러, 이름으로 포커스(공통정책 7.8) */
+  if(eNameErrMsg() || !eDupOk){ eBlur(); document.getElementById('eName').focus(); return; }
   cur.m.n=v; cur.m.desc=document.getElementById('eDesc').value.trim(); cur.m.ico=eIcoSel;
   document.getElementById('mdEdit').classList.remove('on');
   refresh(); toast('ok','수정했습니다.');
@@ -4969,7 +5126,8 @@ function xBlur(id){
 }
 function xValid(){
   ['xName','xUrl','xTok'].forEach(function(id){ if(!xErr(id)) document.getElementById(id+'Err').classList.remove('show'); });
-  document.getElementById('xSubmit').disabled = ['xName','xUrl','xTok'].some(xErr);
+  /* 등록 버튼은 입력 상태와 무관하게 활성이다. 검증은 누를 때 submitExt 가 한다(공통정책 7.1 · 7.8) */
+  document.getElementById('xSubmit').disabled = false;
 }
 /* 섹션 제목·등록 버튼과 같은 말을 쓴다. 한 화면에서 `외부 모델` 과 `연동` 을 섞으면
    같은 것을 가리키는지 알 수 없다(공통정책 1.1). 배포 화면의 `외부 배포` 와도 섞지 않는다(정책 3.6) */
@@ -4978,6 +5136,9 @@ function rmExt(name){
     function(){ cur.m.ext=cur.m.ext.filter(function(x){return x.n!==name;}); refresh(); toast('ok','외부 모델을 해제했습니다.'); },'해제');
 }
 function submitExt(){
+  /* 제출 시 전체 검증 — 필드마다 인라인 에러, 첫 오류 필드로 포커스(공통정책 7.8) */
+  const bad=['xName','xUrl','xTok'].filter(function(id){ xBlur(id); return xErr(id); });
+  if(bad.length){ document.getElementById(bad[0]).focus(); return; }
   const prov=document.querySelector('#xProv input:checked').value;
   cur.m.ext=cur.m.ext||[];
   cur.m.ext.push({n:document.getElementById('xName').value.trim(), prov:prov==='직접 입력'?'사내 API':prov, st:'정상'});
@@ -5050,6 +5211,7 @@ function openByob(){
   drawBySec();
   document.getElementById('byobFields').style.display=byobInit?'':'none';
   document.getElementById('byobSubmit').disabled=true;
+  ['byUrl','byBucket','byKey','bySec'].forEach(function(id){ byErr(id,false); });
   document.getElementById('mdByob').classList.add('on');
 }
 function drawBySec(){
@@ -5066,7 +5228,13 @@ function byobValid(){
   const filled = v('byUrl') && v('byBucket') && v('byKey') && (hasSec || v('bySec'));
   const c=cur.m.s3||{};
   const changed = on!==byobInit || (on && (v('byUrl')!==(c.url||'') || v('byBucket')!==(c.bucket||'') || v('byKey')!==(c.key||'') || !!v('bySec')));
-  document.getElementById('byobSubmit').disabled = !changed || (on && !filled);
+  /* 변경이 없을 때만 비활성이다. 빈 필수 항목은 누를 때 알린다(공통정책 7.1 · 7.8) */
+  document.getElementById('byobSubmit').disabled = !changed;
+  ['byUrl','byBucket','byKey','bySec'].forEach(function(id){ if(v(id)) byErr(id,false); });
+}
+function byErr(id,on){
+  const e=document.getElementById(id+'Err'); if(e) e.classList.toggle('show',on);
+  const el=document.getElementById(id); if(el) el.classList.toggle('err',on);
 }
 function closeByob(){ document.getElementById('mdByob').classList.remove('on'); }
 function byobToggle(val){
@@ -5082,6 +5250,12 @@ function byobToggle(val){
 function submitByob(){
   const on=document.getElementById('byobUse').checked, c=cur.m.s3||{};
   const g=function(id){ const e=document.getElementById(id); return e? e.value.trim() : ''; };
+  /* 제출 시 검증 — 전용 S3 를 켰으면 네 항목이 모두 있어야 한다. 등록된 시크릿 키는 그대로 쓴다 */
+  if(on){
+    const hasSec=!!(c.secret) && !bySecEdit;
+    const bad=['byUrl','byBucket','byKey'].concat(hasSec?[]:['bySec']).filter(function(id){ const b=!g(id); byErr(id,b); return b; });
+    if(bad.length){ document.getElementById(bad[0]).focus(); return; }
+  }
   const moved = byobInit && (!on || g('byUrl')!==(c.url||'') || g('byBucket')!==(c.bucket||''));
   if(moved){
     closeByob();
