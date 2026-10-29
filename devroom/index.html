@@ -1,8 +1,51 @@
 <!--
-  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.30 (2026-10-15)
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.31 (2026-10-28)
+
+  ── v0.31 (2026-10-28) ──
+  · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다).
+  · CDE 신청 자원 칸 옆 표기를 `잔여 {N}` 으로, 상한 문구를 `개발룸 잔여 {N} {단위}보다 많이 신청할 수 없습니다.` 로 —
+    CDE 신청은 개발룸 잔여 안에서 받는 화면이라 「잔여」다(용어집 1장 · 개발룸 기획서 5.2 개발룸 잔여 부족 행에 같이 올렸다).
+  · 10-28 4차. 아래 단위 붙여 쓰기 근거를 「공통정책 1.4」에서 「워크스페이스 목업 표기와 같게」로 고쳤다(1.4에 그런 조항이 없다). 화면 변경 없음.
+  · 개발룸 설정 `배분 가능 {N}` 에 단위를 붙였다(장 · 개는 붙이고 그 밖은 띄움 — 워크스페이스 목업 표기와 같게. 공통정책에는 조항이 없어 개정 제안으로 둔다).
+  · 확인 알럿 최종 버튼은 파괴적 동작(삭제 · 반납 · 회수 · 중단 · 취소 등)일 때만 채움 위험색이다(문서 반영 절차 5.3).
+    `외부 통신 차단` 의 `저장` · `에이전트 키 재발급` 의 `재발급` 은 기본색이다.
+  · 10-28 재검증 정정(2차). 화면 문구의 「장수」를 「가속기 수」로(뜻이 모호하다 — 가속기 칸 소수 문구 · 직접 할당 사유 · 사전 진단 개발룸 잔여 도움말).
+    개발룸 기획서 5.1 · 5.2 문구도 같이 고쳤다. .dis-tip.flip 은 라이브러리 v0.25 에 들어가 주석을 고쳤다.
+  · 10-28 검증 정정. 비활성 사유를 브라우저 title 대신 라이브러리 v0.25 .dis-tip(감싼 요소 앵커 · tabindex · 포커스로 열림)으로 바꿨다 —
+    행 메뉴 · 액션 버튼 · 로그 보기 · 데이터 가져오기 · 핵심 모델 선택(공통정책 4.7 · 7.10).
+    CDE 신청의 직접 할당 조합 불가는 고른 값 때문에 막히고 누르기 전에 화면이 알 수 있어 비활성 + 사유 툴팁이다(공통정책 7.10 개정 · 기획서 5.2).
+    작업 상세 사전 진단 `CDE 가용 자원` 을 `CDE 잔여 자원` 으로(용어집 1 · 5장 — 「가용」은 쓰지 않는 말 · CDE 정책 4.7).
+    개발룸 설정 · CDE 신청 자원 칸 검증 문구를 빈 값 `값을 입력해 주세요.` · 숫자 아님 · 음수 `0 이상의 숫자를 입력해 주세요.` 로 갈랐다
+    (CDE 신청은 0 이면 `0보다 큰 값을 입력해 주세요.`). 날짜 하한 문구를 `오늘 또는 그 뒤 날짜를 선택해 주세요.` ·
+    `현재 만료일 다음 날 이후를 선택해 주세요.` 로(같은 폼의 `~해 주세요` 형식). 회수 상태 도움말을 한 문장으로(CDE 정책 5.5).
+  · 도움말 문구 검수(UI 문구 규칙 · 용어집). 위임 할당 도움말 · 힌트의 `다른 사용자` 를 `다른 멤버` 로(용어집 2장),
+    회수 상태 도움말을 다른 값과 같은 길이로 줄였고, 가속기 행 툴팁의 명사 종결을 `~GB입니다.` 로 맞췄다.
+  · 작업 상세 사전 진단에서 추천 자원을 뺐다. 계산 기준이 없고 작업은 CLI 에서 제출해 화면에서 자원을 바꿀 자리가 없다.
+    대신 제출 시점 `CDE 가용 자원` 과 `개발룸 잔여` 를 따로 둔다. 앞의 것은 CDE 단위, 뒤의 것은 개발룸 단위라 층위가 다르다
+    (CDE 정책 4.6·4.7 · 기획서 REQ-CDE-050 · 7.4 · 2026-10-21 댓글 3487432767 · CON-660).
+    · 경고는 대기로 접수된 작업에만 남는다. 사유는 `개발룸 잔여 부족` · `먼저 제출된 작업 대기` 둘이고 둘 다 해당하면
+      잔여 부족이다(CDE 정책 4.5). 대기 표본의 사유를 제출 시점 기록으로 고쳤다.
+    · 가속기 없이 돌린 작업 · 메모리 부족으로 실패한 작업에 붙어 있던 경고는 근거 없는 판정이라 통과로 바꿨다.
+    · 직접 할당 CDE(jh-jupyter-01)의 컴파일 작업은 사전 진단을 남기면 CDE 가용 가속기가 0 장으로 보여 작업과 맞지 않는다.
+      사전 진단이 없는 예전 작업으로 두었다.
+  · 개발룸 생성·설정(WKSP-CDE-F02) 입력 검증을 정정했다(기획서 7.7 · 5.1 · 워크스페이스 정책 5.1).
+    · 배분 가능한 최대를 워크스페이스 할당량에서 운영룸 점유를 뺀 양으로 고쳤다. 종전에는 할당량 전부를 상한으로 두어
+      운영 중인 배포가 쓰는 몫까지 옮길 수 있는 것처럼 보였다(워크스페이스 정책 3.3). 운영룸 점유는 검토용 샘플 값(PROD_USE)이다.
+    · 빈 값이 통과하던 것을 막았다. 빈 값 · 숫자 아님 · 음수, CPU 0.5 단위, Memory · 가속기 · 공유 볼륨 정수를 칸마다 검사한다.
+    · 문구를 할당량 수정 화면과 같게 맞췄다 — `배분 가능한 최대는 {N} {단위}입니다.` · `현재 점유 중인 {N} {단위}보다 작게 줄일 수 없습니다.`
+      종전 `워크스페이스 할당량은 …입니다.` 는 상한이 무엇인지 잘못 알렸다.
+  · 생성 · 신청 버튼을 입력 상태와 무관하게 활성으로 둔다(공통정책 7.1). 누르면 전체를 검증해 실패한 칸마다 인라인 에러를
+    보이고 첫 오류 칸으로 포커스한다(7.8). 대상: 개발룸 생성(설정은 변경이 없을 때만 비활성), CDE 신청, 연장 신청, 데이터 가져오기.
+    위 개발룸 자원 검증과 문구는 그대로 쓰고, 누를 때 막는 자리만 버튼 비활성에서 제출 검증으로 옮겼다.
+    자리가 없던 문구만 더했다 — CDE 신청 `사용 만료일을 선택해 주세요.` · `오늘 이후여야 합니다.` · `요청 사유를 입력해 주세요.` ·
+    자원 빈 값 `값을 정확히 입력해 주세요.`, 연장 신청 `연장 만료일을 선택해 주세요.` · `사유를 입력해 주세요.`(하한 위반은 기존 힌트 문장),
+    데이터 가져오기 `리포지토리를 입력해 주세요.` · `폴더명을 입력해 주세요.`.
+    직접 할당 조합 불가 때 CDE 신청 잠금은 입력값이 아니라 서버 구성 때문이고 사유를 영역 안내로 이미 보여 그대로 둔다(기획서 5.2).
   CDE 정책 기준.
 
   ── v0.30 (2026-10-15) ──
+
+  · 10-27 용어 정정: 화면 문구의 `여유` 를 `잔여` 로 고쳤다(용어집 5장 — 여유는 쓰지 않는 말).
   · 작업 상세의 `모델로 등록` 은 화면을 옮기지 않고 그 자리에서 모델 등록 모달(MODEL-L01.M01)을 연다.
     소스·소스 경로·학습 이력은 이 작업의 값으로 채운 읽기 전용이고, 모달 상단에 어디서 온 값인지 안내한다
     (기획서 REQ-CDE-053 · MODEL-L01 REQ-MODEL-062·063·070). 종전 안내 `모델 등록 화면으로 이동합니다` 는
@@ -1811,6 +1854,18 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .adv > summary .fold{margin-left:auto;display:grid;place-items:center;color:var(--muted-foreground);transform:rotate(-90deg);transition:transform .15s}
 .adv[open] > summary .fold{transform:rotate(0)}
 .adv > summary .fold svg{width:14px;height:14px}
+
+/* 비활성 사유 툴팁 — 컴포넌트 라이브러리 v0.25 .dis-tip 그대로(공통정책 4.7 · 7.10).
+   비활성 버튼은 호버 · 포커스를 받지 않아 감싼 요소를 앵커로 두고 tabindex="0" 을 준다. title 은 쓰지 않는다 */
+.tip-anchor.dis-tip{margin-left:0;cursor:not-allowed;border-radius:8px}
+.dis-tip:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
+.dis-tip > :disabled{pointer-events:none}
+.dis-tip .tip{white-space:normal;width:max-content;max-width:280px;left:0;transform:translateY(4px)}
+.dis-tip:hover .tip,.dis-tip:focus-within .tip{transform:translateY(0)}
+.dis-tip .tip::after{left:14px;transform:none}
+/* 오른쪽 끝 버튼은 툴팁이 화면 밖으로 나가지 않게 오른쪽 기준으로 연다(라이브러리 v0.25 .dis-tip.flip) */
+.dis-tip.flip .tip{left:auto;right:0}
+.dis-tip.flip .tip::after{left:auto;right:14px}
 </style>
 </head>
 <body class="dark">
@@ -1988,7 +2043,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
       <div id="formBody"></div>
       <div class="formfoot">
         <button class="btn ghost" onclick="cancelForm()">취소</button>
-        <button class="btn" id="fSubmit" onclick="submitForm()">신청</button>
+        <span class="tip-anchor" id="fSubmitWrap"><button class="btn" id="fSubmit" onclick="submitForm()">신청</button><span class="tip" id="fSubmitTip" hidden></span></span>
       </div>
     </div>
   </main>
@@ -2004,7 +2059,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
     <div class="mdbody" id="extForm"></div>
     <div class="mdfoot">
       <button class="btn ghost" onclick="closeExt()">취소</button>
-      <button class="btn" id="extBtn" disabled onclick="submitExt()">신청</button>
+      <button class="btn" id="extBtn" onclick="submitExt()">신청</button>
     </div>
   </div>
 </div>
@@ -2023,7 +2078,8 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
           <option value="S3">S3</option></select>
         </div>
       <div class="fld" style="margin-top:14px"><label>리포지토리<span class="req">*</span></label>
-        <input class="inp" id="dlRepo" placeholder="meta-llama/Llama-3-8B" oninput="dlValid()"></div>
+        <input class="inp" id="dlRepo" placeholder="meta-llama/Llama-3-8B" oninput="dlValid()">
+        <div class="errmsg" id="dlRepoErr" style="display:none">리포지토리를 입력해 주세요.</div></div>
       <div class="fld" style="margin-top:14px"><label>폴더명<span class="req">*</span></label>
         <input class="inp" id="dlDir" placeholder="my_data" oninput="dlValid()">
         <div class="errmsg" id="dlDirErr"></div></div>
@@ -2035,7 +2091,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
     <div class="mdfoot">
       <!-- 모달은 취소 시 바로 닫는다. 모달 안에서 확인 알럿을 띄우지 않는다(공통정책 4.5) -->
       <button class="btn ghost" onclick="closeDl()">취소</button>
-      <button class="btn" id="dlBtn" disabled onclick="submitDl()">가져오기</button>
+      <button class="btn" id="dlBtn" onclick="submitDl()">가져오기</button>
     </div>
   </div>
 </div>
@@ -2120,6 +2176,23 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 </div>
 
 <script>
+/* 비활성 사유 툴팁(라이브러리 v0.25 .dis-tip). 사유 문구는 HTML 로 넣지 않는다 */
+function disTipEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function disTip(inner, why){ return '<span class="tip-anchor dis-tip" tabindex="0">'+inner+'<span class="tip">'+disTipEsc(why)+'</span></span>'; }
+function disTipFit(e){
+  const a=e.target && e.target.closest && e.target.closest('.dis-tip'); if(!a) return;
+  const t=a.querySelector('.tip'); if(!t) return;
+  a.classList.remove('flip'); t.style.left=''; t.style.right='';
+  const r=a.getBoundingClientRect(), w=Math.min(280,t.scrollWidth), vw=window.innerWidth;
+  if(r.left+w+8<=vw) return;
+  /* 화면별 툴팁 위치 규칙이 left 를 덮어쓰는 자리가 있어 인라인으로 둔다 */
+  if(r.right-w>=8){ a.classList.add('flip'); t.style.left='auto'; t.style.right='0'; return; }
+  /* 양쪽 다 모자라면(좁은 화면) 화면 안 8px 여백에 맞춘다 */
+  t.style.left=Math.max(8-r.left, vw-8-w-r.left)+'px';
+}
+document.addEventListener('focusin', disTipFit, true);
+document.addEventListener('mouseover', disTipFit, true);
+
 /* ═══════════ 데모 데이터 ═══════════ */
 
 /* 개발룸 자원 — 워크스페이스 할당량에서 이관받은 몫(워크스페이스 정책 5.2) */
@@ -2253,7 +2326,11 @@ const ME = 'yj.seong';
    ⚠ 실행 시간도 근거가 없다 — 확인 대상 */
 /* 상세 필드 — chk 사전 진단(명세 16) · mt 학습 지표(명세 18) · out 산출물(명세 18).
    mt·out 은 작업 결과 조회와 산출물 업로드 경로가 있어 종결했다(기획서 5.3 C-12·C-13).
-   chk 는 제출 시점 판정을 작업에 남기는지 확인 대상이다(기획서 5.3 C-11). 값이 없으면 섹션을 비운다.
+   chk 는 제출 시점 판정을 작업에 남긴 값이다(CON-660 · 2026-10-21 댓글 3487432767). 값이 없으면 섹션을 비운다.
+   chk.cde 는 제출한 CDE 에서 그때 쓸 수 있던 양(CDE 단위 · CDE 정책 4.7), chk.room 은 제출 시점 개발룸 잔여(개발룸 단위)다.
+   room 은 요청한 가속기 종류 하나만 담는다. 가속기를 요청하지 않은 작업은 null 이라 `-` 로 둔다.
+   경고는 대기로 접수된 작업에만 남는다(CDE 정책 4.5). 가속기 없이 돌린 작업 · 메모리 부족으로 실패한 작업의
+   종전 경고 문구는 근거 없는 판정이라 통과로 바꿨다
    out.path 표본은 CDE 경로 모양이다. 산출물은 S3 에 올라가며 화면에 보일 경로 형식은 확인 대상이라 값을 바꾸지 않았다 */
 /* acc — 작업이 쓴 가속기 종류다. 한 작업은 한 종류만 쓰고, CDE 에 할당된 종류 중에서 고른다
    (CON-596 A-3 · CDE 정책 4.5). CDE 에 종류가 하나면 고르지 않아도 그 종류로 정해진다.
@@ -2263,44 +2340,48 @@ const JOBS = [
      ev.model 은 연결된 모델. 모델 목업 qwen3-32b 평가 탭의 같은 작업 ID 와 값이 같다.
      job-20260821-03 은 튜닝한 모델을 아직 등록하지 않아 연결된 모델이 없다(`-` + 연결 안내) */
   {id:'job-20260823-01', at:'2026-08-23 14:05:09', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'eval', acc:'NVIDIA-H200', gpu:1, disk:20, dur:'38분', st:'실행 중',
-   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', rec:''}, mt:null, out:null,
+   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', cde:'CPU 8 Cores · Memory 32 Gi · NVIDIA-H200 1장', room:{n:'NVIDIA-H200', left:1, total:2, q:0}}, mt:null, out:null,
    ev:{suite:'long-context', model:{n:'qwen3-32b',v:'v3.6'}, tasks:[['LongBench',null],['RULER',null],['InfiniteBench',null]]}},
   {id:'job-20260822-02', at:'2026-08-22 10:12:40', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'eval', acc:'NVIDIA-H200', gpu:1, disk:20, dur:'52분', st:'완료',
-   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', rec:''}, mt:null, out:null,
+   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', cde:'CPU 8 Cores · Memory 32 Gi · NVIDIA-H200 1장', room:{n:'NVIDIA-H200', left:1, total:2, q:0}}, mt:null, out:null,
    ev:{suite:'ko-general', model:{n:'qwen3-32b',v:'v3.6'}, tasks:[['KMMLU',63.8],['KoBEST',81.2],['HAE-RAE',72.5],['MMLU',75.1],['GSM8K',84.0]]}},
   {id:'job-20260821-03', at:'2026-08-21 16:20:31', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'eval', acc:'NVIDIA-H200', gpu:1, disk:20, dur:'24분', st:'완료',
-   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', rec:''}, mt:null, out:null,
+   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', cde:'CPU 8 Cores · Memory 32 Gi · NVIDIA-H200 1장', room:{n:'NVIDIA-H200', left:1, total:2, q:0}}, mt:null, out:null,
    ev:{suite:'cs-faq-ko', model:null, tasks:[['정답률',71.5],['KoBEST',62.0],['HAE-RAE',58.4]]}},
   /* 가용 자원이 요청량보다 적어도 제출은 막지 않는다. 사전 진단을 경고로 두고 자원이 생길 때까지
      대기한다(REQ-CDE-073 · CON-596 A-4). 개발룸 몫이 회수되면 작업은 종료가 아니라 지연된다
      (워크스페이스 정책 5.2). 종류는 그 CDE 에 할당된 것 중에서 고른다 — yj-jupyter-01 은 NVIDIA-H200 하나다
-     (CON-596 A-3). 추천 자원은 두지 않는다 — 잡 한도가 CDE 할당 범위라 더 큰 값을 권할 수 없다(A-1).
-     실행 시간은 아직 없어 `-` 다(공통정책 1.7) */
+     (CON-596 A-3). 추천 자원은 두지 않는다 — 계산 기준이 없고 작업은 CLI 에서 제출해 화면에서 자원을 바꿀 자리가 없다.
+     실행 시간은 아직 없어 `-` 다(공통정책 1.7).
+     ⚠ 표본 시점은 서로 맞추지 않았다. 이 대기 작업 뒤에 제출된 같은 종류 작업이 실행된 것으로 보이나, 실제로는
+     같은 종류에 먼저 대기 중인 작업이 있으면 뒤 작업도 기다리고 제출 순서대로 실행된다(CDE 정책 4.5). 실제 화면에는 없는 검토용 배치다 */
   {id:'job-20260821-01', at:'2026-08-21 08:40:11', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', tm:'lora', acc:'NVIDIA-H200', gpu:1, disk:40, dur:'-', st:'대기',
-   chk:{r:'경고', why:'요청한 가속기의 여유가 부족합니다. 자원이 확보되면 실행됩니다.', rec:''},
+   chk:{r:'경고', why:'제출할 때 개발룸에 요청한 가속기 잔여가 부족해 대기 상태로 접수되었습니다.', cde:'CPU 8 Cores · Memory 32 Gi · NVIDIA-H200 1장', room:{n:'NVIDIA-H200', left:0, total:2, q:0}},
    mt:null, out:null},
   {id:'job-20260820-01', at:'2026-08-20 09:14:02', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', tm:'lora', acc:'NVIDIA-H200', gpu:1, disk:50,  dur:'1시간 22분', st:'완료',
    hp:{base_model:'meta-llama/Llama-3.2-1B', learning_rate:0.0002, epochs:6, batch_size:8, lora_r:16, lora_alpha:32},
-   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', rec:''},
+   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', cde:'CPU 8 Cores · Memory 32 Gi · NVIDIA-H200 1장', room:{n:'NVIDIA-H200', left:1, total:2, q:0}},
    mt:{loss:[2.41,1.88,1.52,1.31,1.19,1.12], acc:[0.42,0.58,0.67,0.72,0.75,0.77]},
    out:{path:'/workspace/outputs/job-20260820-01/', size:'13.2 GB', kind:'safetensors'}},
   {id:'job-20260820-02', at:'2026-08-20 14:31:20', u:'임승주(sj.lim)',  uid:'sj.lim',   cde:'sj-vscode-01',  t:'train', tm:'qlora', acc:'', gpu:0, disk:20,  dur:'12분', st:'실행 중',
    hp:{base_model:'Qwen/Qwen3-32B', learning_rate:0.0001, epochs:3, batch_size:4, lora_r:8, quant_bits:4},
-   chk:{r:'경고', why:'가속기 없이 실행합니다. 학습 시간이 길어질 수 있습니다.', rec:'가속기 1'},
+   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', cde:'CPU 4 Cores · Memory 16 Gi', room:null},
    mt:{loss:[2.55,2.10,1.94], acc:[0.31,0.47,0.55]}, out:null},
   /* 요청 장수를 CDE 할당 범위 안으로 맞췄다. 잡 자원 한도는 제출한 CDE 의 할당 범위다(CON-596 A-1) —
      yj-jupyter-01 이 NVIDIA-H200 1 장이라 2 장을 요청한 작업이 성립하지 않았다.
-     추천 자원도 같은 이유로 비운다. 더 큰 값을 권하려면 CDE 자원부터 늘려야 한다 */
+     제출 시점에 실행할 수 있었고 실행 중 메모리 부족으로 실패했다. 사전 진단은 통과다 */
   {id:'job-20260819-07', at:'2026-08-19 22:07:45', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', tm:'lora', acc:'NVIDIA-H200', gpu:1, disk:100, dur:'-', st:'실패',
    err:'가속기 메모리가 부족해 중단되었습니다.',
-   chk:{r:'경고', why:'요청한 자원으로 메모리가 부족할 수 있습니다.', rec:''}, mt:null, out:null},
+   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', cde:'CPU 8 Cores · Memory 32 Gi · NVIDIA-H200 1장', room:{n:'NVIDIA-H200', left:1, total:2, q:0}}, mt:null, out:null},
   /* 반납된 CDE 의 작업이다. 자원 열은 제출 시점 요청값이라 CDE 가 없어도 그대로 남는다 */
   {id:'job-20260819-03', at:'2026-08-19 11:52:10', u:'유지현(jh.yu)',   uid:'jh.yu',    cde:'',              t:'train', tm:'full', acc:'Furiosa RNGD', gpu:1, disk:30,  dur:'34분', st:'완료',
    chk:null, mt:null,
    out:{path:'/workspace/outputs/job-20260819-03/', size:'6.8 GB', kind:'safetensors'}},
-  /* 컴파일·데이터 가져오기는 결과 섹션 없이 산출물로 본다(CDE 정책 4.6) */
+  /* 컴파일·데이터 가져오기는 결과 섹션 없이 산출물로 본다(CDE 정책 4.6).
+     jh-jupyter-01 은 직접 할당이라 파드가 가속기를 쥐어 작업 몫이 없다(CDE 정책 2.3). 사전 진단을 남기면 CDE 가용 자원이
+     0 장으로 보여 이 작업과 맞지 않는다. 사전 진단이 없는 예전 작업으로 둔다(진단 결과가 없습니다) */
   {id:'job-20260818-02', at:'2026-08-18 15:44:02', u:'유지현(jh.yu)',   uid:'jh.yu',    cde:'jh-jupyter-01', t:'compile', acc:'Furiosa RNGD', gpu:1, disk:30,  dur:'21분', st:'완료',
-   chk:{r:'통과', why:'요청한 자원으로 실행할 수 있습니다.', rec:''}, mt:null,
+   chk:null, mt:null,
    out:{path:'/workspace/outputs/job-20260818-02/', size:'4.1 GB', kind:'enf'}},
   {id:'job-20260818-01', at:'2026-08-18 10:03:55', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'data-import', acc:'', gpu:0, disk:10,  dur:'6분', st:'완료',
    chk:null, mt:null,
@@ -2502,7 +2583,7 @@ function render(){
   if(state==='loading'){ pg.style.display='none';
     el.innerHTML='<div class="tblwrap" style="padding:14px">'+Array(5).fill('<div class="skrow" style="margin:13px 0"></div>').join('')+'</div>'; return; }
   if(state==='error'){ pg.style.display='none';
-    el.innerHTML='<div class="state"><h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p><button class="btn ghost" onclick="setState(\'default\')">다시 시도</button></div>'; return; }
+    el.innerHTML='<div class="state"><h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p><button class="btn ghost" onclick="setState(\'default\')">재시도</button></div>'; return; }
   /* 뷰어는 신청할 수 없어 안내가 달라야 한다. 워크스페이스 목업과 같은 방식으로
      제목을 상황에 맞게 바꾸고 본문은 요청 문장으로 둔다 */
   if(state==='empty'){ pg.style.display='none';
@@ -2622,8 +2703,8 @@ function wrapMenu(items,i){
 function btn(label, ok, fn, why, danger){
   const b='<button'+(danger?' class="d"':'')+(ok?'':' disabled')
    + (ok?' onclick="'+fn+'"':'')+'>'+label+'</button>';
-  /* 비활성 버튼은 마우스 이벤트를 받지 않아 제 title 이 뜨지 않는다 — 감싼 요소에 사유를 단다 */
-  return ok? b : '<span class="disw" title="'+(why||'')+'">'+b+'</span>';
+  /* 비활성 버튼은 마우스 이벤트를 받지 않아 제 툴팁이 뜨지 않는다 — 감싼 요소에 사유를 단다(라이브러리 v0.25 .dis-tip) */
+  return ok? b : disTip(b, why||'');
 }
 
 /* 개발룸 자원 — 승인 시점에 여기서 차감한다(정책 3.1) */
@@ -2714,7 +2795,7 @@ function drawQuota(){
     '<div class="dsec"><h4>개발룸 자원'
     /* 화면 최상단이라 위로 열면 잘린다. 아래로 연다 */
     + '<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span>'
-    + '<span class="tip">개발룸이 최대로 쓸 수 있는 양입니다. 운영룸 자원이 부족해지면 이 중 일부가 회수되며, 실행 중인 작업은 대기 상태로 바뀌었다가 여유가 생기면 다시 진행됩니다.</span></span></h4>'
+    + '<span class="tip">개발룸이 최대로 쓸 수 있는 양입니다. 운영룸 자원이 부족해지면 이 중 일부가 회수되며, 실행 중인 작업은 대기 상태로 바뀌었다가 잔여가 생기면 다시 진행됩니다.</span></span></h4>'
     + '<div class="rsgrid">'
     + rows.map(function(r){
         const p = r[2]? Math.round(r[1]/r[2]*100) : 0;
@@ -2742,7 +2823,7 @@ function drawQuota(){
         if(!full.length) return '';
         /* 원인만 알리지 않고 조치 경로를 함께 준다(라이브러리 차단 안내 규칙).
            자원을 늘릴 수 있는 역할에만 버튼을 둔다 */
-        return alertBox('warn', full.join(' · ')+' 여유가 없습니다.',
+        return alertBox('warn', full.join(' · ')+' 잔여가 없습니다.',
           '새로 신청한 CDE는 자원이 확보될 때까지 준비 중 상태로 기다립니다. '
           + (isAdmin()
              ? '개발룸 자원을 늘리거나, 사용하지 않는 CDE를 반납받아 주세요.'
@@ -2772,8 +2853,8 @@ function drawRoomAct(){
   document.getElementById('roomAct').innerHTML =
       /* 권한 없는 기능은 미노출, 조건으로 막힌 것은 비활성(공통정책 7.10) */
       (canApply()
-        ? '<button class="btn ghost sm"'+(canImport()?' onclick="openDl()"'
-          :' disabled title="구동 중인 CDE 가 없습니다. CDE 를 기동한 뒤 가져와 주세요."')+'>데이터 가져오기</button>'
+        ? (canImport()? '<button class="btn ghost sm" onclick="openDl()">데이터 가져오기</button>'
+          : disTip('<button class="btn ghost sm" disabled>데이터 가져오기</button>', '구동 중인 CDE가 없습니다. CDE를 기동한 뒤 가져와 주세요.'))
         : '')
     + (isAdmin()
       ? '<button class="btn ghost sm" onclick="openRoomCfg()">설정</button>'
@@ -2993,7 +3074,7 @@ function drawJobs(){
     tool.style.display='none';
     box.innerHTML='<div class="state"><h3>데이터를 불러오지 못했습니다.</h3>'
       +'<p>잠시 후 다시 시도해 주세요.</p>'
-      +'<button class="btn ghost" onclick="setState(\'default\')">다시 시도</button></div>';
+      +'<button class="btn ghost" onclick="setState(\'default\')">재시도</button></div>';
     return;
   }
   if(state==='empty'){
@@ -3068,6 +3149,18 @@ ACC.forEach(function(g){ RC['acc_'+g.k]=''; });
 /* 워크스페이스 할당량. 가속기는 종류별로 나뉜다(8/10 회의 2.2) */
 const WSQ = { cpu:64, ram:256, vol:500,
               acc:{'nvidia':2, 'furiosa':2, 'nvidia-mig':8} };
+/* 운영룸이 지금 점유한 양 — 운영 중인 배포가 쓰는 몫이다. 개발룸에 배정한 만큼 운영룸 한도가 줄어
+   이 몫은 개발룸으로 옮길 수 없다(워크스페이스 정책 3.3 · 5.1). 배분 가능한 최대는 워크스페이스 할당량에서 이 값을 뺀 양이다.
+   워크스페이스 목업 ai-service-team 의 use(44 Cores · 176 Gi · 가속기 3)에서 개발룸 점유(20 · 80 · 2)를 뺀 값이다.
+   가속기 1장은 개발룸 배정과 겹치지 않는 NVIDIA-H200 MIG 로 두었다 — 검토용 샘플 값이다 */
+const PROD_USE = { cpu:24, ram:96, acc:{'nvidia-mig':1} };
+function rcCap(k){
+  if(k==='cpu') return WSQ.cpu-PROD_USE.cpu;
+  if(k==='ram') return WSQ.ram-PROD_USE.ram;
+  if(k==='vol') return WSQ.vol;
+  const g=k.replace(/^acc_/,'');
+  return (WSQ.acc[g]||0)-(PROD_USE.acc[g]||0);
+}
 
 /* 생성과 설정은 받는 값이 같다. 처음 만들 때는 0 에서 시작하고 이미 있으면 현재 값을 채운다 */
 let rcNew=false;
@@ -3119,8 +3212,8 @@ function rcStep(k,d,cap,min){
   if(v<min) v=min; if(v>cap) v=cap;
   RC[k]=String(Math.round(v*10)/10); drawRoomCfg();
 }
-/* 배분 가능량은 워크스페이스 할당량 전부다. 다만 지금 쓰고 있는 만큼보다 줄이면
-   구동 중인 CDE 가 멈추므로 하한을 둔다 */
+/* 배분 가능한 최대는 워크스페이스 할당량에서 운영룸 점유를 뺀 양이다(rcCap). 지금 쓰고 있는 만큼보다 줄이면
+   구동 중인 CDE 가 멈추므로 하한을 둔다(워크스페이스 정책 5.1 축소 제한). 고정 하한은 없다 — 생성은 0 부터다 */
 function rcBtn(k,delta,cap,min,label){
   const v=parseFloat(RC[k])||0;
   const off=(delta<0 && v<=min) || (delta>0 && v>=cap);
@@ -3128,45 +3221,57 @@ function rcBtn(k,delta,cap,min,label){
    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">'
    + (delta>0?'<path d="M12 5v14M5 12h14"/>':'<path d="M5 12h14"/>')+'</svg></button>';
 }
-/* ⚠ 하한은 점유량이다. 워크스페이스 정책 3.4 `배포된 리소스의 재시작이 발생하지 않는
-   범위에서 가능` 을 이렇게 해석했다 — 확인 대상(정책 9. 24번).
-   절전 중인 CDE 도 점유로 세고 있어 하한 계산이 달라질 수 있다 */
+/* 하한은 현재 점유량이다(워크스페이스 정책 5.1 축소 제한 · 기획서 7.7).
+   절전 중인 CDE 도 점유로 센다 — 절전은 보유로 보는 상태다(CDE 정책 6장) */
+/* 칸 하나의 검증. 문구는 할당량 수정 화면과 같다(WKSP-L01 · 워크스페이스 목업 qRow) — 같은 자원 배분을 두 화면에서 다르게 말하지 않는다.
+   빈 값 · 숫자 아님 · 음수 → 형식 → 상한 → 하한 순으로 하나만 보인다. 종전에는 빈 값이 0 도 오류도 아닌 채 통과했다 */
+function rcErr(k,unit,cap,min){
+  const raw=String(RC[k]==null?'':RC[k]).trim(), v=+raw;
+  if(raw==='') return '값을 입력해 주세요.';
+  if(isNaN(v) || v<0) return '0 이상의 숫자를 입력해 주세요.';
+  if(unit==='Cores' && (v*2)%1!==0) return '0.5 단위로 입력해 주세요.';
+  if(unit==='장' && v%1!==0) return '가속기 수는 정수로 입력해 주세요.';
+  if(unit!=='Cores' && unit!=='장' && v%1!==0) return '정수로 입력해 주세요.';
+  /* 수량 뒤 단위 — 장 · 개는 붙이고 그 밖은 띄운다(워크스페이스 목업 표기와 같게. 공통정책 조항은 없다 — 개정 제안) */
+  const U=(unit==='장'||unit==='개')? unit : ' '+unit;
+  if(v>cap) return '배분 가능한 최대는 '+cap.toFixed(cap%1?1:0)+U+'입니다.';
+  if(v<min) return '현재 점유 중인 '+min+U+'보다 작게 줄일 수 없습니다.';
+  return '';
+}
 function rcRow(k,label,unit,cap,min,step,desc){
-  const v=parseFloat(RC[k])||0, over=v>cap, under=v<min;
-  return '<div class="qrowbox'+(over||under?' err':'')+'">'
+  const er=rcErr(k,unit,cap,min);
+  return '<div class="qrowbox'+(er?' err':'')+'">'
    /* 사용 중 수치는 툴팁에 둔다. 라벨 아래에 두면 행이 두 줄이 되고
       워크스페이스 목업과 표기가 갈린다 */
    + '<div class="qrhead"><span class="qrlb">'
    +   '<span class="qrname">'+label+'<span class="req">*</span>'
    +     tip((desc? desc+' ' : '')+'지금 '+min+' '+unit+' 사용 중입니다.')+'</span>'
    + '</span>'
-   +   '<span class="stepper'+(over||under?' err':'')+'">'
+   +   '<span class="stepper'+(er?' err':'')+'">'
    /* 워크스페이스 목업과 같은 규격 — .stbtn 클래스와 SVG 아이콘을 쓴다 */
    +     rcBtn(k,-step,cap,min,'줄이기')
    +     '<span class="stfield"><input class="inp" value="'+RC[k]+'" inputmode="decimal" oninput="RC[\''+k+'\']=this.value;drawRoomCfg()"><span class="stunit">'+unit+'</span></span>'
    +     rcBtn(k,step,cap,min,'늘리기')
    +   '</span>'
    /* 소수는 한 자리까지만 보인다. CPU 는 0.5 단위라 값이 길어진다 */
-   +   '<span class="qrcap">배분 가능 '+cap.toFixed(cap%1?1:0)+'</span>'
+   +   '<span class="qrcap">배분 가능 '+cap.toFixed(cap%1?1:0)+(unit==='장'||unit==='개'? unit : ' '+unit)+'</span>'
    + '</div>'
-   + (over? '<div class="errmsg" style="display:block">워크스페이스 할당량은 '+cap+' '+unit+'입니다.</div>'
-      : under? '<div class="errmsg" style="display:block">지금 쓰고 있는 '+min+' '+unit+'보다 줄일 수 없습니다.</div>'
-      : '')
+   + (er? '<div class="errmsg" style="display:block">'+er+'</div>' : '')
    + '</div>';
 }
 function drawRoomCfg(){
   const minC=rcNew?0:ROOM.cpu.use, minR=rcNew?0:ROOM.ram.use, minV=rcNew?0:VOL.used;
   /* 가속기는 종류마다 상한·하한이 다르다 */
   const accBad = ACC.some(function(g){
-    const v=parseFloat(RC['acc_'+g.k]);
-    return v>(WSQ.acc[g.k]||0) || v<(rcNew?0:g.use);
+    return !!rcErr('acc_'+g.k,'장',rcCap('acc_'+g.k),rcNew?0:g.use);
   });
+  /* 칸마다 인라인 에러가 이미 떠 있다(7.8). 버튼은 막지 않고 누를 때 submitRoomCfg 가 이 값으로 막는다(공통정책 7.1) */
   const bad = isSysWs? false :
-              (parseFloat(RC.cpu)>WSQ.cpu) || (parseFloat(RC.cpu)<minC)
-           || (parseFloat(RC.ram)>WSQ.ram) || (parseFloat(RC.ram)<minR)
+              !!rcErr('cpu','Cores',rcCap('cpu'),minC)
+           || !!rcErr('ram','Gi',rcCap('ram'),minR)
            || accBad
            /* 공유 볼륨은 생성 시에만 받는다 */
-           || (rcNew && ((parseFloat(RC.vol)>WSQ.vol) || (parseFloat(RC.vol)<minV)));
+           || (rcNew && !!rcErr('vol','GB',rcCap('vol'),minV));
   document.getElementById('roomForm').innerHTML =
      /* 워크스페이스 정책 5.1·5.2 — 기본값은 전부 운영룸이고 개발룸이 떼어 온다.
         개발룸 자원은 최후 후순위라 운영룸이 부족해지면 회수된다 */
@@ -3196,20 +3301,20 @@ function drawRoomCfg(){
    /* 공용 워크스페이스는 배정 상한이 없어 자원을 입력받지 않는다(8/10 회의 1.3) */
    /* 만들 때는 쓰고 있는 자원이 없어 하한이 0 이다 */
    + (isSysWs? '' :
-     rcRow('cpu','CPU','Cores',WSQ.cpu,rcNew?0:ROOM.cpu.use,1,'워크스페이스 할당량에서 옮겨집니다. 남는 만큼이 운영룸 몫입니다.')
-   + rcRow('ram','Memory','Gi',WSQ.ram,rcNew?0:ROOM.ram.use,1,'')
+     rcRow('cpu','CPU','Cores',rcCap('cpu'),rcNew?0:ROOM.cpu.use,1,'워크스페이스 할당량에서 옮겨집니다. 남는 만큼이 운영룸 몫입니다.')
+   + rcRow('ram','Memory','Gi',rcCap('ram'),rcNew?0:ROOM.ram.use,1,'')
    /* 가속기는 종류별로 배정한다. 워크스페이스에서 종류별로 나눈 것이
       개발룸으로 넘어오면서 뭉뚱그려지면 계산이 맞지 않는다(8/10 회의 2.2) */
    /* vRAM 은 라벨이 아니라 툴팁에 둔다. 라벨 폭(150px)을 넘으면 줄이 바뀌어 행 높이가 갈린다 */
    + ACC.map(function(g,i){
-       return rcRow('acc_'+g.k, g.n, '장', WSQ.acc[g.k]||0, rcNew?0:g.use, 1,
-                    '한 장당 '+g.vram+'GB.'+(i===0? ' 벤더·유형별로 구분해 배정합니다.' : ''));
+       return rcRow('acc_'+g.k, g.n, '장', rcCap('acc_'+g.k), rcNew?0:g.use, 1,
+                    '한 장당 '+g.vram+'GB입니다.'+(i===0? ' 벤더·유형별로 구분해 배정합니다.' : ''));
      }).join('') + '</div>')
    + '<div class="fsec"><h4>스토리지·네트워크</h4>'
    /* 공유 볼륨은 생성 시에만 정한다(8/12 회의 1.5 `생성 후 변경 불가. 관리자만 설정`).
       이미 데이터가 쌓인 볼륨을 줄이면 무엇이 사라지는지 화면이 알 수 없다 */
    + (rcNew
-      ? rcRow('vol','공유 볼륨','GB',WSQ.vol,0,10,'개발룸 멤버가 함께 쓰는 볼륨입니다. 만든 뒤에는 바꿀 수 없습니다.')
+      ? rcRow('vol','공유 볼륨','GB',rcCap('vol'),0,10,'개발룸 멤버가 함께 쓰는 볼륨입니다. 만든 뒤에는 바꿀 수 없습니다.')
       /* 자원 행(.qrowbox)은 아래에 막대·에러가 붙는 규격이라 읽기 전용 값에 쓰면
          여백과 밑줄이 남는다. 라벨+본문만 필요한 것은 신청 폼과 같은 .frow 를 쓴다 */
       : row('공유 볼륨'+tip('개발룸 멤버가 함께 쓰는 볼륨입니다. 생성 시에 정하며 이후에는 바꿀 수 없습니다.'),
@@ -3221,9 +3326,14 @@ function drawRoomCfg(){
          '<textarea class="inp" rows="2" placeholder="한 줄에 하나씩 입력합니다." oninput="RC.egress=this.value">'+RC.egress+'</textarea>',
          egressHint())
    + '</div>';
-  document.getElementById('rcSave').disabled = bad;
+  rcBad = bad;
+  /* 생성은 입력 상태와 무관하게 활성, 설정은 변경이 없을 때만 비활성이다(공통정책 7.1) */
+  document.getElementById('rcSave').disabled = rcNew? false : rcSnap()===rcInit;
 }
+let rcBad=false;
 function submitRoomCfg(){
+  /* 제출 시 검증 — 칸마다 인라인 에러가 떠 있으므로 첫 오류 칸으로 포커스만 옮긴다(공통정책 7.8) */
+  if(rcBad){ const el=document.querySelector('#roomForm .err input, #roomForm input.err'); if(el) el.focus(); return; }
   /* 기본 차단 설치에서 값이 있던 개발룸을 비우고 저장하면 그 순간 CDE 의 외부 통신이 끊긴다.
      돌고 있는 작업이 외부에서 데이터를 받고 있으면 깨지므로 저장 전에 영향을 알린다
      (REQ-CDE-057 과 같은 처리 — 설정 변경의 영향을 사전 안내한다).
@@ -3255,11 +3365,11 @@ function doSubmitRoomCfg(){
 /* 연장도 결재를 거친다(정책 3.1). 승인자가 판단할 사유를 받고,
    연장 후 만료일을 계산해 보여준다 — 며칠 늘어나는지 숫자로만 두면 언제까지인지 모른다.
    ⚠ 연장 가능 기간·횟수 제한은 확인 대상(CDE 정책 9. 4번) */
-let extCur=null, extDays='30', extWhy='';
+let extCur=null, extDays='30', extWhy='', extShown=false;
 function openExt(name){
   extCur = CDE.find(function(m){ return m.n===name; });
   if(!extCur) return;
-  extDays=''; extWhy='';
+  extDays=''; extWhy=''; extShown=false;
   document.getElementById('extTarget').textContent = extCur.n;
   drawExt();
   document.getElementById('mdExt').classList.add('on');
@@ -3282,23 +3392,41 @@ function drawExt(){
    + '<div class="fld" style="margin-top:16px"><label>연장 만료일<span class="req">*</span></label>'
    /* 현재 만료일 다음 날부터 고를 수 있다. 그 이전은 연장이 아니다.
       만료된 CDE 는 현재 만료일이 지나 있어 오늘이 하한이 된다 */
-   +   '<input class="inp" type="date" min="'+extMin()+'" value="'+extDays+'" onchange="extDays=this.value;extValid()">'
-   +   '<div class="hint">'+(extCur.st==='만료'? '오늘 이후여야 합니다.' : '현재 만료일보다 뒤여야 합니다.')+'</div></div>'
+   +   '<input class="inp'+(extDateMsg()?' err':'')+'" id="extDate" type="date" min="'+extMin()+'" value="'+extDays+'" onchange="extDays=this.value;extValid()">'
+   +   (extDateMsg()? '<div class="errmsg">'+extDateMsg()+'</div>' : '')
+   +   '<div class="hint">'+(extCur.st==='만료'? '오늘 또는 그 뒤 날짜를 선택할 수 있습니다.' : '현재 만료일 다음 날부터 선택할 수 있습니다.')+'</div></div>'
    /* 만료되면 정지된다. 파드를 다시 띄워야 해 승인 직후 바로 접속되지 않을 수 있어 미리 알린다 */
    + (extCur.st==='만료'
        ? '<div class="hint" style="margin-top:10px">만료되어 정지된 CDE는 연장이 승인되면 다시 시작됩니다. 준비가 끝나면 접속할 수 있습니다.</div>' : '')
    + '<div class="fld" style="margin-top:14px"><label>사유<span class="req">*</span></label>'
-   +   '<textarea class="inp" rows="3" placeholder="연장이 필요한 이유를 입력해 주세요." oninput="extWhy=this.value;extValid()">'+extWhy+'</textarea></div>';
+   +   '<textarea class="inp'+(extWhyMsg()?' err':'')+'" id="extWhyIn" rows="3" placeholder="연장이 필요한 이유를 입력해 주세요." oninput="extWhy=this.value;extValid()">'+extWhy+'</textarea>'
+   +   '<div class="errmsg" id="extWhyErr"'+(extWhyMsg()?'':' hidden')+'>'+extWhyMsg()+'</div></div>';
   extValid();
 }
+/* 제출한 뒤에만 에러를 보인다. 아직 손대지 않은 필드에 미리 띄우지 않는다(공통정책 7.8) */
+function extDateMsg(){
+  if(!extShown) return '';
+  if(!extDays) return '연장 만료일을 선택해 주세요.';
+  /* 하한 이상이어야 연장이다 — 현재 만료일 다음 날과 오늘 중 늦은 날 */
+  if(extDays<extMin()) return extCur.st==='만료'? '오늘 또는 그 뒤 날짜를 선택해 주세요.' : '현재 만료일 다음 날 이후를 선택해 주세요.';
+  return '';
+}
+function extWhyMsg(){ return (extShown && !extWhy.trim())? '사유를 입력해 주세요.' : ''; }
+/* 신청 버튼은 입력 상태와 무관하게 활성이다(공통정책 7.1). 사유를 적으면 사유 에러만 거둔다 */
 function extValid(){
   const b=document.getElementById('extBtn');
   if(!b) return;
-  /* 하한 이상이어야 연장이다 — 현재 만료일 다음 날과 오늘 중 늦은 날 */
-  const okDate = extDays && extDays>=extMin();
-  b.disabled = !(okDate && extWhy.trim());
+  b.disabled = false;
+  if(extWhy.trim()){ const t=document.getElementById('extWhyIn'), e=document.getElementById('extWhyErr'); if(t) t.classList.remove('err'); if(e) e.hidden=true; }
 }
 function submitExt(){
+  /* 제출 시 전체 검증 — 필드마다 인라인 에러, 첫 오류 필드로 포커스(공통정책 7.8) */
+  extShown=true;
+  if(extDateMsg() || extWhyMsg()){
+    drawExt();
+    document.getElementById(extDateMsg()? 'extDate' : 'extWhyIn').focus();
+    return;
+  }
   closeExt();
   toast('ok','연장 신청을 접수했습니다. 승인 결과는 알림으로 안내됩니다.');
 }
@@ -3313,7 +3441,8 @@ function canImport(){ return CDE.some(function(m){ return m.st==='구동 중'; }
 function openDl(){
   document.getElementById('dlTarget').textContent = '개발룸 공유 볼륨에 내려받습니다. 같은 개발룸의 모든 CDE 가 함께 씁니다.';
   dlValid();
-  ['dlRepo','dlDir'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['dlRepo','dlDir'].forEach(function(id){ document.getElementById(id).value=''; document.getElementById(id).classList.remove('err'); });
+  document.getElementById('dlRepoErr').style.display='none';
   dlValid();
   document.getElementById('mdDl').classList.add('on');
 }
@@ -3351,9 +3480,18 @@ function dlValid(){
   d.classList.toggle('err', !!de);
   if(err){ err.textContent = de; err.style.display = de ? 'block' : 'none'; }
 
-  b.disabled = !(r.value.trim() && d.value.trim() && !de);
+  /* 버튼은 입력 상태와 무관하게 활성이다(공통정책 7.1). 채운 필드의 미입력 에러는 거둔다 */
+  b.disabled = false;
+  if(r.value.trim()){ r.classList.remove('err'); document.getElementById('dlRepoErr').style.display='none'; }
 }
 function submitDl(){
+  /* 제출 시 전체 검증 — 필드마다 인라인 에러, 첫 오류 필드로 포커스(공통정책 7.8) */
+  const r=document.getElementById('dlRepo'), d=document.getElementById('dlDir'), err=document.getElementById('dlDirErr');
+  const rBad=!r.value.trim();
+  r.classList.toggle('err', rBad); document.getElementById('dlRepoErr').style.display = rBad? 'block':'none';
+  const dm = d.value.trim()? dirErr(d.value.trim()) : '폴더명을 입력해 주세요.';
+  d.classList.toggle('err', !!dm); err.textContent=dm; err.style.display = dm? 'block':'none';
+  if(rBad || dm){ (rBad? r : d).focus(); return; }
   closeDl();
   toast('ok','데이터 가져오기를 요청했습니다. 개발룸 공유 볼륨에 내려받으며, 진행 상태는 작업 이력에서 확인할 수 있습니다.');
 }
@@ -3371,7 +3509,8 @@ function logWhy(j){
 function logBtn(j, cls, stop){
   const why=logWhy(j);
   const on = stop ? 'event.stopPropagation();openLog(\''+j.id+'\')' : 'openLog(\''+j.id+'\')';
-  return '<button class="'+cls+'"'+(why?' disabled title="'+why+'"':' onclick="'+on+'"')+'>로그 보기</button>';
+  const b='<button class="'+cls+'"'+(why?' disabled':' onclick="'+on+'"')+'>로그 보기</button>';
+  return why? disTip(b, why) : b;
 }
 /* ═══════════ 작업 로그 ═══════════ */
 /* 기술문서 6.2 `아카이브 로그 조회` — 완료 후 S3 에 백업한 로그를 뷰어에서 검색·추적한다.
@@ -3545,12 +3684,20 @@ function drawJobDetail(){
     + (j.err? '<div class="secnote">'+j.err+'</div>' : '')
     + '</div>';
 
-  h += '<div class="dsec"><h4>사전 진단'+tip('작업을 제출할 때 요청한 자원으로 실행할 수 있는지 확인한 결과입니다.')+'</h4>';
+  h += '<div class="dsec"><h4>사전 진단'+tip('작업을 제출할 때 요청한 자원으로 실행할 수 있는지 확인한 결과입니다. 제출 시점 값이라 지금 잔여와 다를 수 있습니다.')+'</h4>';
   if(j.chk){
+    /* CDE 가용 자원과 개발룸 잔여는 층위가 달라 따로 둔다(CDE 정책 4.6·4.7 · 2026-10-21 댓글 3487432767).
+       CDE 가용 자원을 넘는 요청은 제출이 거부되어 여기까지 오지 않는다. 대기는 개발룸 잔여로 판정한다.
+       추천 자원은 두지 않는다 — 계산 기준이 없고 작업은 CLI 에서 제출한다(CDE 정책 4.5) */
+    const rm=j.chk.room;
     h += '<dl class="dl">'
       + '<dt>판정</dt><dd><span class="stbadge '+(j.chk.r==='통과'?'ok':(j.chk.r==='차단'?'cr':'wa'))+'">'+j.chk.r+'</span></dd>'
       + '<dt>사유</dt><dd>'+j.chk.why+'</dd>'
-      + '<dt>추천 자원</dt><dd>'+(j.chk.rec || '<span class="dash">-</span>')+'</dd>'
+      + '<dt>CDE 잔여 자원'+tip('작업을 제출한 CDE에서 그때 쓸 수 있던 양입니다. CDE에 할당된 자원에서 CDE와 실행 중인 작업이 쓰던 몫을 뺀 값입니다.')+'</dt>'
+      + '<dd>'+(j.chk.cde || '<span class="dash">-</span>')+'</dd>'
+      + '<dt>개발룸 잔여'+tip('제출할 때 개발룸에 남아 있던 요청 가속기 수입니다. 모자라면 작업은 대기합니다.')+'</dt>'
+      + '<dd>'+(rm ? rm.n+' 잔여 '+rm.left+'장 / 배정 '+rm.total+'장'+(rm.q? ' · 먼저 대기 중인 작업 '+rm.q+'건' : '')
+                   : '<span class="dash">-</span>')+'</dd>'
       + '</dl>';
   } else { h += '<p class="secnote">진단 결과가 없습니다.</p>'; }
   h += '</div>';
@@ -3861,7 +4008,7 @@ function drawCdeDetail(){
     + '<dt></dt><dd></dd>'
     + '</dl>'
     + (m.mode==='위임 할당'
-        ? '<div class="secnote">위임 할당은 작업을 실행할 때만 가속기를 사용합니다. 쉬는 동안에는 다른 사용자가 쓸 수 있습니다.</div>'
+        ? '<div class="secnote">위임 할당은 작업을 실행할 때만 가속기를 사용합니다. 쉬는 동안에는 다른 멤버가 쓸 수 있습니다.</div>'
         : '<div class="secnote">직접 할당은 기동한 동안 가속기를 계속 점유합니다.</div>')
     + '</div>';
 
@@ -3869,14 +4016,17 @@ function drawCdeDetail(){
 }
 
 function btnG(label, ok, fn, why){
-  return '<button class="btn ghost"'+(ok?' onclick="'+fn+'"':' disabled title="'+why+'"')+'>'+label+'</button>';
+  const b='<button class="btn ghost"'+(ok?' onclick="'+fn+'"':' disabled')+'>'+label+'</button>';
+  return ok? b : disTip(b, why);
 }
 /* 파괴적 액션은 진입 버튼을 외곽선으로 두고 확인 알럿의 최종 실행만 채운다 */
 function btnD(label, ok, fn, why){
-  return '<button class="btn danger-line"'+(ok?' onclick="'+fn+'"':' disabled title="'+why+'"')+'>'+label+'</button>';
+  const b='<button class="btn danger-line"'+(ok?' onclick="'+fn+'"':' disabled')+'>'+label+'</button>';
+  return ok? b : disTip(b, why);
 }
 function btnL(label, ok, fn, why){
-  return '<button class="btn"'+(ok?' onclick="'+fn+'"':' disabled title="'+why+'"')+'>'+label+'</button>';
+  const b='<button class="btn"'+(ok?' onclick="'+fn+'"':' disabled')+'>'+label+'</button>';
+  return ok? b : disTip(b, why);
 }
 /* 목록으로 돌아가는 자리. 상세를 페이지로 옮겨 패널 대신 페이지를 닫는다 */
 function closePanel(){ if(cdCur) closeCde(); cur=null; }
@@ -3925,7 +4075,9 @@ function cancelForm(){
   }
   closeForm();
 }
+let reqShown=false;   /* 신청을 한 번 누른 뒤에만 빈 칸 에러를 보인다(공통정책 7.8) */
 function openForm(){
+  reqShown=false;
   if(jdCur) closeJob();
   /* 이어받는 볼륨이 있으면 그 크기로 신청된다 */
   const kv=keptVol(); if(kv) NF.vol=String(kv);
@@ -3985,13 +4137,13 @@ function accBlock(){
      +     '<span class="stfield"><input class="inp" value="'+NF[key]+'" inputmode="numeric" oninput="NF[\''+key+'\']=this.value;drawForm()"><span class="stunit">장</span></span>'
      +     qBtn(key,1,1,cap)
      +   '</span>'
-     +   '<span class="qrcap">배분 가능 '+cap+'</span>'
+     +   '<span class="qrcap">잔여 '+cap+'장</span>'
      +   '<span class="qrdel"><button class="cbtn" title="제거" onclick="accDelRow(\''+k+'\')">'
      +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18M6 6l12 12"/></svg></button></span>'
      + '</div>'
      /* 정수만 받는다(공통정책 1.4). 장수는 장치 단위라 소수가 성립하지 않는다 */
-     + (over? '<div class="errmsg" style="display:block">배분 가능한 최대는 '+cap+' 장입니다.</div>'
-        : frac? '<div class="errmsg" style="display:block">장수는 정수로 입력해 주세요.</div>' : '')
+     + (over? '<div class="errmsg" style="display:block">개발룸 잔여 '+cap+'장보다 많이 신청할 수 없습니다.</div>'
+        : frac? '<div class="errmsg" style="display:block">가속기 수는 정수로 입력해 주세요.</div>' : '')
      + '</div>';
   }).join('');
 
@@ -4033,7 +4185,7 @@ function accBlock(){
      값을 고쳐야 하는 결과라 토스트도 아니다. 영역 안내로 두고 신청 버튼을 잠근다(공통정책 7.6 · REQ-CDE-025) */
   if(!srvFit()){
     h+=alertBox('warn','요청한 가속기를 한 서버에서 모두 받을 수 없습니다.',
-      '직접 할당은 요청한 종류와 장수를 한 서버가 모두 갖춰야 합니다. 종류나 장수를 조정하거나 위임 할당을 선택해 주세요.','',false);
+      '직접 할당은 요청한 종류와 가속기 수를 한 서버가 모두 갖춰야 합니다. 종류나 가속기 수를 조정하거나 위임 할당을 선택해 주세요.','',false);
   }
   return h;
 }
@@ -4049,17 +4201,17 @@ function drawForm(){
    /* 내부 명칭(delegated·direct)은 노출하지 않는다(공통정책 7.9) */
    + row('실행 방식', true, seg('mode',['위임 할당','직접 할당']),
        NF.mode==='위임 할당'
-         ? '작업을 실행할 때만 가속기를 사용합니다. 쉬는 동안에는 다른 사용자가 쓸 수 있습니다.'
+         ? '작업을 실행할 때만 가속기를 사용합니다. 쉬는 동안에는 다른 멤버가 쓸 수 있습니다.'
          /* 직접 할당은 종류 조합에 조건이 붙는다(CON-596 A-4). 고르는 자리에서 조건을 밝혀야
             값을 다 넣은 뒤에 막히지 않는다 */
-         : '기동한 동안 한 서버에서 가속기를 계속 점유합니다. 요청한 종류와 장수를 모두 갖춘 서버가 있어야 신청할 수 있습니다.')
+         : '기동한 동안 한 서버에서 가속기를 계속 점유합니다. 요청한 종류와 가속기 수를 모두 갖춘 서버가 있어야 신청할 수 있습니다.')
    + '</div>';
 
   h+='<div class="fsec"><h4>자원</h4>'
    /* 공용 워크스페이스는 배정 상한이 없어 승인 시점의 잔여에 따라 갈린다 */
    + (isSysWs? '<div class="secnote" style="margin-bottom:14px">공용 워크스페이스는 다른 워크스페이스에 배분하고 남은 자원을 사용합니다. 잔여에 따라 기동이 지연될 수 있습니다.</div>' : '')
    /* 사용 중 수치를 두지 않는다. 신청자는 얼마를 쓸 수 있는지만 알면 되고
-      그건 `배분 가능` 이 알린다. 하한이 걸리는 개발룸 설정에서만 사용 중을 보인다 */
+      그건 `잔여` 가 알린다. 하한이 걸리는 개발룸 설정에서만 사용 중을 보인다 */
    + qrow('cpu','CPU','Cores',freeC,0.5,'0.5 단위로 지정할 수 있습니다.')
    /* ⚠ 단위가 확정되지 않았다. 현행이 GiB·Gi·GB 를 섞어 쓴다 — 확인 대상(정책 9. 23번).
       쿠버네티스에 그대로 넘어가는 값이라 Gi 로 둔다 */
@@ -4110,17 +4262,19 @@ function drawForm(){
       기술문서 5.2 도 `최대 사용 기간(만료 시간)` 으로 시점을 말한다.
       연장 신청도 같은 형식이라 맞춘다 */
    + row('사용 만료일', true,
-       '<input class="inp" type="date" min="'+today()+'" value="'+(NF.exp||'')+'" onchange="NF.exp=this.value;validate()">',
+       '<input class="inp'+(expMsg()?' err':'')+'" id="fExp" type="date" min="'+today()+'" value="'+(NF.exp||'')+'" onchange="NF.exp=this.value;validate()">'
+       + '<div class="errmsg" id="fExpErr"'+(expMsg()?'':' hidden')+'>'+expMsg()+'</div>',
        '이 날짜가 지나면 접속할 수 없습니다. 개인 볼륨은 회수 뒤 7일 동안 보존됩니다.')
    + row('요청 사유', true,
-       '<textarea class="inp" rows="3" placeholder="승인 판단에 필요한 내용을 입력해 주세요." oninput="NF.reason=this.value;validate()">'+NF.reason+'</textarea>', '')
+       '<textarea class="inp'+(reasonMsg()?' err':'')+'" id="fReason" rows="3" placeholder="승인 판단에 필요한 내용을 입력해 주세요." oninput="NF.reason=this.value;validate()">'+NF.reason+'</textarea>'
+       + '<div class="errmsg" id="fReasonErr"'+(reasonMsg()?'':' hidden')+'>'+reasonMsg()+'</div>', '')
    + '</div>';
 
   /* 자원 부족은 반려 사유가 아니다. 승인은 막지 않고 자원이 생길 때까지 준비 중으로 기다린다
      (CON-596 A-4 · REQ-CDE-032). `반려될 수 있습니다` 로 두면 승인자가 반려해야 하는 것으로 읽는다.
      `준비 중` 은 CDE 정책 6장 상태값이다 — 요건의 `대기(Pending)` 를 화면에 쓰지 않는다(공통정책 5.1·7.9) */
   h+=alertBox('info','',
-    '신청하면 워크스페이스 관리자 승인 후 CDE가 만들어집니다. 승인 시점에 자원 여유가 부족하면 자원이 확보될 때까지 준비 중 상태로 기다립니다.','',false);
+    '신청하면 워크스페이스 관리자 승인 후 CDE가 만들어집니다. 승인 시점에 자원 잔여가 부족하면 자원이 확보될 때까지 준비 중 상태로 기다립니다.','',false);
 
   document.getElementById('formBody').innerHTML=h;
   validate();
@@ -4145,12 +4299,12 @@ function mselModels(){
    + (list.length
       ? list.map(function(d){
           const on=NF.keyModels.indexOf(d.n)>=0, ok=d.st==='정상';
-          return '<label class="msitem'+(ok?'':' off')+'"'
-           + (ok?'':' title="정상 상태인 배포만 선택할 수 있습니다."')+'>'
+          return '<label class="msitem'+(ok?'':' off')+'">'
            + '<input type="checkbox"'+(on?' checked':'')+(ok?'':' disabled')
            +   ' onchange="toggleModel(\''+d.n+'\')">'
            + '<span class="mnm">'+d.n+'</span>'
-           + '<span class="stbadge '+(ok?'ok':'cr')+'">'+d.st+'</span></label>';
+           + (ok? '<span class="stbadge ok">'+d.st+'</span>'
+               : disTip('<span class="stbadge cr">'+d.st+'</span>', '정상 상태인 배포만 선택할 수 있습니다.'))+'</label>';
         }).join('')
       : '<div class="msempty">검색 결과가 없습니다.</div>')
    + '</div>'
@@ -4200,20 +4354,33 @@ function qBtn(k,delta,step,cap){
 /* 사용 중·근거 수치는 툴팁에 둔다. 워크스페이스 목업과 같은 방식이다.
    ⚠ 증가 단위는 CPU 0.5 만 근거가 있다(8/10 회의). Memory·볼륨은 확인 대상(정책 9. 17번) */
 function qrow(k,label,unit,cap,step,desc){
-  const v=parseFloat(NF[k])||0, over=v>cap;
+  const raw=String(NF[k]==null?'':NF[k]).trim(), n=+raw, v=parseFloat(NF[k])||0;
+  /* 빈 값 · 형식(숫자 아님 · 음수) · 0 을 가른다. 신청 자원은 0 보다 커야 한다 */
+  const emsg = !reqShown? '' : raw===''? '값을 입력해 주세요.' : (isNaN(n) || n<0)? '0 이상의 숫자를 입력해 주세요.' : n===0? '0보다 큰 값을 입력해 주세요.' : '';
+  const empty=!!emsg, over=!empty && v>cap;
   return '<div class="frow"><label class="flb">'+label+'<span class="req">*</span>'+(desc?tip(desc):'')+'</label>'
    + '<div class="fbd"><div class="qline">'
-   +   '<span class="stepper'+(over?' err':'')+'">'
+   +   '<span class="stepper'+(over||empty?' err':'')+'">'
    +     qBtn(k,-1,step,cap)
    +     '<span class="stfield"><input class="inp" value="'+NF[k]+'" inputmode="'+(unit==='Cores'?'decimal':'numeric')+'" oninput="NF.'+k+'=this.value;drawForm()"><span class="stunit">'+unit+'</span></span>'
    +     qBtn(k,1,step,cap)
    +   '</span>'
-   /* 소수는 한 자리까지만 보인다. CPU 는 0.5 단위라 값이 길어진다 */
-   +   '<span class="qrcap">배분 가능 '+cap.toFixed(cap%1?1:0)+'</span>'
+   /* 소수는 한 자리까지만 보인다. CPU 는 0.5 단위라 값이 길어진다.
+      CDE 신청은 개발룸 잔여 안에서 받으므로 「잔여」다(용어집 1장 — 배분 가능은 워크스페이스 · 개발룸 생성 · 설정) */
+   +   '<span class="qrcap">잔여 '+cap.toFixed(cap%1?1:0)+' '+unit+'</span>'
    + '</div>'
-   + (over?'<div class="errmsg" style="display:block">배분 가능한 최대는 '+cap.toFixed(cap%1?1:0)+' '+unit+'입니다.</div>':'')
+   + (empty?'<div class="errmsg" style="display:block">'+emsg+'</div>'
+      : over?'<div class="errmsg" style="display:block">개발룸 잔여 '+cap.toFixed(cap%1?1:0)+' '+unit+'보다 많이 신청할 수 없습니다.</div>':'')
    + '</div></div>';
 }
+/* 신청 정보 칸 에러 — 누른 뒤에만 보인다 */
+function expMsg(){
+  if(!reqShown) return '';
+  if(!NF.exp) return '사용 만료일을 선택해 주세요.';
+  if(NF.exp<today()) return '오늘 또는 그 뒤 날짜를 선택해 주세요.';
+  return '';
+}
+function reasonMsg(){ return (reqShown && !NF.reason.trim())? '요청 사유를 입력해 주세요.' : ''; }
 function stepQ(k,d,cap){
   let v=(parseFloat(NF[k])||0)+d;
   if(v<0) v=0; if(v>cap) v=cap;
@@ -4232,9 +4399,31 @@ function validate(){
     && !accErr() && srvFit()
     /* 이어받는 볼륨은 이미 잡혀 있는 것이라 배분 가능량으로 다시 재지 않는다(CDE 정책 5.5) */
     && (parseFloat(NF.vol)||0)>0 && (keptVol() ? true : (parseFloat(NF.vol)||0)<=freeV);
-  document.getElementById('fSubmit').disabled=!ok;
+  reqOk = ok;
+  /* 신청 버튼은 입력 상태와 무관하게 활성이다(공통정책 7.1). 직접 할당 조합 불가만 잠근다 —
+     고른 값 때문에 막히고 누르기 전에 화면이 알 수 있어 비활성 + 사유 툴팁이다(공통정책 7.10 · 5.2 직접 할당 조합 불가) */
+  const fsb=document.getElementById('fSubmit'), fsw=document.getElementById('fSubmitWrap'), fst=document.getElementById('fSubmitTip');
+  fsb.disabled=!srvFit();
+  /* 막혔을 때만 감싼 요소를 툴팁 앵커로 만든다(라이브러리 v0.25 .dis-tip). 사유는 영역 안내와 같은 원인 + 조치 */
+  fsw.classList.toggle('dis-tip', fsb.disabled);
+  if(fsb.disabled){ fsw.setAttribute('tabindex','0'); fst.hidden=false; fst.textContent='요청한 가속기를 한 서버에서 모두 받을 수 없습니다. 종류나 가속기 수를 조정하거나 위임 할당을 선택해 주세요.'; }
+  else { fsw.removeAttribute('tabindex'); fst.hidden=true; fst.textContent=''; }
+  /* 고친 칸의 에러는 다시 그리지 않고 바로 거둔다 */
+  [['fExp',expMsg()],['fReason',reasonMsg()]].forEach(function(x){
+    const el=document.getElementById(x[0]), e=document.getElementById(x[0]+'Err');
+    if(el && !x[1]){ el.classList.remove('err'); if(e) e.hidden=true; }
+  });
 }
+let reqOk=false;
 function submitForm(){
+  /* 제출 시 전체 검증 — 칸마다 인라인 에러, 첫 오류 칸으로 포커스(공통정책 7.8) */
+  validate();
+  if(!reqOk){
+    reqShown=true; drawForm();
+    const el=document.querySelector('#pgForm input.err, #pgForm textarea.err, #pgForm .err input');
+    if(el) el.focus();
+    return;
+  }
   CDE.unshift({n:ME.split('.')[0]+'-new-01', by:'성유진', id:ME, st:'승인 대기',
     ide:NF.ide, fw:NF.fw, mode:NF.mode, cpu:+NF.cpu, ram:+NF.ram, accs:accWant(),
     vol:+NF.vol,
@@ -4323,7 +4512,8 @@ function openConfirm(title, body, onOk, okLabel, confirmName, cancelLabel){
   document.getElementById('cfBody').innerHTML=body;
   document.getElementById('cfFoot').innerHTML =
     '<button class="btn ghost" onclick="closeConfirm()">'+(cancelLabel||'취소')+'</button>'
-    + (onOk?'<button class="btn danger" id="cfOk">'+(okLabel||'확인')+'</button>':'');
+    /* 최종 실행 버튼은 파괴적 동작일 때만 채움 위험색이다(문서 반영 절차 5.3). 목록은 다른 목업 openConfirm 과 같고 회수 · 중단을 더했다 */
+    + (onOk?'<button class="btn'+(['삭제','제외','취소','폐기','나가기','해제','반납','회수','중단'].indexOf(okLabel)>=0?' danger':'')+'" id="cfOk">'+(okLabel||'확인')+'</button>':'');
   const ok=document.getElementById('cfOk');
   if(ok) ok.onclick=function(){ closeConfirm(); if(onOk) onOk(); };
 
@@ -4367,10 +4557,10 @@ const COLDEF={
     +'<dt>구동 중</dt><dd>접속해 사용할 수 있습니다.</dd>'
     +'<dt>실패</dt><dd>기동에 실패했습니다.</dd>'
     +'<dt>만료</dt><dd>사용 기간이 만료되어 정지되었습니다. 회수되기 전까지 연장할 수 있습니다.</dd>'
-      +'<dt>회수</dt><dd>만료 3일 뒤 연산 자원이 회수되었습니다. 개인 볼륨은 7일 동안 보존되며, 그 안에 새로 신청하면 이어서 사용할 수 있습니다.</dd>'
+      +'<dt>회수</dt><dd>연산 자원을 회수했고, 개인 볼륨은 회수 뒤 7일 동안 보존됩니다.</dd>'
     +'<dt>종료 중</dt><dd>자원을 해제하고 있습니다.</dd></dl>',
   mode:'가속기를 언제 점유하는지가 다릅니다.'
-    +'<dl><dt>위임 할당</dt><dd>작업을 실행할 때만 사용합니다. 쉬는 동안 다른 사용자가 쓸 수 있습니다.</dd>'
+    +'<dl><dt>위임 할당</dt><dd>작업을 실행할 때만 사용합니다. 쉬는 동안 다른 멤버가 쓸 수 있습니다.</dd>'
     +'<dt>직접 할당</dt><dd>기동한 동안 계속 점유합니다.</dd></dl>'
 };
 function thHelp(k,label){
