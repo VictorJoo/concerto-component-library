@@ -1,6 +1,19 @@
 <!--
-  콘체르토 매니저 · 로그인 · 회원가입 목업 v0.24 (2026-10-12)
+  콘체르토 매니저 · 로그인 · 회원가입 목업 v0.26 (2026-10-28)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.26 (2026-10-28) ──
+  · 10-28 4차. SSO 데모 바 주석의 사람 표기를 지웠다(화면 변경 없음).
+  · 10-28 재검증 정정(2차). 문구를 계정 정책 2.1~2.4 · 비밀번호 변경 기획서 5.1 표와 글자까지 맞췄다 — 플레이스홀더 · 에러의 `입력해주세요` 를 `입력해 주세요` 로,
+    `아이디 중복 확인을 해 주세요.`, 허용되지 않은 문자 `영문·숫자·특수문자만 사용할 수 있습니다.`(가입 · 강제 변경),
+    강제 변경 연속 · 반복 문자 `동일하거나 연속된 문자·숫자는 4자 이상 사용할 수 없습니다.`, 강제 변경 새 비밀번호 미입력
+    `새 비밀번호를 입력해 주세요.`(비밀번호 변경 목업과 같다). 정책 표에 없는 `안전 이상의 비밀번호를 사용해 주세요.` 는 뺐다 —
+    앞 규칙(8자 이상 · 3종 이상 · 아이디 동일 · 연속 반복)을 모두 통과하면 강도가 이미 안전 이상이라 닿지 않는다.
+  · 회원가입 `가입 신청` 과 임시 비밀번호 강제 변경 모달 `변경` 을 입력 상태와 무관하게 활성으로 둔다
+    (공통정책 7.1). 누르면 전체를 검증해 실패한 필드마다 인라인 에러를 보이고 첫 오류 필드로 포커스한다(7.8).
+    회원가입은 기존 submit 검증(vSuId · vName · vEmail · vPw · vPw2 · 중복 미확인 안내)을 그대로 쓴다.
+    강제 변경은 기존 fpPwError 문구를 쓰고, 빈 필드는 미입력 문구를 더했다.
+    로그인 버튼은 종전부터 항상 활성이라 손대지 않았다.
 
   ── v0.24 ──
   · 인증 기관에서 돌아온 직후의 처리 중 화면을 걷어냈다(기획서 3장·REQ-LOGIN-019·6장 · 계정정책 4.3).
@@ -322,16 +335,16 @@
 
         <div class="field">
           <label for="li_id">아이디</label>
-          <div class="input-shell"><input class="input" type="text" id="li_id" placeholder="아이디를 입력해주세요." autocomplete="username" /></div>
-          <p class="err" id="li_idErr">아이디를 입력해주세요.</p>
+          <div class="input-shell"><input class="input" type="text" id="li_id" placeholder="아이디를 입력해 주세요." autocomplete="username" /></div>
+          <p class="err" id="li_idErr">아이디를 입력해 주세요.</p>
         </div>
         <div class="field">
           <label for="li_pw">비밀번호</label>
           <div class="input-shell">
-            <input class="input" type="password" id="li_pw" placeholder="비밀번호를 입력해주세요." autocomplete="current-password" />
+            <input class="input" type="password" id="li_pw" placeholder="비밀번호를 입력해 주세요." autocomplete="current-password" />
             <button type="button" class="toggle-pw" data-target="li_pw" aria-label="비밀번호 표시"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
-          <p class="err" id="li_pwErr">비밀번호를 입력해주세요.</p>
+          <p class="err" id="li_pwErr">비밀번호를 입력해 주세요.</p>
         </div>
 
         <div class="row-remember"><input type="checkbox" id="remember" checked /><label for="remember">아이디 저장</label></div>
@@ -358,44 +371,44 @@
         <div class="field">
           <label for="su_id">아이디 <span class="req">*</span></label>
           <div class="input-shell">
-            <input class="input" type="text" id="su_id" placeholder="아이디를 입력해주세요." autocomplete="username" />
+            <input class="input" type="text" id="su_id" placeholder="아이디를 입력해 주세요." autocomplete="username" />
             <button type="button" class="btn-check" id="checkBtn">중복 확인</button>
           </div>
-          <p class="err" id="su_idErr">아이디를 입력해주세요.</p>
+          <p class="err" id="su_idErr">아이디를 입력해 주세요.</p>
           <p class="ok-msg" id="su_idOk">사용 가능한 아이디입니다.</p>
         </div>
         <div class="field">
           <label for="su_name">이름 <span class="req">*</span></label>
-          <div class="input-shell"><input class="input" type="text" id="su_name" placeholder="이름을 입력해주세요." autocomplete="name" /></div>
-          <p class="err" id="su_nameErr">이름을 입력해주세요.</p>
+          <div class="input-shell"><input class="input" type="text" id="su_name" placeholder="이름을 입력해 주세요." autocomplete="name" /></div>
+          <p class="err" id="su_nameErr">이름을 입력해 주세요.</p>
         </div>
         <div class="field">
           <label for="su_email">이메일 <span class="req">*</span></label>
-          <div class="input-shell"><input class="input" type="email" id="su_email" placeholder="이메일을 입력해주세요." autocomplete="email" /></div>
+          <div class="input-shell"><input class="input" type="email" id="su_email" placeholder="이메일을 입력해 주세요." autocomplete="email" /></div>
           <p class="err" id="su_emailErr">올바른 이메일 형식이 아닙니다.</p>
         </div>
         <div class="field">
           <label for="su_pw">비밀번호 <span class="req">*</span></label>
           <div class="input-shell">
-            <input class="input" type="password" id="su_pw" placeholder="비밀번호를 입력해주세요." autocomplete="new-password" />
+            <input class="input" type="password" id="su_pw" placeholder="비밀번호를 입력해 주세요." autocomplete="new-password" />
             <button type="button" class="toggle-pw" data-target="su_pw" aria-label="비밀번호 표시"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
           <div class="pw-meter" id="pwMeter" hidden>
             <div class="pw-bars"><span></span><span></span><span></span><span></span></div>
             <span class="pw-label" id="pwLabel"></span>
           </div>
-          <p class="err" id="su_pwErr">비밀번호를 입력해주세요.</p>
+          <p class="err" id="su_pwErr">비밀번호를 입력해 주세요.</p>
         </div>
         <div class="field">
           <label for="su_pw2">비밀번호 확인 <span class="req">*</span></label>
           <div class="input-shell">
-            <input class="input" type="password" id="su_pw2" placeholder="비밀번호를 다시 입력해주세요." autocomplete="new-password" />
+            <input class="input" type="password" id="su_pw2" placeholder="비밀번호를 다시 입력해 주세요." autocomplete="new-password" />
             <button type="button" class="toggle-pw" data-target="su_pw2" aria-label="비밀번호 표시"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
           <p class="err" id="su_pw2Err">비밀번호가 일치하지 않습니다.</p>
         </div>
 
-        <button type="submit" class="btn" id="signupBtn" disabled><span class="spinner"></span><span class="btn-label">가입 신청</span></button>
+        <button type="submit" class="btn" id="signupBtn"><span class="spinner"></span><span class="btn-label">가입 신청</span></button>
 
         <div class="links single">이미 계정이 있으신가요? <a id="toLogin">로그인</a></div>
         <p class="copyright">© 2025 OKESTRO Co., Ltd. All Rights Reserved.</p>
@@ -424,7 +437,7 @@
     <button data-case="locked">계정 잠금</button>
     <button data-case="expired">세션 만료</button>
     <button data-case="temppw">임시 비밀번호</button>
-    <!-- ── SSO ── 프론트가 새로 만들 단위만 모았다. 실제 화면에는 없는 검토용 처리다.
+    <!-- ── SSO ── 새로 구현할 화면 단위만 모았다. 실제 화면에는 없는 검토용 처리다.
          ① 진입점 노출 — 플랫폼 설정의 인증 기관 연결 여부로 갈린다. 접속한 사람의 속성이 아니다
          ② 로그인 취소. 인증 서버가 오류로 돌려보냈을 때(사용자 취소 포함)의 배너
          ③ SSO 사용 불가. 최고 관리자 이메일로 인증이 들어왔을 때의 배너
@@ -432,7 +445,7 @@
          돌아온 직후의 처리 중 화면은 두지 않는다(v0.24). 결과에 따라 바로 이동한다
          SSO 로 들어와 승인 대기·비활성·반려로 막히는 경우는 케이스를 따로 두지 않았다.
          기획서 5.2 가 비밀번호 경로와 같은 문구를 쓰도록 정해 왼쪽 케이스가 그대로 그 화면이다 —
-         프론트가 새로 만들 것이 없다 -->
+         새로 구현할 것이 없다 -->
     <span class="demo-label" style="margin-left:12px;">SSO 진입점:</span>
     <button data-sso="off" class="on">미노출</button>
     <button data-sso="on">노출</button>
@@ -499,7 +512,7 @@
           <div class="pw-bars"><span></span><span></span><span></span><span></span></div>
           <span class="pw-label" id="fpLabel"></span>
         </div>
-        <p class="err" id="fp_newErr">비밀번호를 입력해주세요.</p>
+        <p class="err" id="fp_newErr">새 비밀번호를 입력해 주세요.</p>
         <p class="hint" style="font-size:12px;color:var(--muted);margin:7px 0 0">8~64자, 영문 대·소문자·숫자·특수문자 중 3종 이상. 아이디·현재 비밀번호와 동일하거나 연속·반복 문자는 사용할 수 없습니다.</p>
       </div>
       <div class="field">
@@ -508,7 +521,7 @@
       
         <p class="err" id="fp_new2Err">비밀번호가 일치하지 않습니다.</p>
       </div>
-      <div class="modal-actions"><button type="button" class="modal-ok" id="fpOk" disabled>변경</button></div>
+      <div class="modal-actions"><button type="button" class="modal-ok" id="fpOk">변경</button></div>
     </div>
   </div>
 
@@ -607,8 +620,8 @@
   // ── ① 로그인 (버튼 항상 활성 + 미입력 인라인 에러 7.8, 통합 실패 9.1) ──
   const li_id=$('li_id'), li_pw=$('li_pw'), loginBtn=$('loginBtn'), formError=$('formError');
   function vLi(el,errId,msg){ const v=!!el.value.trim(); if(!v){el.classList.add('has-error');const e=$(errId);e.textContent=msg;e.classList.add('show');}else{el.classList.remove('has-error');$(errId).classList.remove('show');} return v; }
-  li_id.addEventListener('blur', ()=>vLi(li_id,'li_idErr','아이디를 입력해주세요.'));
-  li_pw.addEventListener('blur', ()=>vLi(li_pw,'li_pwErr','비밀번호를 입력해주세요.'));
+  li_id.addEventListener('blur', ()=>vLi(li_id,'li_idErr','아이디를 입력해 주세요.'));
+  li_pw.addEventListener('blur', ()=>vLi(li_pw,'li_pwErr','비밀번호를 입력해 주세요.'));
   [li_id,li_pw].forEach(el=>el.addEventListener('input', ()=>{ el.classList.remove('has-error'); $(el.id+'Err').classList.remove('show'); }));
   // 회원가입·비밀번호 재설정을 다녀오면 로그인 입력값을 초기화한다(입력 잔존 방지).
   function resetLogin(){
@@ -619,7 +632,7 @@
   }
   $('loginView').addEventListener('submit', e=>{
     e.preventDefault(); formError.classList.remove('show');
-    const okId=vLi(li_id,'li_idErr','아이디를 입력해주세요.'), okPw=vLi(li_pw,'li_pwErr','비밀번호를 입력해주세요.');
+    const okId=vLi(li_id,'li_idErr','아이디를 입력해 주세요.'), okPw=vLi(li_pw,'li_pwErr','비밀번호를 입력해 주세요.');
     if(!okId){ li_id.focus(); return; } if(!okPw){ li_pw.focus(); return; }
     loginBtn.classList.add('loading'); loginBtn.disabled=true;
     setTimeout(()=>{ loginBtn.classList.remove('loading'); loginBtn.disabled=false; formError.classList.add('show'); }, 1100);
@@ -630,8 +643,8 @@
   const signupBtn=$('signupBtn'), checkBtn=$('checkBtn'), su_idOk=$('su_idOk');
   let idChecked=false; const emailRe=/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
   function idError(v){                                                    // 아이디 규칙별 유효성 (계정 정책 2.1)
-    if(!v) return '아이디를 입력해주세요.';
-    if(v.length<4) return '4자 이상 입력해주세요.';
+    if(!v) return '아이디를 입력해 주세요.';
+    if(v.length<4) return '4자 이상 입력해 주세요.';
     if(v.length>20) return '20자까지 입력할 수 있습니다.';
     if(!/^[a-z0-9._-]+$/.test(v)) return '영문 소문자·숫자와 특수문자(_ - .)만 사용할 수 있습니다.';
     if(/^[._-]|[._-]$/.test(v)) return '아이디는 특수문자로 시작하거나 끝날 수 없습니다.';
@@ -647,7 +660,7 @@ const MAIL_TAKEN=['admin@okestro.com'];
 function vEmail(){
   const v=su_email.value.trim();
   const e=$('su_emailErr');
-  if(!v){ e.textContent='이메일을 입력해주세요.'; showErr(su_email,'su_emailErr',true); return false; }
+  if(!v){ e.textContent='이메일을 입력해 주세요.'; showErr(su_email,'su_emailErr',true); return false; }
   if(!emailRe.test(v)){ e.textContent='올바른 이메일 형식이 아닙니다.'; showErr(su_email,'su_emailErr',true); return false; }
   if(MAIL_TAKEN.indexOf(v.toLowerCase())>=0){
     e.textContent='이미 사용 중인 이메일입니다.'; showErr(su_email,'su_emailErr',true); return false;
@@ -671,9 +684,9 @@ function vEmail(){
   function pwBanned(v){ return pwHasRun(v) || pwSameAsId(v); }
   // 규칙별 유효성 문구 (계정 정책 2.2)
   function pwError(v){
-    if(!v) return '비밀번호를 입력해주세요.';
-    if(/[^\x21-\x7E]/.test(v)) return '비밀번호에 사용할 수 없는 문자가 있습니다. (한글·공백·이모지 불가)';
-    if(v.length<8) return '8자 이상 입력해주세요.';
+    if(!v) return '비밀번호를 입력해 주세요.';
+    if(/[^\x21-\x7E]/.test(v)) return '영문·숫자·특수문자만 사용할 수 있습니다.';
+    if(v.length<8) return '8자 이상 입력해 주세요.';
     if(v.length>64) return '64자까지 입력할 수 있습니다.';
     if(pwKinds(v)<3) return '영문 대문자·소문자·숫자·특수문자 중 3종 이상을 포함해야 합니다.';
     if(pwSameAsId(v)) return '아이디와 동일한 비밀번호는 사용할 수 없습니다.';
@@ -699,12 +712,8 @@ function vEmail(){
     su_pw.classList.remove('has-error'); e.classList.remove('show'); return true;
   }
   function vPw2(){ const ok=su_pw2.value!=='' && su_pw2.value===su_pw.value; showErr(su_pw2,'su_pw2Err',!ok); return ok; }
-  /* 중복이면 등록 버튼을 활성화하지 않는다(계정정책 2.1·2.3) */
-  function mailOk(){ const v=su_email.value.trim(); return emailRe.test(v) && MAIL_TAKEN.indexOf(v.toLowerCase())<0; }
-  function refreshBtn(){
-    signupBtn.disabled = !(su_id.value.trim() && idChecked && su_name.value.trim()
-      && mailOk() && pwLevel(su_pw.value)>=2 && su_pw2.value!=='' && su_pw2.value===su_pw.value);
-  }
+  /* 가입 신청은 입력 상태와 무관하게 활성이다(공통정책 7.1). 검증은 제출 시 submit 핸들러가 한다(7.8) */
+  function refreshBtn(){ signupBtn.disabled = false; }
   // 뷰 전환·제출 후 회원가입 폼 초기화 (입력 잔존·비밀번호 잔류 방지)
   function resetSignup(){
     ['su_id','su_name','su_email','su_pw','su_pw2'].forEach(id=>{ const el=$(id); if(el){ el.value=''; el.classList.remove('has-error','is-ok'); } });
@@ -727,7 +736,7 @@ function vEmail(){
     e.preventDefault();
     const rId=vSuId(), rName=vName(), rEmail=vEmail(), rPw=vPw(), rPw2=vPw2();
     if(!rId){ su_id.focus(); return; }
-    if(!idChecked){ const el=$('su_idErr'); el.textContent='아이디 중복 확인을 해주세요.'; el.classList.add('show'); su_id.classList.add('has-error'); su_id.focus(); return; }
+    if(!idChecked){ const el=$('su_idErr'); el.textContent='아이디 중복 확인을 해 주세요.'; el.classList.add('show'); su_id.classList.add('has-error'); su_id.focus(); return; }
     if(!rName){ su_name.focus(); return; } if(!rEmail){ su_email.focus(); return; }
     if(!rPw){ su_pw.focus(); return; } if(!rPw2){ su_pw2.focus(); return; }
     signupBtn.classList.add('loading'); signupBtn.disabled=true;
@@ -887,19 +896,18 @@ function vEmail(){
     });
   });
   /* 변경을 마치면 모달이 닫히고 원래 목적지로 간다. 닫기·취소는 두지 않는다 */
-  /* 세 필드가 모두 유효할 때만 변경을 활성화한다(공통정책 7.1).
+  /* 변경은 입력 상태와 무관하게 활성이다(공통정책 7.1). 누르면 세 필드를 모두 검증한다(fpSubmit).
      새 비밀번호는 강도 `안전` 이상이어야 하고 확인값과 같아야 한다(계정정책 2.2) */
   /* 규칙 문구는 계정정책 2.2 를 그대로 쓴다. 아이디 비교 대상만 로그인 아이디로 바꾼다 */
   function fpPwError(v){
-    if(!v) return '비밀번호를 입력해주세요.';
-    if(/[^\x21-\x7E]/.test(v)) return '비밀번호에 사용할 수 없는 문자가 있습니다. (한글·공백·이모지 불가)';
-    if(v.length<8) return '8자 이상 입력해주세요.';
+    if(!v) return '새 비밀번호를 입력해 주세요.';
+    if(/[^\x21-\x7E]/.test(v)) return '영문·숫자·특수문자만 사용할 수 있습니다.';
+    if(v.length<8) return '8자 이상 입력해 주세요.';
     if(v.length>64) return '64자까지 입력할 수 있습니다.';
     if(pwKinds(v)<3) return '영문 대문자·소문자·숫자·특수문자 중 3종 이상을 포함해야 합니다.';
     const id=$('li_id').value.trim();
     if(id && v.toLowerCase()===id.toLowerCase()) return '아이디와 동일한 비밀번호는 사용할 수 없습니다.';
-    if(pwHasRun(v)) return '동일하거나 연속된 문자·숫자는 사용할 수 없습니다.';
-    if(pwLevel(v)<2) return '안전 이상의 비밀번호를 사용해 주세요.';
+    if(pwHasRun(v)) return '동일하거나 연속된 문자·숫자는 4자 이상 사용할 수 없습니다.';
     return '';
   }
   function fpShowErr(fid, msg){
@@ -914,8 +922,18 @@ function vEmail(){
     if(!msg && nw && cur && nw===cur) msg='현재 비밀번호와 다른 비밀번호를 입력해 주세요.';
     fpShowErr('fp_new', msg);
     fpShowErr('fp_new2', (nw2 && nw!==nw2)? '비밀번호가 일치하지 않습니다.' : '');
-    const ok = cur!=='' && nw!=='' && !msg && nw===nw2;
-    $('fpOk').disabled = !ok;
+  }
+  /* 제출 시 전체 검증. 실패한 필드마다 인라인 에러, 첫 오류 필드로 포커스(공통정책 7.8) */
+  function fpSubmit(){
+    const cur=$('fp_cur').value, nw=$('fp_new').value, nw2=$('fp_new2').value;
+    const eCur = cur? '' : '현재 비밀번호를 입력해 주세요.';
+    let eNew = fpPwError(nw);
+    if(!eNew && cur && nw===cur) eNew='현재 비밀번호와 다른 비밀번호를 입력해 주세요.';
+    const eNew2 = (nw2!=='' && nw2===nw)? '' : '비밀번호가 일치하지 않습니다.';
+    fpShowErr('fp_cur', eCur); fpShowErr('fp_new', eNew); fpShowErr('fp_new2', eNew2);
+    const first = eCur? 'fp_cur' : eNew? 'fp_new' : eNew2? 'fp_new2' : '';
+    if(first){ $(first).focus(); return false; }
+    return true;
   }
   ['fp_cur','fp_new','fp_new2'].forEach(k=>{
     $(k).addEventListener('input', ()=>{
@@ -930,9 +948,10 @@ function vEmail(){
   /* 변경을 마치면 모달이 닫히고 원래 목적지로 이동한다.
      이 목업에는 홈이 없어 로그인 화면에 남는다 — 이동은 실제 화면에서 일어난다 */
   $('fpOk').addEventListener('click', ()=>{
+    if(!fpSubmit()) return;
     $('pwForceModal').classList.remove('show');
     ['fp_cur','fp_new','fp_new2'].forEach(k=>{ $(k).value=''; });
-    $('fpMeter').hidden=true; $('fpOk').disabled=true;
+    $('fpMeter').hidden=true;
     ['fp_cur','fp_new','fp_new2'].forEach(k=>fpShowErr(k,''));
     showToast('비밀번호를 변경했습니다.');
   });
