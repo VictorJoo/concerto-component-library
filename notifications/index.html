@@ -1,7 +1,14 @@
 <!doctype html>
 <!--
-  콘체르토 매니저 — 알림 목업 v0.15 (2026-10-27)
+  콘체르토 매니저 — 알림 목업 v0.16 (2026-10-28)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다.
+
+  ── v0.16 (2026-10-28) ─────────────────────────────
+  · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다).
+  SYS-NOTI-L01 v0.16 과 같은 버전이다. 기획서는 품질 검토 문구 정리(REQ-NOTI-062 · 5.1 · 5.2 · 5.4 · 6장)다.
+  · 10-28 재검증 정정. 규칙 알림 샘플 제목 `SRAM 임계 초과 임계값 초과가 감지되었습니다` 가 겹쳐 읽혀, 값이 0 또는 1인 항목은
+    `{메트릭} 상태가 감지되었습니다` 로 쓰도록 알림 정책 5.4 를 고치고 샘플도 맞췄다.
+  · 모두 읽음 비활성(읽지 않은 알림 없음) 사유를 title 대신 라이브러리 v0.25 사유 툴팁(.dis-tip)으로(공통정책 7.10).
 
   ── v0.15 (2026-10-27) ─────────────────────────────
   SYS-NOTI-L01 v0.15 와 같은 버전이다. 근거는 알림 정책 v0.18 5.6(결정 사항 댓글 3502670009).
@@ -1831,6 +1838,21 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 /* 비활성 사유 툴팁 — 라이브러리 .tip 과 같은 값(목업 공통 처리) */
 .distip{position:fixed;z-index:200;display:none;background:var(--flyout);color:var(--foreground);border:1px solid var(--border-strong);font-size:12px;font-weight:400;line-height:1.5;padding:8px 11px;border-radius:7px;box-shadow:0 6px 18px var(--shadow);max-width:340px;white-space:normal;text-align:left;pointer-events:none}
 
+
+/* 비활성 사유 툴팁 — 컴포넌트 라이브러리 v0.25 .dis-tip 그대로(공통정책 4.7 · 7.10).
+   비활성 버튼은 호버 · 포커스를 받지 않아 감싼 요소를 앵커로 두고 tabindex="0" 을 준다. title 은 쓰지 않는다 */
+.tip-anchor.dis-tip{margin-left:0;cursor:not-allowed;border-radius:8px}
+.dis-tip:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring) 25%,transparent)}
+.dis-tip > :disabled{pointer-events:none}
+.dis-tip .tip{white-space:normal;width:max-content;max-width:280px;left:0;transform:translateY(4px)}
+.dis-tip:hover .tip,.dis-tip:focus-within .tip{transform:translateY(0)}
+.dis-tip .tip::after{left:14px;transform:none}
+/* 오른쪽 끝 버튼은 툴팁이 화면 밖으로 나가지 않게 오른쪽 기준으로 연다(라이브러리 v0.25 .dis-tip.flip) */
+.dis-tip.flip .tip{left:auto;right:0}
+.dis-tip.flip .tip::after{left:auto;right:14px}
+/* 행 더보기 메뉴 안에서는 감싼 요소가 줄 전체를 차지한다 — 메뉴 항목 폭이 그대로다 */
+.rowmenu .tip-anchor.dis-tip{display:flex}
+.rowmenu .tip-anchor.dis-tip > button{flex:1}
 </style><body class="dark">
 <div class="app">
 
@@ -1936,6 +1958,25 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 </div>
 
 <script>
+/* 비활성 사유 툴팁(라이브러리 v0.25 .dis-tip). 사유 문구는 HTML 로 넣지 않는다 */
+function disTipEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function disTip(inner, why){ return '<span class="tip-anchor dis-tip" tabindex="0">'+inner+'<span class="tip">'+disTipEsc(why)+'</span></span>'; }
+function disTipFit(e){
+  const a=e.target && e.target.closest && e.target.closest('.dis-tip'); if(!a) return;
+  const t=a.querySelector('.tip'); if(!t) return;
+  a.classList.remove('flip'); t.style.left=''; t.style.right='';
+  const r=a.getBoundingClientRect(), w=Math.min(280,t.scrollWidth), vw=window.innerWidth;
+  if(r.left+w+8<=vw) return;
+  /* 화면별 툴팁 위치 규칙이 left 를 덮어쓰는 자리가 있어 인라인으로 둔다 */
+  if(r.right-w>=8){ a.classList.add('flip'); t.style.left='auto'; t.style.right='0'; return; }
+  /* 양쪽 다 모자라면(좁은 화면) 화면 안 8px 여백에 맞춘다 */
+  t.style.left=Math.max(8-r.left, vw-8-w-r.left)+'px';
+}
+document.addEventListener('focusin', disTipFit, true);
+document.addEventListener('mouseover', disTipFit, true);
+
+function disTipIf(inner, why){ return why? disTip(inner, why) : inner; }
+
 /* ══════════ 데이터 ══════════
    알림 정책 3장 사건 목록에서 가져온다. 목업이 `알림으로 안내됩니다` 로
    약속한 사건만 둔다 — 화면이 말한 것과 정책이 정한 것을 어긋나지 않게 한다.
@@ -2006,7 +2047,7 @@ const NOTI=[
   at:'2026-08-26 10:27:51', to:'배포', ws:'ai-service-team', read:true, mine:true},
 
  /* 규칙 알림. 제목은 {메트릭} 임계값 초과가 감지되었습니다(미만이면 미만이), Xid는 GPU Xid 오류가 발생했습니다다(알림 정책 5.4).
-    본문은 알림 정책 5.4 형식 그대로다. 값이 0 또는 1인 항목(SRAM 임계 초과)은 제목이 어색하게 읽혀 확인 대상이다 */
+    본문은 알림 정책 5.4 형식 그대로다. 값이 0 또는 1인 항목(SRAM 임계 초과)은 제목도 임계값 문구 없이 {메트릭} 상태가 감지되었습니다다(알림 정책 5.4 10-28 개정) */
  {sev:'주의', cat:'모니터링', t:'첫 토큰 지연 P95 임계값 초과가 감지되었습니다',
   b:'llama-3-2-1b-prod · 첫 토큰 지연 P95 3,000ms 초과 상태가 5분 동안 이어졌습니다.',
   at:'2026-08-25 14:02:30', to:'배포', ws:'ai-service-team', read:true, mine:true},
@@ -2019,7 +2060,7 @@ const NOTI=[
  {sev:'주의', cat:'모니터링', t:'GPU 열·전력 제한 비율 임계값 초과가 감지되었습니다',
   b:'gpu-svr-02 슬롯 1 · GPU 열·전력 제한 비율 0.3 초과 상태가 10분 동안 이어졌습니다.',
   at:'2026-08-26 19:40:00', to:'모니터링', ws:'-', read:true, admin:true},
- {sev:'오류', cat:'모니터링', t:'SRAM 임계 초과 임계값 초과가 감지되었습니다',
+ {sev:'오류', cat:'모니터링', t:'SRAM 임계 초과 상태가 감지되었습니다',
   b:'gpu-svr-02 슬롯 3 · SRAM 임계 초과 상태가 3분 동안 이어졌습니다.',
   at:'2026-08-26 04:12:00', to:'모니터링', ws:'-', read:true, admin:true},
  {sev:'주의', cat:'모니터링', t:'노드 디스크 사용률 임계값 초과가 감지되었습니다',
@@ -2369,7 +2410,7 @@ function drawList(){
     $('listArea').innerHTML='<div class="state">'
      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>'
      + '<h3>데이터를 불러오지 못했습니다.</h3><p>잠시 후 다시 시도해 주세요.</p>'
-     + '<button class="btn ghost" onclick="setState(\'default\')">다시 시도</button></div>';
+     + '<button class="btn ghost" onclick="setState(\'default\')">재시도</button></div>';
     $('pager').innerHTML=''; return;
   }
 
@@ -2469,9 +2510,8 @@ function toolbar(){
    + '<button class="cbtn" title="다운로드" onclick="dlNoti()">'
    +   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">'
    +   '<path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg></button>'
-   + '<button class="btn ghost"'
-   +   (n? ' onclick="askAllRead()"' : ' disabled title="읽지 않은 알림이 없습니다."')
-   +   '>모두 읽음</button>'
+   + (n? '<button class="btn ghost" onclick="askAllRead()">모두 읽음</button>'
+       : disTip('<button class="btn ghost" disabled>모두 읽음</button>', '읽지 않은 알림이 없습니다.'))
    + '</div>'
    /* 선택한 것이 있을 때만 띄운다. 늘 두면 아무것도 안 고른 상태에서 누를 것이 없다 */
    /* 건수는 바로 앞 `N건 선택` 에 있다. 버튼에 또 적지 않는다.
