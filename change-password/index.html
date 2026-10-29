@@ -5,7 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>콘체르토 매니저 · 마이페이지 — 비밀번호 변경 모달</title>
 <!--
-  콘체르토 매니저 · 비밀번호 변경 모달 목업 v0.14 (2026-10-20)
+  콘체르토 매니저 · 비밀번호 변경 모달 목업 v0.15 (2026-10-28)
+
+  ── v0.15 (2026-10-28) ──
+  · 10-28 재검증 정정(3차). 프로필 팝오버 계정 정보에 아이디를 더해 공통 레이아웃 v0.13 과 같게(이름 · 아이디 · 이메일, REQ-CM-LAYOUT-021).
+  · 10-28 재검증 정정(2차). 허용되지 않은 문자 문구를 계정 정책 2.2 · 기획서 5.1 표 그대로 `영문·숫자·특수문자만 사용할 수 있습니다.` 로.
+  · 10-28 검증 정정. 플레이스홀더 · 에러 문구의 `입력해주세요` 를 `입력해 주세요` 로(계정 정책 2.2 · 로그인 강제 변경과 같은 표기).
+    기획서 5.1 유효성 안내 표도 같은 문구로 고친다(표는 남긴다).
+  · [변경] 버튼을 입력 상태와 무관하게 활성으로 둔다(공통정책 7.1). 누르면 세 필드를 모두 검증해
+    실패한 필드마다 인라인 에러를 보이고 첫 오류 필드로 포커스한다(7.8). 검증 함수와 문구는 기존
+    vCur · vNew · vNew2 를 그대로 쓴다. 종전에는 세 필드가 모두 유효해야 버튼이 켜져, 한 번도 포커스하지
+    않은 필드는 에러가 뜨지 않아 왜 누를 수 없는지 알 수 없었다.
 
   ── v0.14 (2026-10-20) ──
   · 플랫폼 설정 플라이아웃을 5메뉴로 맞췄다(사용자 및 역할 · 보안 및 감사 · 인프라 자원 · 카탈로그 ·
@@ -106,7 +116,7 @@
   .pm-head .av{width:32px;height:32px;flex:0 0 auto}
   .pm-who{line-height:1.35;min-width:0}
   .pm-who b{font-size:13px;display:block}
-  .pm-who span{font-size:11px;color:var(--faint);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pm-who span{font-size:11px;color:var(--muted-foreground);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .pmenu .theme{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;font-size:13px;color:var(--muted);cursor:pointer}
   .toggle{width:38px;height:20px;border-radius:11px;background:var(--card-2);border:1px solid var(--border);position:relative;transition:.15s;flex:0 0 auto}
   .toggle::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--faint);transition:.15s}
@@ -285,7 +295,7 @@
         <div class="pmenu">
           <div class="pm-head">
             <span class="av">유</span>
-            <div class="pm-who"><b>성유진</b><span>yj.seong@okestro.com</span></div>
+            <div class="pm-who"><b>성유진</b><span>yj.seong</span><span>yj.seong@okestro.com</span></div>
           </div>
           <hr>
           <a href="#" onclick="go('mypage');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0114 0"/></svg>마이페이지</a>
@@ -323,25 +333,25 @@
         <div class="field">
           <label for="cur_pw">현재 비밀번호 <span class="req">*</span></label>
           <div class="input-shell">
-            <input class="input" type="password" id="cur_pw" placeholder="현재 비밀번호를 입력해주세요." autocomplete="current-password">
+            <input class="input" type="password" id="cur_pw" placeholder="현재 비밀번호를 입력해 주세요." autocomplete="current-password">
             <button type="button" class="toggle-pw" data-target="cur_pw" aria-label="비밀번호 표시"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
-          <p class="err" id="cur_pwErr">현재 비밀번호를 입력해주세요.</p>
+          <p class="err" id="cur_pwErr">현재 비밀번호를 입력해 주세요.</p>
         </div>
         <div class="field">
           <label for="new_pw">새 비밀번호 <span class="req">*</span></label>
           <div class="input-shell">
-            <input class="input" type="password" id="new_pw" placeholder="새 비밀번호를 입력해주세요." autocomplete="new-password">
+            <input class="input" type="password" id="new_pw" placeholder="새 비밀번호를 입력해 주세요." autocomplete="new-password">
             <button type="button" class="toggle-pw" data-target="new_pw" aria-label="비밀번호 표시"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
           <div class="pw-meter" id="pwMeter" hidden><div class="pw-bars"><span></span><span></span><span></span><span></span></div><span class="pw-label" id="pwLabel"></span></div>
-          <p class="err" id="new_pwErr">새 비밀번호를 입력해주세요.</p>
+          <p class="err" id="new_pwErr">새 비밀번호를 입력해 주세요.</p>
           <p class="hint">8~64자, 영문 대·소문자·숫자·특수문자 중 3종 이상. 아이디·현재 비밀번호와 동일하거나 연속·반복 문자는 사용할 수 없습니다.</p>
         </div>
         <div class="field">
           <label for="new_pw2">새 비밀번호 확인 <span class="req">*</span></label>
           <div class="input-shell">
-            <input class="input" type="password" id="new_pw2" placeholder="새 비밀번호를 다시 입력해주세요." autocomplete="new-password">
+            <input class="input" type="password" id="new_pw2" placeholder="새 비밀번호를 다시 입력해 주세요." autocomplete="new-password">
             <button type="button" class="toggle-pw" data-target="new_pw2" aria-label="비밀번호 표시"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
           <p class="err" id="new_pw2Err">비밀번호가 일치하지 않습니다.</p>
@@ -349,7 +359,7 @@
       </div>
       <div class="modal__foot">
         <button type="button" class="btn-default" onclick="closePwModal()">취소</button>
-        <button type="submit" class="btn-primary" id="saveBtn" disabled><span class="spinner"></span><span>변경</span></button>
+        <button type="submit" class="btn-primary" id="saveBtn"><span class="spinner"></span><span>변경</span></button>
       </div>
     </form>
   </div>
@@ -514,7 +524,7 @@ function pwHasRun(v){
 }
 function pwSameAsId(v){ return v.toLowerCase()===MOCK_ID.toLowerCase(); }
 function pwRuleError(v){
-  if(v.length<8) return '8자 이상 입력해주세요.';
+  if(v.length<8) return '8자 이상 입력해 주세요.';
   if(v.length>64) return '64자까지 입력할 수 있습니다.';
   if(pwKinds(v)<3) return '영문 대문자·소문자·숫자·특수문자 중 3종 이상을 포함해야 합니다.';
   if(pwSameAsId(v)) return '아이디와 동일한 비밀번호는 사용할 수 없습니다.';
@@ -524,19 +534,20 @@ function pwRuleError(v){
 function pwLevel(v){ if(!v || /[^\x21-\x7E]/.test(v)) return 0; var k=pwKinds(v); if(v.length<8 || pwHasRun(v) || pwSameAsId(v)) return 0; if(k<3) return 1; if(v.length>=12 && k>=4) return 3; return 2; }   // \x21-\x7E: 공백(0x20)·비ASCII 불허
 function updateMeter(){ var v=new_pw.value; if(!v){ pwMeter.hidden=true; return; } var lv=pwLevel(v); pwMeter.hidden=false; pwMeter.dataset.level=lv; pwLabel.textContent=PW_LABELS[lv]; }
 
-function vCur(){ var v=cur_pw.value; if(!v){ showPwErr(cur_pw,'cur_pwErr',true,'현재 비밀번호를 입력해주세요.'); return false; } showPwErr(cur_pw,'cur_pwErr',false); return true; }
+function vCur(){ var v=cur_pw.value; if(!v){ showPwErr(cur_pw,'cur_pwErr',true,'현재 비밀번호를 입력해 주세요.'); return false; } showPwErr(cur_pw,'cur_pwErr',false); return true; }
 function vNew(){
   var v=new_pw.value;
-  if(!v){ showPwErr(new_pw,'new_pwErr',true,'새 비밀번호를 입력해주세요.'); return false; }
-  if(/[^\x21-\x7E]/.test(v)){ showPwErr(new_pw,'new_pwErr',true,'비밀번호에 사용할 수 없는 문자가 있습니다. (한글·공백·이모지 불가)'); return false; }
-  if(cur_pw.value && v===cur_pw.value){ showPwErr(new_pw,'new_pwErr',true,'현재 비밀번호와 다른 비밀번호를 입력해주세요.'); return false; }
+  if(!v){ showPwErr(new_pw,'new_pwErr',true,'새 비밀번호를 입력해 주세요.'); return false; }
+  if(/[^\x21-\x7E]/.test(v)){ showPwErr(new_pw,'new_pwErr',true,'영문·숫자·특수문자만 사용할 수 있습니다.'); return false; }
+  if(cur_pw.value && v===cur_pw.value){ showPwErr(new_pw,'new_pwErr',true,'현재 비밀번호와 다른 비밀번호를 입력해 주세요.'); return false; }
   if(RECENT.indexOf(v)>=0){ showPwErr(new_pw,'new_pwErr',true,'최근 사용한 비밀번호는 재사용할 수 없습니다.'); return false; }
   var rule=pwRuleError(v);
   if(rule){ showPwErr(new_pw,'new_pwErr',true,rule); return false; }
   showPwErr(new_pw,'new_pwErr',false); return true;
 }
 function vNew2(){ var ok=new_pw2.value!=='' && new_pw2.value===new_pw.value; showPwErr(new_pw2,'new_pw2Err',!ok,'비밀번호가 일치하지 않습니다.'); return ok; }
-function refreshPwBtn(){ var v=new_pw.value; saveBtn.disabled = !(cur_pw.value && pwLevel(v)>=2 && v!==cur_pw.value && RECENT.indexOf(v)<0 && new_pw2.value!=='' && new_pw2.value===new_pw.value); }
+/* 입력 상태와 무관하게 활성(공통정책 7.1). 검증은 제출 시 submit 핸들러가 한다(7.8) */
+function refreshPwBtn(){ saveBtn.disabled = false; }
 
 cur_pw.addEventListener('input', function(){ showPwErr(cur_pw,'cur_pwErr',false); updateMeter(); refreshPwBtn(); });
 cur_pw.addEventListener('blur', vCur);
