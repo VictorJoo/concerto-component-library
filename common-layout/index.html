@@ -1,7 +1,19 @@
 <!doctype html>
 <!--
-  콘체르토 매니저 — 공통 레이아웃 v0.12 (2026-10-20)
+  콘체르토 매니저 — 공통 레이아웃 v0.13 (2026-10-28)
   색·토큰 기준은 워크스페이스 목업 v0.2 를 정본으로 삼아 맞춘다.
+
+  v0.13 (2026-10-28)
+    · 10-28 재검증 정정(2차). 둘째 주석 머리의 전달 대상 표기를 지웠다(주석에 직위 · 사람을 쓰지 않는다).
+    · 프로필 팝오버 계정 정보에 이메일을 더했다. 계정 정보는 이름 첫 글자 아바타 · 이름 · 아이디 ·
+      이메일이다(공통 레이아웃 기획서 REQ-CM-LAYOUT-021). 아바타는 이름 첫 글자다. 프로필 이미지를
+      등록하는 기능이 없다(마이페이지 기획서 · 계정 정책).
+    · 팝오버 구성(마이페이지 · 비밀번호 변경 · 언어 · 다크 테마 · 로그아웃)은 그대로다. 개인 설정은
+      프로필 팝오버에서 바꾼다(2026-07-16 서비스파트 주간회의 Ⅰ.3 · 공통정책 6.2 · 계정 정책 2.2).
+      기획서 6.2 미결정의 1안 / 2안을 1안으로 닫았다(안건 69).
+    · 비밀번호가 없는 계정은 팝오버의 비밀번호 변경을 노출하지 않는다(계정 정책 2.2). 이 목업의 샘플
+      계정은 비밀번호가 있는 계정이라 화면 변화는 없다.
+    · 본문 줄바꿈을 컴포넌트 라이브러리 v0.25 에 맞췄다 — word-break: keep-all + overflow-wrap: break-word.
 
   v0.12
     · 기획서 v0.12와 번호를 맞췄다. 내용은 v0.4와 같다. 기획서 첨부본이 v0.2 내용으로
@@ -33,12 +45,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>콘체르토 매니저 · 공통 레이아웃 (v0.12)</title>
+<title>콘체르토 매니저 · 공통 레이아웃 (v0.13)</title>
 <!--
-  콘체르토 매니저 — 공통 레이아웃 (프론트 핸드오프용)
+  콘체르토 매니저 — 공통 레이아웃
   · 컴포넌트 라이브러리 v0.2 색상 토큰에 맞춤. (: 라이브러리에 없던 레이아웃 전용 색 sidebar·flyout·border-soft·faint·active를 기존 라이브러리 토큰으로 치환 — 모든 색이 라이브러리 역할 토큰만 참조)
   · 치환 매핑: sidebar·header(크롬)→card(흰 크롬), flyout→card, border-soft→border, faint→muted-foreground, active(선택)→border, 메뉴 hover·칩→card-2(muted). 본문 캔버스만 background. 라이브러리 밖 색 제거.
-  · 언어·테마 위치: 1안(프로필 팝오버) 확정 반영.
+  · 언어·테마 위치: 1안(프로필 팝오버) 확정 반영(2026-07-16 서비스파트 주간회의 Ⅰ.3).
   · 프로토타입 비교 요소(안 토글·변경요소 표시·TO-BE 마킹) 제거.
   · GNB 키비주얼: 제공된 키비주얼 이미지 기준 CSS 재현(디자인 확정 시 교체).
   · 실제 아이콘·간격·모션은 디자인 라이브러리로 확정. 본 파일은 구조·배치 전달용.
@@ -80,7 +92,7 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
-  body{background:var(--background);color:var(--foreground);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  body{background:var(--background);color:var(--foreground);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:break-word}
   button{font-family:inherit;color:inherit;cursor:pointer}
   .app{display:grid;grid-template-columns:var(--gnb-w) 1fr;grid-template-rows:var(--header-h) 1fr;height:calc(100vh - 46px);overflow:hidden;grid-template-areas:"brand header" "gnb main"}
 
@@ -311,7 +323,7 @@
         <div class="pmenu">
           <div class="pm-head">
             <span class="av">유</span>
-            <div class="pm-who"><b>성유진</b><span>yj.seong</span></div>
+            <div class="pm-who"><b>성유진</b><span>yj.seong</span><span>yj.seong@okestro.com</span></div>
           </div>
           <hr>
           <a href="#" onclick="go('mypage');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0114 0"/></svg><span class="lb">마이페이지</span></a>
