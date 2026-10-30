@@ -1,5 +1,12 @@
 <!--
-  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.31 (2026-10-28)
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.32 (2026-10-30)
+
+  ── v0.32 (2026-10-30) ──
+  · 개발룸 기획서 v0.32 · CDE 정책 v0.32 와 같은 버전이다.
+  · 작업 잔여 자원 기준 정정(CDE 정책 2.3 · 4.7 — CDE-JOB-HEADROOM-1). CDE는 켜져 있는 동안 신청한 CPU · Memory의 4분의 1을 쓰고, 작업은 그 나머지 범위에서 실행된다.
+    CDE 신청 자원 칸 아래 보조 문구 `CDE가 켜져 있는 동안 CPU {n} Cores · Memory {n} Gi를 씁니다. 작업은 나머지 범위에서 실행됩니다.` — 입력값에 따라 바뀐다(개발룸 기획서 7.3).
+    CDE 상세 자원 섹션 도움말 `작업에 쓸 수 있는 양은 CPU {n} Cores · Memory {n} Gi입니다. 배정값에서 CDE가 쓰는 양과 실행 중인 작업을 뺀 값입니다.`(7.2).
+    상세 값은 백엔드 응답으로 받을 값이다. 목업은 배정값의 4분의 3에서 실행 중인 작업 몫을 빼지 않은 검토용 값이다. 회수된 CDE에는 두지 않는다.
 
   ── v0.31 (2026-10-28) ──
   · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다).
@@ -3995,7 +4002,10 @@ function drawCdeDetail(){
     + '</dl></div>';
 
   /* 상세는 신청·승인된 배정값이다. 회수된 뒤에도 얼마를 쓰던 것인지 확인할 자리가 필요하다 */
-  h += '<div class="dsec"><h4>자원</h4><dl class="dl two">'
+  /* 작업에 쓸 수 있는 양 — 배정값에서 CDE가 쓰는 양(4분의 1)과 실행 중인 작업을 뺀 값(CDE 정책 4.7 · 개발룸 기획서 7.2).
+     ⚠ 값은 백엔드 응답으로 받는다. 목업은 실행 중인 작업 몫을 빼지 않은 검토용 값이다. 회수된 CDE는 작업을 받지 않아 두지 않는다 */
+  const jobFree = m.st==='회수'? '' : '작업에 쓸 수 있는 양은 CPU '+(Math.round(m.cpu*0.75*100)/100)+' Cores · Memory '+(Math.round(m.ram*0.75*100)/100)+' Gi입니다. 배정값에서 CDE가 쓰는 양과 실행 중인 작업을 뺀 값입니다.';
+  h += '<div class="dsec"><h4>자원'+(jobFree? tip(jobFree) : '')+'</h4><dl class="dl two">'
     + '<dt>CPU</dt><dd>'+m.cpu+' Cores</dd>'
     + '<dt>Memory</dt><dd>'+m.ram+' Gi</dd>'
     /* 종류를 함께 보인다. 개수만으로는 어느 장비인지 알 수 없다 */
@@ -4216,6 +4226,9 @@ function drawForm(){
    /* ⚠ 단위가 확정되지 않았다. 현행이 GiB·Gi·GB 를 섞어 쓴다 — 확인 대상(정책 9. 23번).
       쿠버네티스에 그대로 넘어가는 값이라 Gi 로 둔다 */
    + qrow('ram','Memory','Gi',freeR,1,'')
+   /* CDE가 켜져 있는 동안 신청값의 4분의 1을 쓴다. 작업은 나머지에서 돈다(CDE 정책 2.3 · 개발룸 기획서 7.3).
+      위임 · 직접 할당 모두 같다. 값이 없으면 두지 않는다 */
+   + podHint()
    /* 종류를 먼저 고른다. 종류마다 잔여가 달라 개수 상한이 정해지지 않는다 */
    /* 모델명에 vRAM 을 붙인다. 워크스페이스 목업과 같은 규격이고
       한 장당 용량을 알아야 몇 장이 필요한지 정해진다(8/10 회의 2.2) */
@@ -4353,6 +4366,11 @@ function qBtn(k,delta,step,cap){
 }
 /* 사용 중·근거 수치는 툴팁에 둔다. 워크스페이스 목업과 같은 방식이다.
    ⚠ 증가 단위는 CPU 0.5 만 근거가 있다(8/10 회의). Memory·볼륨은 확인 대상(정책 9. 17번) */
+function q4(v){ const n=(parseFloat(v)||0)/4; return String(Math.round(n*100)/100); }
+function podHint(){
+  if(!(parseFloat(NF.cpu)>0) || !(parseFloat(NF.ram)>0)) return '';
+  return '<div class="hint" style="margin:-4px 0 12px">CDE가 켜져 있는 동안 CPU '+q4(NF.cpu)+' Cores · Memory '+q4(NF.ram)+' Gi를 씁니다. 작업은 나머지 범위에서 실행됩니다.</div>';
+}
 function qrow(k,label,unit,cap,step,desc){
   const raw=String(NF[k]==null?'':NF[k]).trim(), n=+raw, v=parseFloat(NF[k])||0;
   /* 빈 값 · 형식(숫자 아님 · 음수) · 0 을 가른다. 신청 자원은 0 보다 커야 한다 */
