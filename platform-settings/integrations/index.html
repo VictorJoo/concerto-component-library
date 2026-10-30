@@ -1,5 +1,10 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.19 (2026-10-28)
+  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.20 (2026-10-30)
+
+  ── v0.20 (2026-10-30) ──
+  · SET-INTEG-L01 v0.20 과 같은 버전이다.
+  · 채널 등록 · 수정 채널명에 2~30자 · 허용 문자(한글 · 영문 · 숫자 · 띄어쓰기 · 하이픈 · 언더바)를 두었다(공통정책 1.1 · SET-INTEG-L01 7.5).
+    실시간 카운터 n/30, 31자째와 허용 외 문자는 입력되지 않는다. 1자로 등록하면 `2자 이상 입력해 주세요.`(5.2). 알림 규칙 이름과 같은 규격이다.
 
   ── v0.19 (2026-10-28) ──
   · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다).
@@ -3740,8 +3745,12 @@ function chSecret(id,label,set,opt,ph){
 function chDraw(){
   const t=CD.type, mailOff = t==='이메일' && !EXT.mail.host;
   let h='<div class="fld"><label>채널명<span class="req">*</span></label>'
-   + '<input class="inp" id="chName" value="'+esc(CD.n)+'" placeholder="예) MLOps Core Slack" onblur="chBlur(\'n\')">'
-   + '<div class="errmsg" id="chNameErr"></div></div>'
+   /* 채널명은 2~30자, 한글 · 영문 · 숫자 · 띄어쓰기 · 하이픈 · 언더바(공통정책 1.1). 초과 · 허용 외 문자는 입력되지 않게 막고 실시간 카운터를 둔다(7.1 · SET-INTEG-L01 7.5).
+      한글 조합 중 글자(자모)는 지우지 않는다 */
+   + '<input class="inp" id="chName" maxlength="30" value="'+esc(CD.n)+'" placeholder="예) MLOps Core Slack" onblur="chBlur(\'n\')"'
+   +   ' oninput="this.value=this.value.replace(/[^가-힣ㄱ-ㅎㅏ-ㅣA-Za-z0-9 _-]/g,\'\');$(\'chNameCnt\').textContent=this.value.length+\'/30\'">'
+   + '<div class="errmsg" id="chNameErr"></div>'
+   + '<div class="hint" id="chNameCnt">'+String(CD.n||'').length+'/30</div></div>'
    + '<div class="fld" style="margin-top:16px"><label>유형<span class="req">*</span></label>'
    /* 수정에서는 유형을 바꾸지 않는다. 다른 채널이 된다 */
    + (CD.edit
@@ -3825,7 +3834,7 @@ function chTip(why){
   else { w.removeAttribute('tabindex'); t.hidden=true; t.textContent=''; }
 }
 function chMsg(k){
-  if(k==='n') return chField('chName')? '' : '채널명을 입력해 주세요.';
+  if(k==='n'){ const v=chField('chName'); return !v? '채널명을 입력해 주세요.' : v.length<2? '2자 이상 입력해 주세요.' : ''; }
   if(k==='url'){ if(CD.edit && !$('chUrl')) return ''; return /^https?:\/\/[^\s/]+\.[^\s]+$/.test(chField('chUrl'))? '' : '올바른 주소 형식이 아닙니다.'; }
   if(k==='ws') return chField('chWs')? '' : '워크스페이스를 선택해 주세요.';
   /* 인증 헤더 이름 · 값 형식(기획서 7.5 · 5.2 · CON-960 2026-10-27). 서버도 같은 규칙으로 거절한다.
