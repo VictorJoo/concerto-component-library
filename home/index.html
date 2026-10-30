@@ -1,7 +1,13 @@
 <!doctype html>
 <!--
-  콘체르토 매니저 — 홈 목업 v0.16 (2026-10-28)
+  콘체르토 매니저 — 홈 목업 v0.17 (2026-10-30)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다.
+
+  ── v0.17 (2026-10-30) ──
+  · HOME-L01 v0.17 과 같은 버전이다.
+  · 최근 알림 항목을 누르면 알림 목록이 아니라 그 알림의 대상 화면으로 간다(HOME-L01 REQ-HOME-033 · SYS-NOTI-L01 REQ-NOTI-005 · 027).
+    누르면 읽음 처리한다. 종전에는 항목과 `전체 보기` 가 모두 알림 목록으로 갔다. `전체 보기` 는 그대로 알림 목록이다(REQ-HOME-030).
+    대상은 알림 팝오버(NOTI)의 `to` 와 같은 말로 둔다. 다른 화면은 각자 목업이 있어 이동은 토스트로 갈음한다.
 
   ── v0.16 (2026-10-28) ──
   · HOME-L01 v0.16 과 같은 버전이다. 기획서 v0.16 문구 정리(품질 검토 — 1장 · 5.2 · 6장 · 7.3 · 8장).
@@ -979,13 +985,21 @@ const TODOS_ALL = [
    t:'모델 <b>gemma-4-12b:v1</b>의 캐싱이 6일째 진행 중입니다.', s:'6일 전 시작',
    act:'상태 확인하기', go:'models'}
 ];
+/* to — 그 알림이 가리키는 대상 화면(SYS-NOTI-L01 REQ-NOTI-005 · 027). 항목을 누르면 여기로 간다(HOME-L01 REQ-HOME-033) */
 const RECENT_ALL = [
-  {sev:'오류', c:'cr', ws:'ai-service-team', t:'배포 생성에 실패했습니다', b:'llama-3-2-1b-prod · 요청한 가속기를 확보하지 못했습니다.', w:'12분 전'},
-  {sev:'정보', c:'mu', ws:'ai-service-team', t:'모델 캐싱이 완료되었습니다', b:'qwen3-32b:v2 · gpu-svr-01에 캐싱되었습니다.', w:'1시간 전'},
-  {sev:'주의', c:'wa', ws:'ai-service-team', t:'CDE 만료가 다가옵니다', b:'yj-jupyter-01 · 3일 뒤 자동 종료됩니다.', w:'3시간 전'},
-  {sev:'정보', c:'mu', ws:'test-npu', t:'배포가 중지되었습니다', b:'furiosa-qwen3-32b-npu · 관리자가 중지했습니다.', w:'어제'},
-  {sev:'정보', c:'mu', ws:'ml-research', t:'모델을 등록했습니다', b:'gemma-4-12b:v1 · 유지현(jh.yu)', w:'6일 전'}
+  {sev:'오류', c:'cr', ws:'ai-service-team', t:'배포 생성에 실패했습니다', b:'llama-3-2-1b-prod · 요청한 가속기를 확보하지 못했습니다.', w:'12분 전', to:'배포 llama-3-2-1b-prod 상세'},
+  {sev:'정보', c:'mu', ws:'ai-service-team', t:'모델 캐싱이 완료되었습니다', b:'qwen3-32b:v2 · gpu-svr-01에 캐싱되었습니다.', w:'1시간 전', to:'모델 qwen3-32b 상세'},
+  {sev:'주의', c:'wa', ws:'ai-service-team', t:'CDE 만료가 다가옵니다', b:'yj-jupyter-01 · 3일 뒤 자동 종료됩니다.', w:'3시간 전', to:'CDE yj-jupyter-01 상세'},
+  {sev:'정보', c:'mu', ws:'test-npu', t:'배포가 중지되었습니다', b:'furiosa-qwen3-32b-npu · 관리자가 중지했습니다.', w:'어제', to:'배포 furiosa-qwen3-32b-npu 상세'},
+  {sev:'정보', c:'mu', ws:'ml-research', t:'모델을 등록했습니다', b:'gemma-4-12b:v1 · 유지현(jh.yu)', w:'6일 전', to:'모델 gemma-4-12b 상세'}
 ];
+/* 최근 알림 항목 — 읽음 처리하고 대상 화면으로 간다. 알림 목록으로 보내지 않는다(REQ-HOME-033) */
+function recentGo(i){
+  const x=recentList()[i]; if(!x) return false;
+  x.read=true;
+  toast('ok', x.to+' 화면으로 이동합니다.');
+  return false;
+}
 
 function todoList(){
   const ws=myWs();
@@ -1186,8 +1200,8 @@ function drawHome(){
     + '</div>'
     + (recent.length
        ? '<div class="nlist">'
-         + recent.map(function(x){
-             return '<button class="nrow" onclick="go(\'notifications\')">'
+         + recent.map(function(x,i){
+             return '<button class="nrow" onclick="recentGo('+i+')">'
               + '<span class="stbadge '+x.c+'"><span class="d"></span>'+x.sev+'</span>'
               + '<span class="n-t">'+x.t+'<span class="n-b">'+x.b+'</span></span>'
               + '<span class="n-w">'+x.w+'</span>'
