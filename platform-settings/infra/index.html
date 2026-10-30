@@ -1,5 +1,10 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 인프라 자원 목업 v0.15 (2026-10-28)
+  콘체르토 매니저 — 플랫폼 설정 | 인프라 자원 목업 v0.15 (2026-10-30)
+
+  ── v0.15 추가 (2026-10-30) ──
+  · SET-INFRA-L01 v0.15 1장 「알림 · 링크로 들어오면 링크가 지정한 탭을 연다. 라이선스 알림은 라이선스 탭」이 목업에 빠져 있어 넣었다.
+    주소 끝 #components · #cluster · #license 로 열면 그 탭이 열린다. 새로 고쳐도 같다. 라이선스 알림의 링크가 #license 다.
+  · 알림 채널 등록 · 수정 모달 복사본을 연동 및 알림 목업 v0.20(10-30)과 같게 — 채널명 2~30자 · 허용 문자 · 카운터 · `2자 이상 입력해 주세요.`(SET-INTEG-L01 7.5).
 
   ── v0.15 (2026-10-28) ──
   · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다).
@@ -2162,7 +2167,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   </div>
 
   <!-- ══════════ 채널 등록 · 수정 모달 ══════════ -->
-  <!-- 연동 및 알림 목업 v0.19 채널 모달과 같은 코드다(chDraw · chMsg · chSubmit · testCh). 문구 · 검증 · 동작이 같다(SET-INTEG-L01 5.2 · 7.5) -->
+  <!-- 연동 및 알림 목업 v0.20 채널 모달과 같은 코드다(chDraw · chMsg · chSubmit · testCh). 문구 · 검증 · 동작이 같다(SET-INTEG-L01 5.2 · 7.5) -->
   <div class="mdbg" id="mdCh">
     <div class="modal">
       <div class="mdhead"><h3 id="chTitle">알림 채널 등록</h3></div>
@@ -3642,8 +3647,12 @@ function chSecret(id,label,set,opt,ph){
 function chDraw(){
   const t=CD.type, mailOff = t==='이메일' && !EXT.mail.host;
   let h='<div class="fld"><label>채널명<span class="req">*</span></label>'
-   + '<input class="inp" id="chName" value="'+esc(CD.n)+'" placeholder="예) MLOps Core Slack" onblur="chBlur(\'n\')">'
-   + '<div class="errmsg" id="chNameErr"></div></div>'
+   /* 채널명은 2~30자, 한글 · 영문 · 숫자 · 띄어쓰기 · 하이픈 · 언더바(공통정책 1.1). 초과 · 허용 외 문자는 입력되지 않게 막고 실시간 카운터를 둔다(7.1 · SET-INTEG-L01 7.5).
+      한글 조합 중 글자(자모)는 지우지 않는다 */
+   + '<input class="inp" id="chName" maxlength="30" value="'+esc(CD.n)+'" placeholder="예) MLOps Core Slack" onblur="chBlur(\'n\')"'
+   +   ' oninput="this.value=this.value.replace(/[^가-힣ㄱ-ㅎㅏ-ㅣA-Za-z0-9 _-]/g,\'\');$(\'chNameCnt\').textContent=this.value.length+\'/30\'">'
+   + '<div class="errmsg" id="chNameErr"></div>'
+   + '<div class="hint" id="chNameCnt">'+String(CD.n||'').length+'/30</div></div>'
    + '<div class="fld" style="margin-top:16px"><label>유형<span class="req">*</span></label>'
    /* 수정에서는 유형을 바꾸지 않는다. 다른 채널이 된다 */
    + (CD.edit
@@ -3727,7 +3736,7 @@ function chTip(why){
   else { w.removeAttribute('tabindex'); t.hidden=true; t.textContent=''; }
 }
 function chMsg(k){
-  if(k==='n') return chField('chName')? '' : '채널명을 입력해 주세요.';
+  if(k==='n'){ const v=chField('chName'); return !v? '채널명을 입력해 주세요.' : v.length<2? '2자 이상 입력해 주세요.' : ''; }
   if(k==='url'){ if(CD.edit && !$('chUrl')) return ''; return /^https?:\/\/[^\s/]+\.[^\s]+$/.test(chField('chUrl'))? '' : '올바른 주소 형식이 아닙니다.'; }
   if(k==='ws') return chField('chWs')? '' : '워크스페이스를 선택해 주세요.';
   /* 인증 헤더 이름 · 값 형식(기획서 7.5 · 5.2 · CON-960 2026-10-27). 서버도 같은 규칙으로 거절한다.
@@ -4030,6 +4039,17 @@ document.addEventListener('click',function(){
 });
 
 go('sys');
+/* 알림 · 링크로 들어오면 링크가 지정한 탭을 연다(SET-INFRA-L01 1장 · 알림 정책 3.4). 라이선스 알림 링크가 #license 다 */
+(function(){
+  const H={'#components':0,'#cluster':1,'#license':2};
+  function openHash(){
+    if(H[location.hash]===undefined) return;
+    sTab=H[location.hash];
+    if(typeof go==='function') go('sys'); else drawSys();
+  }
+  openHash();
+  window.addEventListener('hashchange', openHash);
+})();
 </script>
 </body>
 </html>
