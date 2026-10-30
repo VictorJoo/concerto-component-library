@@ -1,8 +1,20 @@
 <!--
-  콘체르토 매니저 · 배포 화면 목업 v0.40 (2026-10-28)
+  콘체르토 매니저 · 배포 화면 목업 v0.41 (2026-10-30)
   색·컴포넌트 규격은 워크스페이스 목업 v0.33 를 그대로 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
 
   ── 변경 ────────────────────────────────────────
+  ── v0.41 (2026-10-30) ──
+  · DEP-L01 v0.41 · 배포 정책 v0.30 과 같은 버전이다.
+  · 노드에 캐싱된 모델만 배포할 수 있다(배포 정책 2.3 · 모델 정책 4.1). 01 모델에서 미캐싱 · 캐싱 중 모델과 캐싱된 노드가 없는 캐싱 실패 모델을 목록에 남기되
+    (캐싱 실패라도 캐싱된 노드가 있으면 그 노드로 배포할 수 있어 고를 수 있다 — 모델 정책 2.6. 목업의 cached 는 캐싱된 노드가 있는지다)
+    비활성으로 두고 이름 뒤 상태를 붙인다. 사유는 DEP-L01 5.3 문구다. 미캐싱 · 캐싱 중 알림 상자 두 종을 지웠다.
+    option 에는 말풍선을 붙일 수 없어 사유는 선택칸 아래 안내로 둔다 — 02 자원 가속기 종류와 같은 방식이다(REQ-DEP-086 · DEP-L01 5.3).
+    고를 수 있는 모델이 없으면 선택칸 아래 `배포할 수 있는 모델이 없습니다. 모델 화면에서 노드 캐싱을 먼저 해 주세요.` 를 둔다.
+    마법사 기본 모델을 캐싱된 qwen3-32b(v3.6)로 바꿨다. 캐싱 실패 샘플은 qwen-next-80b-a3b-thinking 이다.
+  · 고른 뒤 캐시가 지워져 배포 실행이 거절되는 경우를 데모 바 `v0.41 배포 실행: 캐싱 안 된 모델로 거절` 로 본다.
+    페이지와 입력값을 유지하고 실패 토스트 뒤 01 모델 목록을 다시 불러온다(DEP-L01 5.3 · 6장 Error).
+  · 외부 배포 모니터링 탭의 Grafana 열기를 비활성으로 두지 않는다(DEP-L01 7.6 · 모니터링 정책 5.4). 비활성은 지표 · 추적 수집을 끈 자체 배포만이다.
+
   ── v0.40 (2026-10-28) ──
   · 동작 확인 API Key(댓글 3510272146(2026-10-28) ① · 배포 정책 6장 · DEP-L01 5.1 · 5.3 · 6장 · 7.8 · REQ-DEP-096).
     API Key 인증을 켠 자체 배포에만 `API Key` 칸(가림 표시)을 둔다. 플레이스홀더 `API Key를 입력해 주세요.`, 힌트 `입력한 키는 저장하지 않습니다.`
@@ -2411,6 +2423,9 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <!-- v0.40 · 검토용 처리. 실제 화면에는 없다 -->
   <span class="demo-label" style="margin-left:12px;">v0.40 동작 확인:</span>
   <button onclick="demoKeyReject()">키 거절</button>
+  <!-- v0.41 · 검토용 처리. 실제 화면에는 없다 -->
+  <span class="demo-label" style="margin-left:12px;">v0.41 배포 실행:</span>
+  <button onclick="demoDeployRej()">캐싱 안 된 모델로 거절</button>
   <span class="demo-label" style="margin-left:12px;">테마:</span>
   <button onclick="document.body.classList.remove('dark')">라이트</button>
   <button onclick="document.body.classList.add('dark')">다크</button>
@@ -2512,7 +2527,7 @@ const MODELS=[
  {n:'qwen3-5-122b-a10b-gptq-int4', v:'1.0.0', cached:false, cs:'캐싱 중'},
  {n:'gemma-4-31b-it-fp8-block', v:'1.0.0', cached:true},
  {n:'gemma-4-12b-it', v:'1.0.0', cached:false},
- {n:'qwen-next-80b-a3b-thinking', v:'latest', cached:false},
+ {n:'qwen-next-80b-a3b-thinking', v:'latest', cached:false, cs:'캐싱 실패'},
  {n:'furiosa-qwen3-32b-fp8', v:'latest', cached:true, kind:'npu',
   req:{gpu:4, ctx:32768, note:'RNGD 4장 기준으로 컴파일한 모델입니다.', src:{gpu:'모델 파일', ctx:'모델 파일', note:'관리자 입력'}}},
  {n:'gpt-oss-20b', v:'latest', cached:true},
@@ -3570,9 +3585,10 @@ function dMonitor(d){
       지표 · 추적 수집을 사용하지 않는 배포는 대시보드가 없어 비활성으로 두고 사유를 단다.
       v0.40 · 지표 · 추적 수집을 설정 변경에서 바꿀 수 있게 되어, 설정 변경 권한이 있는 역할(편집자 이상)에게는 켜는 곳을 함께 말한다.
       뷰어와 외부 배포(설정 변경이 없다)는 상태만 말한다(모니터링 정책 5.4 · DEP-L01 7.6) */
-   +   (d.obs
+   /* v0.41 · 외부 배포는 지표 · 추적 수집 설정이 없어 비활성으로 두지 않는다. 지표가 없으면 새 탭의 모니터링 화면이 오류 토스트로 알린다(DEP-L01 7.6) */
+   +   ((d.obs || d.type==='외부 배포')
         ? '<button class="btn ghost sm" onclick="act(\'Grafana 대시보드를 새 탭으로 엽니다.\')">Grafana 열기</button>'
-        : disTip('<button class="btn ghost sm" disabled>Grafana 열기</button>', '지표 · 추적 수집을 사용하지 않는 배포입니다.'+((canDeploy() && d.type!=='외부 배포')? ' 설정 변경에서 켤 수 있습니다.' : '')))
+        : disTip('<button class="btn ghost sm" disabled>Grafana 열기</button>', '지표 · 추적 수집을 사용하지 않는 배포입니다.'+(canDeploy()? ' 설정 변경에서 켤 수 있습니다.' : '')))
    + '</div></div>'
    + '<div class="dsec"><h4>주요 이벤트'+tip('배포에 일어난 일만 모아 보여줍니다.')+'</h4>'
    /* 주요 이벤트는 지표가 아니라 배포에 일어난 일이라 소스 상태와 무관하게 보인다 */
@@ -3889,7 +3905,7 @@ function rvTg(k, cur){ rvOpen[k] = !cur; drawWiz(); }
 function newWF(){
   return {
     /* 01 모델 */
-    model:'llama-3.2-1b-instruct', mver:'latest',
+    model:'qwen3-32b', mver:'v3.6',
     topo:'single',                    // single | pd
     /* 차트 model.args 의 명시 필드다. extraArgs 목록과 다른 층이라 따로 받는다 */
     maxLen:'128K', gpuUtil:'0.90',
@@ -4416,7 +4432,15 @@ function adv(key,label,changed,body){
 }
 
 /* 캐싱 상태 — 캐싱됨이면 빈 값. 모델 정책 2.6 상태값을 그대로 쓴다 */
-function cacheSt(m){ return !m || m.cached ? '' : (m.cs==='캐싱 중' ? '캐싱 중' : '미캐싱'); }
+function cacheSt(m){ return !m || m.cached ? '' : (m.cs==='캐싱 중' ? '캐싱 중' : m.cs==='캐싱 실패' ? '캐싱 실패' : '미캐싱'); }
+/* 캐싱된 모델만 고를 수 있다(배포 정책 2.3). 사유 문구는 DEP-L01 5.3 */
+function cacheWhy(m){
+  const st=cacheSt(m);
+  if(st==='미캐싱') return '노드에 캐싱된 모델만 배포할 수 있습니다. 모델 화면에서 노드 캐싱을 먼저 해 주세요.';
+  if(st==='캐싱 중') return '노드에 캐싱하는 중입니다. 캐싱이 끝나면 배포할 수 있습니다.';
+  if(st==='캐싱 실패') return '노드 캐싱에 실패한 모델입니다. 모델 화면의 작업 이력에서 캐싱을 다시 시도해 주세요.';
+  return '';
+}
 function wReqBox(m){
   if(!m || (!m.kind && !m.req)) return '';
   const q=m.req||{}, li=[];
@@ -4439,21 +4463,20 @@ function paneModel(){
   return wHead('모델','배포할 모델을 고릅니다.')
    + '<div class="fgrid">'
    +   fld('모델','model',
-        selBox('model', MODELS.map(function(m){
-          return {v:m.n, t:m.n+'('+m.v+')'+(cacheSt(m)? ' · '+cacheSt(m) : '')};
-        }), WF.model),
-        '', true)
+        selBox('model', [{v:'', t:'모델을 선택해 주세요.', dis:true}].concat(MODELS.map(function(m){
+          return {v:m.n, t:m.n+'('+m.v+')'+(cacheSt(m)? ' · '+cacheSt(m) : ''), dis:!!cacheWhy(m)};
+        })), WF.model),
+        /* option 에는 말풍선을 붙일 수 없어 사유를 선택칸 아래에 둔다 — 02 자원 가속기 종류와 같은 방식(REQ-DEP-086 · DEP-L01 5.3) */
+        MODELS.some(function(m){ return !cacheWhy(m); })
+          ? (MODELS.some(function(m){ return !!cacheWhy(m); })? '노드에 캐싱된 모델만 배포할 수 있습니다. 미캐싱 · 캐싱 중 · 캐싱 실패 모델은 모델 화면에서 노드 캐싱을 마치면 고를 수 있습니다.' : '')
+          : '배포할 수 있는 모델이 없습니다. 모델 화면에서 노드 캐싱을 먼저 해 주세요.', true)
    + '</div>'
    /* ⚠ 현행 화면은 `10분 이상` 으로 적고 있으나 모델 크기·네트워크에 따라 달라
       그대로 옮기지 않는다. 수치는 확인 후 넣는다 */
    /* v0.36 · 미캐싱 · 캐싱 중 안내(DEP-L01 5.2 · 모델 정책 4.1). 목록 글자 · 배지 · 안내 상자에 세 번 쓰던 것을
       목록 글자와 알림 상자 둘로 줄였다. 같은 단계 배포 조건 안내와 같은 라이브러리 알림 상자(정보)를 쓴다.
       내려받는 것은 모델 파일이 아니라 이미지다(모델 정책 2.6) */
-   + (mm && cacheSt(mm)
-      ? '<div style="margin-top:12px">'+(cacheSt(mm)==='캐싱 중'
-          ? alertBox('info','이 모델은 노드에 캐싱하는 중입니다.','캐싱이 끝나기 전에 배포하면 이미지를 내려받는 동안 기동이 오래 걸립니다.','',false)
-          : alertBox('info','이 모델은 노드에 캐싱되어 있지 않습니다.','배포하면 이미지를 먼저 내려받아 기동이 오래 걸립니다.','',false))+'</div>'
-      : '')
+   /* v0.41 · 미캐싱 · 캐싱 중 · 캐싱 실패 모델은 고를 수 없어 알림 상자를 두지 않는다(DEP-L01 5.3 · 배포 정책 2.3) */
    /* 모델 배포 조건. 자원 단계에서 막히기 전에 여기서 먼저 알린다(REQ-DEP-085).
       배포 조건이 없는 모델은 두지 않는다 */
    + wReqBox(mm)
@@ -4994,7 +5017,22 @@ function wRefreshFoot(){
   if(el) el.outerHTML = wFoot(wErrs());
 }
 
+/* v0.41 · 고른 뒤 캐시가 지워져 거절된 경우(400 SERVING_MODEL_NOT_LOCALLY_CACHED). 페이지와 입력값을 유지하고 모델 목록을 다시 불러온다(DEP-L01 5.3).
+   검토용 분기다. 다시 불러온 목록에서 고른 모델이 미캐싱으로 바뀐다 */
+let DEP_REJ=false;
+function demoDeployRej(){
+  if(!canDeploy()) setRole('editor');
+  DEP_REJ=true;
+  if(typeof goDemo==='function') goDemo('new');
+  toast('ok','검토용: 마지막 단계에서 배포를 누르면 거절됩니다.');
+}
 function submitWiz(){
+  if(DEP_REJ){
+    DEP_REJ=false;
+    toast('cr','노드에 캐싱되지 않은 모델은 배포할 수 없습니다. 모델 화면에서 노드 캐싱을 먼저 해 주세요.');
+    const m=wModelOf(); if(m){ m.cached=false; m.cs=''; }
+    drawWiz(); return;
+  }
   toast('ok','배포 생성을 요청했습니다. 기동이 끝나면 알림으로 안내됩니다.');
   backToList();
 }
