@@ -1,6 +1,22 @@
 <!--
-  콘체르토 매니저 — 모델 화면 목업 v0.37 (2026-10-28)
+  콘체르토 매니저 — 모델 화면 목업 v0.38 (2026-10-30)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다.
+
+  ── v0.38 (2026-10-30) ──
+  · MODEL-L01 v0.38 · 모델 정책 v0.30 과 같은 버전이다.
+  · 미캐싱 · 캐싱 중 이미지와 캐싱된 노드가 없는 캐싱 실패 이미지는 배포할 수 없다(모델 정책 2.6 · 4.1). 목록 행 메뉴 · 패널 · 버전 탭 메뉴의 `배포` 를 비활성 + 사유 툴팁으로 두고,
+    배포 전 지연 안내 알럿과 패널 아래 지연 안내 문장을 지웠다. 사유 문구는 MODEL-L01 5.1 「캐싱되지 않은 이미지의 배포」 행과 같다.
+  · 캐싱 상태에 `캐싱 실패` 를 더했다(모델 정책 2.6). qwen3-32b v3.1 · qwen-next-80b-a3b-thinking 이 샘플이다 — 작업 이력의 실패한 캐싱과 같은 버전이다.
+    qwen-next-80b-a3b-thinking 은 배포 목업 v0.41 의 캐싱 실패 샘플과 같은 모델이다.
+  · 패널 `캐싱된 노드` 를 노드 그룹 단위로 바꿨다. 그룹마다 `{그룹} 완료 / 전체`, 펼치면 노드 이름(MODEL-L01 7.3). 접힘 블록은 기존 `.adv` 를 쓴다.
+    노드 그룹이 없는 노드는 `노드 그룹 미지정` 으로 묶는다 — 샘플 노드는 모두 그룹이 있어 화면에는 나오지 않는다.
+  · 동기화 상태 `저장소에 없음` 샘플을 qwen3-5-122b-a10b-gptq-int4 에 두었다. 노드 캐싱이 목록 · 패널 · 버전 탭에서 비활성 + 사유다(REQ-MODEL-089).
+    화면을 연 뒤 거절되는 경우는 데모 바 `캐싱 요청 거절` 로 본다 — 모달이 닫히지 않고 위에 사유가 뜬다(MODEL-L01 5.3).
+  · 수정 모달 인프라 요건 맨 위에 `권장 엔진 모드` 선택(선택 안 함 · 단일 · 프리필·디코드 분리)을 두었다. 출처 안내 대상이 아니다(모델 정책 2.4).
+    도움말에서 `배포 생성 시 기본값으로 사용됩니다` 를 지웠다.
+  · 캐시 삭제 확인 문구를 `삭제하면 다시 캐싱하기 전까지 이 버전으로 배포할 수 없습니다.` 로(모델 정책 4.5).
+  · 배포에 쓰이는 버전은 캐시 삭제를 비활성 + 사유 `배포에 사용 중인 버전은 캐시를 삭제할 수 없습니다.` 로 둔다(모델 정책 4.5 · REQ-MODEL-087).
+    버전 삭제와 같은 판정이다. 샘플은 gpt-oss-120b latest 등 배포 중인 캐싱됨 버전.
 
   ── v0.37 (2026-10-28) ──
   · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다). 둘째 주석 라이브러리 머리의 용도 표기를 지웠다.
@@ -1229,7 +1245,7 @@ td.regcell .prog{min-width:220px}
       <h3>노드 캐싱</h3>
       <p><b id="cName"></b> 이미지를 미리 내려받을 노드를 선택합니다. 캐싱된 노드에서는 배포 시 기동이 빨라집니다.</p>
     </div>
-    <div class="mdbody" id="cacheBody"></div>
+    <div class="mdbody"><div id="cReqErr"></div><div id="cacheBody"></div></div>
     <div class="mdfoot">
       <button class="btn ghost" onclick="closeCache()">취소</button>
       <button class="btn" id="cSubmit" disabled onclick="submitCache()">캐싱 실행</button>
@@ -1280,6 +1296,11 @@ td.regcell .prog{min-width:220px}
       <div id="eReqWrap" style="margin-top:18px">
         <label style="font-weight:600">인프라 요건</label>
         <div class="hint" id="eReqSrc" style="margin:0 0 10px"></div>
+        <!-- 권장 엔진 모드. 관리자가 정하는 참고 값이다. 출처 안내 대상이 아니고 배포를 제한하지 않는다(MODEL-L01 7.8 · 모델 정책 2.4) -->
+        <div class="f">
+          <label>권장 엔진 모드</label>
+          <select class="inp" id="eMode" onchange="editValid()"><option>선택 안 함</option><option>단일</option><option>프리필·디코드 분리</option></select>
+        </div>
         <div class="row2 f">
           <div>
             <label>레플리카당 가속기 수</label>
@@ -1345,6 +1366,10 @@ td.regcell .prog{min-width:220px}
     <button onclick="demoGo('jobs')">작업 이력·다시 시도</button>
     <button onclick="demoGo('cachefail')">실패한 캐싱</button>
     <button onclick="demoGo('cmp')">이전 버전 비교</button></span>
+  <!-- 검토용: 노드 캐싱 요청 거절(화면을 연 뒤 저장소에서 이미지가 없어짐). 실제 화면에는 없다 -->
+  <span class="dgrp"><span class="demo-label">캐싱 요청:</span>
+    <button class="cj on" onclick="setCacheRej(false,this)">접수</button>
+    <button class="cj" onclick="setCacheRej(true,this)">거절 — 저장소에 없음</button></span>
   <!-- 검토용: 다시 시도 요청 거절 분기. 실제 화면에는 없다 -->
   <span class="dgrp"><span class="demo-label">다시 시도 요청:</span>
     <button class="rj on" onclick="setRetryRej(false,this)">접수</button>
@@ -1441,12 +1466,12 @@ const IMG=[
   arch:{p:'236B',c:'-',q:'NVFP4',d:'-'},infra:{v:'320',r:'예',g:'NVIDIA-H200'},store:'model-registry/k-exaone-236b-a23b-nvfp4a16:v1.0.0',mode:'프리필·디코드 분리',prof:0,deps:[]},
  {n:'solar-open-100b-nvfp4a16',v:'1.0.0',ready:'미캐싱',cn:0,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-07-02 13:55:41',eng:'vLLM',base:'Official Base',
   arch:{p:'100B',c:'-',q:'NVFP4',d:'-'},infra:{v:'160',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/solar-open-100b-nvfp4a16:v1.0.0',mode:'단일',prof:0,deps:[{n:'solar-open-100b-paused',ws:'ai-service-team',st:'중지됨'}]},
- {n:'qwen3-5-122b-a10b-gptq-int4',v:'1.0.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-28 09:11:07',eng:'vLLM',base:'Official Base',
+ {n:'qwen3-5-122b-a10b-gptq-int4',v:'1.0.0',ready:'미캐싱',cn:0,sync:'저장소에 없음',use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-28 09:11:07',eng:'vLLM',base:'Official Base',
   arch:{p:'122B',c:'-',q:'GPTQ-INT4',d:'-'},infra:{v:'96',r:'아니요',g:'제한 없음'},store:'model-registry/qwen3-5-122b-a10b-gptq-int4:v1.0.0',mode:'단일',prof:0,deps:[]},
  {n:'furiosa-qwen3-32b-fp8',v:'latest',ready:'캐싱됨',cn:2,use:'배포 중',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-06-25 16:40:33',eng:'Furiosa-LLM',base:'Official Base',
   arch:{p:'32B',c:'-',q:'FP8',d:'-'},infra:{v:'64',r:'아니요',g:'Furiosa RNGD'},store:'model-registry/furiosa-qwen3-32b-fp8:latest',mode:'단일',prof:0,deps:[{n:'furiosa-qwen3-32b-npu',ws:'test-npu',st:'오류'}],
   dreq:{src:'관리자 입력',gpu:{v:4},ctx:{v:32768},note:{v:'RNGD 4장 기준으로 컴파일한 모델입니다.'}}},
- {n:'qwen-next-80b-a3b-thinking',v:'latest',ready:'미캐싱',cn:0,use:'미사용',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-20 10:05:12',eng:'vLLM',base:'Custom Build',src:'qwen3-next-80b-a3b-thinking:latest',
+ {n:'qwen-next-80b-a3b-thinking',v:'latest',ready:'캐싱 실패',cn:0,use:'미사용',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-20 10:05:12',eng:'vLLM',base:'Custom Build',src:'qwen3-next-80b-a3b-thinking:latest',
   arch:{p:'80B',c:'-',q:'적용 안 함',d:'-'},infra:{v:'128',r:'아니요',g:'제한 없음'},store:'model-registry/qwen-next-80b-a3b-thinking:latest',mode:'단일',prof:0,deps:[]},
  {n:'llama-3.2-1b-instruct',v:'latest',ready:'캐싱 중',cn:1,use:'배포 중',scope:'워크스페이스 전용',ws:'ai-service-team',by:'성유진(yj.seong)',at:'2026-06-18 15:32:44',eng:'vLLM',base:'Custom Build',src:'llama-3.2-1b:latest',
   arch:{p:'1B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'8',r:'아니요',g:'제한 없음'},store:'model-registry/llama-3.2-1b-instruct:latest',mode:'단일',prof:0,deps:[{n:'llama-3-2-1b-prod',ws:'ai-service-team',st:'정상'}]},
@@ -1463,7 +1488,7 @@ const IMG=[
   arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.6',mode:'단일',prof:0,deps:[]},
  {n:'qwen3-32b',v:'v3.2',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',tags:['추천'],by:'성유진(yj.seong)',at:'2026-06-11 15:40:22',eng:'vLLM',base:'Official Base',
   arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.2',mode:'단일',prof:0,deps:[]},
- {n:'qwen3-32b',v:'v3.1',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'성유진(yj.seong)',at:'2026-04-02 11:05:10',eng:'vLLM',base:'Official Base',
+ {n:'qwen3-32b',v:'v3.1',ready:'캐싱 실패',cn:0,use:'미사용',scope:'전역',ws:'-',by:'성유진(yj.seong)',at:'2026-04-02 11:05:10',eng:'vLLM',base:'Official Base',
   arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.1',mode:'단일',prof:0,deps:[]},
  {n:'qwen3-32b',v:'v3.0',ready:'미캐싱',cn:0,use:'미사용',scope:'전역',ws:'-',by:'성유진(yj.seong)',at:'2026-02-15 10:00:00',eng:'vLLM',base:'Official Base',
   arch:{p:'32B',c:'131,072',q:'적용 안 함',d:'BF16'},infra:{v:'80',r:'아니요',g:'NVIDIA-H200'},store:'model-registry/qwen3-32b:v3.0',mode:'단일',prof:0,deps:[]},
@@ -1524,6 +1549,9 @@ const JOBS={
    J('캐싱','latest','2026-04-15 11:40:00','2026-04-15 11:52:31','완료','','',3)],
  'A:furiosa-qwen3-32b-fp8':[
    J('캐싱','latest','2026-06-25 16:45:00','2026-06-25 16:58:12','완료','','',2)],
+ /* v0.38 · 캐싱 실패 샘플(배포 목업 v0.41 과 같은 모델). 노드 그룹 gpu-group-01 의 한 노드에서 실패했다 */
+ 'A:qwen-next-80b-a3b-thinking':[
+   J('캐싱','latest','2026-10-28 16:20:05','2026-10-28 16:27:51','실패','이미지를 노드에 내려받지 못했습니다.','',1,['gpu-svr-02'])],
  'A:llama-3.2-1b-instruct':[
    J('캐싱','v2.0','2026-07-20 16:40:00','2026-07-20 16:46:02','완료','','',3),
    J('캐싱','latest','2026-06-18 15:40:10','2026-06-18 15:47:02','완료','','',1),
@@ -1551,7 +1579,7 @@ IMG.forEach(m=>{ m.gpu=m.infra.g; m.vram=m.infra.v; m.sys=false; });
 IMG.push({n:'oci-storage-initializer',v:'v0.15.2',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-03-02 09:12:00',eng:'-',base:'Official Base',
   arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'},store:'model-registry/oci-storage-initializer:v0.15.2',mode:'-',prof:0,deps:[],gpu:'-',vram:'-',sys:true});
 WGT.forEach(m=>{ m.gpu=m.infra.g; m.vram=m.infra.v; });
-const RB={'캐싱됨':'ok','미캐싱':'mu','캐싱 중':'ac load','미빌드':'mu','빌드 중':'ac load','빌드됨':'ok','빌드 실패':'cr'};
+const RB={'캐싱됨':'ok','미캐싱':'mu','캐싱 중':'ac load','캐싱 실패':'cr','미빌드':'mu','빌드 중':'ac load','빌드됨':'ok','빌드 실패':'cr'};
 /* 등록 단계 배지. 등록됨은 화면에 값으로 나오지 않는다(빌드 상태로 넘어간다 · 모델 정책 3.6). 배지 클래스는 빌드 상태와 같은 것을 쓴다 */
 const REGB={'등록 중':'ac load','등록 실패':'cr'};
 /* 작업 결과 — 진행 중은 `빌드 중` 과, 실패는 `빌드 실패` 와 같은 클래스 */
@@ -1745,7 +1773,7 @@ function depsOf(m){ return (unit==='model' && m._deps) ? m._deps : (m.deps||[]);
 
 /* ===== 필터 (공통정책 3.2) — 단일 필드 다중 값 OR / 필드 간 AND ===== */
 const FDEF={
-  A:[{k:'ready',l:'캐싱 상태',opts:['캐싱됨','미캐싱','캐싱 중']},
+  A:[{k:'ready',l:'캐싱 상태',opts:['캐싱됨','미캐싱','캐싱 중','캐싱 실패']},
      {k:'use',  l:'사용 여부',opts:['배포 중','미사용']},
      /* 값은 `전역` 과 `워크스페이스 전용` 둘이다. 컬럼에는 전용일 때 워크스페이스 이름이
         보이나 필터는 두 갈래로 좁힌다 */
@@ -1762,7 +1790,8 @@ const COLDEF={
   ready_A:'이미지가 서빙 워커 노드에 사전 다운로드되었는지를 표시합니다.'
     +'<dl><dt>캐싱됨</dt><dd>노드에 이미지가 있어 바로 기동할 수 있습니다.</dd>'
     +'<dt>캐싱 중</dt><dd>이미지를 내려받고 있습니다.</dd>'
-    +'<dt>미캐싱</dt><dd>배포 시 이미지를 내려받아야 해 초기 기동에 시간이 걸립니다.</dd></dl>',
+    +'<dt>미캐싱</dt><dd>노드에 이미지가 없습니다. 노드 캐싱을 해야 배포할 수 있습니다.</dd>'
+    +'<dt>캐싱 실패</dt><dd>하나 이상의 노드에서 캐싱에 실패했습니다. 작업 이력에서 다시 시도할 수 있습니다.</dd></dl>',
   /* 원천 가중치 상태 — 등록이 끝나기 전에는 등록 단계, 끝난 뒤에는 빌드 단계(모델 정책 3.6) */
   st:'원천 가중치가 어느 단계에 있는지를 표시합니다. 등록이 끝나면 빌드 상태를 표시합니다.'
     +'<dl><dt>등록 중</dt><dd>가중치를 가져오고 있습니다.</dd>'
@@ -1797,8 +1826,8 @@ const ITEMDEF={
   dreqGpu:'배포할 때 이 가속기 수로 고정됩니다. 괄호는 값의 출처입니다.',
   dreqCtx:'배포할 때 이 길이를 넘는 최대 컨텍스트 길이는 고를 수 없습니다. 괄호는 값의 출처입니다.',
   rdma:'노드 간 고속 통신이 필요한지를 표시합니다. 여러 노드에 분산 배포할 때 사용됩니다.',
-  mode:'이 모델에 적합한 서빙 방식입니다. 배포 생성 시 기본값으로 사용됩니다.',prof:0,
-  sync:'저장소의 실제 이미지와 플랫폼에 등록된 정보가 일치하는지를 표시합니다.',
+  mode:'이 모델에 권하는 서빙 방식입니다. 관리자가 정하며, 배포를 제한하지 않고 배포 생성의 기본값으로 쓰지 않습니다.',prof:0,
+  sync:'저장소의 실제 이미지와 플랫폼에 등록된 정보가 일치하는지를 표시합니다. 저장소에 없음이면 노드 캐싱을 할 수 없습니다.',
   cnode:'이 이미지를 사전 다운로드한 노드 수입니다.',
   ejob:'이 결과를 만든 개발룸 평가 작업입니다. 관리자와 작업을 제출한 사용자만 작업 상세로 이동할 수 있습니다. 개발룸이 삭제된 작업은 작업 상세를 열 수 없습니다.'
 };
@@ -1973,7 +2002,7 @@ function render(){
          목록에서 고치려면 패널을 먼저 열어야 한다 */
       const menu = (canEditBasic(m)? disTipIf('<button onclick="editFromRow('+idx+','+isA+')"'+(lock?' disabled':'')+'>기본 정보 수정</button>', lock) : '')
         + (isA
-        ? disTipIf('<button onclick="openCache(\''+m.n+'\')"'+(busy?' disabled':'')+'>노드 캐싱</button>', busy? busyMsg(m) : '')+cdelBtn(m,'askCdel(\''+m.n+'\',\''+m.v+'\')')+'<button onclick="goDeploy(\''+m.n+'\',\''+m.ready+'\')">배포</button>'
+        ? disTipIf('<button onclick="openCache(\''+m.n+'\')"'+(cacheWhy(m)?' disabled':'')+'>노드 캐싱</button>', cacheWhy(m))+cdelBtn(m,'askCdel(\''+m.n+'\',\''+m.v+'\')')+deployBtn(m)
         : disTipIf('<button onclick="build(\''+m.n+'\')"'+(bwhy?' disabled':'')+'>이미지 빌드</button>', bwhy));
       const act=canWrite()
         ? '<td onclick="event.stopPropagation()"><div class="more" id="m'+(isA?'i':'w')+idx+'"><button class="morebtn" onclick="tgMore(event,\'m'+(isA?'i':'w')+idx+'\')">⋯</button><div class="rowmenu">'+menu+'<hr>'+disTipIf('<button class="d"'+(m.reg==='등록 중'?' disabled':' onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+','+(m._vcnt||1)+','+isA+')"')+'>삭제</button>', m.reg==='등록 중'? lock : '')+'</div></div></td>'
@@ -2084,6 +2113,49 @@ function dv(v){return (v===''||v==='-'||v==null)?'<span class="dash">-</span>':v
 function busyMsg(m){
   return '지금은 '+m.ready+' 상태라 실행할 수 없습니다.';
 }
+/* 배포 진입 — 캐싱됨인 버전만 배포할 수 있다(모델 정책 4.1 · MODEL-L01 5.1). 그릴 때 판정되어 비활성 + 사유다(공통정책 7.10) */
+function deployWhy(m){
+  if(m.ready==='미캐싱') return '노드에 캐싱된 모델만 배포할 수 있습니다. 노드 캐싱을 먼저 해 주세요.';
+  if(m.ready==='캐싱 중') return '노드에 캐싱하는 중입니다. 캐싱이 끝나면 배포할 수 있습니다.';
+  /* 캐싱 실패라도 캐싱된 노드가 있으면 그 노드로 배포할 수 있다(모델 정책 2.6 · 서버 판정 is_cached 와 같다). 하나도 없을 때만 막는다 */
+  if(m.ready==='캐싱 실패' && !m.cn) return '노드 캐싱에 실패했습니다. 작업 이력에서 캐싱을 다시 시도해 주세요.';
+  return '';
+}
+function deployBtn(m, cls){
+  const w=deployWhy(m);
+  return disTipIf('<button'+(cls?' class="'+cls+'"':'')+(w?' disabled':'')+' onclick="goDeploy(\''+m.n+'\')">배포</button>', w);
+}
+/* 저장소에 없는 이미지는 노드 캐싱을 할 수 없다(REQ-MODEL-089 · 모델 정책 4.1) */
+const ORPH_WHY='저장소에 없는 이미지라 캐싱할 수 없습니다.';
+function cacheWhy(m){
+  if(m.sync==='저장소에 없음') return ORPH_WHY;
+  return (m.ready==='캐싱 중'||m.ready==='빌드 중')? busyMsg(m) : '';
+}
+function syncBadge(m){
+  return m.sync==='저장소에 없음'? '<span class="stbadge wa"><span class="d"></span>저장소에 없음</span>' : '<span class="stbadge ok">일치</span>';
+}
+/* 캐싱된 노드 — 노드 그룹 단위(MODEL-L01 7.3). 캐싱된 노드가 있는 그룹만 둔다. 그룹이 없는 노드는 `노드 그룹 미지정` */
+function cnGroups(m){
+  const g={}, order=[];
+  NODES.forEach(function(nd,i){
+    const k=nd.grp||'노드 그룹 미지정';
+    if(!g[k]){ g[k]={n:k,tot:0,done:[]}; order.push(k); }
+    g[k].tot++; if(nodeCached(m,i)) g[k].done.push(nd.n);
+  });
+  return order.map(function(k){ return g[k]; }).filter(function(x){ return x.done.length; });
+}
+/* 기본 접힘. 펼치면 캐싱된 노드 이름을 쉼표로 잇는다 */
+function cnGroupHtml(m){
+  const gs=cnGroups(m);
+  if(!gs.length) return '<span class="dash">-</span>';
+  return gs.map(function(x){
+    /* 접힘 블록은 기존 `.adv`(배포 목업과 같은 규격)를 쓴다. 새 클래스 · 값을 만들지 않는다 */
+    /* 수량은 값 옆 부가 정보에 쓰는 `.mver` 로 둔다(목록 캐싱 노드 칸과 같은 `완료 / 전체`) */
+    return '<details class="adv"><summary><span>'+x.n+'<span class="mver">'+x.done.length+' / '+x.tot+'</span></span>'
+      + '<span class="fold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></summary>'
+      + '<div class="advbody">'+x.done.join(', ')+'</div></details>';
+  }).join('');
+}
 /* 기본 정보 수정·삭제를 막는 사유. 캐싱 중·빌드 중에 더해 등록 중도 막는다(모델 정책 3.4·3.5).
    상태로 잠시 막히는 것이라 비활성 + 사유다. 없으면 빈 문자열 */
 function lockMsg(m){
@@ -2132,7 +2204,7 @@ function openPanel(i){
     + (isA?'<dt>서빙 엔진</dt><dd>'+m.eng+'</dd>':'<dt>토크나이저 경로</dt><dd>'+dv(m.tok)+'</dd>')
     + (isA?'<dt>베이스</dt><dd>'+m.base+'</dd>':'')
     + '<dt>태그</dt><dd>'+((m.tags&&m.tags.length)?m.tags.map(function(t){return '<span class="vtag">'+t+'</span>';}).join(' '):dv(''))+'</dd>'
-    + '<dt>동기화 상태'+help('sync')+'</dt><dd><span class="stbadge ok">일치</span></dd>'
+    + '<dt>동기화 상태'+help('sync')+'</dt><dd>'+syncBadge(m)+'</dd>'
     + '<dt>등록자</dt><dd>'+userRef(m.by)+'</dd>'
     + '<dt>등록일시</dt><dd>'+m.at+'</dd>'
     + '</dl>', 'basic');
@@ -2164,15 +2236,12 @@ function openPanel(i){
       + '<dt>저장 위치</dt><dd><span class="path" style="max-width:100%">'+m.store+'</span></dd>'
       + '<dt>캐싱 상태</dt><dd><span class="stbadge '+RB[m.ready]+(m.ready.indexOf('중')>-1?' load':'')+'"><span class="d"></span>'+m.ready+'</span></dd>'
       /* 몇 개인지와 어느 노드인지를 함께 둔다. 배포가 그 노드에 뜨면 기동이 빠르다 */
-      + '<dt>캐싱된 노드'+help('cnode')+'</dt><dd>'
-      +   (m.cn? cnCell(m)+'<span class="mver">'+cnNames(m).join(' · ')+'</span>'
-                : '<span class="dash">-</span>')+'</dd>'
+      + '<dt>캐싱된 노드'+help('cnode')+'</dt><dd>'+cnGroupHtml(m)+'</dd>'
       /* 빌드한 이미지는 원본 가중치와 상호 링크된다(모델 정책 3.2 · 기획서 7.3). 학습 이력은 그 가중치 버전에서 본다 */
       + (m.base==='Custom Build'? '<dt>원본 가중치</dt><dd>'+(m.src? '<a href="#" class="mname" onclick="goWgt(\''+m.src+'\');return false">'+m.src+'</a>' : '<span class="dash">-</span>')+'</dd>' : '')
       + '</dl>'
-      + (canWrite()?'<div class="secact">'+disTipIf('<button class="btn ghost sm" '+(busy?'disabled':'')+' onclick="openCache(\''+m.n+'\')">'+(busy?'캐싱 중…':'노드 캐싱')+'</button>', busy? busyMsg(m) : '')
-        +'<button class="btn sm" onclick="goDeploy(\''+m.n+'\',\''+m.ready+'\')">배포</button></div>':'')
-      + (m.ready==='미캐싱'?'<div class="secnote">노드에 캐싱되지 않은 이미지는 배포할 수 있으나 초기 기동이 지연됩니다.</div>':''), 'ready');
+      + (canWrite()?'<div class="secact">'+disTipIf('<button class="btn ghost sm" '+(cacheWhy(m)?'disabled':'')+' onclick="openCache(\''+m.n+'\')">'+(busy?'캐싱 중…':'노드 캐싱')+'</button>', cacheWhy(m))
+        +deployBtn(m,'btn sm')+'</div>':''), 'ready');
 
     /* 버전 목록은 상세 페이지의 버전 탭에서 제공한다.
        버전에 캐싱·배포·삭제 액션이 붙어 패널 폭으로는 수용할 수 없다 */
@@ -2363,7 +2432,7 @@ function drawDetail(){
      + '<th>'+(isA?'저장 경로':'경로·출처')+'</th><th>등록자</th><th>등록일시</th><th style="width:64px">작업</th></tr></thead><tbody>'
      + vers.map(function(v,vi){
         const busy = v.ready==='캐싱 중'||v.ready==='빌드 중';
-        const why = isA? (busy? '지금은 '+v.ready+' 상태라 실행할 수 없습니다.' : '') : buildBlock(v);
+        const why = isA? cacheWhy(v) : buildBlock(v);
         /* 행을 누르면 버전 상세(D01.T01.M02)가 열린다 */
         return '<tr onclick="openVerDt('+vi+')">'
          + '<td><span class="mname">'+v.v+'</span></td>'
@@ -2377,10 +2446,10 @@ function drawDetail(){
          + '<td>'+userRef(v.by)+'</td><td>'+v.at+'</td>'
          + '<td onclick="event.stopPropagation()">'+(canWrite()
              ? '<div class="more" id="vm'+vi+'"><button class="morebtn" onclick="tgMore(event,\'vm'+vi+'\')">⋯</button><div class="rowmenu">'
-               /* 목록 행 메뉴와 같은 동작이다. 노드 캐싱은 모달, 빌드는 그 버전, 배포는 미캐싱 사전 안내를 거친다 */
+               /* 목록 행 메뉴와 같은 동작이다. 노드 캐싱은 모달, 빌드는 그 버전. 배포는 캐싱됨인 버전만(모델 정책 4.1) */
                + disTipIf('<button '+(why?'disabled':'')+' onclick="'+(isA? 'openCache(\''+v.n+'\',\''+v.v+'\')' : 'build(\''+v.n+'\',false,\''+v.v+'\')')+'">'+(isA?'노드 캐싱':'이미지 빌드')+'</button>', why)
                + (isA? cdelBtn(v,'askCdel(\''+v.n+'\',\''+v.v+'\')') : '')
-               + (isA?'<button onclick="goDeploy(\''+v.n+'\',\''+v.ready+'\')">배포</button>':'')
+               + (isA? deployBtn(v) : '')
                /* 배포에 쓰이는 버전은 삭제할 수 없다(정책 2.5). 등록 중인 버전도 삭제하지 않는다(정책 3.5) */
                + '<hr>'+disTipIf('<button class="d"'+(v.use==='배포 중'||v.reg==='등록 중'?' disabled':'')
                + ' onclick="delVer(\''+v.v+'\')">삭제</button>',
@@ -3021,6 +3090,7 @@ function openEdit(){
   document.getElementById('eReqWrap').style.display = isA?'':'none';
   const d=m.dreq||{};
   function manual(o){ return o && o.v!=null? String(o.v) : ''; }
+  document.getElementById('eMode').value = (m.mode==='단일'||m.mode==='프리필·디코드 분리')? m.mode : '선택 안 함';
   document.getElementById('eReqGpu').value = manual(d.gpu);
   document.getElementById('eReqCtx').value = manual(d.ctx);
   document.getElementById('eReqNote').value = manual(d.note);
@@ -3031,7 +3101,8 @@ function openEdit(){
     document.getElementById(id+'Err').style.display='none';
   });
   eInit={desc:document.getElementById('eDesc').value, tag:'', scope:m.scope,
-         rg:document.getElementById('eReqGpu').value, rc:document.getElementById('eReqCtx').value, rn:document.getElementById('eReqNote').value};
+         rg:document.getElementById('eReqGpu').value, rc:document.getElementById('eReqCtx').value, rn:document.getElementById('eReqNote').value,
+         md:document.getElementById('eMode').value};
   document.getElementById('mdEdit').classList.add('on');
   editValid();
 }
@@ -3043,7 +3114,8 @@ function closeEdit(){
 function isEditChanged(){
   return document.getElementById('eDesc').value!==eInit.desc || document.getElementById('eTag').value!==eInit.tag
     || document.getElementById('eReqGpu').value!==eInit.rg || document.getElementById('eReqCtx').value!==eInit.rc
-    || document.getElementById('eReqNote').value!==eInit.rn;
+    || document.getElementById('eReqNote').value!==eInit.rn
+    || document.getElementById('eMode').value!==eInit.md;
 }
 /* 수정은 변경 1개 이상 + 검증 통과 시 활성 (7.1) */
 function editValid(){ document.getElementById('eSubmit').disabled = !isEditChanged(); }
@@ -3060,6 +3132,8 @@ function submitEdit(){
     if(!ok && !first) first=el;
   });
   if(first){ first.focus(); return; }
+  /* 권장 엔진 모드는 값만 바꾼다. 비우면 - 로 보인다 */
+  if(cur && cur.isA){ const mv=document.getElementById('eMode').value; cur.m.mode = mv==='선택 안 함'? '-' : mv; refresh(); }
   document.getElementById('mdEdit').classList.remove('on'); toast('ok','수정했습니다.');
 }
 
@@ -3302,6 +3376,7 @@ function cacheGrp(el, i){
 /* v 를 넘기면 그 버전을, 넘기지 않으면 최신 버전을 캐싱한다(상세 버전 탭은 버전을 넘긴다) */
 function openCache(n, v){
   cTarget=n; cTargetV=v||''; document.getElementById('cName').textContent=n+(v?' '+v:'');
+  document.getElementById('cReqErr').innerHTML='';
   const b=document.getElementById('cacheBody');
   if(!NODES.length){
     b.innerHTML='<div class="state" style="padding:36px 12px;border:0;background:transparent"><h3>캐싱 가능한 노드가 없습니다.</h3><p>클러스터에 가속기 노드가 없습니다.</p></div>';
@@ -3321,6 +3396,8 @@ function openCache(n, v){
   document.getElementById('mdCache').classList.add('on'); cacheValid();
 }
 function closeCache(){document.getElementById('mdCache').classList.remove('on');}
+let cacheRej=false;
+function setCacheRej(v,btn){ cacheRej=v; document.querySelectorAll('#demoBar .cj').forEach(function(b){ b.classList.remove('on'); }); if(btn) btn.classList.add('on'); }
 /* 고를 수 있는 노드가 없을 때만 비활성이다(상태). 고르지 않은 것은 누를 때 알린다(공통정책 7.1 · 7.8) */
 function cacheValid(){
   document.getElementById('cSubmit').disabled=!document.querySelectorAll('#mdCache input[type=checkbox]:not(:disabled)').length;
@@ -3331,6 +3408,12 @@ function submitCache(){
   if(!document.querySelectorAll('#mdCache input:checked').length){
     document.getElementById('cNodeErr').style.display='block';
     const f=document.querySelector('#mdCache input[type=checkbox]:not(:disabled)'); if(f) f.focus();
+    return;
+  }
+  /* 화면을 연 뒤 저장소 동기화로 이미지가 없어진 경우 — 모달을 닫지 않고 위에 사유를 둔다(MODEL-L01 5.3). 검토용 분기다 */
+  if(cacheRej){
+    document.getElementById('cReqErr').innerHTML='<div class="alertbox crit"><svg class="aic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg><div class="atx">저장소에 없는 이미지라 캐싱할 수 없습니다.</div></div>';
+    const t=IMG.find(x=>x.n===cTarget && (!cTargetV || x.v===cTargetV)); if(t){ t.sync='저장소에 없음'; refresh(); }
     return;
   }
   closeCache();
@@ -3367,12 +3450,15 @@ function runCache(m, picked){
 function canCdel(m){ return canWrite() && !!m && m.ready==='캐싱됨'; }
 function cdelBtn(m, call){
   if(!canCdel(m)) return '';
-  return disTipIf('<button'+(m._cdel?' disabled':'')+' onclick="'+call+'">캐시 삭제</button>', m._cdel? '캐시 삭제가 진행 중입니다.' : '');
+  /* 배포에 쓰이는 버전은 캐시를 지울 수 없다(모델 정책 4.5). 배포가 노드 캐시를 물고 뜨고, 삭제는 모든 노드 그룹의 캐시를 함께 지운다.
+     사용 여부는 버전 삭제와 같은 판정(참조 배포 기록, 정책 2.6)이다 — 캐시는 버전 단위라 버전의 use 를 본다 */
+  const why = m.use==='배포 중'? '배포에 사용 중인 버전은 캐시를 삭제할 수 없습니다.' : m._cdel? '캐시 삭제가 진행 중입니다.' : '';
+  return disTipIf('<button'+(why?' disabled':'')+' onclick="'+call+'">캐시 삭제</button>', why);
 }
 function askCdel(n, v){
   const m=IMG.find(function(x){ return x.n===n && (!v || x.v===v); }); if(!m) return;
   openConfirm('캐시 삭제',
-    '<b>'+m.n+' '+m.v+'</b>의 노드 캐시를 삭제합니다. 삭제한 뒤 배포하면 초기 기동이 지연됩니다.',
+    '<b>'+m.n+' '+m.v+'</b>의 노드 캐시를 삭제합니다. 삭제하면 다시 캐싱하기 전까지 이 버전으로 배포할 수 없습니다.',
     function(){ runCdel(m); },'삭제');
 }
 function runCdel(m){
@@ -3473,13 +3559,8 @@ function reconcileAsk(){
   openConfirm('저장소 동기화','저장소의 실제 상태와 메타데이터를 맞춥니다.',
     function(){ reconcile(); },'동기화');
 }
-/* 캐싱되지 않은 이미지 배포 — 사전 안내 (기획서 R030) */
-function goDeploy(name,ready){
-  if(ready==='미캐싱'||ready==='캐싱 중'){
-    openConfirm('캐싱되지 않은 모델 배포','<b>'+name+'</b>은(는) 아직 노드에 캐싱되어 있지 않아('+ready+') 배포 시 초기 기동이 지연될 수 있습니다.',
-      function(){ toast('ok','배포 생성으로 이동합니다.'); },'계속');
-  } else { toast('ok','배포 생성으로 이동합니다.'); }
-}
+/* 배포 생성으로 이동한다. 캐싱됨인 버전만 진입할 수 있어 진입 버튼이 비활성 + 사유다(deployWhy · 모델 정책 4.1) */
+function goDeploy(name){ toast('ok','배포 생성으로 이동합니다.'); }
 
 /* ===== 토스트 (공통정책 7.7 — 성공 3초 / 실패 5초) ===== */
 function toast(t,msg){
