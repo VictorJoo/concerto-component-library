@@ -1,5 +1,14 @@
 <!--
-  콘체르토 매니저 · 워크스페이스 화면 목업 v0.63 (2026-10-28)
+  콘체르토 매니저 · 워크스페이스 화면 목업 v0.64 (2026-11-02)
+
+  ── v0.64 (2026-11-02) ──
+  · 워크스페이스 기획서 v0.64 와 같은 버전이다.
+  · 멤버 초대 안내 문구에 초대할 수 없는 계정 상태를 넣었다(WKSP-L01 REQ-WKSP-061 · 5.2 · 계정 정책 3장 · 워크스페이스 정책 9장).
+    후보는 이미 joinable() 로 승인 · 활성 계정만 두고 있었다. 후보가 0건일 때 `모든 사용자가 이미 이 워크스페이스의 멤버입니다.` 는
+    남은 사용자가 승인 대기 · 반려 · 비활성 계정뿐인 경우와 맞지 않아 고쳤다.
+  · 워크스페이스 생성 토스트를 정책 2.3에 맞췄다. 워크스페이스는 즉시 만들어지므로 `워크스페이스를 생성했습니다.` 로 끝내고,
+    룸을 함께 만들 때만 `룸 준비가 끝나면 알림으로 안내됩니다.` 를 붙인다. 종전 `생성을 요청했습니다. 준비가 끝나면 알림으로 안내됩니다.` 는
+    워크스페이스 자체가 비동기로 만들어지는 것처럼 읽혔다(알림 정책 3.1 「워크스페이스 생성 완료 · 실패」 사건 삭제와 같이).
 
   ── v0.63 (2026-10-28) ──
   · 10-28 4차. 운영룸 삭제 실패의 `운영룸 삭제` 확인 알럿 본문에 배포 건수를 넣었다 — `배포 {N}건이 함께 제거되어 모델 호출이 중단됩니다.`
@@ -4715,7 +4724,7 @@ function submitForm(){
       ico:NF.ico,
     members:NF.owners.map(function(u){ return {n:u.split('(')[0], id:u.replace(/.*\(|\)/g,''), role:'관리자'}; }),
       models:[],deps:[],cdes:[],keys:[],jobs:[]});
-    backToList(); toast('ok','워크스페이스 생성을 요청했습니다. 준비가 끝나면 알림으로 안내됩니다.');
+    backToList(); toast('ok', (NF.mkProd||NF.mkDev)? '워크스페이스를 생성했습니다. 룸 준비가 끝나면 알림으로 안내됩니다.' : '워크스페이스를 생성했습니다.');
   } else {
     /* 신청은 결재 레코드로만 남는다. 워크스페이스는 승인 시 만들어진다.
        전이도가 CREATING 부터 시작하므로 승인 전에는 워크스페이스가 아니다 */
@@ -4740,8 +4749,8 @@ function openInvite(){
     '<option value="">선택해 주세요</option>'+cands.map(function(u){ return '<option>'+u+'</option>'; }).join('');
   document.getElementById('iUser').disabled = !cands.length;
   document.getElementById('iHint').textContent = cands.length
-    ? '이미 멤버인 사용자는 목록에 표시되지 않습니다. 역할을 바꾸려면 멤버 목록에서 변경합니다.'
-    : '초대할 수 있는 사용자가 없습니다. 모든 사용자가 이미 이 워크스페이스의 멤버입니다.';
+    ? '이미 멤버인 사용자와 승인 대기 · 반려 · 비활성 계정은 목록에 표시되지 않습니다. 역할을 바꾸려면 멤버 목록에서 변경합니다.'
+    : '초대할 수 있는 사용자가 없습니다. 이미 멤버이거나 승인 대기 · 반려 · 비활성 계정입니다.';
   document.getElementById('iUser').classList.remove('err'); document.getElementById('iUserErr').classList.remove('show');
   iValid();
   document.getElementById('mdInvite').classList.add('on');
