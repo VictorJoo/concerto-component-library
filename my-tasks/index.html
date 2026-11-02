@@ -1,5 +1,13 @@
 <!--
-  콘체르토 매니저 — 내 작업함 목업 v0.15 (2026-10-28)
+  콘체르토 매니저 — 내 작업함 목업 v0.16 (2026-11-02)
+
+  ── v0.16 (2026-11-02) ──
+  · 활성 관리자가 없어 최고 관리자에게 보인 CDE 건은 그 뒤 관리자가 생겨도 최고 관리자에게 계속 보이고 처리할 수 있다(승인 정책 3.3 · TASK-L01 REQ-TASK-041 · 5.2).
+    관리자가 생기면 그 관리자에게도 보인다. 판정 플래그를 둘로 갈랐다 — noAdmin 은 지금 활성 관리자가 없는지(워크스페이스 컬럼 경고 아이콘),
+    toSuper 는 최고 관리자에게 넘어간 적이 있는지(최고 관리자 처리 가능). v0.15 는 noAdmin 하나로 판정해 관리자가 생기면 최고 관리자에게서 빠졌다.
+  · 활성 관리자가 있는 워크스페이스의 건이 최고 관리자 탭에 나오지 않는 판정은 v0.15 그대로다(공통정책 7.10). 거절 안내 화면은 두지 않는다.
+  · 데모 바 `관리자 없음 건` — `관리자 없음`(기본) / `관리자 생김`. 켜면 edge-inference 건의 경고 아이콘이 사라지고 WS 관리자 권한에서도 보이며,
+    최고 관리자 권한에서는 그대로 남는다. 실제 화면에는 없는 검토용 처리다.
 
   ── v0.15 보탬 (2026-10-28) ──
   · 10-28 재검증 정정(2차). .dis-tip.flip 은 라이브러리 v0.25 에 들어가 주석을 고쳤다. 화면 변경은 없다.
@@ -1945,6 +1953,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <span class="dgrp"><span class="demo-label">연장 대상:</span>
   <button class="rc on" onclick="setReclaim(false,this)">회수 전</button>
   <button class="rc" onclick="setReclaim(true,this)">회수 후</button></span>
+  <span class="dgrp"><span class="demo-label">관리자 없음 건:</span>
+  <button class="ab on" onclick="setAdminBack(false,this)">관리자 없음</button>
+  <button class="ab" onclick="setAdminBack(true,this)">관리자 생김</button>
+  <span class="dnote" id="abNote"></span></span>
   <span class="dgrp"><span class="demo-label">권한:</span>
   <button class="rl" onclick="setRole('super',this)">최고 관리자</button>
   <button class="rl on" onclick="setRole('admin',this)">WS 관리자</button>
@@ -2162,7 +2174,7 @@ const TASKS=[
     요청이 갈 곳이 없어 멈추는 것을 막는다 */
  {at:'2026-08-25 14:02:51', type:'CDE 신청', who:'유지현(jh.yu)', ws:'edge-inference',
   tgt:'jh-jupyter-02', st:'승인 대기', by:'', byAt:'',
-  mine:false, toMe:true, noAdmin:true,
+  mine:false, toMe:true, noAdmin:true, toSuper:true,
   body:[['이미지 태그','pytorch-nvidia-v2.5'],['CPU','4 Cores'],['Memory','16 Gi'],
         ['가속기','NVIDIA-H200 1장'],['개인 볼륨','50 GB'],['사용 기간','2026-09-24'],
         ['요청 사유','엣지 추론 실험에 쓰려고 합니다.']]},
@@ -2341,9 +2353,14 @@ function canApproveType(type){
   return role==='super'||role==='admin';
 }
 /* CDE 신청·연장은 그 워크스페이스 관리자가 처리한다. 최고 관리자는 활성 관리자가 없는
-   워크스페이스의 건만 처리한다(승인 정책 3.3 · REQ-TASK-009-1) */
+   워크스페이스의 건만 처리한다(승인 정책 3.3 · REQ-TASK-009-1).
+   한 번 최고 관리자에게 넘어간 건(toSuper)은 관리자가 생겨도 최고 관리자가 처리할 수 있고, 관리자에게도 보인다(REQ-TASK-041) */
 function canApproveTask(t){
-  if(t.noAdmin) return role==='super';
+  if(t.type==='CDE 신청'||t.type==='CDE 연장'){
+    if(role==='super') return !!(t.noAdmin || t.toSuper);
+    if(t.noAdmin) return false;
+    return role==='admin';
+  }
   if(t.type==='CDE 신청'||t.type==='CDE 연장') return role==='admin';
   return canApproveType(t.type);
 }
@@ -2641,6 +2658,16 @@ function guardDone(t){
   openConfirm('이미 처리된 신청입니다',
     '<b>'+esc(t.by)+'</b>님이 '+t.byAt+'에 '+t.st+' 처리했습니다.', null, null, '닫기');
   return true;
+}
+
+/* 데모 — 활성 관리자가 없던 워크스페이스(edge-inference)에 그 뒤 관리자가 생긴 상황. 경고 아이콘이 사라지고
+   WS 관리자에게도 보이며, 최고 관리자에게는 그대로 남는다(REQ-TASK-041). 실제 화면에는 없는 검토용 처리다 */
+function setAdminBack(on,btn){
+  document.querySelectorAll('.demo-bar .ab').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  TASKS.forEach(function(t){ if(t.ws==='edge-inference' && t.type==='CDE 신청'){ t.noAdmin=!on; t.toSuper=true; } });
+  const note=$('abNote'); if(note) note.textContent= on ? '최고 관리자 · WS 관리자 모두 처리할 수 있습니다' : '';
+  drawList(); if(cur!==null) drawDetail();
 }
 
 /* 목록 행 메뉴에서도 부르므로 대상 인덱스를 받는다. 생략하면 열려 있는 상세를 쓴다 */
