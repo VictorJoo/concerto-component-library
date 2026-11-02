@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>콘체르토 매니저 · 마이페이지</title>
 <!--
-  콘체르토 매니저 · 마이페이지 화면 목업 v0.27 (2026-10-28)
+  콘체르토 매니저 · 마이페이지 화면 목업 v0.28 (2026-11-02)
+
+  ── v0.28 (2026-11-02) ──
+  · 마이페이지 기획서 v0.28 과 같은 버전이다.
+  · saveMp() 주석을 기획서 5.2에 맞췄다. 비밀번호가 없는 계정은 확인할 값이 없어 본인 확인 없이 저장하고 인증 기관 재인증도 거치지 않는다
+    (REQ-MYPAGE-018 · 5.1 · 5.2). 종전 주석은 「인증 기관으로 이동해 재인증하고 돌아와 저장된다」로 반대였다. 동작은 바뀌지 않는다.
 
   ── v0.27 (2026-10-28) ──
   · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다). 프로필 팝오버 계정 정보에 아이디를 더해 공통 레이아웃 v0.13 과 같게(이름 · 아이디 · 이메일, REQ-CM-LAYOUT-021).
@@ -776,8 +781,7 @@ function saveMp(){
   /* 첫 오류 필드에 포커스한다(공통정책 7.8) */
   if(!okN||!okE||!okP){ (!okN?$mp('mpName'):!okE?$mp('mpEmail'):$mp('mpPw')).focus(); return; }
   var b=$mp('mpSave'); b.classList.add('loading'); b.disabled=true;
-  /* 비밀번호가 없는 계정은 여기서 인증 기관으로 이동해 재인증하고 돌아와 저장된다(기획서 5.2).
-     이 목업에는 인증 서버가 없어 이동을 생략하고 저장 결과만 보인다 —
+  /* 비밀번호가 없는 계정은 확인할 값이 없어 본인 확인 없이 저장한다. 인증 기관 재인증도 거치지 않는다(기획서 5.2 · REQ-MYPAGE-018).
      저장 흐름이 이 화면의 검토 대상이라 스피너에서 멈추지 않는다 */
   setTimeout(function(){ b.classList.remove('loading');
     MP_ORIG.name=$mp('mpName').value.trim(); MP_ORIG.email=$mp('mpEmail').value.trim();
