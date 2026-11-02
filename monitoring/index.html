@@ -1,7 +1,20 @@
 <!--
-  콘체르토 매니저 — 모니터링 목업 v0.32 (2026-10-30)
+  콘체르토 매니저 — 모니터링 목업 v0.33 (2026-11-02)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다 —
   필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
+
+  ── v0.33 (2026-11-02) ──────────────────────
+  · 모니터링 정책 v0.24 · MON-L01 v0.33 과 같은 버전이다.
+  · Furiosa LLM 도 KV 캐시 사용률(1분 평균)을 낸다(결정 사항 3.5 #35 · 확인 요청 3515449379 댓글 3519414549). 시스템 기본 규칙과 인프라 차트의
+    KV 캐시 사용률은 서빙 엔진 · 가속기 계열(GPU · NPU) 구분 없이 같은 항목이다(정책 6.4). 엔진별 VRAM 기본 규칙은 두지 않는다.
+    v0.32 에 더했던 시스템 기본 규칙 `VRAM 사용률 초과`(g5) 원본과 ai-service-team · ml-research 복제본을 지웠다. 기본 규칙은 4종이다(정책 6.4 · MON-L01 8장).
+    사용자 규칙 `VRAM 사용률 높음`(ai-service-team)은 남긴다 — VRAM 사용률은 카탈로그에 남아 사용자가 직접 규칙을 만들 수 있다(정책 6.4).
+    꺼진 기본 규칙 샘플(같은 범위 · 심각도의 사용자 규칙 있음)은 ml-research `가속기 온도 오류` 복제본 그대로다.
+  · Grafana 열기 오류로 돌아온 화면은 배포 성능 탭 · 열기를 누른 배포가 선택된 상태다(정책 5.4 · MON-L01 5.2). 주소의 deployment 값으로 배포를 고른다.
+    데모 바 `v0.32 확인: Grafana 열기 오류` 버튼은 지금 고른 배포로 그 상황을 흉내 낸다(가속기 탭에서 눌러도 배포 성능 탭으로 옮겨 토스트).
+  · 서빙 엔진 차트 축을 `8,000 ms` 로 고쳤다. v0.31에 계열을 TTFT · TPOT로 바꾸면서 축을 `2,000 tok/s` 로 둔 채였다.
+  · 측정하지 못한 지표는 차트에도 선을 긋지 않는다. llama-3-2-1b-prod 는 KV 캐시 사용률을 재지 못해 카드가 `-` 인데 인프라 차트에 KV 선이 있던 것을 비웠다(정책 1장 원칙 4 · 5.3).
+  · 아래 v0.32 묶음의 Furiosa VRAM 규칙 서술은 이력으로 남긴 것이다. 현재 기준은 이 묶음이다.
 
   ── v0.32 (2026-10-30) ──────────────────────
   · 모니터링 정책 v0.23 · MON-L01 v0.32 와 같은 버전이다.
@@ -3404,8 +3417,8 @@ let RULES=[
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:'성유진(yj.seong)', at:'2026-10-20 16:40:02', fires:[]},
   /* 시스템 기본 규칙의 원본. 공용 워크스페이스에 속한 전역 규칙이고 최고 관리자만 고친다(모니터링 정책 6.1 · 6.4). 시스템이 만들어 등록자가 없다.
      gid 는 원본과 복제본을 잇는 검토용 키다. 연결된 복제본(linked)은 원본의 임계값 · 연산자 · 심각도 · 채널을 따른다(정책 6.4).
-     첫 규칙은 KV 캐시 사용률(1분 평균) 90% 초과 주의다. 1분 평균 KV 캐시를 내지 않는 엔진(Furiosa LLM)의 배포에는 평가되지 않는다.
-     그 엔진의 배포에는 다섯째 `VRAM 사용률 초과`(90% 초과 · 1분 · 오류)가 대신 평가된다(정책 6.4) */
+     첫 규칙은 KV 캐시 사용률(1분 평균) 90% 초과 주의다. 서빙 엔진 · 가속기 계열(GPU · NPU) 구분 없이 같은 항목으로 평가한다(정책 6.4).
+     엔진별 VRAM 기본 규칙은 두지 않는다. 기본 규칙은 4종이다 */
   {n:'KV 캐시 사용률 초과', metric:'kv_cache_usage_1m', op:'초과', th:90, dur:1, sev:'주의',
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g1'},
   {n:'첫 토큰 지연 증가', metric:'ttft_p95_ms', op:'초과', th:3000, dur:1, sev:'주의',
@@ -3414,19 +3427,15 @@ let RULES=[
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g3'},
   {n:'가속기 온도 주의', metric:'gpu_temp', op:'초과', th:80, dur:1, sev:'주의',
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g4'},
-  {n:'VRAM 사용률 초과', metric:'vram_pct', op:'초과', th:90, dur:1, sev:'오류',
-   ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g5'},
   /* ai-service-team 의 복제본. `첫 토큰 지연 증가` · `가속기 온도 주의` 는 연결되어 있다. `가속기 온도 오류` 복제본은 지웠다 —
      사용자 규칙 `가속기 온도 이상` 이 같은 범위 · 메트릭 · 심각도라 함께 둘 수 없다(정책 6.3 중복). 지운 복제본의 지표는 전역 규칙으로 판정한다(정책 6.4).
      `KV 캐시 사용률 초과` 복제본은 연결된 상태다. 같은 범위의 사용자 규칙 `KV 캐시 포화`(주의)는 직접 중지라 기본 규칙을 끄지 않는다(정책 6.4).
-     `VRAM 사용률 높음` 은 사용자가 직접 만든 규칙이다. 같은 범위 · 메트릭 · 심각도라 `VRAM 사용률 초과` 복제본은 꺼진 채 남았다(정책 6.4 · REQ-MON-075).
+     `VRAM 사용률 높음` 은 사용자가 직접 만든 규칙이다. VRAM 사용률은 기본 규칙이 아니라 카탈로그에 남은 항목이다(정책 6.4).
      꺼진 기본 규칙 샘플은 ml-research 에 둔다 */
   {n:'KV 캐시 사용률 초과', metric:'kv_cache_usage_1m', op:'초과', th:90, dur:1, sev:'주의',
    ws:'ai-service-team', scope:'전체', ch:[], by:null, at:'2026-08-20 10:00:00', fires:[], linked:true, gid:'g1'},
   {n:'VRAM 사용률 높음', metric:'vram_pct', op:'초과', th:85, dur:1, sev:'오류',
    ws:'ai-service-team', scope:'전체', ch:['slack-ai-alert'], by:'성유진(yj.seong)', at:'2026-10-22 10:14:05', fires:[]},
-  {n:'VRAM 사용률 초과', metric:'vram_pct', op:'초과', th:90, dur:1, sev:'오류',
-   ws:'ai-service-team', scope:'전체', ch:[], by:null, at:'2026-08-20 10:00:00', fires:[], gid:'g5', off:'같은 규칙 있음', offAt:'2026-10-22 10:14:05'},
   {n:'첫 토큰 지연 증가', metric:'ttft_p95_ms', op:'초과', th:3000, dur:1, sev:'주의',
    ws:'ai-service-team', scope:'전체', ch:[], by:null, at:'2026-08-20 10:00:00', fires:[], linked:true, gid:'g2'},
   {n:'가속기 온도 주의', metric:'gpu_temp', op:'초과', th:80, dur:1, sev:'주의',
@@ -3442,8 +3451,6 @@ let RULES=[
      꺼진 규칙은 건전성 판정과 중복 검사에서 세지 않는다(정책 6.3 · 6.4). 시각은 검토용이다 */
   {n:'KV 캐시 사용률 초과', metric:'kv_cache_usage_1m', op:'초과', th:90, dur:1, sev:'주의',
    ws:'ml-research', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], linked:true, gid:'g1'},
-  {n:'VRAM 사용률 초과', metric:'vram_pct', op:'초과', th:90, dur:1, sev:'오류',
-   ws:'ml-research', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], linked:true, gid:'g5'},
   {n:'KV 캐시 사용률 높음', metric:'kv_cache_usage_1m', op:'초과', th:85, dur:1, sev:'주의',
    ws:'ml-research', scope:'전체', ch:[], by:'유지현(jh.yu)', at:'2026-10-21 15:30:12', fires:[]},
   {n:'첫 토큰 지연 증가', metric:'ttft_p95_ms', op:'초과', th:3000, dur:1, sev:'주의',
@@ -3499,7 +3506,7 @@ const CATALOG=[
   {k:'ttft_p95_ms',    p:'서빙 엔진',   t:'첫 토큰 지연 P95', u:'ms', sev:'주의', op:'초과', th:3000, on:true, hb:'over'},
   {k:'tpot_p99_ms',    p:'서빙 엔진',   t:'토큰당 지연 P99', u:'ms', sev:'주의', op:'초과', th:200,  on:true, hb:'over'},
   {k:'kv_cache_usage', p:'서빙 엔진',   t:'KV 캐시 사용률',  u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room', nocrit:true},
-  /* 1분 평균 키(KV-KEY-1M-1). 시스템 기본 규칙이 이 키를 쓴다(정책 6.4). vLLM 계열만 낸다 — Furiosa LLM은 내지 않는다. 그 엔진의 메모리 규칙은 VRAM 사용량 · 사용률 항목으로 직접 만든다.
+  /* 1분 평균 키(KV-KEY-1M-1). 시스템 기본 규칙이 이 키를 쓴다(정책 6.4). 서빙 엔진 · 가속기 계열(GPU · NPU) 구분 없이 같은 항목이다 — Furiosa LLM 도 낸다.
      건전성 판정은 현재 값 키(kv_cache_usage)가 맡아 hb 를 두지 않는다(정책 5.2 표 집계 `현재`). 건전성 반영 지표가 아니라 같은 칸 중복 검사도 걸리지 않는다(BE alert_rule_seed_kv_cache) */
   {k:'kv_cache_usage_1m', p:'서빙 엔진', t:'KV 캐시 사용률(1분 평균)', u:'%', sev:'주의', op:'초과', th:90, on:true},
   {k:'latency_p99_ms', p:'서빙 엔진',   t:'P99 응답 지연',  u:'ms', sev:'주의', op:'초과', th:2000, on:true},
@@ -5044,7 +5051,7 @@ const XTICK={
    최댓값을 안 보이면 선이 위로 붙었을 때 그것이 한계인지 아닌지 알 수 없다 */
 const YMAX={
   '가속기 사용률':'100%', 'KV 캐시 사용률':'100%', '에러율':'100%',
-  '게이트웨이':'2,000 req/s', '서빙 엔진':'2,000 tok/s', '인프라':'100%'
+  '게이트웨이':'2,000 req/s', '서빙 엔진':'8,000 ms', '인프라':'100%'  /* v0.33 · 서빙 엔진 차트 계열이 TTFT · TPOT(ms)라 축도 ms. v0.31에 계열만 바꾸고 축을 tok/s로 둔 것을 고침 */
 };
 
 function lineChart(title, seedExtra){
@@ -5055,6 +5062,9 @@ function lineChart(title, seedExtra){
   const a=wave(sd+'a', N), b=wave(sd+'b', N);
   /* 빈 구간 검토용 — 이 배포의 서빙 엔진 차트에만 넣는다. 실제 값이 아니다 */
   if(seedExtra==='llama-3-2-1b-prod' && title==='서빙 엔진'){ for(let k=12;k<16;k++){ a[k]=null; b[k]=null; } }
+  /* 측정하지 못한 지표(건전성 missing)는 차트에도 선을 그리지 않는다(정책 1장 원칙 4 · 5.3). 카드는 `-` 인데 차트에 선이 있으면 어긋난다.
+     인프라 차트 둘째 계열이 KV 캐시 사용률이라 그 배포의 missing 에 KV 캐시 사용률이 있으면 비운다(v0.33) */
+  if(title==='인프라' && seedExtra){ const hm=(DEPM[seedExtra]||{}).missing||[]; if(hm.indexOf('KV 캐시 사용률')>=0){ for(let k=0;k<N;k++) b[k]=null; } }
   const two = !!SERIES2[title];
   const lg = SERIES2[title]||[];
   const xt = XTICK[range]||XTICK['1h'];
@@ -6658,21 +6668,27 @@ const GRAFANA_ERR = {
   OBS_GRAFANA_NO_METRICS:         '이 배포의 지표가 아직 없어 대시보드를 열 수 없습니다.'
 };
 const GRAFANA_ERR_ELSE = '대시보드를 열 수 없습니다. 잠시 후 다시 시도해 주세요.';
+/* 돌아오는 자리는 배포 성능 탭, 열기를 누른 배포가 선택된 상태다(정책 5.4 · MON-L01 5.2 · v0.33). 주소의 deployment 값으로 배포를 고른다.
+   배포 상세 모니터링 탭에서 열었을 때도 같은 자리로 돌아온다 */
 function readGrafanaErr(){
-  let code=null;
+  let code=null, dn=null;
   try{
     const u=new URL(window.location.href);
     code=u.searchParams.get('grafana_error');
     if(code===null) return;
-    u.searchParams.delete('grafana_error');
+    dn=u.searchParams.get('deployment');
+    u.searchParams.delete('grafana_error'); u.searchParams.delete('deployment');
     history.replaceState(null,'',u.pathname+(u.search||'')+u.hash);
   }catch(e){ if(code===null) return; }
+  if(dn && DEPS.some(function(x){ return x.n===dn; })) dep=dn;
+  if(tab!==1) tab=1;
+  render();
   toast('cr', GRAFANA_ERR[code] || GRAFANA_ERR_ELSE);
 }
-/* 실제 화면에는 없는 검토용 처리다. 그 코드로 돌아온 화면을 흉내 낸다 */
+/* 실제 화면에는 없는 검토용 처리다. 지금 고른 배포의 Grafana 열기가 실패해 그 코드로 돌아온 화면을 흉내 낸다 */
 function demoGrafanaErr(code){
-  try{ const u=new URL(window.location.href); u.searchParams.set('grafana_error',code); history.replaceState(null,'',u.pathname+u.search+u.hash); }
-  catch(e){ toast('cr', GRAFANA_ERR[code] || GRAFANA_ERR_ELSE); return; }
+  try{ const u=new URL(window.location.href); u.searchParams.set('grafana_error',code); u.searchParams.set('deployment',dep); history.replaceState(null,'',u.pathname+u.search+u.hash); }
+  catch(e){ if(tab!==1){ tab=1; render(); } toast('cr', GRAFANA_ERR[code] || GRAFANA_ERR_ELSE); return; }
   readGrafanaErr();
 }
 
