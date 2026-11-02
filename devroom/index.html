@@ -1,5 +1,13 @@
 <!--
-  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.32 (2026-10-30)
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.33 (2026-11-02)
+
+  ── v0.33 (2026-11-02) ──
+  · 개발룸 기획서 v0.33 · CDE 정책 v0.33 과 같은 버전이다.
+  · 절전 상태 접속에서 자동 복원 분기와 주석을 걷었다(REQ-CDE-036 · 개발룸 기획서 5.2 「절전 상태 접속」 · CDE 정책 5.1).
+    접속 버튼이 이미 비활성 + 사유라 닿지 않는 코드였으나 「접속하면 깨어나 복원된다」는 반대 규칙을 적고 있었다. 복원 동작은 2차 범위다.
+  · 승인 대기 안내 박스(drawPend)를 승인할 수 있는 사람에게만 둔다(REQ-CDE-010 · 승인 정책 3.3 v0.19).
+    최고 관리자는 활성 관리자가 없는 워크스페이스의 건만 처리하므로, 활성 관리자가 있으면 내 작업함에 그 건이 없다.
+    이 목업의 워크스페이스(ai-service-team)는 활성 관리자가 있어 최고 관리자에게 박스를 두지 않는다(WS_ADMIN_ACTIVE).
 
   ── v0.32 (2026-10-30) ──
   · 개발룸 기획서 v0.32 · CDE 정책 v0.32 와 같은 버전이다.
@@ -2465,6 +2473,10 @@ let jq='', jSel=[], jTmp=[], tSel=[], tTmp=[];
 function setCdeTab(i){ cdeTab=i; render(); }
 const isSuper=()=>role==='super';
 const isAdmin=()=>role==='super'||role==='admin';
+/* 이 개발룸이 속한 워크스페이스(ai-service-team)에 활성 관리자가 있는지. 워크스페이스 목업과 같은 표본이다.
+   최고 관리자의 CDE 신청 · 연장 승인은 활성 관리자가 없는 워크스페이스의 건만이다(승인 정책 3.3) */
+const WS_ADMIN_ACTIVE = true;
+const canApproveCde=()=>role==='admin'||(role==='super'&&!WS_ADMIN_ACTIVE);
 const canApply=()=>role!=='viewer';
 const isMine=(m)=>m.id===ME;
 
@@ -2848,7 +2860,7 @@ function drawQuota(){
    라이브러리 알림 박스 `조치 필요` 규격 — 닫을 수 없고 실행 경로를 붙인다. 0건이면 두지 않는다 */
 function drawPend(){
   const n = CDE.filter(m=>m.st==='승인 대기' && inRoom(m)).length;
-  document.getElementById('pendBox').innerHTML = (isAdmin() && n)
+  document.getElementById('pendBox').innerHTML = (canApproveCde() && n)
     ? alertBox('warn','승인 대기 중인 CDE 신청이 '+n+'건 있습니다.','승인·반려 처리는 내 작업함에서 합니다.',
         '<button class="btn ghost sm" onclick="act(\'내 작업함으로 이동합니다.\')">내 작업함으로<span class="ar">→</span></button>')
     : '';
@@ -3457,15 +3469,11 @@ function closeDl(){ document.getElementById('mdDl').classList.remove('on'); }
 
 
 /* 웹 IDE 접속 — 새 탭으로 연다. 로그인 폼을 거치지 않는다(기술문서 2.2 Zero-Login).
-   절전 상태면 접속하면서 깨어나고 작업 상태가 그대로 복원된다(기술문서 5.2).
-   ⚠ 깨어나는 데 걸리는 시간이 확인되지 않았다 — 그동안 무엇을 보일지 정해야 한다 */
+   절전 상태에서는 접속 버튼이 비활성이고 사유를 안내한다(REQ-CDE-036 · 개발룸 기획서 5.2). 복원 동작은 2차 범위다 */
 function openIde(name){
   const m=CDE.find(function(x){ return x.n===name; });
   if(!m) return;
-  if(m.st==='절전'){
-    toast('ok','절전 상태를 해제하고 있습니다. 준비되면 새 탭으로 열립니다.');
-    return;
-  }
+  if(m.st==='절전') return;
   act('웹 IDE를 새 탭으로 엽니다.');
 }
 /* 공유 볼륨 하위 폴더명만 받는다. 절대경로·상위 폴더 이탈은 백엔드가 422 로 막으므로
