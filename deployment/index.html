@@ -4,9 +4,46 @@
 
   ── 변경 ────────────────────────────────────────
   ── v0.43 (2026-11-03) ──
-  · DEP-L01 v0.43 · 배포 정책 v0.31 과 같은 버전이다.
+  · API Key 인증을 끈 경우의 안내(마법사 03 게이트웨이 힌트 · 설정 변경 API Key 인증 도움말)에 `잘못된 키를 실은 요청은 거부합니다.` 를 더했다.
+    키 없는 요청은 받고, 잘못된 키를 실은 요청은 거부하며, 키 없는 요청에 분당 한도를 둔다(배포 정책 5.5 · DEP-L01 REQ-DEP-076 · 5.1 · 7.3).
+  · 시분할은 할당량을 레플리카 수와 관계없이 풀마다 세므로(배포 정책 4.6) 잔여 초과 안내에서 레플리카 수를 빼고 레플리카당 가속기 수만 안내한다.
+  · DEP-L01 v0.43 · 배포 정책 v0.32 와 같은 버전이다.
   · 배포 생성을 막는 운영룸 상태를 미생성 · 생성 실패 둘에서 미생성 · 생성 실패 · 생성 중 · 삭제 중 · 삭제 실패 다섯으로 늘렸다(배포 정책 2.4 · REQ-DEP-029 · DEP-L01 5.3).
     정상 · 오류는 막지 않는다. 사유 문구를 상태별로 나눴다. 목록 생성 버튼 비활성 · 마법사 01 안내 · 배포 전 검사가 같은 판정(prodBlocks)을 쓴다.
+  · 설정 변경 모달(DEP-L01.D01.M01)에서 자동 확장을 지웠다. 4.0 범위 밖이다(DEP-L01 7.7 · 배포 정책 5.6 · 4.0 지원 범위 정책 2.1).
+    자동 확장 토글과 최소 · 최대 레플리카를 걷고 레플리카 수를 상시로 둔다. 용량 구간은 레플리카 수 하나다.
+    cfgDef 의 auto · minRep · maxRep 키, 변경 판정 · 레플리카 검증 · 저장의 자동 확장 분기를 함께 지웠다.
+  · 레플리카 열 도움말(COLDEF.rep)에서 `호출이 없으면 0으로 내려갑니다.` 를 뺐다. 4.0은 레플리카 수를 설정값으로 유지한다(4.0 지원 범위 정책 2.1).
+  · 상용 API(외부 모델)는 4.0에서 제공하지 않는다(배포 정책 2.2 · DEP-L01 5.1). 유형 주석과 확인 항목 16을 닫았다. 화면 변경 없음.
+    자동 확장 주석과 확인 항목 7도 4.0 범위 밖으로 닫았다(배포 정책 5.6).
+  · 설정 변경 레플리카 수를 1~10 정수로 바꿨다. 벗어나면 인라인 에러 `1에서 10 사이의 정수로 입력해 주세요.` 를 보이고 저장하지 않는다.
+    늘리기 버튼은 10에서 멈춘다(4.0 지원 범위 정책 1장 · DEP-L01 7.7). v0.39 블록의 상한 없음 서술은 이 줄로 바뀐다.
+  · 가속기 공유(없음 · 시분할 · MPS)를 넣었다(배포 정책 4.6 · DEP-L01 3장 · 5.1 · 5.3 · 7.3 · 7.7 · REQ-DEP-100~103 · 결정 사항 3.5 #24).
+    02 자원 고급 설정의 요청 분배 기준 아래에 `가속기 공유` 선택(없음 · 시분할 · MPS)을 두고 기본은 없음이다.
+    시분할이면 시간 간격 등급(드라이버 기본 · 짧음 · 중간 · 김, 김으로 채움), MPS 면 연산 지분 · 메모리 지분(% 정수 직접 입력)을 받는다.
+    가속기 지정 · 지분 프리셋 · 공유 가속기 잔여는 두지 않는다. 최소 메모리 지분은 화면이 계산하지 않고 배포 전 검사가 판정한다.
+    지분을 비우면 `값을 입력해 주세요.`, 범위 밖이면 `1~98 사이의 정수를 입력해 주세요.`(연산) · `1~90 사이의 정수를 입력해 주세요.`(메모리).
+    연산 지분 상한 98 은 한 공유 가속기의 연산 지분 합 상한과 같다. 99 는 혼자서도 배치되지 않는다(배포 정책 4.6).
+    시간 간격 등급 `드라이버 기본` 은 가속기 드라이버의 기본 간격을 쓰는 값이다. 김으로 채우는 것은 비워 보내면 김으로 보내는 백엔드 동작과 같다(배포 정책 4.6).
+    시분할 배포의 총 사용량은 레플리카 수와 관계없이 풀마다 레플리카당 가속기 수만큼 센다(배포 정책 4.3 · 4.6 · DEP-L01 REQ-DEP-035).
+    MPS 배포는 기존 공유 가속기에 합류하면 0장, 새 공유 가속기를 잡으면 1장이라 배치 전에는 확정할 수 없어 최대값 1장으로 보인다(배포 정책 4.2 · 4.3 · DEP-L01 REQ-DEP-035).
+    입력란을 벗어날 때 띄우고 04 검수에서 한 번 더 잡는다(공통정책 7.8).
+    MIG 가속기 · NVIDIA가 아닌 가속기는 시분할 · MPS 를 비활성으로 두고 선택칸 아래 사유 `MIG 가속기와 NVIDIA가 아닌 가속기는 나눠 쓸 수 없습니다.`
+    공유를 고른 뒤 그런 가속기로 바꾸면 없음으로 되돌린다(DEP-L01 5.3 · REQ-DEP-101).
+    MPS 를 고르면 서빙 방식 · 레플리카 수 · 레플리카당 가속기 수를 단일 · 1 · 1 로 잠그고 사유
+    `MPS는 단일 서빙, 레플리카 1개, 레플리카당 가속기 1장으로만 배포할 수 있습니다.` 를 서빙 방식 아래와 서빙 풀에 둔다(REQ-DEP-102).
+    01 모델 고급의 가속기 메모리 사용률을 두지 않고 넣은 값을 지운다. 다른 전략으로 바꾸면 잠금을 풀고 가속기 메모리 사용률을 처음 값(0.90)으로 채운다.
+    MPS 를 고르면 선택칸 아래에 다른 배포 오류의 영향과 배포 뒤 바꿀 수 없음을 안내한다. 항목 도움말에 시분할 · MPS 의 뜻과 할당량 산정을 둔다.
+    MPS 는 잔여 초과로 배포 버튼을 막지 않고 배포 전 검사 결과를 따른다(배포 정책 4.2 · DEP-L01 5.3). 04 검수 자원 섹션에 가속기 공유 줄을 두었다.
+  · 배포 전 검사에 가속기 공유 거절 ✕ 를, 설정 변경 저장 거절에 모달 상단 사유를 둔다. 문구는 DEP-L01 5.3 「가속기 공유 거절 사유 문구」 표이고 사유 값은 내지 않는다(공통정책 7.9).
+  · 설정 변경 모달(DEP-L01.D01.M01): 없음 · 시분할 배포는 `가속기 공유` 구간(재기동 필요)에서 없음 ↔ 시분할과 시간 간격 등급을 바꾼다. MPS 는 선택지에 없다.
+    바꾸면 재기동 경고가 나온다. 공유할 수 없는 가속기의 배포는 시분할을 비활성으로 두고 같은 사유를 둔다(DEP-L01 5.3).
+    MPS 배포는 병렬 처리(변경 불가) 구간에 공유 설정을 표시 전용으로 두고 사유 `MPS 설정은 바꿀 수 없습니다. 바꾸려면 배포를 종료한 뒤 다시 만들어 주세요.`
+    가속기 메모리 사용률을 두지 않는다(DEP-L01 7.7 · REQ-DEP-103 · 배포 정책 2.6).
+  · 검토용 샘플 MPS 배포 gpt-oss-20b-mps-chat(ai-service-team)을 더했다. 모니터링 목업 공유 슬롯 샘플과 같은 이름이다.
+  · 데모 바 `v0.43 가속기 공유` 를 두었다. `개수 할당 클러스터` 를 누르면 생성 02 자원 고급 설정이 열리고 가속기 공유 항목이 없다. `DRA 클러스터` 로 되돌린다.
+    거절 사유를 고르면 MPS 로 채운 생성 04 검수가 열려 배포 전 검사 ✕ 로 보인다. 고른 사유는 MPS 가 아닌 배포의 설정 변경에서 가속기 공유를 바꿔 저장할 때도 쓴다.
+    `MPS 배포 설정 변경` 은 샘플 MPS 배포의 설정 변경 모달을 연다. 실제 화면에는 없는 검토용 처리다.
 
   ── v0.41 (2026-10-30) ──
   · DEP-L01 v0.41 · 배포 정책 v0.30 과 같은 버전이다.
@@ -562,8 +599,8 @@
 
   ── 유형 ────────────────────────────────────────
   · 자체 배포 / 외부 배포 두 가지로 둔다. 유형이 답하는 것은 "이 배포를 어디까지 다룰 수 있나" 다
-  · 상용 API 연동(OpenAI 등)은 기술문서 8.4 에 있으나 워크스페이스 소관으로 서술되어 있고
-    배포 목록에 나오는지 확인되지 않아 유형에 두지 않았다 — 확인 대상
+  · 상용 API 연동(OpenAI 등)은 유형에 두지 않는다. 워크스페이스 운영룸의 외부 모델로 다루며 4.0은 제공하지 않는다
+    (v0.43 닫음. 배포 정책 2.2 · 워크스페이스 정책 3.6 · DEP-L01 5.1)
   · ⚠ 자체 배포 건의 원천 Type 값을 관측하지 못했다. 현행에서 확인된 값은 `EXTERNAL` 하나다
 
   ── 외부 배포 ───────────────────────────────────
@@ -596,7 +633,7 @@
     파드는 차트 기본값(cpu 4 · memory 16Gi)을 쓴다. TUI·현행 생성 화면도 받지 않는다.
     vLLM 은 추론 파라미터를 호출 시 받으므로 배포 설정에 둘 값이 아닐 수 있다 —
     확인 항목 13·14
-  · 오토스케일은 사용자 설정이다 — 현행 모달에서 확인
+  · 자동 확장은 두지 않는다. 4.0 범위 밖이다(v0.43. 배포 정책 5.6 · 4.0 지원 범위 정책 2.1)
 
   ── 상태 ────────────────────────────────────────
   · 배포 상태는 생성 중 · 정상 · 오류 · 유휴 · 중지됨 · 생성 실패 · 삭제 중 · 삭제 실패 8종으로 둔다.
@@ -657,6 +694,7 @@
   5. 워크스페이스 드롭다운의 `Global Cluster` 의미
   6. 내부 기술 용어 노출 범위
   7. 오토스케일·Scale-to-Zero 설정 화면 위치 — 마법사에 없다
+     → 닫음(v0.43). 4.0 범위 밖(배포 정책 5.6 · 4.0 지원 범위 정책 2.1)
   8. 서빙 엔진 선택(기술문서 §8.1) 화면 위치 — 마법사에 없다
      → 닫음(v0.33). 배포 생성에서 고르지 않는다. 모델과 가속기에 따라 자동으로 정해진다(배포 정책 2.3 ·
        DEP-L01 5.1 · CON-685)
@@ -675,6 +713,7 @@
      vLLM 은 호출 시 파라미터로 받는다. 회의에 언급이 없어 화면에서 뺐다
  15. 자체 배포 건의 원천 Type 값
  16. 상용 API 연동이 배포 목록에 나오는지, 워크스페이스에서만 관리하는지
+     → 닫음(v0.43). 4.0 제외(배포 정책 2.2)
  17. 외부 배포의 엔드포인트가 클러스터 내부 주소인 이유. 외부 호출용 주소가 따로 있는지
  18. 서빙 엔진(vLLM·Triton)을 배포 시 고르는지, 모델에 딸려 정해지는지 — 기술문서 1.3 에 엔진 카탈로그가 있다
      → 닫음(v0.33). 배포 생성에서 고르지 않는다. 모델과 가속기에 따라 자동으로 정해진다(배포 정책 2.3 ·
@@ -2431,6 +2470,27 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <!-- v0.41 · 검토용 처리. 실제 화면에는 없다 -->
   <span class="demo-label" style="margin-left:12px;">v0.41 배포 실행:</span>
   <button onclick="demoDeployRej()">캐싱 안 된 모델로 거절</button>
+  <!-- v0.43 · 검토용 처리. 실제 화면에는 없다. 클러스터 할당 방식과 가속기 공유 거절을 흉내 낸다 -->
+  <span class="demo-label" style="margin-left:12px;">v0.43 가속기 공유:</span>
+  <button class="ca on" onclick="setClAlloc('dra',this)">DRA 클러스터</button>
+  <button class="ca" onclick="setClAlloc('count',this)">개수 할당 클러스터</button>
+  <select id="shRejSel" onchange="demoShareRej(this.value)">
+    <option value="">거절 없음</option>
+    <option>SERVING_SHARING_REQUIRES_DRA</option>
+    <option>SERVING_SHARING_CONFLICTS_MIG</option>
+    <option>SERVING_SHARING_UNSUPPORTED_VENDOR</option>
+    <option>SERVING_SHARING_INTERVAL_NOT_APPLICABLE</option>
+    <option>SERVING_SHARING_SHARE_NOT_APPLICABLE</option>
+    <option>SERVING_SHARING_SHARE_INVALID</option>
+    <option>SERVING_SHARING_POOL_FULL</option>
+    <option>SERVING_SHARING_MPS_UNSUPPORTED_SHAPE</option>
+    <option>SERVING_SHARING_GPU_MEMORY_UNKNOWN</option>
+    <option>SERVING_SHARING_NO_ELIGIBLE_DEVICE</option>
+    <option>SERVING_SHARING_CHANGE_REQUIRES_REDEPLOY</option>
+    <option value="OTHER">그 밖의 값</option>
+  </select>
+  <button onclick="demoMpsCfg()">MPS 배포 설정 변경</button>
+  <span class="demo-label">클러스터를 누르면 생성 02 고급 설정이, 거절 사유를 고르면 04 검수가 열립니다.</span>
   <span class="demo-label" style="margin-left:12px;">테마:</span>
   <button onclick="document.body.classList.remove('dark')">라이트</button>
   <button onclick="document.body.classList.add('dark')">다크</button>
@@ -2602,6 +2662,15 @@ const DEPS=[
   ep:'https://gw.concerto.okestro.io/v1', gw:true, host:'', tls:false, auth:true, obs:true, keys:[]}
 ,
 
+ /* v0.43 · 가속기 공유가 MPS 인 배포 샘플(배포 정책 4.6 · DEP-L01 7.7). 단일 · 레플리카 1 · 레플리카당 1장이다.
+    share.comp · share.mem 은 연산 · 메모리 지분(%)이다. 설정 변경에서 공유 설정이 표시 전용으로 나온다. 검토용 값이다 */
+ {n:'gpt-oss-20b-mps-chat', ws:'ai-service-team', model:'gpt-oss-20b', mver:'latest',
+  type:'자체 배포', st:'정상', rep:1, tgt:1, acc:'nvidia-h200', gpu:1, topo:'단일',
+  owner:'성유진(yj.seong)', at:'2026-11-03 10:20:11', upd:'2026-11-03 10:20:11', health:'안정',
+  ep:'https://gw.ai-service.concerto.io/v1',
+  gw:true, host:'gw.ai-service.concerto.io', tls:true, auth:true, obs:true, keys:[],
+  share:{mode:'mps', comp:30, mem:30}},
+
  /* 외부 배포 — 콘체르토 밖에서 돌던 워크로드를 목록에 등록한 것.
     콘체르토가 기동·스케일링을 관리하지 않아 목표 레플리카가 없고
     자원 한도가 적용되지 않는다. 워크스페이스 소속은 가져올 때 고른 워크스페이스다(v0.36 · CON-866 4항).
@@ -2758,7 +2827,7 @@ const FDEF=[
 const COLDEF={
   st:'배포의 현재 상태입니다.<dl>'+ST_ALL.map(function(s){return '<dt>'+s+'</dt><dd>'+ST_DESC[s]+'</dd>';}).join('')+'</dl>',
   type:'배포를 누가 기동했는지에 따라 제어할 수 있는 범위가 달라집니다.<dl><dt>자체 배포</dt><dd>콘체르토가 기동한 추론 서비스입니다. 자원과 설정을 모두 조정할 수 있습니다.</dd><dt>외부 배포</dt><dd>콘체르토 밖에서 이미 돌고 있던 워크로드를 목록에 가져온 것입니다. 자원과 라우팅을 콘체르토가 관리하지 않아 조회 · 동작 확인 · 등록 해제만 제공합니다.</dd></dl>',
-  rep:'현재 기동된 레플리카 수와 목표 수입니다. 호출이 없으면 0으로 내려갑니다. 외부 배포는 콘체르토가 스케일링을 관리하지 않아 관측된 수만 표시합니다.',
+  rep:'현재 기동된 레플리카 수와 목표 수입니다. 외부 배포는 콘체르토가 스케일링을 관리하지 않아 관측된 수만 표시합니다.',
   model:'배포가 서비스하는 모델입니다. 외부 배포는 콘체르토 밖에서 기동한 것이라 모델 대신 호출 주소를 표시합니다.',
   impacc:'이 워크로드가 점유하고 있는 가속기입니다. 가져와도 콘체르토가 자원을 관리하지 않아 워크스페이스 한도에 잡히지 않습니다.',
   bmres:'실행 상태에 따라 진행 상황이나 결과 요약을 표시합니다.'
@@ -3923,6 +3992,9 @@ function newWF(){
     customArgs:[],
     /* 02 자원 */
     scorer:'prefix-cache',
+    /* v0.43 · 가속기 공유(배포 정책 4.6 · DEP-L01 7.3). none 없음 · ts 시분할 · mps MPS. 시간 간격 등급은 김(long)으로 채운다.
+       지분은 비워 두고 직접 받는다 */
+    share:'none', tsInt:'long', mpsComp:'', mpsMem:'',
     alloc:'devicePlugin',             // devicePlugin | dra
     acc:'nvidia-h200',
     rep:'2', gpu:'1',                 // 단일 · 디코드 풀
@@ -4127,6 +4199,40 @@ function accReqName(m){
 /* 가속기마다 지원하는 서빙 방식이 정해져 있다(배포 정책 4.5). 이를 알려 주는 가속기 데이터는 없고,
    백엔드는 Furiosa 가속기 + 분리를 거절한다(117756). 목업은 noPd 로 같은 판정을 흉내 낸다 */
 function accNoPd(k){ return !!(k && accOf(k).noPd); }
+/* v0.43 · 가속기 공유(배포 정책 4.6 · DEP-L01 5.1 · 5.3 · 7.3 · REQ-DEP-100~102).
+   가속기를 개수로 할당하는 클러스터는 항목을 두지 않는다. 목업은 CL_ALLOC 으로 클러스터 할당 방식을 흉내 낸다. 표준은 DRA 다(배포 정책 4.4).
+   MIG 가속기 · NVIDIA가 아닌 가속기는 시분할 · MPS 를 고를 수 없다 */
+let CL_ALLOC='dra';
+function accShareOk(k){ return !!k && k.indexOf('nvidia')===0 && k.indexOf('-mig')<0; }
+function depMps(d){ return !!(d && d.share && d.share.mode==='mps'); }
+const SHARE_NO='MIG 가속기와 NVIDIA가 아닌 가속기는 나눠 쓸 수 없습니다.';
+const MPS_SHAPE='MPS는 단일 서빙, 레플리카 1개, 레플리카당 가속기 1장으로만 배포할 수 있습니다.';
+const MPS_LOCKED='MPS 설정은 바꿀 수 없습니다. 바꾸려면 배포를 종료한 뒤 다시 만들어 주세요.';
+const TS_INT=[{v:'default',t:'드라이버 기본'},{v:'short',t:'짧음'},{v:'medium',t:'중간'},{v:'long',t:'김'}];
+function tsIntName(v){ const o=TS_INT.find(function(x){ return x.v===v; }); return o? o.t : '-'; }
+/* 지분 검증. 비우면 값 요청, 정수가 아니거나 범위 밖이면 범위 문구다(DEP-L01 5.3 · 공통정책 7.8) */
+function shareErr(v,max){
+  const t=String(v).trim(); if(t==='') return '값을 입력해 주세요.';
+  const n=parseInt(t,10);
+  return (/^\d+$/.test(t) && n>=1 && n<=max)? '' : '1~'+max+' 사이의 정수를 입력해 주세요.';
+}
+/* 거절 사유 문구(DEP-L01 5.3 「가속기 공유 거절 사유 문구」). 사유 값은 화면에 내지 않는다(공통정책 7.9) */
+const SHARE_REJ={
+  SERVING_SHARING_REQUIRES_DRA:'이 클러스터에서는 가속기를 나눠 쓸 수 없습니다. 가속기 공유를 없음으로 바꿔 주세요.',
+  SERVING_SHARING_CONFLICTS_MIG:'MIG 가속기는 나눠 쓸 수 없습니다. 다른 가속기 종류를 고르거나 가속기 공유를 없음으로 바꿔 주세요.',
+  SERVING_SHARING_UNSUPPORTED_VENDOR:'가속기 공유는 NVIDIA GPU에서만 쓸 수 있습니다. 가속기 공유를 없음으로 바꿔 주세요.',
+  SERVING_SHARING_INTERVAL_NOT_APPLICABLE:'가속기 공유 설정이 맞지 않습니다. 가속기 공유를 다시 골라 주세요.',
+  SERVING_SHARING_SHARE_NOT_APPLICABLE:'가속기 공유 설정이 맞지 않습니다. 가속기 공유를 다시 골라 주세요.',
+  SERVING_SHARING_SHARE_INVALID:'연산 지분이나 메모리 지분을 쓸 수 없습니다. 메모리 지분은 모델을 올릴 만큼 잡아 주세요.',
+  SERVING_SHARING_POOL_FULL:'나눠 쓸 가속기가 모자랍니다. 지분을 줄이거나 이 운영룸의 다른 배포를 정리해 주세요.',
+  SERVING_SHARING_MPS_UNSUPPORTED_SHAPE:'MPS는 단일 서빙, 레플리카 1개, 레플리카당 가속기 1장으로만 배포할 수 있습니다.',
+  SERVING_SHARING_GPU_MEMORY_UNKNOWN:'가속기 메모리를 확인할 수 없어 나눠 쓸 수 없습니다. 가속기 공유를 없음으로 바꾸거나 관리자에게 문의해 주세요.',
+  SERVING_SHARING_NO_ELIGIBLE_DEVICE:'이 지분으로 나눠 쓸 가속기를 찾지 못했습니다. 메모리 지분을 바꾸거나 관리자에게 문의해 주세요.',
+  SERVING_SHARING_CHANGE_REQUIRES_REDEPLOY:'MPS 설정은 바꿀 수 없습니다. 바꾸려면 배포를 종료한 뒤 다시 만들어 주세요.'
+};
+function shareRejMsg(c){ return SHARE_REJ[c] || '가속기 공유 설정으로 배포할 수 없습니다.'; }
+/* 검토용: 배포 전 검사 · 설정 변경 저장에서 서버가 가속기 공유를 거절하는 경우. 실제 화면에는 없다 */
+let SHREJ='';
 function ctxTok(v){ const n=parseInt(v)||0; return /K$/.test(v)? n*1024 : n; }
 function ctxK(t){ return Math.round(t/1024)+'K'; }
 /* 토큰 수 표기는 천 단위 쉼표(공통정책 1.4) */
@@ -4141,11 +4247,20 @@ function wApplyReq(){
   if(accNoPd(WF.acc) && WF.topo==='pd') WF.topo='single';
   if(q && q.gpu){ WF.gpu=String(q.gpu); WF.preGpu=String(q.gpu); }
   if(q && q.ctx && ctxTok(WF.maxLen)>q.ctx) WF.maxLen=ctxK(q.ctx);
+  /* v0.43 · 가속기 공유. 개수 할당 클러스터이거나 공유할 수 없는 가속기면 없음으로 되돌린다(배포 정책 4.6 · DEP-L01 5.3).
+     MPS 면 서빙 방식 · 레플리카 수 · 레플리카당 가속기 수를 단일 · 1 · 1 로 두고 가속기 메모리 사용률을 지운다(REQ-DEP-102).
+     MPS 를 벗어나면 가속기 메모리 사용률을 처음 값으로 채운다. 빈 채로 두면 선택칸이 값 없이 열린다 */
+  if(WF.share!=='none' && (CL_ALLOC!=='dra' || !accShareOk(WF.acc))) WF.share='none';
+  if(WF.share==='mps'){ WF.topo='single'; WF.rep='1'; WF.gpu='1'; WF.gpuUtil=''; }
+  else if(WF.gpuUtil==='') WF.gpuUtil=newWF().gpuUtil;
 }
 
 /* 총 사용량 — 블록마다 레플리카 수 × 레플리카당 가속기 수를 더한다.
-   블록이 셋이 되어도 같은 방식으로 계산된다 */
+   블록이 셋이 되어도 같은 방식으로 계산된다.
+   v0.43 · 시분할은 레플리카 수와 관계없이 풀마다 레플리카당 가속기 수만큼 센다(배포 정책 4.3 · 4.6)
+   MPS 는 단일 · 1 · 1 고정이라 최대값 1장이 나온다. 합류하면 0장이라 배치 전에는 확정할 수 없다(배포 정책 4.3) */
 function wTotalGpu(){
+  if(WF.share==='ts') return (parseInt(WF.gpu)||0) + (WF.topo==='pd'? (parseInt(WF.preGpu)||0) : 0);
   let t = (parseInt(WF.rep)||0) * (parseInt(WF.gpu)||0);
   if(WF.topo==='pd') t += (parseInt(WF.preRep)||0) * (parseInt(WF.preGpu)||0);
   return t;
@@ -4181,7 +4296,7 @@ function chkName(){
   WF.nameTerm=false; WF.nameChecked=true; wBlur('name'); toast('ok','사용할 수 있는 배포명입니다.');
 }
 function drySnap(){
-  return [WF.model,WF.acc,WF.topo,WF.rep,WF.gpu,WF.preRep,WF.preGpu,WF.maxLen,WF.name].join('|');
+  return [WF.model,WF.acc,WF.topo,WF.rep,WF.gpu,WF.preRep,WF.preGpu,WF.maxLen,WF.name,WF.share,WF.tsInt,WF.mpsComp,WF.mpsMem].join('|');
 }
 function dryRun(){
   dryKey = drySnap();
@@ -4197,10 +4312,11 @@ function dryRun(){
     const need = wTotalGpu(), free = WF.ws? gpuFree(WF.ws) : 0;
     /* 워크스페이스를 고르지 않았으면 자원을 판정하지 않는다. 배정이 0장이면 줄여도 풀리지 않아 상태만 쓴다(5.3 · 공통정책 7.9) */
     /* 운영룸 배정은 가속기 종류별이다(워크스페이스 정책 5.4). 표본 워크스페이스는 운영룸 배정이 한 종류라 합계가 곧 그 종류의 잔여다 */
-    if(WF.ws && need > free) rows.push({t:'warn', m:'요청 '+accOf(WF.acc).n+' '+need+'장 · '+accOf(WF.acc).n+' 잔여 '+free+'장',
+    /* v0.43 · MPS 는 공유 가속기에 합류하면 할당량을 쓰지 않아 잔여로 판정하지 않는다(배포 정책 4.2 · 4.6) */
+    if(WF.ws && WF.share!=='mps' && need > free) rows.push({t:'warn', m:'요청 '+accOf(WF.acc).n+' '+need+'장 · '+accOf(WF.acc).n+' 잔여 '+free+'장',
       d: gpuTotal(WF.ws)===0
         ? '이 워크스페이스에 배정된 가속기가 없어 배포할 수 없습니다.'
-        : accOf(WF.acc).n+' 잔여를 넘습니다. 레플리카 수나 레플리카당 가속기 수를 줄여 주세요.'});
+        : accOf(WF.acc).n+' 잔여를 넘습니다. '+(WF.share==='ts'? '레플리카당 가속기 수를 줄여 주세요.' : '레플리카 수나 레플리카당 가속기 수를 줄여 주세요.')});
     /* 모델 배포 조건. 화면이 이미 막으므로 마지막 확인이다(배포 정책 2.3) */
     const q=modelReq(WF.model)||{}, wm=wModelOf();
     /* 계열 불일치는 백엔드 거절 코드가 없어 검사 항목에 두지 않는다. 화면이 02 자원에서 막는다 */
@@ -4210,6 +4326,8 @@ function dryRun(){
       rows.push({t:'err', m:'최대 컨텍스트 길이가 모델 상한('+ctxN(q.ctx)+' 토큰)을 넘습니다.'});
     if(accNoPd(WF.acc) && WF.topo==='pd')
       rows.push({t:'err', m:'이 가속기에서는 프리필·디코드 분리를 지원하지 않습니다.'});
+    /* v0.43 · 가속기 공유 거절(배포 정책 4.6 · DEP-L01 5.3). 사유 값 대신 문구를 쓴다. 목업은 데모 바에서 사유를 고른다 */
+    if(WF.share!=='none' && SHREJ) rows.push({t:'err', m:shareRejMsg(SHREJ)});
     /* 엔진 인자 중복 — 목록에서 고른 인자를 직접 입력으로 또 넣었거나 직접 입력끼리 겹치면 서버가 거절한다(DEP-L01 5.3) */
     const ck=WF.customArgs.map(function(r){ return r.key; }).filter(function(k){ return k; });
     if(ck.some(function(k,ix){ return ck.indexOf(k)!==ix || (WF.args[k]!==undefined && String(WF.args[k]).trim()!==''); }))
@@ -4251,7 +4369,7 @@ function wGo(i){
 function wDirty(){
   const b=newWF();
   /* newWF 가 정하는 키를 모두 본다. 목록을 따로 두면 필드를 늘릴 때 빠뜨린다 */
-  for(const k of ['model','mver','topo','maxLen','gpuUtil','scorer','alloc','acc',
+  for(const k of ['model','mver','topo','maxLen','gpuUtil','scorer','share','tsInt','mpsComp','mpsMem','alloc','acc',
                   'rep','gpu','preRep','preGpu','rdma',
                   'name','ws','tls','auth','anon',
                   'limit','limitReq','limitUnit','limitKey','limitHeader',
@@ -4271,7 +4389,7 @@ function wQuit(){
   backToList();
 }
 
-function wSet(k,v){ WF[k]=v; if(k==='model'||k==='acc') wApplyReq(); drawWiz(); }
+function wSet(k,v){ WF[k]=v; if(k==='model'||k==='acc'||k==='share') wApplyReq(); drawWiz(); }
 function wSetQuiet(k,v){ WF[k]=v; wRefreshFoot(); }
 function wBlur(k){ wShown[k]=true; drawWiz(); }
 function wTgAdv(k){ wAdv[k]=!wAdv[k]; drawWiz(); }
@@ -4287,6 +4405,12 @@ function wErrs(){
   const rep=parseInt(WF.rep), gpu=parseInt(WF.gpu);
   if(!(rep>=1)) e.push({step:1, f:'rep', m:'레플리카 수는 1 이상이어야 합니다.'});
   if(!(gpu>=1)) e.push({step:1, f:'gpu', m:'레플리카당 가속기 수는 1 이상이어야 합니다.'});
+  /* v0.43 · MPS 지분(DEP-L01 5.3 · 7.3). 입력란을 벗어날 때 띄우고 04 검수에서 한 번 더 잡는다 */
+  if(WF.share==='mps'){
+    const ce=shareErr(WF.mpsComp,98), me=shareErr(WF.mpsMem,90);
+    if(ce) e.push({step:1, f:'mpsComp', m:ce});
+    if(me) e.push({step:1, f:'mpsMem', m:me});
+  }
   if(WF.topo==='pd'){
     if(!(parseInt(WF.preRep)>=1)) e.push({step:1, f:'preRep', m:'프리필 레플리카 수는 1 이상이어야 합니다.'});
     if(!(parseInt(WF.preGpu)>=1)) e.push({step:1, f:'preGpu', m:'레플리카당 가속기 수는 1 이상이어야 합니다.'});
@@ -4295,7 +4419,8 @@ function wErrs(){
      필드(f)를 두지 않는다 — 레플리카 수와 레플리카당 가속기 수의 곱이 넘은 것이라
      어느 한쪽을 지목할 수 없고, 분리 배치면 필드가 넷이 되어 붙일 자리가 없어진다.
      사유는 총 사용량 영역이 맡고 여기서는 배포 버튼을 막는 역할만 한다 */
-  if(WF.ws && !isSysWs(WF.ws) && wTotalGpu()>gpuFree(WF.ws))
+  /* v0.43 · MPS 는 잔여 초과로 막지 않고 배포 전 검사를 따른다(배포 정책 4.2 · DEP-L01 5.3) */
+  if(WF.ws && !isSysWs(WF.ws) && WF.share!=='mps' && wTotalGpu()>gpuFree(WF.ws))
     e.push({step:1, m:WF.ws+' 운영룸의 잔여 가속기는 '+gpuFree(WF.ws)+'장입니다. 지금 '+wTotalGpu()+'장을 요청하고 있습니다.'});
 
   const nm=WF.name.trim();
@@ -4356,7 +4481,7 @@ function drawWiz(){
 const WADV={0:'고급 설정', 1:'고급 설정', 2:'고급 설정'};
 function wAdvCount(i){
   if(i===0) return argCount();
-  if(i===1) return WF.scorer!=='prefix-cache' ? 1 : 0;
+  if(i===1) return (WF.scorer!=='prefix-cache' ? 1 : 0) + (WF.share!=='none' ? 1 : 0);
   if(i===2) return (WF.timeout!=='60초'?1:0) + (WF.maxBody!=='50'?1:0);
   return 0;
 }
@@ -4567,7 +4692,8 @@ function paneModelAdv(){
           ? '이 모델의 최대 컨텍스트 길이는 '+ctxN(modelReq(WF.model).ctx)+' 토큰입니다.'
           : '한 번에 처리할 토큰 수입니다.')
    /* v0.40 · Furiosa-LLM 배포에는 가속기 메모리 사용률을 두지 않는다(배포 정책 5.3) */
-   +   (fur ? '' : fld('가속기 메모리 사용률','gpuUtil',
+   /* v0.43 · 가속기 공유가 MPS 여도 두지 않는다. 메모리 지분이 대신 정한다(배포 정책 4.6 · DEP-L01 7.3) */
+   +   (fur || WF.share==='mps' ? '' : fld('가속기 메모리 사용률','gpuUtil',
         selBox('gpuUtil',['0.80','0.85','0.90','0.95'],WF.gpuUtil),
         '높이면 더 많은 요청을 담지만 남는 메모리가 줄어듭니다.'))
    + '</div>'
@@ -4618,8 +4744,9 @@ function paneRes(){
      + '<span class="pcnt">'+n+'장</span></div>'
      + (note? '<p class="pnote">'+note+'</p>' : '')
      + '<div class="fgrid">'
-     +   fld('레플리카 수',repKey, step(repKey,WF[repKey],'개',1,16,1), '', true)
-     +   fld('레플리카당 가속기 수',gpuKey, step(gpuKey,WF[gpuKey],'장',1,8,1,!!(modelReq(WF.model)||{}).gpu),
+     /* v0.43 · MPS 면 레플리카 수 · 레플리카당 가속기 수를 1 로 잠근다. 사유는 풀 안내가 맡는다(REQ-DEP-102) */
+     +   fld('레플리카 수',repKey, step(repKey,WF[repKey],'개',1,16,1,WF.share==='mps'), '', true)
+     +   fld('레플리카당 가속기 수',gpuKey, step(gpuKey,WF[gpuKey],'장',1,8,1,!!(modelReq(WF.model)||{}).gpu || WF.share==='mps'),
           (modelReq(WF.model)||{}).gpu
             ? '이 모델은 레플리카당 가속기 '+modelReq(WF.model).gpu+'장으로만 배포할 수 있습니다.'
             : '한 장당 '+a.vram, true)
@@ -4629,7 +4756,8 @@ function paneRes(){
   const free = WF.ws? gpuFree(WF.ws) : null;
   const used = wTotalGpu();
   /* 공용은 배정이 없어 넘을 기준이 없다(워크스페이스 정책 6.1) */
-  const over = free!==null && !isSysWs(WF.ws) && used>free;
+  /* v0.43 · MPS 는 잔여 초과로 막지 않는다(배포 정책 4.2 · 4.6) */
+  const over = free!==null && !isSysWs(WF.ws) && WF.share!=='mps' && used>free;
 
   return wHead('자원','배포가 사용할 가속기와 레플리카 수를 정합니다.')
 
@@ -4684,11 +4812,13 @@ function paneRes(){
    +   pick('topo', WF.topo, [
          {v:'single', t:'단일', rec:true,
           d:'한 곳에서 프롬프트 분석과 토큰 생성을 함께 처리합니다'},
-         {v:'pd',     t:'프리필·디코드 분리', dis:accNoPd(WF.acc),
+         {v:'pd',     t:'프리필·디코드 분리', dis:accNoPd(WF.acc) || WF.share==='mps',
           d:'두 작업을 나눠 배치합니다. 풀 사이로 KV 캐시가 오갑니다'}
        ])
    /* 고른 가속기가 지원하지 않는 서빙 방식은 비활성(REQ-DEP-088 · 배포 정책 4.5) */
-   +   (accNoPd(WF.acc)? '<p class="segnote">이 가속기에서는 프리필·디코드 분리를 지원하지 않습니다.</p>' : '')
+   +   (accNoPd(WF.acc)? '<p class="segnote">이 가속기에서는 프리필·디코드 분리를 지원하지 않습니다.</p>'
+        /* v0.43 · MPS 면 단일로 잠근다(DEP-L01 5.3 · REQ-DEP-102) */
+        : WF.share==='mps'? '<p class="segnote">'+MPS_SHAPE+'</p>' : '')
    + '</div>'
 
    /* 가속기 할당 방식(DRA / 디바이스 플러그인)은 화면에 두지 않는다(4.4 확정).
@@ -4709,7 +4839,7 @@ function paneRes(){
 
    + '<div class="pools">'
    +   (pd? poolBlock('프리필 풀','preRep','preGpu','프롬프트를 분석해 KV 캐시를 만듭니다.') : '')
-   +   poolBlock(pd? '디코드 풀':'서빙 풀','rep','gpu', pd? '캐시를 받아 토큰을 생성합니다.':'')
+   +   poolBlock(pd? '디코드 풀':'서빙 풀','rep','gpu', pd? '캐시를 받아 토큰을 생성합니다.':(WF.share==='mps'? MPS_SHAPE : ''))
    + '</div>'
 
    /* 총량은 개수를 고치는 자리 바로 아래에 둔다. 잔여 초과를 그 자리에서 알아야 한다 */
@@ -4731,7 +4861,7 @@ function paneRes(){
       줄여서 풀리는 경우만 조치를 적고, 대상은 필드 라벨 그대로 둘 다 적는다(1.1) */
    +   (over? '<div class="rmsg">'+(gpuTotal(WF.ws)===0
           ? '이 워크스페이스에 배정된 가속기가 없어 배포할 수 없습니다.'
-          : accOf(WF.acc).n+' 잔여를 넘습니다. 레플리카 수나 레플리카당 가속기 수를 줄여 주세요.')+'</div>':'')
+          : accOf(WF.acc).n+' 잔여를 넘습니다. '+(WF.share==='ts'? '레플리카당 가속기 수를 줄여 주세요.' : '레플리카 수나 레플리카당 가속기 수를 줄여 주세요.'))+'</div>':'')
    + '</div>'
 
    /* 분리 배치일 때만 둔다. 단일은 풀이 하나라 보여줄 흐름이 없고
@@ -4747,7 +4877,7 @@ function paneRes(){
       : '');
 }
 
-/* 02 자원 — 요청 분배 기준만 둔다(회의 4.6).
+/* 02 자원 — 요청 분배 기준과 가속기 공유를 둔다(회의 4.6 · v0.43 배포 정책 4.6 · 5.2).
    엔진 인자와 성격이 달라 01 고급에 섞지 않는다 — 하나는 vLLM 값, 하나는 차트 값이다.
    나머지 라우팅 값(토크나이저 연동·스케줄러 권한·KV 캐시 블록)은 회의에서 언급이 없어
    플랫폼 기본값으로 둔다.
@@ -4801,7 +4931,7 @@ function paneGw(){
    +     fld('API Key 인증','auth',
           selBox('auth',[{v:'true',t:'사용'},{v:'false',t:'사용 안 함'}], String(WF.auth)),
           (WF.auth==='false'||WF.auth===false)
-            ? '키 없이 호출할 수 있습니다. 요청자를 식별하지 못해 사용량을 셀 수 없습니다.'
+            ? '키 없이 호출할 수 있습니다. 잘못된 키를 실은 요청은 거부합니다. 요청자를 식별하지 못해 사용량을 셀 수 없습니다.'
             : '호출 시 API Key 를 요구합니다. 키 발급은 워크스페이스에서 합니다.')
    /* v0.36 · 인증을 끄면 키 없는 요청 전체에 분당 한도를 둔다. 키가 없어 요청자별로 셀 수 없기 때문이다
       (배포 정책 5.5 · CON-866 9항 · DEP-L01 7.3). 인증 필드 바로 아래 열에 둔다. 켜면 숨기고 검증하지 않는다 */
@@ -4837,7 +4967,7 @@ function paneGw(){
 ;
 }
 
-/* ── 02 고급 — 요청 분배 기준만 둔다(회의 4.6).
+/* ── 02 고급 — 요청 분배 기준과 가속기 공유를 둔다(회의 4.6 · v0.43 배포 정책 4.6 · 5.2).
    엔진 인자와 성격이 달라 01 고급에 섞지 않는다 — 하나는 vLLM 값, 하나는 차트 값이다.
    나머지 라우팅 값(토크나이저 연동·스케줄러 권한·KV 캐시 블록)은 회의에서 언급이 없어
    플랫폼 기본값으로 둔다 ───────────────────────── */
@@ -4852,7 +4982,27 @@ function paneResAdv(){
           {v:'no-hit-lru', t:'오래된 것부터'}
         ], WF.scorer),
         '요청을 어느 레플리카로 보낼지 정하는 기준입니다.')
+   +   shareFields()
    + '</div>';
+}
+/* v0.43 · 가속기 공유(배포 정책 4.6 · DEP-L01 7.3 · REQ-DEP-100~102).
+   개수 할당 클러스터는 항목을 두지 않는다. 공유할 수 없는 가속기는 시분할 · MPS 를 비활성으로 두고 option 에 말풍선을 붙일 수 없어 사유를 선택칸 아래에 둔다.
+   지분은 % 정수 직접 입력이다. 가속기 지정 · 프리셋 · 공유 가속기 잔여는 두지 않는다 */
+function shareFields(){
+  if(CL_ALLOC!=='dra') return '';
+  const ok=accShareOk(WF.acc);
+  return fld('가속기 공유'+tip('가속기 한 장을 나눠 쓰는 방식입니다. 시분할은 같은 배포의 레플리카끼리 시간으로 번갈아 쓰고, 할당량을 레플리카 수와 관계없이 레플리카당 가속기 수만큼 셉니다. MPS는 같은 운영룸의 배포 여럿이 지분으로 나눠 동시에 쓰고, 새 공유 가속기를 열 때만 할당량 1장을 셉니다.'),'share',
+        selBox('share',[{v:'none',t:'없음'},{v:'ts',t:'시분할',dis:!ok},{v:'mps',t:'MPS',dis:!ok}], WF.share),
+        !ok? SHARE_NO
+          : WF.share==='mps'? '같은 가속기를 쓰는 다른 배포의 오류가 이 배포에 영향을 줄 수 있습니다. 배포한 뒤에는 MPS 설정을 바꿀 수 없습니다.' : '')
+   + (WF.share==='ts'
+      ? fld('시간 간격 등급'+tip('가속기가 레플리카 사이에서 번갈아 실행하는 시간 조각의 길이입니다. 짧을수록 응답이 고르고, 길수록 처리량이 좋습니다. 드라이버 기본은 가속기 드라이버가 정한 길이를 씁니다.'),'tsInt',
+          selBox('tsInt',TS_INT,WF.tsInt), '', true)
+      : '')
+   + (WF.share==='mps'
+      ? fld('연산 지분','mpsComp', step('mpsComp',WF.mpsComp,'%',1,98,1), '1~98 사이의 정수로 입력합니다.', true)
+        + fld('메모리 지분','mpsMem', step('mpsMem',WF.mpsMem,'%',1,90,1), '1~90 사이의 정수로 입력합니다. 모델을 올릴 만큼 잡아 주세요.', true)
+      : '');
 }
 
 /* ── 03 고급 ─────────────────────────────────────── */
@@ -4913,6 +5063,16 @@ function paneReview(){
   const nm = em(2,'name', WF.name);
   const ws = em(1,'ws', WF.ws);
   const an = em(2,'anon', '사용 안 함 · 키 없는 요청 분당 '+Number(WF.anon).toLocaleString('ko-KR')+'건');
+  /* v0.43 · 가속기 공유. 지분 오류가 있으면 그 자리에 사유를 쓴다(DEP-L01 5.3) */
+  const sh = (function(){
+    if(WF.share==='ts') return ['시분할 · 시간 간격 등급 '+tsIntName(WF.tsInt), false];
+    if(WF.share==='mps'){
+      const c=em(1,'mpsComp',''), m=em(1,'mpsMem','');
+      if(c[1]) return c; if(m[1]) return m;
+      return ['MPS · 연산 지분 '+WF.mpsComp+'% · 메모리 지분 '+WF.mpsMem+'%', false];
+    }
+    return ['없음', false];
+  })();
 
   /* 고급 설정 요약 — 설정한 것만 보여준다. 안 건드린 것은 넣지 않는 값이라 나열할 것이 없다.
      이 자리가 없으면 배포 직전에 엔진 인자를 확인할 방법이 없다 */
@@ -4959,6 +5119,7 @@ function paneReview(){
           ? row('프리필 풀', WF.preRep+'개 · 레플리카당 '+WF.preGpu+'장')
             + row('디코드 풀', WF.rep+'개 · 레플리카당 '+WF.gpu+'장')
           : row('서빙 풀', WF.rep+'개 · 레플리카당 '+WF.gpu+'장'))
+       + (CL_ALLOC==='dra'? row('가속기 공유', sh[0], sh[1]) : '')
        + row('총 사용량', '<b>'+wTotalGpu()+'장</b>'))
    +   sec(2,'게이트웨이',
          (WF.name||'배포명 없음')+' · https://'+(prodHost() || 'gw.concerto.okestro.io')+'/v1',
@@ -5033,6 +5194,37 @@ function demoDeployRej(){
   DEP_REJ=true;
   if(typeof goDemo==='function') goDemo('new');
   toast('ok','검토용: 마지막 단계에서 배포를 누르면 거절됩니다.');
+}
+/* v0.43 · 검토용 처리. 실제 화면에는 없다.
+   클러스터 할당 방식을 바꾸고 생성 02 자원 고급 설정을 연다. 개수 할당이면 가속기 공유 항목이 없다(배포 정책 4.6) */
+function setClAlloc(v,btn){
+  CL_ALLOC=v;
+  document.querySelectorAll('#demoBar .ca').forEach(function(b){ b.classList.toggle('on', b===btn || (!btn && b.textContent.indexOf(v==='dra'?'DRA':'개수')===0)); });
+  if(!canDeploy()) setRole('editor');
+  goDemo('new');
+  if(view!=='wiz') return;
+  wApplyReq(); wStep=1; wAdv.resAdv=true; drawWiz();
+}
+/* 거절 사유를 고르면 MPS 로 채운 배포 생성 04 검수를 연다. 배포 전 검사 결과가 그 사유의 ✕ 로 나온다.
+   고른 사유는 MPS 가 아닌 배포의 설정 변경에서 가속기 공유를 바꿔 저장할 때도 쓴다 */
+function demoShareRej(c){
+  SHREJ=c||'';
+  if(!SHREJ) return;
+  if(CL_ALLOC!=='dra') setClAlloc('dra');
+  if(!canDeploy()) setRole('editor');
+  goDemo('new');
+  if(view!=='wiz') return;
+  WF.ws=WF.ws||'ai-service-team'; WF.share='mps'; WF.mpsComp='30'; WF.mpsMem='30';
+  WF.name='gpt-oss-20b-mps-new'; WF.nameChecked=true;
+  wApplyReq();
+  wGo(WSTEPS.length-1);
+}
+/* 샘플 MPS 배포의 설정 변경 모달을 연다 */
+function demoMpsCfg(){
+  if(!canDeploy()) setRole('editor');
+  const i=DEPS.findIndex(function(x){ return depMps(x); });
+  if(i<0) return;
+  openDetailAt(i); openCfg(i);
 }
 function submitWiz(){
   if(DEP_REJ){
@@ -5364,8 +5556,8 @@ drawWsBtn(); setRole('super'); syncView(); render();
 let CFG=null;
 function cfgDef(d){
   return {
-    auto: d.auto!==false,
-    minRep: String(d.tgt||1), maxRep: String(d.maxRep||Math.max(2,(d.tgt||1)+1)), rep: String(d.tgt||1),
+    /* v0.43 · 자동 확장(auto · minRep · maxRep)은 두지 않는다. 4.0 범위 밖(DEP-L01 7.7 · 배포 정책 5.6) */
+    rep: String(d.tgt||1),
     /* ⚠ CPU · 메모리는 화면에서 받은 적이 없다 — TUI · 현행 생성 화면 어디에도 없다.
        추론 기본값도 근거가 없어 뺐다. 현행 Configure 모달 내용은 관측되지 않았다 */
     maxLen: String(d.maxLen||''), gpuUtil: String(d.gpuUtil||'0.9'),
@@ -5373,7 +5565,9 @@ function cfgDef(d){
     /* v0.36 · 키 없는 요청 분당 한도(배포 정책 5.5 · CON-866 9항). 재기동 없음 구간이다 */
     anon: String(anonOf(d)),
     /* v0.40 · 지표 · 추적 수집. 재기동 필요 구간이다(배포 정책 2.6 · DEP-L01 7.7) */
-    obs: !!d.obs
+    obs: !!d.obs,
+    /* v0.43 · 가속기 공유. 없음 · 시분할 배포만 바꾼다. MPS 배포는 표시 전용이다(DEP-L01 7.7 · 배포 정책 2.6 · 4.6) */
+    share: (d.share && d.share.mode) || 'none', tsInt: (d.share && d.share.int) || 'long'
   };
 }
 /* 검토용: 저장 시 서버가 배포 조건으로 거절하는 경우. 실제 화면에는 없다 */
@@ -5403,7 +5597,7 @@ function cfgChg(){
   const o=cfgDef(cur.d);
   return {
     live: ['temp','topP','sysPrompt'].some(function(k){ return CFG[k]!==o[k]; }),
-    rest: ['auto','minRep','maxRep','rep','cpu','mem','maxLen','gpuUtil','obs'].some(function(k){ return CFG[k]!==o[k]; }),
+    rest: ['rep','cpu','mem','maxLen','gpuUtil','obs','share','tsInt'].some(function(k){ return CFG[k]!==o[k]; }),
     /* 인증은 재기동이 따르지 않는다. 끄던 것을 켜면 기존 호출이 막히므로 그때만 알린다 */
     /* v0.36 · 인증을 끈 채 한도만 바꿔도 저장할 수 있다. 재기동 판정(rest)에는 넣지 않는다 */
     auth: CFG.auth!==o.auth || (!CFG.auth && CFG.anon!==o.anon),
@@ -5448,13 +5642,10 @@ function drawCfg(){
      둘 다 저장을 눌러야 반영되고, 차이는 재기동이 따르느냐다 */
   h+='<div class="cfggrp"><div class="gh"><h5>용량</h5><span class="gtag rst">재기동 필요</span></div>'
    + '<div class="gd">저장하면 배포가 다시 기동됩니다.</div>'
-   + '<div class="cfgrow"><label>자동 확장'+tip('호출량에 따라 레플리카 수를 자동으로 조정합니다.')+chgMark('auto')+'</label>'
-   +   '<span class="sw'+(CFG.auto?' on':'')+'" onclick="cSet(\'auto\',!CFG.auto)"></span></div>'
-   + (CFG.auto
-      ? cfgStep('minRep','최소 레플리카','개',0,16,1,'호출이 없어도 이 수만큼 유지합니다. 0으로 두면 호출이 없을 때 모두 내려갑니다.')
-        + cfgStep('maxRep','최대 레플리카','개',1,16,1)
-      : cfgStep('rep','레플리카 수','개',1,16,1,'','id="cfgRep"',!!CFG.repErr)
-        + (CFG.repErr? '<p class="ferr" style="text-align:right">'+CFG.repErr+'</p>' : ''))
+   /* v0.43 · 레플리카 수만 둔다. 자동 확장은 4.0 범위 밖이다(DEP-L01 7.7 · 배포 정책 5.6 · 4.0 지원 범위 정책 2.1)
+      v0.43 · 1~10 정수다. 늘리기 버튼은 10에서 멈춘다(4.0 지원 범위 정책 1장 · DEP-L01 7.7) */
+   + cfgStep('rep','레플리카 수','개',1,10,1,'','id="cfgRep"',!!CFG.repErr)
+   + (CFG.repErr? '<p class="ferr" style="text-align:right">'+CFG.repErr+'</p>' : '')
    + '</div>';
 
   h+='<div class="cfggrp"><div class="gh"><h5>엔진 설정</h5><span class="gtag rst">재기동 필요</span></div>'
@@ -5464,7 +5655,8 @@ function drawCfg(){
    /* 모델 상한을 넘으면 저장 시 인라인 에러(REQ-DEP-089 · DEP-L01 5.3) */
    + (CFG.err? '<p class="ferr" style="text-align:right">'+CFG.err+'</p>' : '')
    /* v0.40 · Furiosa-LLM 배포에는 가속기 메모리 사용률을 두지 않는다(배포 정책 5.3 · DEP-L01 7.7) */
-   + (depFuriosa(d) ? ''
+   /* v0.43 · 가속기 공유가 MPS 인 배포도 두지 않는다. 메모리 지분이 대신 정한다(DEP-L01 7.7 · REQ-DEP-103) */
+   + (depFuriosa(d) || depMps(d) ? ''
       : cfgStep('gpuUtil','가속기 메모리 사용률','',0.1,1.0,0.1,'높이면 더 많은 요청을 담지만 남는 메모리가 줄어듭니다. 0.1~1.0 사이로 지정합니다.','id="cfgGpuUtil"',!!CFG.utilErr)
         + (CFG.utilErr? '<p class="ferr" style="text-align:right">'+CFG.utilErr+'</p>' : ''))
    + '</div>';
@@ -5480,19 +5672,44 @@ function drawCfg(){
    +   '<span class="sw'+(CFG.obs?' on':'')+'" onclick="cSet(\'obs\',!CFG.obs)"></span></div>'
    + '</div>';
 
+  /* v0.43 · 가속기 공유. 없음 · 시분할 배포는 재기동 필요 구간에서 없음 ↔ 시분할과 시간 간격 등급을 바꾼다. MPS 는 선택지에 두지 않는다
+     (DEP-L01 7.7 · REQ-DEP-103 · 배포 정책 2.6). 개수 할당 클러스터는 항목을 두지 않는다. 공유할 수 없는 가속기는 시분할을 비활성으로 두고 사유를 둔다(DEP-L01 5.3) */
+  if(CL_ALLOC==='dra' && !depMps(d)){
+    const sok=accShareOk(d.acc);
+    h+='<div class="cfggrp"><div class="gh"><h5>가속기 공유</h5><span class="gtag rst">재기동 필요</span></div>'
+     + '<div class="gd">저장하면 배포가 다시 기동됩니다.</div>'
+     + '<div class="cfgrow"><label>가속기 공유'+chgMark('share')+'</label>'
+     +   '<select class="inp" style="width:auto" onchange="cSet(\'share\',this.value)">'
+     +     '<option value="none"'+(CFG.share==='none'?' selected':'')+'>없음</option>'
+     +     '<option value="ts"'+(CFG.share==='ts'?' selected':'')+(sok?'':' disabled')+'>시분할</option></select></div>'
+     + (sok? '' : '<div class="gd" style="margin:8px 0 0">'+SHARE_NO+'</div>')
+     + (CFG.share==='ts'
+        ? '<div class="cfgrow"><label>시간 간격 등급'+tip('가속기가 레플리카 사이에서 번갈아 실행하는 시간 조각의 길이입니다. 짧을수록 응답이 고르고, 길수록 처리량이 좋습니다. 드라이버 기본은 가속기 드라이버가 정한 길이를 씁니다.')+chgMark('tsInt')+'</label>'
+          + '<select class="inp" style="width:auto" onchange="cSet(\'tsInt\',this.value)">'
+          + TS_INT.map(function(o){ return '<option value="'+o.v+'"'+(CFG.tsInt===o.v?' selected':'')+'>'+o.t+'</option>'; }).join('')
+          + '</select></div>'
+        : '')
+     + '</div>';
+  }
+
   /* 구간 순서는 재기동 필요 → 변경 불가 → 재기동 없음이다(DEP-L01 7.7).
      바꿀 수 없는 값도 자리를 둔다 — 없으면 어디서 바꾸는지 찾아 헤맨다 */
   h+='<div class="cfggrp"><div class="gh"><h5>병렬 처리</h5><span class="gtag">변경 불가</span></div>'
    + '<div class="cfgrow"><label>레플리카당 가속기 수</label>'
    +   '<span class="dash" style="text-align:right">'+accName(d.acc)+' × '+(d.gpu||0)+'</span></div>'
-   + '<div class="gd" style="margin:8px 0 0">이 값은 여기서 바꿀 수 없습니다. 배포를 다시 만들어 주세요.</div>'
+   /* v0.43 · MPS 배포의 공유 설정은 표시 전용이다(DEP-L01 7.7 · 5.3 · REQ-DEP-103) */
+   + (depMps(d)
+      ? '<div class="cfgrow"><label>가속기 공유</label>'
+        + '<span class="dash" style="text-align:right">MPS · 연산 지분 '+d.share.comp+'% · 메모리 지분 '+d.share.mem+'%</span></div>'
+      : '')
+   + '<div class="gd" style="margin:8px 0 0">'+(depMps(d)? MPS_LOCKED : '이 값은 여기서 바꿀 수 없습니다. 배포를 다시 만들어 주세요.')+'</div>'
    + '</div>';
 
   /* API Key 인증 — 재기동이 따르지 않아 용량·엔진 설정과 구간을 나눈다.
      `즉시 반영` 이라 쓰지 않는다. 저장을 눌러야 반영되는 것은 같다(배포 정책 2.6) */
   h+='<div class="cfggrp"><div class="gh"><h5>접근 설정</h5><span class="gtag">재기동 없음</span></div>'
    + '<div class="gd">저장하면 바로 적용되며 배포는 다시 기동되지 않습니다.</div>'
-   + '<div class="cfgrow"><label>API Key 인증'+tip('끄면 키 없이 호출할 수 있습니다. 요청자를 식별하지 못해 사용량을 셀 수 없습니다.')+chgMark('auth')+'</label>'
+   + '<div class="cfgrow"><label>API Key 인증'+tip('끄면 키 없이 호출할 수 있습니다. 잘못된 키를 실은 요청은 거부합니다. 요청자를 식별하지 못해 사용량을 셀 수 없습니다.')+chgMark('auth')+'</label>'
    /* 생성 마법사 03과 같은 선택 상자다(DEP-L01 7.3 · 7.7) */
    +   '<select class="inp" style="width:auto" onchange="cSet(\'auth\',this.value===\'true\')">'
    +     '<option value="true"'+(CFG.auth?' selected':'')+'>사용</option><option value="false"'+(CFG.auth?'':' selected')+'>사용 안 함</option></select></div>'
@@ -5528,19 +5745,25 @@ function submitCfg(){
   /* v0.39 · 레플리카 수 · 최대 컨텍스트 길이 · 가속기 메모리 사용률의 형식 검증(DEP-L01 7.7).
      레플리카 상한은 정해지지 않아(CON-849) 하한만 본다. 최대 컨텍스트 길이는 비우면 모델 기본값이라 오류가 아니다 */
   const isInt=function(v){ return /^\d+$/.test(String(v).trim()); };
-  CFG.repErr = (!CFG.auto && !(isInt(CFG.rep) && parseInt(CFG.rep,10)>=1)) ? '1 이상의 정수를 입력해 주세요.' : '';
+  /* v0.43 · 레플리카 수는 1~10 정수(4.0 지원 범위 정책 1장 · DEP-L01 7.7) */
+  CFG.repErr = (!(isInt(CFG.rep) && parseInt(CFG.rep,10)>=1 && parseInt(CFG.rep,10)<=10)) ? '1에서 10 사이의 정수로 입력해 주세요.' : '';
   const ml=String(CFG.maxLen).trim();
   CFG.err = (ml && !(isInt(ml) && parseInt(ml,10)>=1)) ? '1 이상의 정수를 입력해 주세요.'
     : (q.ctx && ml && (parseInt(ml)||0)>q.ctx)
     ? '이 모델의 최대 컨텍스트 길이는 '+ctxN(q.ctx)+' 토큰입니다. '+ctxN(q.ctx)+' 이하로 입력해 주세요.' : '';
   const gu=String(CFG.gpuUtil).trim(), guN=Number(gu);
-  CFG.utilErr = (!depFuriosa(d) && (gu==='' || isNaN(guN) || guN<0.1 || guN>1)) ? '0.1~1.0 사이의 값을 입력해 주세요.' : '';
+  CFG.utilErr = (!depFuriosa(d) && !depMps(d) && (gu==='' || isNaN(guN) || guN<0.1 || guN>1)) ? '0.1~1.0 사이의 값을 입력해 주세요.' : '';
   CFG.anonErr = (!CFG.auth && !anonOk(CFG.anon)) ? '1~1,000,000 사이의 정수를 입력해 주세요.' : '';
   /* 검토용: 화면 검증을 지나도 서버가 배포 조건으로 거절하면 모달 상단에 사유 한 문장을 둔다(DEP-L01 5.3). 모달과 입력값은 그대로 둔다 */
   if(CFG_REJ && !(CFG.repErr || CFG.utilErr || CFG.anonErr)){
     const lim=(q.ctx||32768);
     CFG.err=''; CFG.reject='최대 컨텍스트 길이가 모델 상한('+ctxN(lim)+' 토큰)을 넘습니다.';
     drawCfg(); return;
+  }
+  /* v0.43 · 검토용: 가속기 공유를 바꿔 저장할 때 서버가 거절하면 모달 상단에 사유 한 문장을 둔다(DEP-L01 5.3). 모달과 입력값은 그대로 둔다 */
+  const o0=cfgDef(d);
+  if(SHREJ && (CFG.share!==o0.share || CFG.tsInt!==o0.tsInt) && !(CFG.repErr || CFG.err || CFG.utilErr || CFG.anonErr)){
+    CFG.reject=shareRejMsg(SHREJ); drawCfg(); return;
   }
   if(CFG.repErr || CFG.err || CFG.utilErr || CFG.anonErr){
     drawCfg();
@@ -5554,9 +5777,10 @@ function submitCfg(){
   if(chg.auth){ d.auth=CFG.auth; if(!CFG.auth) d.anon=parseInt(CFG.anon,10); }
 
   if(chg.rest){
-    d.auto=CFG.auto; d.maxRep=parseInt(CFG.maxRep)||d.maxRep;
-    d.tgt=parseInt(CFG.auto? CFG.minRep : CFG.rep)||d.tgt;
+    d.tgt=parseInt(CFG.rep)||d.tgt;
     d.maxLen=CFG.maxLen; d.gpuUtil=CFG.gpuUtil; d.obs=CFG.obs;
+    /* v0.43 · 없음 · 시분할 배포만 공유 설정을 바꾼다. MPS 배포는 그대로다 */
+    if(!depMps(d)) d.share = CFG.share==='none'? null : {mode:'ts', int:CFG.tsInt};
     /* 엔드포인트는 운영룸 호스트로 정해져 재기동해도 바뀌지 않는다(5.1). 최근 변경일시를 갱신한다(5.1) */
     d.st='생성 중'; d.rep=0; d.upd=nowStr();
     toast('ok','설정 변경을 요청했습니다. 다시 기동되면 알림으로 안내됩니다.');
