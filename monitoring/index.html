@@ -1,7 +1,26 @@
 <!--
-  콘체르토 매니저 — 모니터링 목업 v0.33 (2026-11-02)
+  콘체르토 매니저 — 모니터링 목업 v0.34 (2026-11-03)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다 —
   필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
+
+  ── v0.34 (2026-11-03) ──────────────────────
+  · 모니터링 정책 v0.25 · MON-L01 v0.34 와 같은 버전이다.
+  · 슬롯 상태에 `공유` 를 다시 두었다. 한 가속기를 점유한 파드가 둘 이상인 슬롯이다. 시분할 · MPS 공통이다
+    (모니터링 정책 4.2 · MON-L01 REQ-MON-091 · 7.1 · 배포 정책 4.6 · 결정 사항 3.5 #24).
+    배지는 라이브러리 .stbadge.ac 다. 상태 필터 · 상태 열 도움말에 공유를 더했다.
+    머리 주석 「현행에서 바꾼 것」 의 슬롯 상태 줄에 SHARED 는 공유로 표기함을 적었다.
+  · MPS 로 배포 여럿이 점유한 슬롯은 점유 배포 칸에 첫 배포와 `외 N건` 을, 슬롯 패널에 점유 배포 전체를 둔다.
+    패널의 배포마다 누르면 그 배포 상세의 모니터링 탭으로 간다(모니터링 정책 4.3 · MON-L01 7.1). 점유 배포 열 도움말에 한 문장을 더했다.
+  · 요약 카드 · 점유 막대 · 범례 · 노드 카드 · 가속기 모델별 사용 수는 공유를 사용 중에 넣어 센다. 새 배포가 전용으로 받을 수 없는 자리다(모니터링 정책 4.4).
+    전체 슬롯은 사용 중 · 공유 · 유휴 · 확인 불가의 합이다. 막대에 공유 구간을 따로 두지 않아 남아 있는 .ubar i.shared · .sglg i.lg.shared 는 쓰지 않는다.
+    할당량 층(allocRows · freeRows)도 공유 슬롯을 사용 1장으로 센다. 목업은 슬롯으로 세고, MPS 공유 가속기는 할당량 1장이다(배포 정책 4.6).
+    「장치별 할당이라 슬롯 하나에 배포 하나」 · 「하나를 나눠 쓰지 않는다」 주석을 정정했다.
+  · MPS 배포의 인프라 계층 가속기 지표는 공유 가속기 전체 값이다. 제목 줄에 한 번 밝힌다. MIG 와 같은 방식이다(모니터링 정책 5.1 · 5.2).
+  · 검토용 샘플: gpu-svr-01 슬롯 5(GPU-4)를 공유로 두고 ai-service-team MPS 배포 셋(gpt-oss-20b-mps-chat · gpt-oss-20b-mps-search ·
+    gpt-oss-20b-mps-tagging)이 점유한다. 배포 목업의 MPS 샘플(gpt-oss-20b-mps-chat)과 같은 이름이다. 지표 값은 검토용이다.
+  · Xid 오류 표시를 4.0 화면에서 뺐다. 슬롯 표 Xid 오류 열 · 슬롯 패널 Xid 오류 섹션 · 확인 필요 항목의 노드 Xid 항목이다.
+    4.1 범위다(모니터링 정책 4.3 · 4.4 · MON-L01 REQ-MON-009 · 038 · 039). xidNode 가 XID_ON(false)을 보게 했고 표시 코드 · 데모 값은 4.1 재검토용으로 남긴다.
+    알림 규칙의 GPU Xid 오류 규칙(모니터링 정책 6.3 · REQ-MON-074)은 4.0 범위라 그대로다.
 
   ── v0.33 (2026-11-02) ──────────────────────
   · 모니터링 정책 v0.24 · MON-L01 v0.33 과 같은 버전이다.
@@ -432,7 +451,7 @@
   · 탭명을 줄였다 — `가속기 모니터링` → `가속기`, `오버뷰 대시보드` → `배포 성능`,
     `알림 규칙 탐색기` → `알림 규칙`. 화면 이름이 이미 모니터링이라 탭마다 되풀이하지
     않는다(공통정책 1.1). `오버뷰 대시보드` 는 무엇을 보는지 말하지 않는다.
-  · 슬롯 상태를 한글로 뒀다 — `IDLE`·`ACTIVE`·`SHARED`·`UNKNOWN` 은 내부 값이다(7.9).
+  · 슬롯 상태를 한글로 뒀다. `IDLE`·`ACTIVE`·`SHARED`·`UNKNOWN` 은 내부 값이다(7.9). SHARED 는 공유로 표기한다(v0.34 · 정책 4.2).
   · `Zombie Slot` 을 `확인 불가` 로 묶었다. 상태를 읽지 못하는 것이라 UNKNOWN 과 같은 값이다(정책 4.2).
   · 알림 규칙에 수정·삭제를 뒀다. 현행은 작업 열이 있으나 액션이 없다.
   · 건전성에 원인·조치를 함께 뒀다. 점수만으로는 무엇을 해야 할지 알 수 없다(기술문서 10.5).
@@ -2874,7 +2893,9 @@ const NODES=[
      {no:3, dev:'NVIDIA-H200', id:'GPU-2', st:'사용 중', core:41, vram:{use:62.0,cap:140},  temp:58, pw:245,
       by:['gemma-4-12b-it-idle']},
      {no:4, dev:'NVIDIA-H200', id:'GPU-3', st:'사용 중', core:52, vram:{use:96.7,cap:140}, temp:64, pw:331, by:['solar-open-100b-paused']},
-     {no:5, dev:'NVIDIA-H200', id:'GPU-4', st:'유휴', core:0, vram:{use:0.4,cap:140}, temp:34, pw:62, by:[]},
+     /* v0.34 · 공유 슬롯. MPS 로 같은 운영룸(ai-service-team)의 배포 셋이 함께 점유한다(모니터링 정책 4.2 · 4.3 · 배포 정책 4.6). 검토용 값이다 */
+     {no:5, dev:'NVIDIA-H200', id:'GPU-4', st:'공유', core:68, vram:{use:96.3,cap:140}, temp:63, pw:318,
+      by:['gpt-oss-20b-mps-chat','gpt-oss-20b-mps-search','gpt-oss-20b-mps-tagging']},
      {no:6, dev:'NVIDIA-H200', id:'GPU-5', st:'유휴', core:0, vram:{use:0.4,cap:140}, temp:33, pw:61, by:[]},
      {no:7, dev:'NVIDIA-H200', id:'GPU-6', st:'유휴', core:0, vram:{use:0.4,cap:140}, temp:35, pw:63, by:[]},
      /* 상태를 읽지 못하는 슬롯이다. 현행은 `Zombie Slot (UNKNOWN)` 으로 표기한다.
@@ -3146,7 +3167,11 @@ const DEPS=[
   {n:'gemma-4-12b-it-idle',    ws:'ml-research',     st:'유휴'},
   {n:'furiosa-qwen3-32b-npu',  ws:'test-npu',        st:'오류'},
   /* 지표 · 추적 수집을 사용하지 않고 만든 배포. Grafana 열기가 비활성이다(모니터링 정책 5.4). 배포 목업의 같은 이름 샘플도 수집을 쓰지 않는다 */
-  {n:'solar-open-100b-paused',  ws:'ml-research',     st:'중지됨', obs:false}
+  {n:'solar-open-100b-paused',  ws:'ml-research',     st:'중지됨', obs:false},
+  /* v0.34 · 가속기 공유가 MPS 인 배포 셋. gpu-svr-01 슬롯 5 를 함께 점유한다. 인프라 계층 가속기 지표가 공유 가속기 전체 값이다(모니터링 정책 5.1). 검토용 값이다 */
+  {n:'gpt-oss-20b-mps-chat',    ws:'ai-service-team', st:'정상', mps:true},
+  {n:'gpt-oss-20b-mps-search',  ws:'ai-service-team', st:'정상', mps:true},
+  {n:'gpt-oss-20b-mps-tagging', ws:'ai-service-team', st:'정상', mps:true}
 ];
 /* 슬롯의 점유 배포에서 워크스페이스를 역추적한다.
    ⚠ 백엔드가 이 매핑을 내려주는지 확인 대상(정책 7. 16번) */
@@ -3218,6 +3243,25 @@ const DEPM={
     todo:'배포 상세에서 다시 시작할 수 있습니다.',
     items:[null,null,null,null,null],
     eng:[null,null,null,null], infra:[null,null,null,null,null]
+  },
+  /* v0.34 · MPS 배포 셋. 인프라 값은 공유 가속기(gpu-svr-01 슬롯 5) 전체 값이라 셋이 같다(모니터링 정책 5.1). VRAM 할당량 칸도 공유 가속기 값이다. 지표는 검토용이다 */
+  'gpt-oss-20b-mps-chat': {
+    score:84, label:'안정', why:'', todo:'',
+    items:['6','68','52','34','0'],
+    gw:['42','1,860','0.2','151,200','2,318,404'],
+    eng:['1,860','48','14','41'], infra:['1','68','96.3','63','318']
+  },
+  'gpt-oss-20b-mps-search': {
+    score:88, label:'안정', why:'', todo:'',
+    items:['3','68','47','30','0'],
+    gw:['18','920','0.1','64,800','1,102,377'],
+    eng:['920','44','12','33'], infra:['1','68','96.3','63','318']
+  },
+  'gpt-oss-20b-mps-tagging': {
+    score:90, label:'안정', why:'', todo:'',
+    items:['2','68','45','28','0'],
+    gw:['9','410','0.0','32,400','508,931'],
+    eng:['410','40','11','27'], infra:['1','68','96.3','63','318']
   }
 };
 function dm(){ return DEPM[dep] || DEPM['llama-3-2-1b-prod']; }
@@ -3558,10 +3602,14 @@ function chBlocked(c){
 }
 
 /* 상태 배지 색 — 시스템 용어집 5.3 */
-const SLOTB={'사용 중':'ok','유휴':'mu','확인 불가':'wa'};
+/* v0.34 · 공유는 라이브러리 .stbadge.ac(모니터링 정책 4.2) */
+const SLOTB={'사용 중':'ok','공유':'ac','유휴':'mu','확인 불가':'wa'};
 /* Xid — NVIDIA GPU 슬롯만 대상이다. NPU 노드는 지표 목록에 Xid 가 없어 열·섹션을 두지 않는다(모니터링 정책 1장 원칙 4 · 4.3).
    MIG 로 나눈 슬롯도 대상이 아니다(릴리즈 노트 v4.0.0 4장) */
-function xidNode(nd){ return nd.kind==='gpu'; }
+/* v0.34 · Xid 오류 표시(슬롯 표 열 · 슬롯 패널 섹션 · 확인 필요 항목)는 4.1 범위다(모니터링 정책 4.3 · MON-L01 REQ-MON-038·039).
+   4.0 화면에는 두지 않는다. 아래 분기와 표시 코드는 4.1 재검토용으로 남긴다. 실제 화면에는 없는 검토용 처리다 */
+const XID_ON=false;
+function xidNode(nd){ return XID_ON && nd.kind==='gpu'; }
 function xidOf(x){ return x.xid===undefined ? {} : x.xid; }
 function xidName(c){ return c==='*' ? '코드 미상' : 'Xid '+c; }
 function xidDesc(c){ const r=XIDS.find(function(v){ return v.c===c; }); return r? r.d : ''; }
@@ -3808,7 +3856,7 @@ function allocRows(){
   const cap={}, use={};
   ws.forEach(function(w){ Object.keys(QUOTA[w]).forEach(function(d){ cap[d]=(cap[d]||0)+QUOTA[w][d]; }); });
   accNodes().forEach(function(nd){ nd.slots.forEach(function(x){
-    if(x.st==='사용 중' && ws.indexOf(slotWs(x))>=0) use[x.dev]=(use[x.dev]||0)+1;
+    if(slotUsed(x) && ws.indexOf(slotWs(x))>=0) use[x.dev]=(use[x.dev]||0)+1;
   }); });
   return Object.keys(cap).map(function(d){ return {dev:d, cap:cap[d], use:use[d]||0}; })
     .sort(function(a,b){ return b.use/b.cap - a.use/a.cap; });
@@ -3821,7 +3869,7 @@ function freeRows(){
   const tot={}, use={}, q={};
   accNodes().filter(function(nd){ return nd.st==='정상'; }).forEach(function(nd){ nd.slots.forEach(function(x){
     tot[x.dev]=(tot[x.dev]||0)+1;
-    if(x.st==='사용 중' && slotWs(x)==='공용 워크스페이스') use[x.dev]=(use[x.dev]||0)+1;
+    if(slotUsed(x) && slotWs(x)==='공용 워크스페이스') use[x.dev]=(use[x.dev]||0)+1;
   }); });
   Object.keys(QUOTA).forEach(function(w){ Object.keys(QUOTA[w]).forEach(function(d){ q[d]=(q[d]||0)+QUOTA[w][d]; }); });
   return Object.keys(tot).map(function(d){ return {dev:d, cap:Math.max(0, tot[d]-(q[d]||0)), use:use[d]||0}; })
@@ -4093,7 +4141,7 @@ function thFilterSt(){
    + '</button></span>'
    + '<div class="thpop">'+COLDEF.sst+'</div>'
    + '<span class="fdd" onclick="event.stopPropagation()">'
-   +   ['사용 중','유휴','확인 불가'].map(function(o){
+   +   ['사용 중','공유','유휴','확인 불가'].map(function(o){
          return '<label><input type="checkbox"'+(slotSel.indexOf(o)>=0?' checked':'')
               + ' onchange="tgSlotSt(\''+o+'\')"><span>'+o+'</span></label>'; }).join('')
    + '</span>';
@@ -4349,7 +4397,7 @@ function drawAcc(el){
              + '<td class="mono">'+(mig? '' : dead? dash() : x.pw+'W')+'</td>'
              + (xidNode(nd)? '<td>'+xidCell(x)+'</td>' : '')
              + '<td><span class="stbadge '+(SLOTB[x.st]||'mu')+'">'+x.st+'</span></td>'
-     /* 장치별 할당이라 슬롯 하나에 배포 하나다(2026-09-02 확인) */
+     /* v0.34 · 공유 슬롯은 점유 배포가 여럿일 수 있다. 첫 배포와 `외 N건` 을 두고 전체는 슬롯 패널에서 본다(모니터링 정책 4.3 · MON-L01 7.1) */
      /* 모름은 `확인 불가` 로 둔다 — `-` 로 두면 점유한 배포가 없는 것으로 읽힌다 */
      /* CDE 점유는 글자로만 둔다. 링크·경고 아이콘을 두지 않는다 — 등록되지 않은 워크로드가 아니다(CON-865) */
      + '<td>'+(x.cde
@@ -4358,7 +4406,7 @@ function drawAcc(el){
          ? '<span class="dash">확인 불가</span>'
            + warnIc('등록되지 않은 워크로드가 점유하고 있습니다. 배포 화면에서 외부 배포로 가져오면 이름이 표시됩니다.'
                + (x.pod? '<br>워크로드 '+x.pod : ''))
-         : byList(x).length? '<span class="rname">'+x.by[0]+'</span>' : dash())+'</td></tr>';
+         : byList(x).length? '<span class="rname">'+x.by[0]+'</span>'+(x.by.length>1? ' <span class="mver">외 '+(x.by.length-1)+'건</span>' : '') : dash())+'</td></tr>';
           }).join('')
       +   '</tbody></table></div>')
       + '</div>'
@@ -4484,11 +4532,12 @@ function grpList(nodes){
 /* ── 가속기 탭 공용 ──────────────────────────────
    전체와 노드가 같은 함수를 쓴다. 형태가 같아야 층위가 눈으로 읽힌다 */
 
-const USEHELP = '사용 중을 전체로 나눈 값입니다. 확인 불가도 분모에 넣습니다 — '
+const USEHELP = '사용 중을 전체로 나눈 값입니다. 공유도 사용 중으로 셉니다. 확인 불가도 분모에 넣습니다 — '
   + '쓸 수 없는 상태이지 자리가 없어진 것은 아닙니다.';
 
-/* 가속기는 장치별로 할당한다. 하나를 나눠 쓰지 않는다(2026-09-02 확인) */
-function usedOf(list){ return list.filter(function(x){ return x.st==='사용 중'; }).length; }
+/* v0.34 · 가속기 공유(시분할 · MPS)로 한 가속기를 나눠 쓸 수 있다(배포 정책 4.6). 공유 슬롯은 사용 중에 넣어 센다(모니터링 정책 4.4) */
+function slotUsed(x){ return x.st==='사용 중' || x.st==='공유'; }
+function usedOf(list){ return list.filter(slotUsed).length; }
 function pcOf(list){ return list.length? Math.round(usedOf(list)/list.length*100) : 0; }
 
 /* 노드 부제 — 가속기 구성. 연결 불가·사라짐이면 마지막으로 확인된 구성을 그대로 둔다(정책 4.5 · REQ-MON-036).
@@ -4553,12 +4602,13 @@ function devList(byDev, sw){
 /* 점유 막대 — 상태별 길이를 이어 붙인다. 칸을 하나씩 그리던 격자를 대신한다.
    격자는 `몇 개 찼나` 만 답하면서 표와 같은 정보를 덜 정확하게 보여 주고 있었다.
    개별 슬롯은 표에서 본다 */
-const SGRID={'사용 중':'used','유휴':'idle','확인 불가':'dead'};
+/* v0.34 · 공유는 사용 중 구간에 넣는다(모니터링 정책 4.4) */
+const SGRID={'사용 중':'used','공유':'used','유휴':'idle','확인 불가':'dead'};
 const SORDER=['사용 중','확인 불가','유휴'];
 /* 구간마다 말풍선을 둔다. `title` 은 1초 지연되고 여러 줄이 안 되며 꾸밀 수 없다.
    호버한 구간만 원색이 되고 나머지는 흐린 채로 남아, 지금 보는 것이 어느 상태인지 드러난다 */
 const SDESC={
-  '사용 중':'배포나 CDE 하나가 점유한 상태입니다.',
+  '사용 중':'배포나 CDE가 점유한 상태입니다. 나눠 쓰는 공유 슬롯도 함께 셉니다.',
   '유휴':'점유한 배포가 없어 바로 쓸 수 있습니다.',
   '확인 불가':'상태를 읽지 못합니다. 노드나 수집 에이전트를 확인해 주세요.'
 };
@@ -4566,7 +4616,7 @@ function barOf(list, scope){
   const tot=list.length||1;
   return '<div class="ubar">'
    + SORDER.map(function(st){
-       const g=list.filter(function(x){ return x.st===st; });
+       const g=list.filter(function(x){ return SGRID[x.st]===SGRID[st]; });
        if(!g.length) return '';
        const pc = g.length/tot*100;
        /* 배포가 여럿이면 셋까지만 보이고 나머지는 건수로 줄인다 */
@@ -4920,7 +4970,9 @@ function drawPerf(el){
   h+=perfSec('게이트웨이','요청이 들어오는 지점입니다.',bind(PERF.gw, m.gw||[null,null,null,null,null]))
    + perfSec('서빙 엔진','모델이 실행되는 지점입니다.',bind(PERF.eng, m.eng))
    /* MIG 인스턴스에 올라간 배포는 가속기 지표가 부모 GPU 전체 값이다. 제목 줄에 한 번만 밝힌다. 카드마다 두면 같은 말이 넷 반복된다(정책 5.1 · REQ-MON-052) */
-   + perfSec('인프라','자원을 사용하는 지점입니다.',bind(PERF.infra, m.infra), curDep().mig? '부모 GPU 전체(MIG 개별 아님)' : '');
+   + perfSec('인프라','자원을 사용하는 지점입니다.',bind(PERF.infra, m.infra), curDep().mig? '부모 GPU 전체(MIG 개별 아님)'
+     /* v0.34 · MPS 배포는 공유 가속기 전체 값이다(모니터링 정책 5.1 · 5.2) */
+     : curDep().mps? '공유 가속기 전체(배포별 아님)' : '');
   h += '</div>'; /* depshell 닫기 */
   el.innerHTML=h;
 }
@@ -6406,9 +6458,10 @@ const COLDEF={
       +'<dt>중지</dt><dd>최고 관리자가 중지했습니다.</dd></dl>',
   sst:'슬롯의 점유 상태입니다.'
       +'<dl><dt>사용 중</dt><dd>배포나 CDE 하나가 점유하고 있습니다.</dd>'
+      +'<dt>공유</dt><dd>레플리카나 배포 여럿이 한 가속기를 나눠 쓰고 있습니다.</dd>'
       +'<dt>유휴</dt><dd>점유한 배포가 없습니다.</dd>'
       +'<dt>확인 불가</dt><dd>상태를 읽지 못했습니다.</dd></dl>',
-  dep:'이 슬롯을 쓰고 있는 배포입니다. 누르면 그 배포의 모니터링으로 이동합니다.',
+  dep:'이 슬롯을 쓰고 있는 배포입니다. 누르면 그 배포의 모니터링으로 이동합니다. 여럿이면 첫 배포와 나머지 건수를 표시하고, 전체는 슬롯 패널에서 봅니다.',
   /* 다른 열 도움말과 같은 꼴이다 — 첫 문장 `{대상}의 {무엇}입니다.`, 둘째 문장 표시 방식, 값별 뜻 한 문장씩.
      등급 배지는 같은 화면 알림 규칙 심각도(sev)와 같은 값이라 뜻도 같은 문장을 쓴다(알림 정책 4.1).
      무엇을 하면 되는지는 슬롯 패널의 조치 안내가 코드마다 따로 준다. 도움말에서 다시 풀지 않는다 */
