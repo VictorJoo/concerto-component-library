@@ -1,6 +1,23 @@
 <!--
-  콘체르토 매니저 — 모델 화면 목업 v0.38 (2026-10-30)
+  콘체르토 매니저 — 모델 화면 목업 v0.40 (2026-11-03)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다.
+
+  ── v0.40 (2026-11-03) ──
+  · MODEL-L01 v0.40 · 모델 정책 v0.32 와 같은 버전이다.
+  · 노드 캐싱 모달(MODEL-L01.M02)에서 요구 가속기와 계열(GPU·NPU)이 다른 노드가 하나라도 있는 노드 그룹의 노드를 비활성 + 사유 툴팁으로 둔다
+    (MODEL-L01 5.1 · 7.7 · REQ-MODEL-090 · 모델 정책 4.1). 캐싱은 노드 그룹 전체에 걸리므로 그룹 단위로 막는다.
+    사유는 계열이 다른 노드에 `요구 가속기와 계열이 다른 노드라 캐싱할 수 없습니다.`,
+    그 그룹의 같은 계열 노드에 `같은 노드 그룹에 요구 가속기와 계열이 다른 노드가 있어 캐싱할 수 없습니다.` 다.
+    요구 가속기가 `제한 없음` 이거나 없으면 막지 않는다(모델 정책 2.9). 계열은 가속기 이름으로 가른다(NVIDIA 는 GPU, Furiosa 는 NPU).
+  · 일괄 선택 버튼 `가속기 노드 전체 선택` 을 `전체 선택` 으로 바꿨다. 고를 수 있는 노드만 고른다(MODEL-L01 7.7).
+  · 요구 가속기와 계열이 같은 노드가 하나도 없으면 빈 상태 둘째 줄을 `이 모델의 요구 가속기와 계열이 같은 노드가 없습니다.` 로 둔다. 클러스터에 가속기 노드가 없을 때는 종전 문구다(MODEL-L01 6장).
+  · 목록 · 버전 탭 캐싱 노드 `완료 / 전체` 와 패널 노드 그룹 수량을 캐싱할 수 있는 노드 기준으로 센다(모델 정책 4.1 · MODEL-L01 5.1).
+    요구 가속기와 계열이 같은 가속기 노드에서 계열이 다른 노드가 섞인 노드 그룹의 노드를 뺀다. 그 노드는 고를 수 없어 분모에 두면 완료 / 전체가 같아질 수 없다.
+    다른 계열 노드에 남은 캐시는 세지 않는다. 샘플 qwen3-32b v3.6 은 furiosa 노드 캐시가 남아 있어 종전 3 / 3 이 2 / 2 로 보인다.
+  · 데모 바 `노드 그룹 계열 혼재` 를 켜면 npu-group-01 에 NVIDIA-H200 노드(gpu-svr-03)가 더해진다. 실제 화면에는 없는 검토용 처리다.
+    NPU 모델(gpt-oss-120b-furiosa 등)의 노드 캐싱을 열면 furiosa 노드가 그룹 사유로 막힌다.
+  · CNAI(modctl) 형식의 모델 이미지가 아닌 이미지(oci-storage-initializer 샘플)는 모델 목록에 두지 않는다(모델 정책 4.3 · REQ-MODEL-054).
+    이전에 등록된 것도 목록에 보이지 않고 레지스트리의 이미지는 지우지 않는다. 종전 시스템 컴포넌트 제외 분기(sys)를 그대로 쓴다.
 
   ── v0.38 (2026-10-30) ──
   · MODEL-L01 v0.38 · 모델 정책 v0.30 과 같은 버전이다.
@@ -1371,6 +1388,10 @@ td.regcell .prog{min-width:220px}
     <button class="cj on" onclick="setCacheRej(false,this)">접수</button>
     <button class="cj" onclick="setCacheRej(true,this)">거절 — 저장소에 없음</button></span>
   <!-- 검토용: 다시 시도 요청 거절 분기. 실제 화면에는 없다 -->
+  <!-- 검토용(v0.40): 노드 그룹 하나에 GPU 노드와 NPU 노드가 섞인 경우. 실제 화면에는 없다. 켠 뒤 gpt-oss-120b-furiosa 의 노드 캐싱을 연다 -->
+  <span class="dgrp"><span class="demo-label">노드 그룹 계열 혼재:</span>
+    <button class="mx on" onclick="setMix(false,this)">없음</button>
+    <button class="mx" onclick="setMix(true,this)">npu-group-01 에 GPU 노드</button></span>
   <span class="dgrp"><span class="demo-label">다시 시도 요청:</span>
     <button class="rj on" onclick="setRetryRej(false,this)">접수</button>
     <button class="rj" onclick="setRetryRej(true,this)">거절</button></span>
@@ -1568,13 +1589,31 @@ const JOBS={
    /* v0.36 · 실패한 캐싱 검토용 샘플. 노드 그룹 gpu-group-01 의 두 노드에서 실패했다(모델 정책 4.1). v3.1 은 미캐싱이다 */
    J('캐싱','v3.1','2026-10-20 14:05:12','2026-10-20 14:11:40','실패','이미지를 노드에 내려받지 못했습니다.','',2,['gpu-svr','gpu-svr-02'])]
 };
+/* v0.40 · 가속기 계열. 이름으로 가른다(NVIDIA 는 GPU, Furiosa 는 NPU). 요구 가속기가 `제한 없음` · `-` 이면 계열이 없다(모델 정책 2.9) */
+function accFam(a){ a=String(a||''); if(/^NVIDIA/i.test(a)) return 'GPU'; if(/furiosa|rngd|warboy|rebellions|atom/i.test(a)) return 'NPU'; return ''; }
+function reqFam(m){ return (m && m.infra)? accFam(m.infra.g) : ''; }
+/* 분모 · 분자에 넣는 노드. 캐싱할 수 있는 노드다 — 요구 가속기와 계열이 같고 계열이 다른 노드가 섞인 노드 그룹에 속하지 않는다.
+   계열이 없으면 가속기 노드 전부(모델 정책 4.1) */
+function nodeInScope(m,i){ const f=reqFam(m); return !f || (accFam(NODES[i].acc)===f && !nodeFamWhy(m,i)); }
+/* 고를 수 없는 사유. 계열이 다른 노드, 또는 계열이 다른 노드가 섞인 노드 그룹의 노드(모델 정책 4.1 · MODEL-L01 5.1) */
+const FAM_WHY='요구 가속기와 계열이 다른 노드라 캐싱할 수 없습니다.';
+const GRP_FAM_WHY='같은 노드 그룹에 요구 가속기와 계열이 다른 노드가 있어 캐싱할 수 없습니다.';
+function nodeFamWhy(m,i){
+  const f=reqFam(m); if(!f) return '';
+  if(accFam(NODES[i].acc)!==f) return FAM_WHY;
+  const g=NODES[i].grp;
+  if(g && NODES.some(function(nd){ return nd.grp===g && accFam(nd.acc)!==f; })) return GRP_FAM_WHY;
+  return '';
+}
 const NODES=[
  {n:'furiosa',acc:'rngd',cpu:'128',mem:'1,007 GB',cached:true,grp:'npu-group-01'},
  {n:'gpu-svr',acc:'NVIDIA-H200',cpu:'128',mem:'1,007 GB',cached:false,grp:'gpu-group-01'},
  {n:'gpu-svr-02',acc:'NVIDIA-H200',cpu:'96',mem:'755 GB',cached:false,grp:'gpu-group-01'}
 ];
 /* 필터·정렬용 평면 필드 — infra 중첩값을 목록에서 바로 쓰기 위함 */
-/* 시스템 컴포넌트는 목록에서 제외 (판정 기준 확인 필요 — B-12) */
+/* 시스템 컴포넌트는 목록에서 제외 (판정 기준 확인 필요 — B-12)
+   v0.40 · CNAI(modctl) 형식의 모델 이미지가 아닌 이미지도 모델 목록에 두지 않는다. 이전에 등록된 행도 보이지 않고 레지스트리 이미지는 남는다(모델 정책 4.3).
+   아래 oci-storage-initializer 샘플이 그 이미지다. 같은 sys 분기로 뺀다 */
 IMG.forEach(m=>{ m.gpu=m.infra.g; m.vram=m.infra.v; m.sys=false; });
 IMG.push({n:'oci-storage-initializer',v:'v0.15.2',ready:'캐싱됨',cn:3,use:'미사용',scope:'전역',ws:'-',by:'관리자(admin)',at:'2026-03-02 09:12:00',eng:'-',base:'Official Base',
   arch:{p:'-',c:'-',q:'-',d:'-'},infra:{v:'-',r:'아니요',g:'-'},store:'model-registry/oci-storage-initializer:v0.15.2',mode:'-',prof:0,deps:[],gpu:'-',vram:'-',sys:true});
@@ -1727,8 +1766,11 @@ let unit='model';
    목록에서 판단하는 것은 `지금 배포하면 기동이 빠른가` 이고 1/3 과 3/3 은 다르다 */
 function cnCell(m){
   if(m.cn===undefined || m.ready.indexOf('빌드')>=0) return '<span class="dash">-</span>';
-  const tot=NODES.length, gap=m.cn<tot;
-  return '<span'+(gap?' class="dash"':'')+'>'+m.cn+' / '+tot+'</span>';
+  /* v0.40 · 분모 · 분자 모두 캐싱할 수 있는 노드만 센다. 다른 계열에 남은 캐시와 계열이 섞인 노드 그룹의 노드는 세지 않는다(모델 정책 4.1) */
+  let tot=0, done=0;
+  NODES.forEach(function(nd,i){ if(!nodeInScope(m,i)) return; tot++; if(nodeCached(m,i)) done++; });
+  const gap=done<tot;
+  return '<span'+(gap?' class="dash"':'')+'>'+done+' / '+tot+'</span>';
 }
 /* 사용 여부. 한 건이면 배포 이름을, 여러 건이면 `{첫 배포} 외 N건` 으로 줄인다(라이브러리 4.5).
    0 건이면 `-` 다. `미사용` 이라 쓰면 값이 있는 것처럼 읽힌다(공통정책 1.7).
@@ -1743,7 +1785,7 @@ function useCell(m){
 /* 캐싱된 노드 이름 — 패널·상세에서 쓴다 */
 function cnNames(m){
   if(!m.cn) return [];
-  return NODES.filter(function(nd,i){ return nodeCached(m,i); }).map(function(nd){ return nd.n; });
+  return NODES.filter(function(nd,i){ return nodeCached(m,i) && nodeInScope(m,i); }).map(function(nd){ return nd.n; });
 }
 
 function groupByModel(list){
@@ -2138,6 +2180,7 @@ function syncBadge(m){
 function cnGroups(m){
   const g={}, order=[];
   NODES.forEach(function(nd,i){
+    if(!nodeInScope(m,i)) return;   /* v0.40 · 캐싱할 수 있는 노드만 센다(모델 정책 4.1) */
     const k=nd.grp||'노드 그룹 미지정';
     if(!g[k]){ g[k]={n:k,tot:0,done:[]}; order.push(k); }
     g[k].tot++; if(nodeCached(m,i)) g[k].done.push(nd.n);
@@ -3378,18 +3421,26 @@ function openCache(n, v){
   cTarget=n; cTargetV=v||''; document.getElementById('cName').textContent=n+(v?' '+v:'');
   document.getElementById('cReqErr').innerHTML='';
   const b=document.getElementById('cacheBody');
-  if(!NODES.length){
-    b.innerHTML='<div class="state" style="padding:36px 12px;border:0;background:transparent"><h3>캐싱 가능한 노드가 없습니다.</h3><p>클러스터에 가속기 노드가 없습니다.</p></div>';
+  const tm=IMG.find(function(x){ return x.n===n && (!v || x.v===v); });
+  /* v0.40 · 요구 가속기와 계열이 같은 노드가 하나도 없으면 빈 상태다. 가속기 노드가 아예 없는 경우와 둘째 줄을 가른다.
+     같은 계열 노드가 있으면 그룹 사유로 막혀도 목록을 보이고 행마다 사유를 단다 */
+  const anyOk=NODES.some(function(nd){ const f=reqFam(tm); return !f || accFam(nd.acc)===f; });
+  if(!NODES.length || !anyOk){
+    b.innerHTML='<div class="state" style="padding:36px 12px;border:0;background:transparent"><h3>캐싱 가능한 노드가 없습니다.</h3><p>'
+      +(NODES.length? '이 모델의 요구 가속기와 계열이 같은 노드가 없습니다.' : '클러스터에 가속기 노드가 없습니다.')+'</p></div>';
   }else{
-    const tm=IMG.find(function(x){ return x.n===n && (!v || x.v===v); });
     b.innerHTML='<div class="secnote" style="margin:0 0 12px">노드를 선택하면 그 노드가 속한 노드 그룹 전체에 캐싱됩니다.</div>'
-     + '<div class="selall"><span>클러스터 노드</span><button onclick="selAllNodes()">가속기 노드 전체 선택</button></div>'
+     /* v0.40 · 라벨 `전체 선택`. 고를 수 있는 노드만 고른다(MODEL-L01 7.7) */
+     + '<div class="selall"><span>클러스터 노드</span><button onclick="selAllNodes()">전체 선택</button></div>'
      + NODES.map(function(nd,i){
        const done=nodeCached(tm,i);
-       /* 이미 캐싱된 노드는 다시 고를 수 없다. 같은 이미지를 두 번 내려받을 이유가 없다 */
-       return '<label class="noderow"><input type="checkbox" onchange="cacheGrp(this,'+i+')" '+(done?'disabled':'')+'>'
+       /* 이미 캐싱된 노드는 다시 고를 수 없다. 같은 이미지를 두 번 내려받을 이유가 없다.
+          v0.40 · 계열이 다른 노드와 그런 노드가 섞인 노드 그룹의 노드도 고를 수 없다. 사유 툴팁(.dis-tip)을 행 전체에 단다 */
+       const why=done? '' : nodeFamWhy(tm,i);
+       const row='<label class="noderow"'+(why?' style="margin-bottom:0"':'')+'><input type="checkbox" onchange="cacheGrp(this,'+i+')" '+((done||why)?'disabled':'')+'>'
        + '<div><div class="nn">'+nd.n+' <span class="chip">'+nd.acc+'</span></div><div class="nm2">노드 그룹 '+nd.grp+' · CPU '+nd.cpu+' · Mem '+nd.mem+'</div></div>'
        + '<span class="rt stbadge '+(done?'ok':'mu')+'">'+(done?'캐싱됨':'미캐싱')+'</span></label>';
+       return why? '<span class="tip-anchor dis-tip" tabindex="0" style="display:block;margin-bottom:8px">'+row+'<span class="tip">'+disTipEsc(why)+'</span></span>' : row;
       }).join('')
      + '<div class="errmsg" id="cNodeErr" style="display:none">노드를 1개 이상 선택해 주세요.</div>';
   }
@@ -3397,6 +3448,14 @@ function openCache(n, v){
 }
 function closeCache(){document.getElementById('mdCache').classList.remove('on');}
 let cacheRej=false;
+/* v0.40 · 검토용. npu-group-01 에 NVIDIA-H200 노드를 더하고 뺀다. 실제 화면에는 없는 검토용 처리다 */
+function setMix(v,btn){
+  const k=NODES.findIndex(function(nd){ return nd.n==='gpu-svr-03'; });
+  if(v && k<0) NODES.push({n:'gpu-svr-03',acc:'NVIDIA-H200',cpu:'96',mem:'755 GB',cached:false,grp:'npu-group-01'});
+  if(!v && k>=0) NODES.splice(k,1);
+  document.querySelectorAll('#demoBar .mx').forEach(function(b){ b.classList.remove('on'); }); if(btn) btn.classList.add('on');
+  refresh();
+}
 function setCacheRej(v,btn){ cacheRej=v; document.querySelectorAll('#demoBar .cj').forEach(function(b){ b.classList.remove('on'); }); if(btn) btn.classList.add('on'); }
 /* 고를 수 있는 노드가 없을 때만 비활성이다(상태). 고르지 않은 것은 누를 때 알린다(공통정책 7.1 · 7.8) */
 function cacheValid(){
