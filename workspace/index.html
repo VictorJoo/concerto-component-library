@@ -1,5 +1,25 @@
 <!--
-  콘체르토 매니저 · 워크스페이스 화면 목업 v0.64 (2026-11-02)
+  콘체르토 매니저 · 워크스페이스 화면 목업 v0.65 (2026-11-03)
+
+  ── v0.65 (2026-11-03) ──
+  · 워크스페이스 기획서 v0.65 와 같은 버전이다.
+  · 운영룸(WKSP-PROD-D01)의 외부 모델 섹션을 그리지 않는다. 4.0은 외부 모델을 제공하지 않는다
+    (WKSP-L01 7.6 · 8장 · 워크스페이스 정책 3.6 · 4.0 지원 범위 정책 2.1).
+    섹션 제목 · 도움말 · `외부 모델 등록` 버튼 · 표 · 빈 상태 · `해제` 메뉴가 모두 빠지고 등록 진입점이 없어진다.
+    섹션 코드는 EXT_ON(false) 분기 아래 재검토 기준으로 남긴다. 등록 모달 · 등록 · 해제 함수도 같다.
+  · 샘플 데이터의 외부 모델(gpt-4o · claude-sonnet-4-6)을 비웠다. 4.0 화면에 없는 값이 제품 기본값으로 읽히지 않게 한다.
+  · 외부 모델을 가리키는 권한 · 소관 주석(연동 · 외부 모델 · 룸, canManageExt)에 4.0 제외를 덧붙였다.
+    키 발급의 접근 허용 모델 선택지에 외부 모델을 넣을지의 확인 대상은 4.0 제외로 닫는다.
+  · 할당량 수정의 축소 하한 문구에 두 룸 점유를 붙였다. `현재 점유 중인 {N} {단위}(운영룸 {a} · 개발룸 {b})보다 작게 줄일 수 없습니다.`
+    (가속기는 `{N}장`). 하한은 종전대로 워크스페이스 점유 전체(운영룸 + 개발룸)다(WKSP-L01 5.1 · 워크스페이스 정책 5.1).
+    샘플 ai-service-team 에 개발룸 점유(devuse, 개발룸 목업과 같은 20 Cores · 80 Gi · 2장)를 두었다.
+  · 할당량을 개발룸 자원보다 작게 줄여도 막지 않고 저장한다. 새 할당량에서 운영룸 점유를 뺀 양으로 개발룸 자원을 함께 줄인다
+    (워크스페이스 정책 2.4 · WKSP-L01 REQ-WKSP-109). 섹션 도움말에 이 동작을 한 문장으로 더했다.
+  · 워크스페이스 생성에서 개발룸을 함께 만들 때 CPU · Memory · 가속기를 모두 0으로 두면 생성을 누른 뒤 CPU 칸에 인라인 에러
+    `개발룸 자원을 모두 0으로 둘 수 없습니다. 개발룸이 필요 없으면 생성 안 함을 골라 주세요.` 를 보이고 생성하지 않는다(WKSP-L01 7.3 · 개발룸 기획서 5.1 · REQ-CDE-087).
+    룸 생성은 선택이고 기본은 생성 안 함이라(워크스페이스 정책 2.3) 이 화면에서 할 수 있는 조치를 적는다. 개발룸 목업의 설정 문구(삭제 안내)와 다르다.
+  · 가속기 머리 주석의 「장치별로 고정되어 분할 사용이 불가능하다」를 워크스페이스 정책 5.1 문구로 고쳤다. 가속기 공유도 할당량은 장 수로 센다.
+    화면 변경 없음(배포 정책 4.6).
 
   ── v0.64 (2026-11-02) ──
   · 워크스페이스 기획서 v0.64 와 같은 버전이다.
@@ -225,7 +245,7 @@
   · 공용 워크스페이스 관리자는 최고 관리자가 겸한다(정책 6.1 · CON-562). 종전에는 최고
     관리자가 공용 관리자를 지정하고 그 관리자가 속성 운영을 맡는 구조였으나, 구현이
     최고 관리자 외에는 공용 관리자를 허용하지 않아 지정할 대상이 없다. 연동·외부 모델·룸
-    진입점을 최고 관리자 기준으로 바꿨다.
+    진입점을 최고 관리자 기준으로 바꿨다. (v0.65 · 외부 모델은 4.0 제외. 워크스페이스 정책 3.6)
   · 공용 워크스페이스 역할 셀렉트 — `관리자` 선택지를 최고 관리자 계정에만 두고, 최고
     관리자 계정의 역할은 관리자로 고정해 셀렉트를 비활성으로 둔다.
   · 전원 자동 등록이라는 사실은 멤버 섹션 도움말에 둔다(공통정책 4.7). 조치가 없는
@@ -262,7 +282,7 @@
 
   따라서 공용에서 관리자 작업의 기준은 `isWsAdmin()` 이 아니라 `isSuper()` 다.
     연동·전용 저장소  최고 관리자만(정책 6.1·6.2)
-    외부 모델        최고 관리자만 등록·해제(정책 3.6·9장)
+    외부 모델        최고 관리자만 등록·해제(정책 3.6·9장). v0.65 · 4.0 제외라 진입점 없음
     룸              최고 관리자만 생성·설정·삭제(정책 6.2)
     멤버 역할 변경    최고 관리자만. `관리자` 선택지는 최고 관리자 계정에만(정책 6.2)
 
@@ -338,6 +358,7 @@
    브레드크럼 링크가 모두 `개발룸 화면으로 이동합니다` 안내로 간다.
    생성도 개발룸 화면 소관이다 — `＋ 개발룸 생성` 도 같은 안내로 보낸다.
    ⚠ 운영룸은 워크스페이스 소관이라 그대로 둔다(자원 현황 · 배포된 모델 · 외부 모델).
+     v0.65 · 외부 모델은 4.0 제외라 그리지 않는다(워크스페이스 정책 3.6).
 
   ── 개발룸·CDE 잔여 코드 제거 (2026-09-28) ─────────────
    개발룸 목업 v0.25 와 대조를 마쳐, 진입점이 없어 도달하지 않던 코드를 지웠다 —
@@ -354,7 +375,7 @@
    대상을 인자로 받게 고쳤다 — 카드·테이블 모두 행마다 판정한다.
    공용은 기본 정보 수정과 삭제를 노출하지 않는다(정책 6.1·6.2).
    ⚠ 연동·외부 모델·API Key 는 공용도 일반과 동일하다(6.2). 기본 정보 수정과 권한 축이
-     달라 `canManageExt(m)` 로 갈랐다.
+     달라 `canManageExt(m)` 로 갈랐다. (v0.65 · 외부 모델은 4.0 제외. 워크스페이스 정책 3.6)
 
 ── 탭 배지 (2026-08-26) ──────────────────────
    상세 탭(멤버·연동·API Key)에 건수를 넣었다. 탭을 열기 전에 몇 건인지가 판단 재료다 —
@@ -468,8 +489,8 @@
   · 진입 권한이 없는 역할에게는 링크를 노출하지 않는다(9.4)
 
   ── 가속기 ──────────────────────────────────────
-  · 벤더·유형별로 구분해 할당한다. 수량으로 배정하고 vRAM 수치는 입력받지 않는다 —
-    장치별로 고정되어 분할 사용이 불가능하다
+  · 벤더·유형별로 구분해 할당한다. 수량으로 배정하고 vRAM 수치는 입력받지 않는다.
+    배포가 가속기 한 장을 나눠 쓰는 경우(가속기 공유)도 할당량은 장 수로 센다(v0.65 · 워크스페이스 정책 5.1 · 배포 정책 4.6)
   · 한 장당 vRAM은 타입명에 함께 둔다. 고를 때 판단 재료가 된다
   · 합계는 반복 필드 아래 한 줄로 모은다. vRAM 총량이 판단 기준이다
   · 행마다 환산값을 두지 않는다. 중간 계산이고 가속기 풀이 혼합 구성되면 숫자가 쌓인다
@@ -2124,7 +2145,9 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 </div>
 
 
-<!-- 외부 모델 등록 — 스크린 ID 미부여 -->
+<!-- 외부 모델 등록 — 스크린 ID 미부여
+     v0.65 · 4.0은 외부 모델을 제공하지 않아 이 모달을 여는 진입점이 없다(워크스페이스 정책 3.6 · 4.0 지원 범위 정책 2.1).
+     재검토 기준으로 남긴다(WKSP-L01 7.6). -->
 <div class="mdbg" id="mdExt">
   <div class="modal" style="width:520px">
     <div class="mdhead">
@@ -2272,10 +2295,12 @@ const WS=[
   quota:{cpu:64,ram:256,gpu:4,vol:500},
   devq:{cpu:32,ram:128,gpu:2},
   use:{cpu:44,ram:176,gpu:3},
+  /* v0.65 · use 중 개발룸(CDE)이 점유한 양. 개발룸 목업과 같은 값이다. 나머지가 운영룸 점유다 */
+  devuse:{cpu:20,ram:80,gpu:2},
   members:[{n:'성유진',id:'yj.seong',role:'관리자'},{n:'임승주',id:'sj.lim',role:'편집자'},{n:'유지현',id:'jh.yu',role:'뷰어'}],
   models:[{n:'llama-3.2-1b-instruct',st:'캐싱됨',use:'배포 중'},{n:'gemma-4-12b-it',st:'미캐싱',use:'배포 중'}],
   deps:[{n:'llama-3-2-1b-prod',st:'정상',rep:'2 / 2',by:'성유진(yj.seong)'},{n:'gpt-oss-120b-symphony',st:'정상',rep:'4 / 4',by:'임승주(sj.lim)',auth:false},{n:'gemma-4-12b-it-idle',st:'유휴',rep:'0 / 2',by:'성유진(yj.seong)'},{n:'solar-open-100b-paused',st:'중지됨',rep:'0 / 1',by:'유지현(jh.yu)'}],
-  ext:[{n:'gpt-4o',prov:'OpenAI',st:'정상'},{n:'claude-sonnet-4-6',prov:'Anthropic',st:'정상'}],
+  ext:[],
   hfToken:true, hfTokenAt:'2026-07-14 10:20',
   cdes:[{u:'yj.seong',env:'Jupyter Lab',fw:'PyTorch (Furiosa)',acc:'Furiosa RNGD 2장',mode:'비동기 위임',
          start:'2026-07-08 17:47:25',exp:'2026-08-08 17:47:00',st:'정상',ip:'10.20.0.0/16'},
@@ -2428,9 +2453,12 @@ const cdeCnt=(m)=>m.cdes.filter(c=>CDE_LIVE.indexOf(c.st)>=0 && (isWsAdmin() || 
    진입점을 두지 않는다(공통정책 7.10) */
 const canEditInfo =(m)=>!isSysWs(m) && isWsAdmin();
 /* 연동·외부 모델·룸은 일반은 Workspace Admin, 공용은 최고 관리자가 한다(정책 6.1·3.6).
+   v0.65 · 외부 모델은 4.0 제외라 이 함수가 여는 외부 모델 진입점은 없다. 연동 설정 버튼만 이 함수를 쓴다.
    기본 정보 수정(6.1 미노출)과 권한 축이 다르므로 함수를 가른다.
    ⚠ v0.54 까지 `공용도 일반과 동일` 이었으나 정책 6.1 개정으로 바뀌었다 */
 const canManageExt=(m)=>canAdminWs(m);
+/* v0.65 · 운영룸 외부 모델 섹션 표시 여부. 4.0은 false(워크스페이스 정책 3.6 · 4.0 지원 범위 정책 2.1) */
+const EXT_ON=false;
 /* 전용 저장소는 공용에서 최고 관리자 전용이다(정책 6.1 · CON-562).
    연동 전체가 같은 기준이 되어 canManageExt 와 결과가 같으나,
    근거 조항이 달라(6.1 저장소 · 6.1 관리자 겸임) 함수를 남겨 둔다 */
@@ -2660,6 +2688,16 @@ function adminLabel(m){
 function pct(u,q){ return q? Math.round(u/q*100) : 0; }
 function qCls(p){ return p>=90?'full':(p>=70?'hi':''); }
 /* 운영룸 몫 = 전체 할당량 − 개발룸 몫 */
+/* v0.65 · 개발룸 점유. 값이 없는 샘플은 0 이다 */
+function devUse(m){ return m.devuse || {cpu:0,ram:0,gpu:0}; }
+/* v0.65 · 할당량 수정의 축소 하한은 운영룸 점유와 개발룸 점유를 더한 양(m.use)이다.
+   문구에 두 점유를 함께 보인다(WKSP-L01 5.1 축소 제한 · 워크스페이스 정책 5.1). 생성 · 신청과 전체 저장소 용량은 종전 문구다 */
+function underMsg(kind,used,unit){
+  const U=(unit==='장'||unit==='개')? unit : ' '+unit;
+  if(formKind!=='quota' || !cur || kind==='vol') return '현재 점유 중인 '+used+U+'보다 작게 줄일 수 없습니다.';
+  const d=devUse(cur.m)[kind]||0;
+  return '현재 점유 중인 '+used+U+'(운영룸 '+(used-d)+' · 개발룸 '+d+')보다 작게 줄일 수 없습니다.';
+}
 function prodQ(m){ return {cpu:m.quota.cpu-m.devq.cpu, ram:m.quota.ram-m.devq.ram, gpu:m.quota.gpu-m.devq.gpu}; }
 /* ===== 목록 ===== */
 function setView(v){ listView=v;
@@ -3813,7 +3851,10 @@ function roomTab(m){
   /* 외부 상용 AI API를 외부 모델로 등록하면 이 운영룸 게이트웨이에 라우팅 규칙으로 연결되어
      자체 배포 모델과 같은 방식으로 호출한다. 호출은 API Key 인증·사용량 집계 대상이다(정책 3.6 · C-5).
      운영룸이 '이 워크스페이스에서 호출할 수 있는 모델 전부'를 다루는 자리가 된다.
-     배포 화면의 `외부 배포`(클러스터 워크로드 가져오기)와 다른 대상이다 */
+     배포 화면의 `외부 배포`(클러스터 워크로드 가져오기)와 다른 대상이다
+     v0.65 · 4.0은 외부 모델을 제공하지 않는다. 운영룸 화면에 이 섹션과 등록 진입점을 두지 않는다
+     (WKSP-L01 7.6 · 워크스페이스 정책 3.6 · 4.0 지원 범위 정책 2.1). 아래 코드는 재검토 기준으로 EXT_ON 분기 아래 남긴다 */
+  if(!EXT_ON) return h;
   const ext=m.ext||[];
   h+='<div class="dsec"><h4>외부 모델'
    +   tip('외부 모델을 등록하면 자체 배포 모델과 같은 방식으로 호출할 수 있습니다.')
@@ -4056,11 +4097,24 @@ function ownerKey(e){ if(e.key==='Enter' && !e.isComposing && e.keyCode!==229){ 
 function formValid(){
   if(formKind==='quotaReq') return true;   /* 버튼 활성은 drawQuotaReqForm 이 직접 본다 */
   if(formKind==='quota') return qDirty() && qErrs().length===0;
+  if(NF.mkDev && devAllZero()) return false;
   /* 중복 확인을 마친 이름이어야 한다. 확인 뒤 값이 바뀌면 다시 확인한다 */
   const dupOk = fDupOk && fDupName===NF.name.trim();
   /* 전용 S3 를 켜면 네 항목이 모두 있어야 한다. 버킷은 기본값이 없다(CON-492) */
   const s3Ok = !NF.byob || [NF.s3url,NF.s3bucket,NF.s3key,NF.s3sec].every(function(x){ return (x||'').trim(); });
   return !nameErr() && dupOk && !ownerErr() && qErrs().length===0 && s3Ok && (formKind==='new' || !rsnErr());
+}
+/* v0.65 · 개발룸을 함께 만들 때 CPU · Memory · 가속기를 모두 0으로 둘 수 없다(개발룸 기획서 5.1 · REQ-CDE-087 · 워크스페이스 정책 3.4).
+   문구는 WKSP-L01 7.3 이고 CPU 칸에 둔다. 생성을 누른 뒤에만 보인다(shownF.q) */
+function devAllZero(){
+  return ['devCpu','devRam','devGpu'].every(function(k){ const raw=String(NF[k]==null?'':NF[k]).trim(); return raw!=='' && +raw===0; });
+}
+function devCpuRow(html){
+  if(!(NF.mkDev && shownF.q && devAllZero()) || html.indexOf('class="errmsg"')>=0) return html;
+  const h=html.replace('class="qrowbox','class="qrowbox err').replace('class="stepper','class="stepper err');
+  /* qRow 는 qrowbox 를 닫는 </div> 로 끝난다. 그 안쪽 끝에 에러를 넣는다 */
+  return h.slice(0,h.length-6)
+    + '<div class="errmsg" style="display:block">개발룸 자원을 모두 0으로 둘 수 없습니다. 개발룸이 필요 없으면 생성 안 함을 골라 주세요.</div></div>';
 }
 /* 개발룸 생성 입력 — 정책 3.3.
    워크스페이스 할당량 안에서 개발룸 몫을 정하고 그만큼 운영룸에서 옮겨진다.
@@ -4076,7 +4130,7 @@ function devRoomFields(){
    + '<div class="f"><label>대상 클러스터'+tip('개발룸이 만들어질 클러스터입니다. 생성 후에는 바꿀 수 없습니다.')+'</label>'
    +   '<select class="inp" style="max-width:320px"><option>remote-cluster-main</option></select></div>'
    /* 개발룸 몫은 워크스페이스 할당량에서 옮겨온다. 남는 만큼이 운영룸 몫이다 */
-   + qRow('devCpu','CPU',cpuCap,cpuCap,0,0,'Cores','워크스페이스 할당량에서 옮겨집니다. 남는 만큼이 운영룸 몫입니다.')
+   + devCpuRow(qRow('devCpu','CPU',cpuCap,cpuCap,0,0,'Cores','워크스페이스 할당량에서 옮겨집니다. 남는 만큼이 운영룸 몫입니다.'))
    + qRow('devRam','Memory',ramCap,ramCap,0,0,'Gi','')
    + qRow('devGpu','가속기',gpuCap,gpuCap,0,0,'장','')
    + qRow('devVol','공유 볼륨',volCap,volCap,0,0,'GB','개발룸 멤버가 함께 쓰는 볼륨입니다. 생성 시에 정하며 이후에는 바꿀 수 없습니다.')
@@ -4417,7 +4471,7 @@ function drawQuotaForm(){
   h+='<div class="formpage two">';
   /* 가용량과 입력을 한 행으로 합친다. 위에서 남은 양을 보고 아래에서 입력하면
      값이 가용량을 넘는지 즉시 보이지 않는다 */
-  h+='<div class="fsec"><h4>워크스페이스 할당량'+tip('배분 가능한 범위 안에서 정합니다. 현재 점유량보다 작게 줄일 수 없습니다. 개발룸 자원은 개발룸 화면에서 정합니다.')+'</h4>'
+  h+='<div class="fsec"><h4>워크스페이스 할당량'+tip('배분 가능한 범위 안에서 정합니다. 운영룸과 개발룸이 점유한 양보다 작게 줄일 수 없습니다. 개발룸 자원보다 작게 줄이면 개발룸 자원도 함께 줄어듭니다.')+'</h4>'
    + qRow('cpu','CPU',CLUSTER.cpu.total,CLUSTER.cpu.free,m.quota.cpu,m.use.cpu,CLUSTER.cpu.unit,'0.5 단위로 지정할 수 있습니다.')
    + qRow('ram','Memory',CLUSTER.ram.total,CLUSTER.ram.free,m.quota.ram,m.use.ram,CLUSTER.ram.unit,'')
    + accBlock(m)
@@ -4472,6 +4526,14 @@ function submitQuota(){
   }
   m.quota.cpu=+NF.cpu; m.quota.ram=+NF.ram; m.quota.gpu=CLUSTER.gpu.reduce(function(a,g){ return a+(+NF[accKey(g)]||0); },0); m.quota.vol=+NF.vol;
   m.devq.cpu=+NF.devCpu; m.devq.ram=+NF.devRam; m.devq.gpu=+NF.devGpu;
+  /* v0.65 · 새 할당량에서 운영룸 점유를 뺀 양이 개발룸 자원보다 작으면 개발룸 자원도 그 양으로 함께 줄여 한 번에 저장한다.
+     운영룸 점유가 우선한다. 자원마다 따로 계산한다(워크스페이스 정책 2.4 · WKSP-L01 REQ-WKSP-109).
+     줄면 워크스페이스 관리자에게 알림이 간다(알림 정책 3.4). 저장한 최고 관리자에게는 종전 토스트만 둔다 */
+  const du=devUse(m);
+  ['cpu','ram','gpu'].forEach(function(k){
+    const room=m.quota[k]-(m.use[k]-du[k]);
+    if(m.devq[k]>room) m.devq[k]=Math.max(du[k],room);
+  });
   view='detail'; wTab=1; syncView(); refresh();
   toast('ok','할당량을 수정했습니다.');
 }
@@ -4543,7 +4605,7 @@ function accBlock(m){
      + '</div>'
      + (fe? '<div class="errmsg" style="display:block">'+fe+'</div>'
         : over? '<div class="errmsg" style="display:block">배분 가능한 최대는 '+cap+'장입니다.</div>'
-        : under? '<div class="errmsg" style="display:block">현재 점유 중인 '+use+'장보다 작게 줄일 수 없습니다.</div>' : '')
+        : under? '<div class="errmsg" style="display:block">'+underMsg('gpu',use,'장')+'</div>' : '')
      + '</div>';
   }).join('');
 
@@ -4679,7 +4741,7 @@ function qRow(key,label,total,free,curQuota,used,unit,desc,rm,sub){
    + '</div>'
    + (fe? '<div class="errmsg" style="display:block">'+fe+'</div>'
       : over? '<div class="errmsg" style="display:block">배분 가능한 최대는 '+cap.toFixed(cap%1?1:0)+' '+unit+'입니다.</div>'
-      : under? '<div class="errmsg" style="display:block">현재 점유 중인 '+used+' '+unit+'보다 작게 줄일 수 없습니다.</div>'
+      : under? '<div class="errmsg" style="display:block">'+underMsg(key,used,unit)+'</div>'
       : '')
    + '</div>';
 }
@@ -5102,7 +5164,9 @@ function refresh(){
    워크스페이스 내 단일 게이트웨이로 자체 배포 모델과 같게 호출한다.
    게이트웨이는 워크스페이스마다 있고 외부 모델은 라우팅 규칙으로 연결한다. 플랫폼 공용 진입 주소는 없다.
    호출은 API Key 인증·사용량 집계 대상이다(정책 3.6 · 2026-09-29 결정 C-5).
-   ⚠ 키 발급의 접근 허용 모델 선택지에 외부 모델을 넣을지는 정해지지 않았다(REQ-WKSP-069 · 확인 대상) */
+   ⚠ 키 발급의 접근 허용 모델 선택지에 외부 모델을 넣을지는 정해지지 않았다(REQ-WKSP-069 · 확인 대상)
+     → 닫음(v0.65). 4.0은 외부 모델을 제공하지 않는다(워크스페이스 정책 3.6 · 4.0 지원 범위 정책 2.1).
+   v0.65 · 운영룸 섹션을 그리지 않아(EXT_ON) 아래 등록 · 해제 함수를 부르는 진입점이 없다. 재검토 기준으로 남긴다 */
 const XPROV={'OpenAI':'https://api.openai.com/v1','Anthropic':'https://api.anthropic.com/v1','직접 입력':''};
 function openExt(){
   ['xName','xUrl','xTok'].forEach(function(id){ document.getElementById(id).value=''; document.getElementById(id+'Err').classList.remove('show'); });
