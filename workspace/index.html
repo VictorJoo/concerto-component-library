@@ -1,5 +1,46 @@
 <!--
-  콘체르토 매니저 · 워크스페이스 화면 목업 v0.65 (2026-11-03)
+  콘체르토 매니저 · 워크스페이스 화면 목업 v0.66 (2026-11-06)
+
+  ── v0.66 (2026-11-06) ──
+  · 기본 정보 수정에서 워크스페이스명을 읽기 전용으로 바꿨다. 중복 확인 버튼 · 이름 변경 경고가 나오지 않고, 아이콘 · 설명만 바꾼다.
+    모달 머리 문구 `워크스페이스명은 네임스페이스에 쓰여 변경할 수 없습니다.` 목록 카드 더보기 > 수정도 같은 모달이다. 생성 폼은 그대로다(정책 2.2 · 2.4 · WKSP-L01 REQ-WKSP-025).
+  · WKSP-L01 v0.66 · 워크스페이스 정책 v0.68 과 같은 버전이다. 게시하지 않은 11-04 · 11-05 묶음을 이 판에 합쳤다(아래 「11-05 묶음」 · 「11-04 묶음」).
+  · API Key 사용 한도를 토큰 한도 하나로 정리했다. 발급 · 한도 수정 모달에서 요청 수 한도 필드를 뺐다. 키 요청 수는 배포의 요청 수 제한이 맡는다(정책 7장 · 배포 정책 2.6).
+    기준 시간에 일당 · 주당을 더했다(분당 · 시간당 · 일당 · 주당, 기본 분당). 일당은 매일 0시, 주당은 매주 월요일 0시(한국 시간)에 새로 센다 — 토큰 한도 도움말에 적었다.
+    목록 한도 열은 `{n}토큰/{기준 시간}`, 없으면 - 다. 사용량 열(오늘 · 이번 주 사용 토큰)을 더했다. 받지 못하면 - 다(REQ-WKSP-111 · WKSP-L01 7.9).
+    한도 수정에서 기준 시간을 바꾸면 `기준 시간을 바꾸면 사용량을 새 구간부터 다시 셉니다.` 를 보인다(WKSP-L01 7.11).
+    샘플 lang-chain-agent-prod 는 2,000,000토큰/주 · 사용량 값을 둔다. 검토용 값이다.
+  · 멤버 초대를 이메일 정확 입력으로 바꿨다. 사용자 목록 선택을 없애고 여러 줄 입력(줄바꿈 · 쉼표, 최대 50개)을 받는다(WKSP-L01 7.12 · REQ-WKSP-061 · 다중 기관 격리 결정 B1 「정확 입력」).
+    아이디는 받지 않는다 — 아직 초대하지 않은 사람의 아이디는 알 길이 없고, 이메일은 모든 계정에 있다(회원가입 입력 · SSO 첫 로그인 때 인증 서버 값, 승인 정책 2.2).
+    한 사람을 아이디 · 이메일로 두 번 넣어 실패로 세는 경우도 없어진다. 라벨 `이메일`, 플레이스홀더 `예: yj.seong@okestro.com`.
+    이메일 형식이 아닌 값(이름 등)은 계정을 찾기 전에 `올바른 이메일 형식이 아닙니다.` 로 거른다(공통정책 7.8). 형식만 보므로 계정이 있는지 드러나지 않는다.
+    없는 계정과 승인 대기 · 반려 · 비활성 계정은 같은 문구 `초대할 수 없는 계정입니다. 이메일을 확인해 주세요.` 로 칸 아래에 남는다(계정 정책 5장).
+    일부만 초대하면 부분 성공 토스트 `멤버 초대 {N}건 완료, {M}건 실패` 를 띄우고 못 한 값만 칸에 남긴다(공통정책 7.7). 샘플에 승인 대기 계정 sj.lee 를 더했다.
+  · 공용 워크스페이스 자동 추가를 없앴다. 공용은 공용 멤버와 최고 관리자에게만 보인다. 데모 바 `공용 멤버(최고 관리자 외)` 로 멤버가 아닌 경우를 본다(정책 2.7 · 6.1).
+    최고 관리자에게 공용 멤버 초대 · 제외를 열었다. 나가기는 없고, 최고 관리자 계정 행의 제외는 비활성 + 사유다. 초대 모달에서 공용은 관리자 역할을 두지 않는다(정책 6.2 · WKSP-L01 7.4).
+    고정 설명 문구를 `초대된 멤버가 함께 쓰는 자산을 두는 공간` 으로 고쳤다(정책 6.1).
+  · 워크스페이스 삭제 차단 문구를 `해당 배포를 삭제한 뒤 워크스페이스를 다시 삭제해 주세요.` 로 고쳤다. 배포 화면의 동작 이름은 삭제다.
+
+  ── v0.66 · 11-05 묶음 ──
+  · API Key 토큰 한도에서 집계 대상을 뺐다. 입력 · 출력 토큰을 합쳐 센다. 발급 · 한도 수정 모달, 목록 한도 열 요약에서 함께 뺐다(정책 7장).
+  · 사용 한도 적용 단위를 배포마다에서 키별로 바꿨다. 키가 접근하는 배포의 호출을 합쳐 센다. 라벨 · 열 도움말을 맞췄다(정책 7장 · WKSP-L01 7.9 · 7.10).
+  · 운영룸 자원이 부족할 때 개발룸 자원을 자동으로 회수하는 동작은 4.1 범위다(정책 5.2 · 4.0 지원 범위 정책 3장).
+    환경별 배분 · 개발룸 안내 · 운영룸 자원 도움말에서 회수 문장을 뺐다.
+
+  ── v0.66 · 11-04 묶음 ──
+  · 접근 방식 라벨을 `임시 보안 자격 증명(STS)` 으로, 보조 설명을 `임시 보안 자격 증명을 발급받아 접근` 으로 썼다. 용어는 AWS 한국어 문서의 「임시 보안 자격 증명」을 따르고,
+    저장소 콘솔에서 찾을 이름(STS)은 괄호에 둔다(`전역 저장소(S3)` 와 같은 방식). 「역할」은 콘체르토 역할과 겹쳐 설명 문장에 쓰지 않는다. 필드 라벨 `역할 ARN` 은 콘솔 이름이라 둔다.
+  · 전용 저장소에 접근 방식을 더했다. 직접 접근(기본) · 임시 보안 자격 증명(STS) 중 고르고, STS 면 STS 엔드포인트 URL · 역할 ARN 이 필수다.
+    생성 폼 · 저장소 설정 모달 · 연동 탭 조회 셋 다 같다(워크스페이스 정책 2.4 · REQ-WKSP-046).
+    STS 로 저장하면 시험 호출을 통과해야 하고, 실패하면 모달 위 알림으로 사유를 남긴다(WKSP-L01 5.2).
+  · 저장소 설정 모달에 `연결 확인` 을 두었다. 입력한 값으로 저장 전에 시험하고 결과를 항목별 표로 모달 안에 보인다.
+    저장은 막지 않는다. 한 번 누르면 10초 동안 다시 누를 수 없다(REQ-WKSP-110 · WKSP-L01 5.1).
+    표의 항목 이름은 가안이다. 백엔드 항목 목록이 오면 화면 문구로 바꾼다.
+  · 허용 목록 밖 엔드포인트는 엔드포인트 URL 칸 인라인 에러로 알린다. 허용 목록은 전역 저장소에서 최고 관리자가 정한다(WKSP-L01 5.2).
+    데모는 주소에 `not-allowed` 가 들어가면 거절된다. 검토용 처리이며 실제 화면에는 없다.
+  · 워크스페이스 삭제 확인 알럿에 저장소 정리 시점 문장을 더했다(워크스페이스 정책 2.5).
+    다른 워크스페이스의 배포가 이 워크스페이스의 모델을 쓰고 있으면 삭제를 거절하고 차단 알럿으로 알린다.
+    데모는 ai-service-team 에 그런 배포 2건을 둔다. 검토용 값이다.
 
   ── v0.65 (2026-11-03) ──
   · 워크스페이스 기획서 v0.65 와 같은 버전이다.
@@ -300,8 +341,8 @@
   ⚠ 종전 주석이 `속성 운영은 지정된 Workspace Admin 이 한다(정책 v0.42 6.1·8장)` 로
     적혀 있었다. 9/22 배포로 최고 관리자 외에는 공용 ADMIN 이 될 수 없어 지정할 대상이
     없어졌고, CON-562(2026-09-29)에서 최고 관리자 겸임으로 확정됐다.
-  ⚠ 일반 워크스페이스의 이름 변경 가능 여부는 확인 대상이다(정책 10. 7번).
-    확정 전까지 입력을 유지하고 `불가` 로 확정되면 `canEditName()` 를 고쳐 잠근다.
+  · 일반 워크스페이스도 이름을 바꾸지 않는다(v0.66 · 정책 2.2 · 2.4). `canEditName()` 이 늘 거짓이라
+    공용과 같은 읽기 전용 표시를 쓴다.
 
   ── 탭별 액션 (2026-08-25) ───────────────────────
   액션은 그 액션이 걸리는 대상 옆에 둔다(공통정책 3.6) — 섹션 제목 줄 우측이다.
@@ -847,6 +888,8 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .toast .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
 .toast.ok .dot{background:var(--success)}
 .toast.cr .dot{background:var(--destructive)}
+/* v0.66 · 부분 성공(일괄 작업 한정, 5초) — 멤버 여러 명 초대에서 쓴다(공통정책 7.7 · 라이브러리 7.6) */
+.toast.warn .dot{background:var(--warning)}
 .toast .x{margin-left:auto;border:0;background:transparent;color:var(--muted-foreground);font-size:14px}
 
 /* 검증 컨트롤 (목업 전용) */
@@ -1913,15 +1956,18 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     <div class="mdhead"><h3>멤버 초대</h3><p id="invTarget"></p></div>
     <div class="mdbody">
       <div class="f">
-        <label>사용자<span class="req">*</span></label>
-        <select class="inp" id="iUser" onchange="iValid()"></select>
-        <div class="errmsg" id="iUserErr">사용자를 선택해 주세요.</div>
-        <div class="hint" id="iHint"></div>
+        <!-- v0.66 · 사용자 목록에서 고르지 않고 이메일을 정확히 입력한다. 여러 명은 줄바꿈 · 쉼표로 나눈다.
+             다른 워크스페이스 사람의 계정이 목록에 보이지 않게 한다(정책 9장 · WKSP-L01 7.12 · 다중 기관 격리 결정 B1) -->
+        <label>이메일<span class="req">*</span></label>
+        <textarea class="inp" id="iUser" rows="4" placeholder="예: yj.seong@okestro.com" oninput="iValid()"></textarea>
+        <div class="hint">여러 명은 줄을 바꾸거나 쉼표로 나눠 입력합니다.</div>
+        <div class="errmsg" id="iUserErr">이메일을 입력해 주세요.</div>
+        <div id="iFail"></div>
       </div>
       <div class="f" style="margin-bottom:0">
         <label>역할</label>
         <div class="pick" id="iRole">
-          <label><input type="radio" name="irole" value="관리자"><span>관리자</span><small>멤버·설정 관리</small></label>
+          <label id="iRoleAdm"><input type="radio" name="irole" value="관리자"><span>관리자</span><small>멤버·설정 관리</small></label>
           <label><input type="radio" name="irole" value="편집자"><span>편집자</span><small>CDE·배포 생성</small></label>
           <label><input type="radio" name="irole" value="뷰어" checked><span>뷰어</span><small>조회만</small></label>
         </div>
@@ -1929,7 +1975,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     </div>
     <div class="mdfoot">
       <button class="btn ghost" onclick="closeInvite()">취소</button>
-      <button class="btn" id="iSubmit" disabled onclick="runSync(this,submitInvite)">초대</button>
+      <button class="btn" id="iSubmit" onclick="runSync(this,submitInvite)">초대</button>
     </div>
   </div>
 </div>
@@ -1955,21 +2001,14 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <div class="mselect" id="kScope"></div>
         <div class="errmsg" id="kScopeErr">접근 허용 모델을 1개 이상 선택해 주세요.</div>
       </div>
-      <!-- 사용 한도 — 발급 시 정하고 발급 후에도 수정할 수 있다(정책 7장 수정 행 · 한도 수정 모달 M02).
-           적용 단위는 키가 접근하는 배포마다다. 인증을 끈 배포에는 걸리지 않고, 그 배포에 정한
-           키 없는 요청 분당 한도가 대신 적용된다(배포 정책 5.5 · CON-866 9항) -->
-      <div class="f">
-        <label>분당 요청 수 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">키가 접근하는 배포마다 따로 적용됩니다. API Key 인증을 끈 배포에는 적용되지 않고, 그 배포에 정한 키 없는 요청 분당 한도가 적용됩니다.</span></span></label>
-        <input class="inp" id="kRpm" inputmode="numeric" autocomplete="off" oninput="kLimInput('kRpm')" onblur="kLimBlur('kRpm')">
-        <div class="hint">비우면 플랫폼 기본값이 적용됩니다.</div>
-        <div class="errmsg" id="kRpmErr">1 이상의 정수를 입력해 주세요.</div>
-      </div>
-      <div class="f" style="margin-bottom:0">
-        <label>토큰 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">기준 시간 동안 처리할 수 있는 토큰 수입니다. 집계 대상에서 입력·출력 중 하나만 셀 수 있습니다. 키가 접근하는 배포마다 따로 적용됩니다.</span></span></label>
+      <!-- 사용 한도 — 토큰 한도 하나다(v0.66 · 정책 7장). 키에는 요청 수 한도를 두지 않는다 — 배포의 요청 수 제한이 맡는다(배포 정책 2.6).
+           발급 시 정하고 발급 후에도 수정할 수 있다(한도 수정 모달 M02). 적용 단위는 키다. 키가 접근하는 배포의 호출을 합쳐 센다.
+           인증을 끈 배포에는 걸리지 않고, 그 배포에 정한 키 없는 요청 분당 한도가 대신 적용된다(배포 정책 5.5) -->
+            <div class="f" style="margin-bottom:0">
+        <label>토큰 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">기준 시간 동안 처리할 수 있는 토큰 수입니다. 입력·출력 토큰을 합쳐 세고, 키가 접근하는 모든 배포의 사용량을 함께 셉니다. 일당은 매일 0시, 주당은 매주 월요일 0시(한국 시간)에 새로 셉니다. API Key 인증을 끈 배포에는 적용되지 않습니다.</span></span></label>
         <div style="display:flex;gap:8px">
           <input class="inp" id="kTok" inputmode="numeric" autocomplete="off" style="flex:1;min-width:0" aria-label="토큰 수" oninput="kLimInput('kTok')" onblur="kLimBlur('kTok')">
-          <select class="inp" id="kTokWin" style="width:96px" aria-label="기준 시간" disabled><option value="분">분당</option><option value="시간">시간당</option></select>
-          <select class="inp" id="kTokAgg" style="width:96px" aria-label="집계 대상" disabled><option value="전체">전체</option><option value="입력">입력</option><option value="출력">출력</option></select>
+          <select class="inp" id="kTokWin" style="width:96px" aria-label="기준 시간" disabled><option value="분">분당</option><option value="시간">시간당</option><option value="일">일당</option><option value="주">주당</option></select>
         </div>
         <div class="hint">비우면 토큰 한도를 두지 않습니다.</div>
         <div class="errmsg" id="kTokErr">1 이상의 정수를 입력해 주세요.</div>
@@ -1989,21 +2028,16 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <div class="modal" style="width:480px">
     <div class="mdhead"><h3>사용 한도 수정</h3><p id="lmDesc"></p></div>
     <div class="mdbody">
-      <div class="f">
-        <label>분당 요청 수 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">키가 접근하는 배포마다 따로 적용됩니다. API Key 인증을 끈 배포에는 적용되지 않고, 그 배포에 정한 키 없는 요청 분당 한도가 적용됩니다.</span></span></label>
-        <input class="inp" id="lmRpm" inputmode="numeric" autocomplete="off" oninput="lmInput('lmRpm')" onblur="kLimBlur('lmRpm')">
-        <div class="hint">비우면 플랫폼 기본값이 적용됩니다.</div>
-        <div class="errmsg" id="lmRpmErr">1 이상의 정수를 입력해 주세요.</div>
-      </div>
-      <div class="f" style="margin-bottom:0">
-        <label>토큰 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">기준 시간 동안 처리할 수 있는 토큰 수입니다. 집계 대상에서 입력·출력 중 하나만 셀 수 있습니다. 키가 접근하는 배포마다 따로 적용됩니다.</span></span></label>
+            <div class="f" style="margin-bottom:0">
+        <label>토큰 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">기준 시간 동안 처리할 수 있는 토큰 수입니다. 입력·출력 토큰을 합쳐 세고, 키가 접근하는 모든 배포의 사용량을 함께 셉니다. 일당은 매일 0시, 주당은 매주 월요일 0시(한국 시간)에 새로 셉니다. API Key 인증을 끈 배포에는 적용되지 않습니다.</span></span></label>
         <div style="display:flex;gap:8px">
           <input class="inp" id="lmTok" inputmode="numeric" autocomplete="off" style="flex:1;min-width:0" aria-label="토큰 수" oninput="lmInput('lmTok')" onblur="kLimBlur('lmTok')">
-          <select class="inp" id="lmTokWin" style="width:96px" aria-label="기준 시간" onchange="lmValid()"><option value="분">분당</option><option value="시간">시간당</option></select>
-          <select class="inp" id="lmTokAgg" style="width:96px" aria-label="집계 대상" onchange="lmValid()"><option value="전체">전체</option><option value="입력">입력</option><option value="출력">출력</option></select>
+          <select class="inp" id="lmTokWin" style="width:96px" aria-label="기준 시간" onchange="lmValid()"><option value="분">분당</option><option value="시간">시간당</option><option value="일">일당</option><option value="주">주당</option></select>
         </div>
         <div class="hint">비우면 토큰 한도를 두지 않습니다.</div>
         <div class="errmsg" id="lmTokErr">1 이상의 정수를 입력해 주세요.</div>
+        <!-- v0.66 · 기준 시간을 바꾸면 새 구간부터 다시 센다(정책 7장 한도 수정 시 사용량 · WKSP-L01 7.11) -->
+        <div class="hint" id="lmWinHint" style="display:none">기준 시간을 바꾸면 사용량을 새 구간부터 다시 셉니다.</div>
       </div>
     </div>
     <div class="mdfoot">
@@ -2023,7 +2057,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <label>아이콘</label>
         <div class="icopick" id="eIco"></div>
       </div>
-      <!-- 공용 워크스페이스는 이름을 바꾸지 않는다(정책 6.1). 입력 대신 읽기 전용으로 둔다 -->
+      <!-- 워크스페이스명은 생성 뒤 바꾸지 않는다(정책 2.2 · 2.4). 입력 대신 읽기 전용으로 둔다(공통정책 7.11). 중복 확인 버튼도 보이지 않는다 -->
       <div class="f" id="eNameWrap">
         <label>워크스페이스명<span class="req" id="eNameReq">*</span></label>
         <div style="display:flex;gap:8px" id="eNameEdit">
@@ -2057,6 +2091,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
       <p>이 워크스페이스가 사용할 저장소를 정합니다.</p>
     </div>
     <div class="mdbody">
+      <div id="byAlert"></div>
       <div class="f" style="margin-bottom:0">
         <div class="optcard" id="byobCard" onclick="byobToggle()"><input type="checkbox" id="byobUse" onclick="event.stopPropagation()" onchange="byobToggle(this.checked)">
           <div><div class="oc-t">전용 S3 저장소 사용</div><div class="oc-d">이 워크스페이스만 사용할 저장소를 따로 연결합니다. 사용하지 않으면 전역 저장소를 사용합니다.</div></div></div>
@@ -2075,6 +2110,24 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <div class="f" style="margin-bottom:0"><label>시크릿 키<span class="req">*</span></label>
           <div id="bySecBox"></div>
           <div class="errmsg" id="bySecErr">시크릿 키를 입력해 주세요.</div></div>
+        <!-- 접근 방식 — 직접 접근(기본) · 임시 보안 자격 증명(STS)(워크스페이스 정책 2.4 · CON-951).
+             STS 를 고르면 두 값이 필수다. 직접 접근으로 돌리면 STS 값은 지운다 -->
+        <div class="f" style="margin-top:14px"><label>접근 방식</label>
+          <div class="pick" id="byModePick">
+            <label><input type="radio" name="bymode" value="direct" checked onchange="byModeSet('direct')"><span>직접 접근</span><small>액세스 키로 저장소에 바로 접근</small></label>
+            <label><input type="radio" name="bymode" value="sts" onchange="byModeSet('sts')"><span>임시 보안 자격 증명(STS)</span><small>임시 보안 자격 증명을 발급받아 접근</small></label>
+          </div></div>
+        <div id="byStsBox" style="display:none">
+          <div class="f"><label>STS 엔드포인트 URL<span class="req">*</span></label>
+            <input class="inp" id="byStsUrl" placeholder="https://sts.example.com" oninput="byobValid()">
+            <div class="errmsg" id="byStsUrlErr">STS 엔드포인트 URL을 입력해 주세요.</div></div>
+          <div class="f"><label>역할 ARN<span class="req">*</span></label>
+            <input class="inp" id="byArn" placeholder="arn:aws:iam::123456789012:role/concerto" oninput="byobValid()">
+            <div class="errmsg" id="byArnErr">역할 ARN을 입력해 주세요.</div></div>
+        </div>
+        <!-- 연결 확인 — 입력한 값으로 저장 전에 시험한다(CON-952). 결과는 항목별 표로 모달 안에 남는다 -->
+        <div style="margin-top:4px" id="byVerifyBtn"></div>
+        <div id="byVerifyRes" style="margin-top:10px"></div>
 </div>
     </div>
     <div class="mdfoot">
@@ -2223,6 +2276,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <button class="st" onclick="setState('empty',this)">빈 상태</button>
   <button class="st" onclick="setState('loading',this)">로딩</button>
   <button class="st" onclick="setState('error',this)">오류</button></span>
+  <!-- v0.66 · 공용 멤버인지. 최고 관리자는 늘 멤버라 이 토글과 무관하다(정책 6.2). 검토용 처리. 실제 화면에는 없다 -->
+  <span class="dgrp"><span class="demo-label">공용 멤버(최고 관리자 외):</span>
+  <button class="gw on" onclick="setGwIn(true,this)">예</button>
+  <button class="gw" onclick="setGwIn(false,this)">아니오</button></span>
   <span class="dgrp"><span class="demo-label">권한:</span>
   <button class="rl on" onclick="setRole('super',this)">최고 관리자</button>
   <button class="rl" onclick="setRole('admin',this)">WS 관리자</button>
@@ -2272,14 +2329,15 @@ const WS=[
     삭제 진입점 미노출(2.5) · 자원 할당량 진입점 미노출(6.2) ·
     기본 정보(이름·설명·아이콘) 수정 진입점 미노출(6.1) */
  {n:'공용 워크스페이스',ico:'globe',st:'활성',/* 설치 시 고정 문구다. 아무도 바꾸지 않는다(정책 6.1) */
-   desc:'전 사용자가 함께 쓰는 자산을 두는 공간',
+   desc:'초대된 멤버가 함께 쓰는 자산을 두는 공간',  /* v0.66 · 자동 추가가 없어져 「전 사용자」가 맞지 않는다(정책 6.1) */
   sys:true, prod:'정상', dev:'정상', host:'', byob:false, by:'시스템', at:'2026-01-02 09:00:00',
   /* 공용 워크스페이스는 자원 할당 정책이 없다. 다른 워크스페이스에 배분하고 남은 자원을 쓴다.
      공유 볼륨만 값을 갖는다 */
   quota:{cpu:0,ram:0,gpu:0,vol:50},
   devq:{cpu:0,ram:0,gpu:0},
   use:{cpu:0,ram:0,gpu:0},
-  /* 공용은 승인·활성 계정 전원이 자동 등록된다(정책 6.1 · CON-562).
+  /* v0.66 · 공용은 최고 관리자가 초대한 계정만 멤버다. 아래는 자동 추가가 있던 때 들어온 멤버로, 그대로 둔다(정책 6.2).
+     종전: 공용은 승인·활성 계정 전원이 자동 등록된다(정책 6.1 · CON-562).
      최고 관리자 계정(admin·yj.seong)은 역할이 관리자로 고정되고,
      그 외 계정은 `관리자` 선택지가 노출되지 않는다(정책 6.2 · CON-605).
      종전 데모가 admin 1명이라 두 규칙이 화면에 드러나지 않았다 */
@@ -2289,7 +2347,7 @@ const WS=[
   models:[{n:'qwen3-32b',st:'캐싱됨',use:'미사용'},{n:'gpt-oss-120b',st:'캐싱됨',use:'배포 중'}],
   deps:[{n:'furiosa-gpt-oss-120b-biz-prod',st:'정상',rep:'1',by:'-'},{n:'gpt-oss-20b-081valid',st:'정상',rep:'2',by:'-'}],
   ext:[], cdes:[], keys:[], jobs:[]},
- {n:'ai-service-team',ico:'server',st:'활성',desc:'AI 서비스 개발 및 모델 서빙',
+ {n:'ai-service-team',ico:'server',st:'활성',refDeps:2,desc:'AI 서비스 개발 및 모델 서빙',
   prod:'정상',dev:'정상',host:'gw.ai-service.concerto.io',byob:true,s3:{url:'https://s3.ai-service.internal',key:'ai-svc',bucket:'ai-service-models',secret:true},by:'성유진(yj.seong)',at:'2026-05-14 10:20:31',
   /* 개발룸 목업과 같은 값이다. devq 안에서 CDE 가 20 Cores · 80 Gi · 가속기 2 를 점유한다 */
   quota:{cpu:64,ram:256,gpu:4,vol:500},
@@ -2312,9 +2370,9 @@ const WS=[
          start:'-',exp:'-',st:'반려',ip:'-',rsn:'대규모 학습',rej:'가속기 잔여량 부족. 2장 이하로 다시 신청해 주세요.'}],
   keys:[{n:'lang-chain-agent-prod',type:'일반',exp:'2026-08-28',at:'2026-07-29 10:12:03',by:'성유진(yj.seong)',
     scope:['llama-3-2-1b-prod','gemma-4-12b-it-idle'], last:'2026-08-20 14:32:08',
-    rpm:600, tok:{n:50000,win:'시간',agg:'출력'}},
+    tok:{n:2000000,win:'주'}, use:{d:184230,w:1253880}},
    {n:'batch-infer-key',type:'일반',exp:'2026-09-30',at:'2026-07-14 16:40:21',by:'임승주(sj.lim)',
-    scope:['llama-3-2-1b-prod'], last:null, rpm:null, tok:null}],
+    scope:['llama-3-2-1b-prod'], last:null, tok:null, use:null}],
   jobs:[{id:'job-8f2a',u:'yj.seong',t:'학습',fw:'PyTorch',dur:'1시간 24분',st:'완료'},
         {id:'job-3c91',u:'yj.seong',t:'전처리',fw:'PyTorch',dur:'12분',st:'실행 중'},
         {id:'job-b04e',u:'sj.lim',t:'학습',fw:'PyTorch',dur:'3분',st:'실패',err:'CUDA out of memory. 배치 크기를 줄이거나 가속기를 늘려 주세요.'},
@@ -2463,10 +2521,10 @@ const EXT_ON=false;
    연동 전체가 같은 기준이 되어 canManageExt 와 결과가 같으나,
    근거 조항이 달라(6.1 저장소 · 6.1 관리자 겸임) 함수를 남겨 둔다 */
 const canManageStorage=(m)=>canAdminWs(m);
-/* 공용은 이름을 바꾸지 않는다(정책 6.1).
-   ⚠ 일반 워크스페이스의 이름 변경 가능 여부는 확인 대상이다(정책 10. 7번) —
-     `불가` 로 확정되면 여기도 읽기 전용으로 바꾼다 */
-const canEditName =()=>!isSysWs();
+/* 워크스페이스명은 생성 뒤 바꾸지 않는다. 일반 · 공용 모두다(정책 2.2 · 2.4 · 6.1).
+   슬러그가 이름에서 만들어져 네임스페이스 {slug} · {slug}-dev 로 쓰여, 이름만 바꾸면
+   화면의 이름과 네임스페이스가 갈린다. 생성 폼은 이 함수를 쓰지 않는다 */
+const canEditName =()=>false;
 /* 룸 생성·삭제·설정은 워크스페이스 관리자가 한다 */
 const canEditQuota=(m)=>isWsAdmin() && !isSysWs(m);   /* 공용은 배정 정책이 없다 */
 /* 자원 할당량 조정은 최고 관리자 전용이다(워크스페이스 정책 2.4 · CON-492).
@@ -2483,7 +2541,9 @@ const isBusy=(m)=>m && m.st && m.st!=='활성';
    제거·탈퇴가 성립하지 않고(백엔드도 거부한다) 초대할 대상도 남지 않는다.
    진입점을 감춘다(공통정책 7.10) */
 const canManageMember=(m)=>canAdminWs(m);          /* 역할 변경 */
-const canChangeMembership=(m)=>canAdminWs(m) && !isSysWs(m);   /* 초대·제외·나가기 */
+const canChangeMembership=(m)=>canAdminWs(m);   /* 초대·제외. v0.66 · 공용도 최고 관리자가 초대 · 제외한다(정책 6.2) */
+/* 공용에는 나가기가 없고, 최고 관리자 계정은 제외할 수 없다(정책 6.2 · WKSP-L01 7.4) */
+const canLeave=(m)=>!isSysWs(m);
 /* 공용에서 `관리자` 역할을 고를 수 있는 계정인지 — 최고 관리자 계정만이다.
    최고 관리자 계정의 공용 역할은 관리자로 고정되어 셀렉트를 비활성으로 둔다 */
 const roleOpts=(m,u)=>(isSysWs(m) && !isSuperAcct(u.id))
@@ -2643,7 +2703,8 @@ function sortTh(k,label){ const on=sortKey===k; const def=COLDEF[k];
    하단바의 역할 전환은 '그 역할로 소속된 워크스페이스만 조회하는 사용자'를 재현한다.
    최고 관리자는 전역 권한이라 소속과 무관하게 전체를 본다 */
 const ROLE_KO={admin:'관리자',editor:'편집자',viewer:'뷰어'};
-/* 공용 워크스페이스는 소속과 무관하게 전 역할이 조회한다 */
+/* v0.66 · 공용 워크스페이스는 공용 멤버만 조회한다. 최고 관리자는 늘 멤버다(정책 2.7 · 6.1 · 6.2).
+   종전에는 승인 · 활성 계정이 모두 자동으로 들어가 소속과 무관하게 전 역할이 봤다 */
 function gwEntry(){ return WS.find(function(w){return w.sys;}); }
 /* 소속 워크스페이스 */
 function mine(){
@@ -2654,7 +2715,7 @@ function mine(){
 
 /* 공용은 목록에 섞어 정렬·필터 대상에 포함한다. 구분은 이름 옆 배지가 한다.
    하나뿐이라 구획으로 묶으면 항목 한 줄짜리 묶음이 생긴다 */
-function base(){ return [gwEntry()].concat(mine()); }
+function base(){ return ((isSuper()||GW_IN)? [gwEntry()] : []).concat(mine()); }
 /* 상단 드롭다운은 작업 대상을 바꾸는 전환기다. 지금 들어갈 수 있는 것만 담는다.
    삭제 중·삭제 실패는 진입이 막혀 있어 고를 수 없다(정책 2.6).
    전체 조회는 목록 화면에서 한다 */
@@ -2847,6 +2908,16 @@ function askReissue(i){
 }
 /* 실제 화면에는 없는 검토용 처리다. 켜면 생성 · 할당량 수정 저장이 배분 범위 초과로 실패한다(WKSP-L01 5.2) */
 let QFAIL=false;
+/* v0.66 · 공용 멤버 여부 — 멤버가 아니면 공용이 목록 · 상세 · 스위처에 나오지 않는다(정책 2.7 · 6.1).
+   다른 소속도 없으면 목록이 빈 상태가 된다(WKSP-L01 5.2 소속 워크스페이스 0건). 검토용 처리 */
+let GW_IN=true;
+function setGwIn(v,btn){
+  GW_IN=v;
+  document.querySelectorAll('#demoBar .gw').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  if(!v && cur && cur.m && cur.m.sys && !isSuper()){ view='list'; cur=null; closePanel(); }
+  wsInit(); syncView(); render();
+}
 function setQfail(v,btn){
   QFAIL=v;
   document.querySelectorAll('#demoBar .qf').forEach(function(b){ b.classList.remove('on'); });
@@ -3477,7 +3548,7 @@ function drawDetail(){
     : roomMsg(m.dev, m.devFail);
   /* 액션은 그 액션이 걸리는 대상 옆에 둔다(공통정책 3.6).
      멤버·API Key 섹션과 같은 자리다 */
-  h+='<div class="dsec"><h4>환경별 배분'+tip('운영룸이 개발룸보다 우선합니다. 운영룸 자원이 부족해지면 개발룸에 배정된 자원을 회수해 사용합니다.')
+  h+='<div class="dsec"><h4>환경별 배분'+tip('운영룸이 개발룸보다 우선합니다. 할당량을 줄이면 운영룸이 쓰는 몫을 남기고 개발룸 자원을 함께 줄입니다.')
    + (canSetQuota()
       ? '<span class="secbtns"><button class="btn ghost sm" onclick="openForm(\'quota\')">할당량 수정</button></span>'
       : canAskQuota()
@@ -3500,7 +3571,7 @@ function drawDetail(){
       목록 카드의 룸 버튼은 진입 수단이라 실행 액션을 섞지 않는다 */
    + roomFailAlert(m,'prod') + roomFailAlert(m,'dev')
    + (m.dev==='미생성'? alertBox('info','개발룸이 없습니다.',
-       '개발룸을 만들면 멤버가 CDE를 신청할 수 있습니다. 할당한 자원만큼 운영룸 한도에서 옮겨지며, 운영룸 자원이 부족해지면 회수될 수 있습니다.',
+       '개발룸을 만들면 멤버가 CDE를 신청할 수 있습니다. 할당한 자원만큼 운영룸 한도에서 옮겨집니다.',
        canEditQuota()?'<button class="btn sm" onclick="act(\'개발룸 생성 화면으로 이동합니다.\')">개발룸 생성</button>':'', false) : '')
    + '<div class="tblwrap" style="border:0"><table class="tbl enter"><thead><tr><th>환경</th><th>상태</th><th>CPU</th><th>Memory</th><th>가속기</th><th>내역</th></tr></thead><tbody>'
    /* 개발룸 행은 룸 상태에 따라 진입을 가른다(워크스페이스 정책 3.5 상태별 제약 · WKSP-L01 3장·REQ-WKSP-026).
@@ -3559,7 +3630,8 @@ function drawDetail(){
      /* 공용은 초대·제외 진입점이 없어 그 이유를 밝힌다. 조치가 없는 정보이므로
         알럿이 아니라 섹션 도움말에 둔다(공통정책 4.7 · 개정 제안 7.10).
         알럿은 조치가 딸릴 때만 쓴다 — 아래 `관리자가 1명입니다` 가 그 경우다 */
-     + (isSysWs(m)? tip('승인·활성 계정이 자동으로 추가됩니다. 역할만 변경할 수 있습니다.') : '')
+     /* v0.66 · 자동 추가가 없어졌다. 최고 관리자가 초대 · 제외하고 나가기는 없다(정책 6.2) */
+     + (isSysWs(m)? tip('최고 관리자가 초대한 계정만 멤버입니다. 나가기는 없습니다.') : '')
      + (canChangeMembership(m)?'<span class="secbtns"><button class="btn sm" onclick="openInvite()">멤버 초대</button></span>':'')
      + '</h4>'
      /* 공용은 제외·나가기를 두지 않아 `작업` 열 자체를 빼고 3열로 둔다(정책 6.2).
@@ -3589,9 +3661,11 @@ function drawDetail(){
           + (canChangeMembership(m)
               /* 행 작업은 개수와 무관하게 더보기 메뉴로 둔다(공통정책 3.6 · REQ-WKSP-084) */
               ? '<td><div class="more" id="mm'+i+'"><button class="morebtn" aria-label="작업" onclick="tgMore(event,\'mm'+i+'\')">⋯</button><div class="rowmenu">'
-                + (isLastAdmin(m,i)
+                + ((isSysWs(m) && isSuperAcct(u.id))
+                 ? disTip('<button class="d" disabled>제외</button>', '최고 관리자는 공용 워크스페이스에서 제외할 수 없습니다.')
+                 : isLastAdmin(m,i)
                  ? disTip('<button class="d" disabled>제외</button>', '이 워크스페이스의 유일한 관리자입니다. 다른 멤버를 관리자로 지정한 뒤 제외할 수 있습니다.')
-                 : '<button class="d" onclick="rmMember('+i+')">'+(u.id==='yj.seong'?'나가기':'제외')+'</button>')
+                 : '<button class="d" onclick="rmMember('+i+')">'+((u.id==='yj.seong'&&canLeave(m))?'나가기':'제외')+'</button>')
                 + '</div></div></td>'
               : '')+'</tr>';
        }).join('')
@@ -3599,7 +3673,7 @@ function drawDetail(){
      + '</div>'
      /* 공용은 관리자를 지정하지 않으므로(최고 관리자가 겸한다) 관리자 수 안내를 두지 않는다.
         전원 자동 등록이라는 사실은 섹션 도움말에 두었다 — 조치가 없어 알럿을 쓰지 않는다 */
-     + (canChangeMembership(m)&&adminCount(m)<=1
+     + (canChangeMembership(m)&&!isSysWs(m)&&adminCount(m)<=1
         ? alertBox('info','관리자가 1명입니다.',
             '관리자는 최소 1명이 있어야 하므로 지금은 역할 변경과 제외를 할 수 없습니다. 부재 시 CDE 승인이 지연될 수 있어 관리자를 추가로 지정하는 것을 권장합니다.',
             '<button class="btn ghost sm" onclick="openInvite()">멤버 초대</button>', false)
@@ -3629,7 +3703,9 @@ function drawDetail(){
      + (m.byob? '<dt>엔드포인트 URL</dt><dd>'+((m.s3&&m.s3.url)||'-')+'</dd>'
          + '<dt>버킷</dt><dd>'+((m.s3&&m.s3.bucket)||'-')+'</dd>'
          + '<dt>액세스 키</dt><dd>'+((m.s3&&m.s3.key)||'-')+'</dd>'
-         + '<dt>시크릿 키</dt><dd>'+((m.s3&&m.s3.secret)? '<span class="stbadge ok">등록됨</span>' : '<span class="dash">-</span>')+'</dd>' : '')
+         + '<dt>시크릿 키</dt><dd>'+((m.s3&&m.s3.secret)? '<span class="stbadge ok">등록됨</span>' : '<span class="dash">-</span>')+'</dd>'
+         + '<dt>접근 방식</dt><dd>'+((m.s3&&m.s3.mode==='sts')? '임시 보안 자격 증명(STS)' : '직접 접근')+'</dd>'
+         + ((m.s3&&m.s3.mode==='sts')? '<dt>STS 엔드포인트 URL</dt><dd>'+m.s3.stsUrl+'</dd><dt>역할 ARN</dt><dd>'+m.s3.arn+'</dd>' : '') : '')
      + '</dl></div>';
   }
 
@@ -3638,7 +3714,7 @@ function drawDetail(){
      + (canIssueKey()?'<span class="secbtns"><button class="btn sm" onclick="openKey()">API Key 발급</button></span>':'')
      + '</h4>'
      + (m.keys.length
-       ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>API Key명</th><th>유형</th><th>접근 허용 모델</th><th>한도'+tip('이 키에 설정된 사용 한도입니다. 키가 접근하는 배포마다 따로 적용됩니다. 기본값은 플랫폼에 설정된 분당 요청 수 한도입니다.')+'</th><th>마지막 사용</th><th>만료일</th><th>발급자</th><th>발급일시</th><th style="width:72px">작업</th></tr></thead><tbody>'
+       ? '<div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>API Key명</th><th>유형</th><th>접근 허용 모델</th><th>한도'+tip('이 키에 설정된 토큰 한도입니다. 키가 접근하는 모든 배포의 사용량을 합쳐 셉니다.')+'</th><th>사용량'+tip('한국 시간 기준 오늘 0시와 이번 주 월요일 0시부터 쓴 토큰입니다. 실제 사용보다 늦게 반영될 수 있습니다.')+'</th><th>마지막 사용</th><th>만료일</th><th>발급자</th><th>발급일시</th><th style="width:72px">작업</th></tr></thead><tbody>'
          /* 기본 정렬은 발급일시 최신순(WKSP-L01 7.9) */
          + m.keys.slice().sort(function(a,b){ return String(b.at||'').localeCompare(String(a.at||'')); }).map((k,i)=>'<tr><td><span class="rname">'+k.n+'</span></td><td>'+k.type+'</td>'
            /* 어떤 모델에 쓰이고 있는지가 사용 현황이다(정책 7.1).
@@ -3648,6 +3724,7 @@ function drawDetail(){
                : '<span class="dash">-</span>')+'</td>'
            /* 사용 한도 — 키 상세가 없어 발급 뒤 한도를 볼 자리가 여기뿐이다(WKSP-L01 7.9) */
            +'<td style="white-space:nowrap">'+keyLimitLabel(k)+'</td>'
+           +'<td style="white-space:nowrap">'+keyUseLabel(k)+'</td>'
            /* 쓰고 있는 키인지 알아야 폐기 대상을 가릴 수 있다.
               인증 시점에 기록되는 값이라 인증·인가 도메인이 갖고 있다 */
            +'<td>'+(k.last? k.last : '<span class="dash">-</span>')+'</td>'
@@ -3667,12 +3744,15 @@ function drawDetail(){
 
   document.getElementById('detailBody').innerHTML=h;
 }
-/* 사용 한도 요약 — `{n}회/분`(비웠으면 `기본값`) + 토큰 한도가 있으면 ` · {집계}{n}토큰/{분·시간}`.
-   집계가 전체면 접두를 생략한다. 토큰 수는 천 단위 쉼표 */
+/* 사용 한도 요약 — `{n}토큰/{분·시간·일·주}`, 없으면 -. 수는 천 단위 쉼표(WKSP-L01 7.9).
+   v0.66 · 요청 수 한도와 집계 대상을 뺐다. 키 한도는 토큰 한도 하나다(정책 7장) */
 function keyLimitLabel(k){
-  let t = k.rpm ? k.rpm.toLocaleString('en-US')+'회/분' : '<span class="dash">기본값</span>';
-  if(k.tok) t += ' · '+(k.tok.agg==='전체'?'':k.tok.agg+' ')+k.tok.n.toLocaleString('en-US')+'토큰/'+k.tok.win;
-  return t;
+  return k.tok ? k.tok.n.toLocaleString('en-US')+'토큰/'+k.tok.win : '<span class="dash">-</span>';
+}
+/* 사용량 — 기준 시간과 관계없이 모든 키에 오늘 · 이번 주 사용 토큰을 보인다(정책 7장 사용량 · REQ-WKSP-111).
+   게이트웨이 집계를 받아 보이므로 받지 못하면 - 다. 새로 발급한 키는 데모에서 - 로 둔다 */
+function keyUseLabel(k){
+  return k.use ? '오늘 '+k.use.d.toLocaleString('en-US')+' · 이번 주 '+k.use.w.toLocaleString('en-US') : '<span class="dash">-</span>';
 }
 /* 배포에 연결된 API Key — 키와 배포는 N:M이므로 여러 개가 걸릴 수 있다.
    목록 셀에는 첫 항목과 건수만 표기하고 전체는 API Key 탭에서 확인한다 */
@@ -3798,7 +3878,7 @@ function roomTab(m){
   h+='<div class="dsec"><h4>자원 현황'
    +   tip(noQuota
         ? '이 워크스페이스는 자원을 배정받지 않습니다. 다른 워크스페이스에 배분하고 남은 자원을 사용합니다.'
-        : '워크스페이스 할당량 중 개발룸에 넘긴 몫을 뺀 나머지입니다. 부족해지면 개발룸에 배정된 자원을 회수해 사용합니다.')
+        : '워크스페이스 할당량 중 개발룸에 넘긴 몫을 뺀 나머지입니다.')
    + '</h4>'
    /* 배정이 없으면 상한 대비 점유를 그릴 수 없다. 사용 방식만 안내한다 */
    + (noQuota
@@ -4054,12 +4134,14 @@ CLUSTER.gpu.forEach(function(g){ NF[accKey(g)]='0'; });
 /* 초대·소유자 후보는 로그인할 수 있는 계정만이다 — 승인 + 활성(계정정책 3장).
    비활성 계정에 역할을 주면 쓸 수 없는 권한이 남고, 미승인 계정은 아직 계정이 아니다.
    ⚠ 상태는 플랫폼 설정이 갖고 있다. 화면은 조회해서 받는다(확인 항목) */
+/* v0.66 · 초대는 이메일로 찾는다. 이메일은 대소문자를 가리지 않는다(계정 정책 2.3). 검토용 값 */
 const USERS=[
-  {n:'성유진(yj.seong)', apv:'승인', active:true},
-  {n:'임승주(sj.lim)',   apv:'승인', active:true},
-  {n:'유지현(jh.yu)',    apv:'승인', active:false},  /* 관리자가 끈 계정 */
-  {n:'오경환(kh.oh)',    apv:'승인', active:true},
-  {n:'김병건(bg.kim)',   apv:'승인', active:true}
+  {n:'성유진(yj.seong)', em:'yj.seong@okestro.com', apv:'승인', active:true},
+  {n:'임승주(sj.lim)',   em:'sj.lim@okestro.com',   apv:'승인', active:true},
+  {n:'유지현(jh.yu)',    em:'jh.yu@okestro.com',    apv:'승인', active:false},  /* 관리자가 끈 계정 */
+  {n:'오경환(kh.oh)',    em:'kh.oh@okestro.com',    apv:'승인', active:true},
+  {n:'김병건(bg.kim)',   em:'bg.kim@okestro.com',   apv:'승인', active:true},
+  {n:'이서준(sj.lee)',   em:'sj.lee@gnu.ac.kr',     apv:'승인 대기', active:false}
 ];
 function joinable(){ return USERS.filter(function(u){ return u.apv==='승인' && u.active; }).map(function(u){ return u.n; }); }
 function ownerCands(){ const q=NF.ownerQ.trim().toLowerCase();
@@ -4101,7 +4183,7 @@ function formValid(){
   /* 중복 확인을 마친 이름이어야 한다. 확인 뒤 값이 바뀌면 다시 확인한다 */
   const dupOk = fDupOk && fDupName===NF.name.trim();
   /* 전용 S3 를 켜면 네 항목이 모두 있어야 한다. 버킷은 기본값이 없다(CON-492) */
-  const s3Ok = !NF.byob || [NF.s3url,NF.s3bucket,NF.s3key,NF.s3sec].every(function(x){ return (x||'').trim(); });
+  const s3Ok = !NF.byob || [NF.s3url,NF.s3bucket,NF.s3key,NF.s3sec].concat(NF.s3mode==='sts'?[NF.s3sts,NF.s3arn]:[]).every(function(x){ return (x||'').trim(); });
   return !nameErr() && dupOk && !ownerErr() && qErrs().length===0 && s3Ok && (formKind==='new' || !rsnErr());
 }
 /* v0.65 · 개발룸을 함께 만들 때 CPU · Memory · 가속기를 모두 0으로 둘 수 없다(개발룸 기획서 5.1 · REQ-CDE-087 · 워크스페이스 정책 3.4).
@@ -4285,7 +4367,15 @@ function drawForm(){
          + '<div class="f"><label>엔드포인트 URL<span class="req">*</span></label><input class="inp'+s3E('s3url')+'" placeholder="https://s3.example.com" value="'+(NF.s3url||'')+'" oninput="NF.s3url=this.value;drawFormValidOnly()">'+s3M('s3url','엔드포인트 URL을 입력해 주세요.')+'</div>'
          + '<div class="f"><label>버킷<span class="req">*</span></label><input class="inp'+s3E('s3bucket')+'" value="'+(NF.s3bucket||'')+'" oninput="NF.s3bucket=this.value;drawFormValidOnly()">'+s3M('s3bucket','버킷을 입력해 주세요.')+'</div>'
          + '<div class="f"><label>액세스 키<span class="req">*</span></label><input class="inp'+s3E('s3key')+'" value="'+(NF.s3key||'')+'" oninput="NF.s3key=this.value;drawFormValidOnly()">'+s3M('s3key','액세스 키를 입력해 주세요.')+'</div>'
-         + '<div class="f" style="margin-bottom:0"><label>시크릿 키<span class="req">*</span></label><input class="inp'+s3E('s3sec')+'" type="password" placeholder="시크릿 키를 입력해 주세요." oninput="NF.s3sec=this.value;drawFormValidOnly()">'+s3M('s3sec','시크릿 키를 입력해 주세요.')+'</div>'
+         + '<div class="f"><label>시크릿 키<span class="req">*</span></label><input class="inp'+s3E('s3sec')+'" type="password" placeholder="시크릿 키를 입력해 주세요." oninput="NF.s3sec=this.value;drawFormValidOnly()">'+s3M('s3sec','시크릿 키를 입력해 주세요.')+'</div>'
+         /* 접근 방식 — 저장소 설정 모달과 같은 항목이다(정책 2.4 · CON-951). 생성 폼에는 연결 확인을 두지 않는다 — 워크스페이스가 아직 없다 */
+         + '<div class="f'+(NF.s3mode==='sts'?'':'" style="margin-bottom:0')+'"><label>접근 방식</label><div class="pick">'
+         +   '<label><input type="radio" name="nfmode" '+(NF.s3mode!=='sts'?'checked':'')+' onchange="NF.s3mode=\'direct\';drawForm()"><span>직접 접근</span><small>액세스 키로 저장소에 바로 접근</small></label>'
+         +   '<label><input type="radio" name="nfmode" '+(NF.s3mode==='sts'?'checked':'')+' onchange="NF.s3mode=\'sts\';drawForm()"><span>임시 보안 자격 증명(STS)</span><small>임시 보안 자격 증명을 발급받아 접근</small></label></div></div>'
+         + (NF.s3mode==='sts'
+            ? '<div class="f"><label>STS 엔드포인트 URL<span class="req">*</span></label><input class="inp'+s3E('s3sts')+'" placeholder="https://sts.example.com" value="'+(NF.s3sts||'')+'" oninput="NF.s3sts=this.value;drawFormValidOnly()">'+s3M('s3sts','STS 엔드포인트 URL을 입력해 주세요.')+'</div>'
+              + '<div class="f" style="margin-bottom:0"><label>역할 ARN<span class="req">*</span></label><input class="inp'+s3E('s3arn')+'" placeholder="arn:aws:iam::123456789012:role/concerto" value="'+(NF.s3arn||'')+'" oninput="NF.s3arn=this.value;drawFormValidOnly()">'+s3M('s3arn','역할 ARN을 입력해 주세요.')+'</div>'
+            : '')
          + '</div>' : '')
      + '</div>';
   }
@@ -4703,7 +4793,7 @@ function clusterCard(){
    + '</div>';
 }
 /* 전용 S3 필수 항목 — 제출한 뒤 비어 있으면 에러 */
-function s3Bad(k){ return shownF.s3 && NF.byob && !(NF[k]||'').trim(); }
+function s3Bad(k){ return shownF.s3 && NF.byob && (k!=='s3sts' && k!=='s3arn' || NF.s3mode==='sts') && !(NF[k]||'').trim(); }
 function s3E(k){ return s3Bad(k)? ' err' : ''; }
 function s3M(k,msg){ return s3Bad(k)? '<div class="errmsg" style="display:block">'+msg+'</div>' : ''; }
 /* 형식 오류 — 제출한 뒤에만 보인다. 문구는 개발룸 자원 검증과 같다(공통정책 7.8) */
@@ -4795,41 +4885,66 @@ function submitForm(){
   }
 }
 /* ═══════════ 모달 ═══════════ */
-/* 이미 소속된 사용자는 후보에서 제외한다.
+/* 이미 소속된 사용자는 초대하지 않고 그 사실을 알린다.
    같은 사람이 역할만 다르게 두 번 등록되면 어느 역할이 적용되는지 알 수 없다.
    역할을 바꾸려면 멤버 목록에서 변경한다 */
-function inviteCands(){
-  if(!cur) return [];
-  const has=cur.m.members.map(function(u){ return u.n+'('+u.id+')'; });
-  /* 로그인할 수 없는 계정은 초대하지 않는다 — 쓸 수 없는 권한이 남는다 */
-  return joinable().filter(function(u){ return has.indexOf(u)<0; });
+/* v0.66 · 멤버 초대 — 이메일 정확 입력(WKSP-L01 7.12 · 5.2 · REQ-WKSP-061).
+   목록에서 고르지 않는다. 없는 계정과 승인 대기 · 반려 · 비활성 계정은 같은 문구로 남겨 계정이 있는지 드러내지 않는다(계정 정책 5장).
+   이미 멤버면 그 사실을 알린다 — 멤버 목록에서 이미 보이는 정보다. 초대할 수 있는 값은 초대하고, 못 한 값만 칸에 남긴다 */
+const INV_MAX=50;
+function invParse(){
+  const seen={}, out=[];
+  document.getElementById('iUser').value.split(/[\n,]/).forEach(function(x){
+    const v=x.trim(); if(!v) return; const k=v.toLowerCase(); if(seen[k]) return; seen[k]=1; out.push(v); });
+  return out;
+}
+function invFind(v){
+  const k=v.toLowerCase();
+  return USERS.filter(function(u){ return (u.em||'').toLowerCase()===k; })[0];
 }
 function openInvite(){
-  const cands=inviteCands();
-  document.getElementById('invTarget').innerHTML='<b>'+cur.m.n+'</b>에 초대할 사용자를 선택해 주세요.';
-  document.getElementById('iUser').innerHTML =
-    '<option value="">선택해 주세요</option>'+cands.map(function(u){ return '<option>'+u+'</option>'; }).join('');
-  document.getElementById('iUser').disabled = !cands.length;
-  document.getElementById('iHint').textContent = cands.length
-    ? '이미 멤버인 사용자와 승인 대기 · 반려 · 비활성 계정은 목록에 표시되지 않습니다. 역할을 바꾸려면 멤버 목록에서 변경합니다.'
-    : '초대할 수 있는 사용자가 없습니다. 이미 멤버이거나 승인 대기 · 반려 · 비활성 계정입니다.';
+  document.getElementById('invTarget').innerHTML='<b>'+cur.m.n+'</b>에 초대할 사람의 이메일을 입력합니다.';
+  document.getElementById('iUser').value='';
+  document.getElementById('iFail').innerHTML='';
   document.getElementById('iUser').classList.remove('err'); document.getElementById('iUserErr').classList.remove('show');
-  iValid();
+  /* 공용은 관리자 역할을 최고 관리자 계정에만 준다(정책 6.2) */
+  document.getElementById('iRoleAdm').style.display = isSysWs(cur.m)? 'none' : '';
+  document.querySelector('input[name=irole][value="뷰어"]').checked=true;
   document.getElementById('mdInvite').classList.add('on');
+  setTimeout(function(){ document.getElementById('iUser').focus(); },0);
 }
 function closeInvite(){ document.getElementById('mdInvite').classList.remove('on'); }
-/* 초대할 수 있는 사용자가 없을 때만 비활성이다(WKSP-L01 6장 Empty). 고르지 않은 것은 누를 때 알린다(공통정책 7.1 · 7.8) */
+/* 초대 버튼은 늘 활성이다. 비었거나 50개를 넘으면 누를 때 알린다(공통정책 7.1 · 7.8) */
 function iValid(){
   const u=document.getElementById('iUser');
-  document.getElementById('iSubmit').disabled=u.disabled;
-  if(u.value){ u.classList.remove('err'); document.getElementById('iUserErr').classList.remove('show'); }
+  if(u.value.trim()){ u.classList.remove('err'); document.getElementById('iUserErr').classList.remove('show'); }
+}
+function iErr(msg){
+  const u=document.getElementById('iUser'), e=document.getElementById('iUserErr');
+  e.textContent=msg; e.classList.add('show'); u.classList.add('err'); u.focus();
 }
 function submitInvite(){
-  const v=document.getElementById('iUser').value;
-  if(!v){ const u=document.getElementById('iUser'); u.classList.add('err'); document.getElementById('iUserErr').classList.add('show'); u.focus(); return; }
+  const vals=invParse();
+  if(!vals.length){ iErr('이메일을 입력해 주세요.'); return; }
+  if(vals.length>INV_MAX){ iErr('한 번에 '+INV_MAX+'명까지 초대할 수 있습니다.'); return; }
   const r=document.querySelector('input[name=irole]:checked').value;
-  cur.m.members.push({n:v.split('(')[0],id:v.replace(/.*\(|\)/g,''),role:r});
-  closeInvite(); refresh(); toast('ok','멤버를 초대했습니다.');
+  const ok=[], fail=[];
+  vals.forEach(function(v){
+    /* 형식만 본다. 계정을 찾기 전이라 계정이 있는지 드러나지 않는다(공통정책 7.8) */
+    if(!/^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/.test(v)){ fail.push([v,'올바른 이메일 형식이 아닙니다.']); return; }
+    const u=invFind(v);
+    if(!u || u.apv!=='승인' || !u.active){ fail.push([v,'초대할 수 없는 계정입니다. 이메일을 확인해 주세요.']); return; }
+    const id=u.n.replace(/.*\(|\)/g,'');
+    if(cur.m.members.some(function(x){ return x.id===id; })){ fail.push([v,'이미 이 워크스페이스의 멤버입니다.']); return; }
+    cur.m.members.push({n:u.n.split('(')[0],id:id,role:r}); ok.push(v);
+  });
+  if(!fail.length){ closeInvite(); refresh(); toast('ok','멤버 '+ok.length+'명을 초대했습니다.'); return; }
+  /* 못 한 값만 칸에 남기고 값별 사유를 칸 아래에 보인다. 모두 못 했으면 토스트 없이 모달을 그대로 둔다(WKSP-L01 7.12) */
+  document.getElementById('iUser').value=fail.map(function(f){ return f[0]; }).join('\n');
+  document.getElementById('iFail').innerHTML='<div class="errmsg show" style="display:block">'
+    + fail.map(function(f){ return '<div><b>'+f[0]+'</b> · '+f[1]+'</div>'; }).join('')+'</div>';
+  document.getElementById('iUser').classList.add('err');
+  if(ok.length){ refresh(); toast('warn','멤버 초대 '+ok.length+'건 완료, '+fail.length+'건 실패'); }
 }
 /* 관리자가 0명이 되면 멤버 초대·설정 변경을 할 수 없어 워크스페이스가 고립된다 */
 function adminCount(m){ return m.members.filter(function(u){return u.role==='관리자';}).length; }
@@ -4857,7 +4972,7 @@ function rmMember(i){
     return;
   }
   /* 본인을 제외하면 이 워크스페이스에 다시 들어올 수 없으므로 결과를 다르게 안내한다 */
-  const isMe = u.id==='yj.seong';
+  const isMe = u.id==='yj.seong' && canLeave(cur.m);
   /* 제목이 동작을 밝히고 버튼이 실행하므로 본문에서 '~하시겠습니까'를 되묻지 않는다 */
   openConfirm(isMe?'워크스페이스 나가기':'멤버 제외',
     isMe
@@ -4929,9 +5044,9 @@ function openKey(){
   document.getElementById('kName').value='';
   document.getElementById('kNameErr').classList.remove('show'); document.getElementById('kName').classList.remove('err');
   document.getElementById('kScopeErr').classList.remove('show');
-  ['kRpm','kTok'].forEach(function(id){ document.getElementById(id).value=''; kLimShow(id,false); });
-  document.getElementById('kTokWin').value='분'; document.getElementById('kTokAgg').value='전체';
-  document.getElementById('kTokWin').disabled=true; document.getElementById('kTokAgg').disabled=true;
+  ['kTok'].forEach(function(id){ document.getElementById(id).value=''; kLimShow(id,false); });
+  document.getElementById('kTokWin').value='분';
+  document.getElementById('kTokWin').disabled=true;
   setKeyType(); drawKScope(); kValid(); document.getElementById('mdKey').classList.add('on');
 }
 function closeKey(){ document.getElementById('mdKey').classList.remove('on'); }
@@ -4955,10 +5070,9 @@ function kLimBlur(id){ kLimShow(id,kLimBad(id)); }
 function kLimInput(id){
   if(!kLimBad(id)) kLimShow(id,false);
   if(id==='kTok'){
-    /* 토큰 수를 비우면 기준 시간·집계 대상은 의미가 없어 비활성으로 둔다 */
+    /* 토큰 수를 비우면 기준 시간은 의미가 없어 비활성으로 둔다 */
     const off=document.getElementById('kTok').value.trim()==='';
     document.getElementById('kTokWin').disabled=off;
-    document.getElementById('kTokAgg').disabled=off;
   }
   kValid();
 }
@@ -4979,13 +5093,13 @@ function submitKey(){
   if(!v) bad.push(document.getElementById('kName'));
   document.getElementById('kScopeErr').classList.toggle('show',!kSel.length);
   if(!kSel.length) bad.push(document.querySelector('#kScope input'));
-  ['kRpm','kTok'].forEach(function(id){ const b=kLimBad(id); kLimShow(id,b); if(b) bad.push(document.getElementById(id)); });
+  ['kTok'].forEach(function(id){ const b=kLimBad(id); kLimShow(id,b); if(b) bad.push(document.getElementById(id)); });
   if(bad.length){ if(bad[0]) bad[0].focus(); return; }
-  const rpm=document.getElementById('kRpm').value.trim(), tk=document.getElementById('kTok').value.trim();
+  const tk=document.getElementById('kTok').value.trim();
   cur.m.keys.push({n:v,type:'일반',exp:(function(){ const o=document.getElementById('kExp').value; if(o==='만료 없음') return '만료 없음'; const d=new Date(); d.setDate(d.getDate()+parseInt(o,10)); return d.toISOString().slice(0,10); })(),at:new Date().toISOString().slice(0,19).replace('T',' '),by:'성유진(yj.seong)',
     scope: kSel.slice(),
-    rpm: rpm? Number(rpm) : null,
-    tok: tk? {n:Number(tk), win:document.getElementById('kTokWin').value, agg:document.getElementById('kTokAgg').value} : null});
+    use: null,
+    tok: tk? {n:Number(tk), win:document.getElementById('kTokWin').value} : null});
   document.getElementById('mdKey').classList.remove('on');
   refresh();
   /* 키 값은 발급 직후 한 번만 보인다. 닫으면 다시 볼 수 없다(WKSP-L01 REQ-WKSP-071 · 7.10) */
@@ -5002,17 +5116,15 @@ function submitKey(){
    현재 값으로 채워 열고, 바뀐 값이 없을 때만 저장을 비활성으로 둔다. 형식은 누를 때 검증한다(공통정책 7.1 · 7.8) */
 let lmKey=null, lmInit='';
 function lmSnap(){
-  return ['lmRpm','lmTok','lmTokWin','lmTokAgg'].map(function(id){ return document.getElementById(id).value.trim(); }).join('|');
+  return ['lmTok','lmTokWin'].map(function(id){ return document.getElementById(id).value.trim(); }).join('|');
 }
 function openKeyLim(name){
   document.querySelectorAll('.more').forEach(function(m){ m.classList.remove('open','up'); });
   lmKey=(cur.m.keys||[]).filter(function(k){ return k.n===name; })[0]; if(!lmKey) return;
   document.getElementById('lmDesc').textContent=name+'의 사용 한도를 수정합니다. 접근 허용 모델과 만료일은 바뀌지 않습니다.';
-  document.getElementById('lmRpm').value = lmKey.rpm? String(lmKey.rpm) : '';
   document.getElementById('lmTok').value = lmKey.tok? String(lmKey.tok.n) : '';
   document.getElementById('lmTokWin').value = lmKey.tok? lmKey.tok.win : '분';
-  document.getElementById('lmTokAgg').value = lmKey.tok? lmKey.tok.agg : '전체';
-  ['lmRpm','lmTok'].forEach(function(id){ kLimShow(id,false); });
+  ['lmTok'].forEach(function(id){ kLimShow(id,false); });
   lmToggleTok();
   lmInit=lmSnap(); lmValid();
   document.getElementById('mdKeyLim').classList.add('on');
@@ -5021,7 +5133,6 @@ function closeKeyLim(){ document.getElementById('mdKeyLim').classList.remove('on
 function lmToggleTok(){
   const off=document.getElementById('lmTok').value.trim()==='';
   document.getElementById('lmTokWin').disabled=off;
-  document.getElementById('lmTokAgg').disabled=off;
 }
 function lmInput(id){
   if(!kLimBad(id)) kLimShow(id,false);
@@ -5030,13 +5141,16 @@ function lmInput(id){
 }
 function lmValid(){
   document.getElementById('lmSubmit').disabled = lmSnap()===lmInit;
+  /* 기준 시간을 바꾸면 새 구간부터 다시 센다. 토큰 한도가 있던 키에서 기준 시간만 다를 때 안내한다(WKSP-L01 7.11) */
+  const tk=document.getElementById('lmTok').value.trim();
+  document.getElementById('lmWinHint').style.display =
+    (lmKey && lmKey.tok && tk && document.getElementById('lmTokWin').value!==lmKey.tok.win)? '' : 'none';
 }
 function submitKeyLim(){
-  const bad=['lmRpm','lmTok'].filter(function(id){ const b=kLimBad(id); kLimShow(id,b); return b; });
+  const bad=['lmTok'].filter(function(id){ const b=kLimBad(id); kLimShow(id,b); return b; });
   if(bad.length){ document.getElementById(bad[0]).focus(); return; }
-  const rpm=document.getElementById('lmRpm').value.trim(), tk=document.getElementById('lmTok').value.trim();
-  lmKey.rpm = rpm? Number(rpm) : null;
-  lmKey.tok = tk? {n:Number(tk), win:document.getElementById('lmTokWin').value, agg:document.getElementById('lmTokAgg').value} : null;
+  const tk=document.getElementById('lmTok').value.trim();
+  lmKey.tok = tk? {n:Number(tk), win:document.getElementById('lmTokWin').value} : null;
   closeKeyLim(); refresh(); toast('ok','사용 한도를 저장했습니다.');
 }
 function revokeKey(name){
@@ -5045,8 +5159,8 @@ function revokeKey(name){
 }
 
 /* ═══════════ 기본 정보 수정 ═══════════
-   이름은 쿠버네티스 네임스페이스명과 연결되어 있어 변경 시 영향 범위 확인이 필요하다(B-53).
-   중복 확인은 값을 여러 번 수정하며 만드는 항목이라 버튼 클릭 방식으로 둔다(공통정책 7.1) */
+   바꿀 수 있는 것은 아이콘과 설명이다. 워크스페이스명은 네임스페이스에 쓰여 바꾸지 않는다(정책 2.2 · 2.4).
+   이름 입력 · 중복 확인 · 변경 경고 코드는 canEditName() 이 거짓이라 쓰이지 않는다. 공용 판단과 함께 남겨 둔다 */
 let eInit={}, eDupOk=true, eIcoSel='cube';
 function openEditAt(i){
   cur={m:WS[i]};
@@ -5065,9 +5179,9 @@ function openEdit(){
   document.getElementById('eNameRo').textContent     = m.n;
   document.getElementById('eNameReq').style.display  = nameEditable? '' : 'none';
   document.getElementById('eNameHint').style.display = nameEditable? '' : 'none';
-  document.getElementById('eTarget').innerHTML = nameEditable
-    ? '생성일시와 생성자는 변경할 수 없습니다.'
-    : '공용 워크스페이스는 이름과 자원 할당량을 변경할 수 없습니다.';
+  document.getElementById('eTarget').innerHTML = isSysWs(m)
+    ? '공용 워크스페이스는 이름과 자원 할당량을 변경할 수 없습니다.'
+    : '워크스페이스명은 네임스페이스에 쓰여 변경할 수 없습니다.';
   document.getElementById('eName').value=m.n;
   document.getElementById('eDesc').value=m.desc||'';
   eInit={n:m.n,d:m.desc||'',i:m.ico||'cube'}; eDupOk=true; eIcoSel=m.ico||'cube'; drawEIco();
@@ -5281,10 +5395,18 @@ function openByob(){
   document.getElementById('byUrl').value=c.url||'';
   document.getElementById('byBucket').value=c.bucket||'';
   document.getElementById('byKey').value=c.key||'';
+  byMode = c.mode||'direct';
+  document.querySelectorAll('input[name=bymode]').forEach(function(r){ r.checked=(r.value===byMode); });
+  document.getElementById('byStsUrl').value=c.stsUrl||'';
+  document.getElementById('byArn').value=c.arn||'';
+  document.getElementById('byStsBox').style.display = byMode==='sts'? '' : 'none';
+  document.getElementById('byAlert').innerHTML='';
+  document.getElementById('byVerifyRes').innerHTML='';
+  drawByVerifyBtn();
   drawBySec();
   document.getElementById('byobFields').style.display=byobInit?'':'none';
   document.getElementById('byobSubmit').disabled=true;
-  ['byUrl','byBucket','byKey','bySec'].forEach(function(id){ byErr(id,false); });
+  ['byUrl','byBucket','byKey','bySec','byStsUrl','byArn'].forEach(function(id){ byErr(id,false); });
   document.getElementById('mdByob').classList.add('on');
 }
 function drawBySec(){
@@ -5300,10 +5422,51 @@ function byobValid(){
   const hasSec=!!(cur.m.s3&&cur.m.s3.secret) && !bySecEdit;
   const filled = v('byUrl') && v('byBucket') && v('byKey') && (hasSec || v('bySec'));
   const c=cur.m.s3||{};
-  const changed = on!==byobInit || (on && (v('byUrl')!==(c.url||'') || v('byBucket')!==(c.bucket||'') || v('byKey')!==(c.key||'') || !!v('bySec')));
+  const changed = on!==byobInit || (on && (v('byUrl')!==(c.url||'') || v('byBucket')!==(c.bucket||'') || v('byKey')!==(c.key||'') || !!v('bySec')
+    || byMode!==(c.mode||'direct') || (byMode==='sts' && (v('byStsUrl')!==(c.stsUrl||'') || v('byArn')!==(c.arn||'')))));
   /* 변경이 없을 때만 비활성이다. 빈 필수 항목은 누를 때 알린다(공통정책 7.1 · 7.8) */
   document.getElementById('byobSubmit').disabled = !changed;
-  ['byUrl','byBucket','byKey','bySec'].forEach(function(id){ if(v(id)) byErr(id,false); });
+  ['byUrl','byBucket','byKey','bySec','byStsUrl','byArn'].forEach(function(id){ if(v(id)) byErr(id,false); });
+  drawByVerifyBtn();
+}
+/* 접근 방식 — STS 를 고르면 두 값을 받는다. 직접 접근으로 돌리면 STS 값은 저장하지 않는다(WKSP-L01 7.8) */
+let byMode='direct';
+function byModeSet(v){
+  byMode=v;
+  document.querySelectorAll('input[name=bymode]').forEach(function(r){ r.checked=(r.value===v); });
+  document.getElementById('byStsBox').style.display = v==='sts'? '' : 'none';
+  byobValid();
+}
+/* 연결 확인 — 입력값으로 저장 전에 시험한다(REQ-WKSP-110). 비운 시크릿 키는 저장된 값으로 확인한다.
+   한 번 누르면 10초 동안 다시 누를 수 없다(백엔드 10초에 1회). 필수값이 비어 있으면 비활성 + 사유 */
+let byCool=0, byVerifySeq=0;
+function drawByVerifyBtn(){
+  const box=document.getElementById('byVerifyBtn'); if(!box) return;
+  const v=function(id){ const e=document.getElementById(id); return e? e.value.trim() : ''; };
+  const hasSec=!!(cur.m.s3&&cur.m.s3.secret) && !bySecEdit;
+  const filled = v('byUrl') && v('byBucket') && v('byKey') && (hasSec || v('bySec')) && (byMode!=='sts' || (v('byStsUrl') && v('byArn')));
+  const why = !filled? '먼저 필수 항목을 입력해 주세요.' : (byCool? '10초 뒤에 다시 확인할 수 있습니다.' : '');
+  const b='<button class="btn ghost sm"'+(why?' disabled':'')+' onclick="byVerify()">연결 확인</button>';
+  box.innerHTML = why? '<span class="tip-anchor dis-tip" tabindex="0">'+b+'<span class="tip">'+why+'</span></span>' : b;
+}
+/* 결과 표 — 항목 · 결과 · 사유. 플랫폼 설정 스토리지 연결 확인과 같은 표다(SET-INTEG-L01 5.1).
+   항목 이름은 가안이다(백엔드 항목 목록 확인 대기). 데모는 누를 때마다 통과 · 일부 실패를 번갈아 보인다. 검토용 처리다 */
+const VERIFY_ITEMS=['버킷 접근','파일 쓰기','파일 읽기','파일 목록 조회','파일 삭제'];
+function verifyTable(fails){
+  return '<table class="tbl" style="margin-top:8px"><thead><tr><th style="width:110px;white-space:nowrap">항목</th><th style="width:64px">결과</th><th>사유</th></tr></thead><tbody>'
+    + VERIFY_ITEMS.map(function(it,i){ const f=fails.indexOf(i)>=0;
+        return '<tr><td style="white-space:nowrap">'+it+'</td><td>'+(f?'<span class="stbadge cr">실패</span>':'<span class="stbadge ok">통과</span>')+'</td>'
+          +'<td>'+(f?'권한이 없습니다. 이 버킷에 쓰기 권한이 있는 키인지 확인해 주세요.':'<span class="dash">-</span>')+'</td></tr>'; }).join('')
+    + '</tbody></table>';
+}
+function byVerify(){
+  const fails = (byVerifySeq++%2)? [1,4] : [];
+  document.getElementById('byVerifyRes').innerHTML =
+    '<div class="alertbox '+(fails.length?'crit':'info')+'" style="margin-bottom:0"><div class="atx"><b>'
+    + (fails.length? '연결 확인 실패 · 항목 '+fails.length+'개' : '연결 확인 통과') + '</b>'
+    + verifyTable(fails) + '</div></div>';
+  byCool=1; drawByVerifyBtn();
+  setTimeout(function(){ byCool=0; drawByVerifyBtn(); }, 10000);
 }
 function byErr(id,on){
   const e=document.getElementById(id+'Err'); if(e) e.classList.toggle('show',on);
@@ -5326,8 +5489,22 @@ function submitByob(){
   /* 제출 시 검증 — 전용 S3 를 켰으면 네 항목이 모두 있어야 한다. 등록된 시크릿 키는 그대로 쓴다 */
   if(on){
     const hasSec=!!(c.secret) && !bySecEdit;
-    const bad=['byUrl','byBucket','byKey'].concat(hasSec?[]:['bySec']).filter(function(id){ const b=!g(id); byErr(id,b); return b; });
+    const bad=['byUrl','byBucket','byKey'].concat(hasSec?[]:['bySec']).concat(byMode==='sts'?['byStsUrl','byArn']:[]).filter(function(id){ const b=!g(id); byErr(id,b); return b; });
     if(bad.length){ document.getElementById(bad[0]).focus(); return; }
+    /* 허용 목록 밖 엔드포인트는 거절된다(WKSP-L01 5.2). 데모는 주소에 not-allowed 가 들어가면 거절한다 — 검토용 */
+    if(/not-allowed/.test(g('byUrl'))){
+      const e=document.getElementById('byUrlErr'); e.textContent='허용되지 않은 엔드포인트입니다. 최고 관리자에게 허용 목록 추가를 요청해 주세요.';
+      byErr('byUrl',true); document.getElementById('byUrl').focus(); return;
+    }
+    document.getElementById('byUrlErr').textContent='엔드포인트 URL을 입력해 주세요.';
+    /* STS 는 저장 전에 시험 호출을 통과해야 한다(워크스페이스 정책 2.4). 실패하면 모달 위 알림으로 남긴다.
+       데모는 역할 ARN 이 arn: 으로 시작하지 않으면 실패한다 — 검토용 */
+    document.getElementById('byAlert').innerHTML='';
+    if(byMode==='sts' && !/^arn:/.test(g('byArn'))){
+      document.getElementById('byAlert').innerHTML='<div class="alertbox crit"><div class="atx"><b>저장하지 못했습니다</b>'
+        +'<div>임시 보안 자격 증명을 받지 못했습니다. STS 엔드포인트 URL과 역할 ARN을 확인해 주세요.</div></div></div>';
+      return;
+    }
   }
   const moved = byobInit && (!on || g('byUrl')!==(c.url||'') || g('byBucket')!==(c.bucket||''));
   if(moved){
@@ -5342,7 +5519,8 @@ function applyByob(on){
   cur.m.byob=on;
   if(cur.m.byob){
     const g=function(id){ const e=document.getElementById(id); return e? e.value.trim() : ''; };
-    cur.m.s3={url:g('byUrl'), bucket:g('byBucket'), key:g('byKey'), secret:true};
+    cur.m.s3={url:g('byUrl'), bucket:g('byBucket'), key:g('byKey'), secret:true, mode:byMode,
+      stsUrl: byMode==='sts'? g('byStsUrl') : '', arn: byMode==='sts'? g('byArn') : ''};
   }
   closeByob(); drawDetail();
   toast('ok','저장소 설정을 변경했습니다.');
@@ -5473,9 +5651,21 @@ function delWs(name){
   if(m.keys.length)   lost.push('API Key '+m.keys.length+'건');
   openConfirm('워크스페이스 삭제', has
     ? '<b>'+name+'</b>'+jo(name,'을')+' 삭제하면 '+(lost.length?lost.join(' · ')+'이 함께 제거되며 복구할 수 없습니다. ':'')
-      +'멤버 '+m.members.length+'명도 접근할 수 없게 됩니다.'
-    : '<b>'+name+'</b>'+jo(name,'을')+' 삭제하면 복구할 수 없습니다.',
-    function(){ m.st='삭제 중'; closePanel(); refresh(); toast('ok','워크스페이스 삭제를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.'); }, '삭제', null, m.n);
+      +'멤버 '+m.members.length+'명도 접근할 수 없게 됩니다. '+wsStoreMsg(m)
+    : '<b>'+name+'</b>'+jo(name,'을')+' 삭제하면 복구할 수 없습니다. '+wsStoreMsg(m),
+    function(){
+      /* 다른 워크스페이스의 배포가 이 워크스페이스의 모델을 쓰고 있으면 삭제를 거절한다(워크스페이스 정책 2.5).
+         데모는 ai-service-team 에 그런 배포 2건을 둔다(refDeps) — 검토용 값 */
+      if(m.refDeps){
+        openConfirm('워크스페이스를 삭제할 수 없습니다',
+          '다른 워크스페이스의 배포 '+m.refDeps+'건이 이 워크스페이스의 모델을 쓰고 있습니다. 해당 배포를 삭제한 뒤 워크스페이스를 다시 삭제해 주세요.', null,'','확인');
+        return;
+      }
+      m.st='삭제 중'; closePanel(); refresh(); toast('ok','워크스페이스 삭제를 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.'); }, '삭제', null, m.n);
+}
+/* 저장소 정리 시점 — 전용 저장소는 바로 비우고, 전역 저장소 · 모델 저장소는 7일 뒤 정리한다(워크스페이스 정책 2.5) */
+function wsStoreMsg(m){
+  return (m.byob? '전용 저장소의 데이터는 바로 비워지고, ' : '')+'전역 저장소와 모델 저장소에 남은 데이터는 7일 뒤 정리됩니다.';
 }
 function act(msg){toast('ok',msg);}
 function toast(t,msg){
