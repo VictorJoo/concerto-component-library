@@ -2,6 +2,10 @@
   콘체르토 매니저 · 워크스페이스 화면 목업 v0.66 (2026-11-06)
 
   ── v0.66 (2026-11-06) ──
+     · 전용 저장소 접근 방식 선택지를 세로로 바꿨다. 가로 두 칸으로 두었는데 컴포넌트
+       라이브러리는 선택지 카드를 세로로 쌓는다(라이브러리 v0.25 · 공통정책 7.1).
+       생성 폼 · 저장소 설정 모달 둘 다 같다. 라디오를 숨기지 않고 왼쪽에 두어
+       라이브러리 카드와 같은 모양으로 맞췄다.
   · 기본 정보 수정에서 워크스페이스명을 읽기 전용으로 바꿨다. 중복 확인 버튼 · 이름 변경 경고가 나오지 않고, 아이콘 · 설명만 바꾼다.
     모달 머리 문구 `워크스페이스명은 네임스페이스에 쓰여 변경할 수 없습니다.` 목록 카드 더보기 > 수정도 같은 모달이다. 생성 폼은 그대로다(정책 2.2 · 2.4 · WKSP-L01 REQ-WKSP-025).
   · WKSP-L01 v0.66 · 워크스페이스 정책 v0.68 과 같은 버전이다. 게시하지 않은 11-04 · 11-05 묶음을 이 판에 합쳤다(아래 「11-05 묶음」 · 「11-04 묶음」).
@@ -1191,7 +1195,10 @@ th.thcell.fdd-on .fdd{display:block}
 /* 두 칸을 한 줄에 둔다 */
 .f2{display:flex;gap:14px;align-items:flex-start}
 .f2>.f{flex:1;min-width:0}
-.optcard{display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border:1px solid var(--border);border-radius:10px;cursor:pointer;background:transparent}
+.optcard{display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border:1px solid var(--border);border-radius:10px;cursor:pointer;background:transparent;margin-bottom:8px}
+    .optcard:last-child{margin-bottom:0}
+    /* 라벨로 쓸 때도 같은 가로 배치를 유지한다 — 폼의 label{display:block} 보다 뒤에 둔다 */
+    label.optcard{display:flex;font-weight:400}
 .optcard:hover{border-color:var(--accent)}
 .optcard.on{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 7%,transparent)}
 .optcard input{margin-top:3px;accent-color:var(--primary)}
@@ -2113,10 +2120,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <!-- 접근 방식 — 직접 접근(기본) · 임시 보안 자격 증명(STS)(워크스페이스 정책 2.4 · CON-951).
              STS 를 고르면 두 값이 필수다. 직접 접근으로 돌리면 STS 값은 지운다 -->
         <div class="f" style="margin-top:14px"><label>접근 방식</label>
-          <div class="pick" id="byModePick">
-            <label><input type="radio" name="bymode" value="direct" checked onchange="byModeSet('direct')"><span>직접 접근</span><small>액세스 키로 저장소에 바로 접근</small></label>
-            <label><input type="radio" name="bymode" value="sts" onchange="byModeSet('sts')"><span>임시 보안 자격 증명(STS)</span><small>임시 보안 자격 증명을 발급받아 접근</small></label>
-          </div></div>
+            <div id="byModePick">
+              <label class="optcard on" id="byModeDirect"><input type="radio" name="bymode" value="direct" checked onchange="byModeSet('direct')"><div><div class="oc-t">직접 접근</div><div class="oc-d">액세스 키로 저장소에 바로 접근</div></div></label>
+              <label class="optcard" id="byModeSts"><input type="radio" name="bymode" value="sts" onchange="byModeSet('sts')"><div><div class="oc-t">임시 보안 자격 증명(STS)</div><div class="oc-d">임시 보안 자격 증명을 발급받아 접근</div></div></label>
+            </div></div>
         <div id="byStsBox" style="display:none">
           <div class="f"><label>STS 엔드포인트 URL<span class="req">*</span></label>
             <input class="inp" id="byStsUrl" placeholder="https://sts.example.com" oninput="byobValid()">
@@ -4369,9 +4376,11 @@ function drawForm(){
          + '<div class="f"><label>액세스 키<span class="req">*</span></label><input class="inp'+s3E('s3key')+'" value="'+(NF.s3key||'')+'" oninput="NF.s3key=this.value;drawFormValidOnly()">'+s3M('s3key','액세스 키를 입력해 주세요.')+'</div>'
          + '<div class="f"><label>시크릿 키<span class="req">*</span></label><input class="inp'+s3E('s3sec')+'" type="password" placeholder="시크릿 키를 입력해 주세요." oninput="NF.s3sec=this.value;drawFormValidOnly()">'+s3M('s3sec','시크릿 키를 입력해 주세요.')+'</div>'
          /* 접근 방식 — 저장소 설정 모달과 같은 항목이다(정책 2.4 · CON-951). 생성 폼에는 연결 확인을 두지 않는다 — 워크스페이스가 아직 없다 */
-         + '<div class="f'+(NF.s3mode==='sts'?'':'" style="margin-bottom:0')+'"><label>접근 방식</label><div class="pick">'
-         +   '<label><input type="radio" name="nfmode" '+(NF.s3mode!=='sts'?'checked':'')+' onchange="NF.s3mode=\'direct\';drawForm()"><span>직접 접근</span><small>액세스 키로 저장소에 바로 접근</small></label>'
-         +   '<label><input type="radio" name="nfmode" '+(NF.s3mode==='sts'?'checked':'')+' onchange="NF.s3mode=\'sts\';drawForm()"><span>임시 보안 자격 증명(STS)</span><small>임시 보안 자격 증명을 발급받아 접근</small></label></div></div>'
+         + '<div class="f'+(NF.s3mode==='sts'?'':'" style="margin-bottom:0')+'"><label>접근 방식</label><div>'
+                + '<label class="optcard'+(NF.s3mode!=='sts'?' on':'')+'"><input type="radio" name="nfmode" '+(NF.s3mode!=='sts'?'checked':'')+' onchange="NF.s3mode=\'direct\';drawForm()">'
+                + '<div><div class="oc-t">직접 접근</div><div class="oc-d">액세스 키로 저장소에 바로 접근</div></div></label>'
+                + '<label class="optcard'+(NF.s3mode==='sts'?' on':'')+'"><input type="radio" name="nfmode" '+(NF.s3mode==='sts'?'checked':'')+' onchange="NF.s3mode=\'sts\';drawForm()">'
+                + '<div><div class="oc-t">임시 보안 자격 증명(STS)</div><div class="oc-d">임시 보안 자격 증명을 발급받아 접근</div></div></label></div></div>'
          + (NF.s3mode==='sts'
             ? '<div class="f"><label>STS 엔드포인트 URL<span class="req">*</span></label><input class="inp'+s3E('s3sts')+'" placeholder="https://sts.example.com" value="'+(NF.s3sts||'')+'" oninput="NF.s3sts=this.value;drawFormValidOnly()">'+s3M('s3sts','STS 엔드포인트 URL을 입력해 주세요.')+'</div>'
               + '<div class="f" style="margin-bottom:0"><label>역할 ARN<span class="req">*</span></label><input class="inp'+s3E('s3arn')+'" placeholder="arn:aws:iam::123456789012:role/concerto" value="'+(NF.s3arn||'')+'" oninput="NF.s3arn=this.value;drawFormValidOnly()">'+s3M('s3arn','역할 ARN을 입력해 주세요.')+'</div>'
@@ -5435,6 +5444,8 @@ function byModeSet(v){
   byMode=v;
   document.querySelectorAll('input[name=bymode]').forEach(function(r){ r.checked=(r.value===v); });
   document.getElementById('byStsBox').style.display = v==='sts'? '' : 'none';
+      document.getElementById('byModeDirect').classList.toggle('on', v!=='sts');
+      document.getElementById('byModeSts').classList.toggle('on', v==='sts');
   byobValid();
 }
 /* 연결 확인 — 입력값으로 저장 전에 시험한다(REQ-WKSP-110). 비운 시크릿 키는 저장된 값으로 확인한다.
