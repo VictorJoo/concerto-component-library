@@ -1,5 +1,14 @@
 <!--
-  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.34 (2026-11-03)
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.35 (2026-11-06)
+
+  ── v0.35 (2026-11-06) ──
+  · 개발룸 기획서 v0.35 · CDE 정책 v0.35 와 같은 버전이다.
+  · 개발룸 상세 자원 섹션 도움말에서 운영룸 자원 부족 시 회수 · 대기 문장을 뺐다. 4.0은 운영룸 자원이 부족해도 개발룸 자원을 자동으로 회수하지 않는다(워크스페이스 정책 5.2 · CDE 정책 4.5).
+    새 도움말 `개발룸이 최대로 쓸 수 있는 양입니다. 관리자가 줄이거나 워크스페이스 할당량이 줄면 함께 줄어듭니다.` 개발룸 자원은 관리자가 줄이거나 할당량 감액으로 함께 줄 때만 줄어든다(워크스페이스 정책 2.4).
+  · 승인 대기 안내 박스를 탭 위에서 CDE 탭 안 목록 위로 옮겼다. 작업 이력 탭에서는 보이지 않는다(라이브러리 알림 박스 `관련 섹션 상단`).
+    CDE 연장 승인 대기도 함께 센다(REQ-CDE-010). 문구를 `승인 대기 중인 신청이 {N}건 있습니다.` 로(라이브러리 예시와 같음). 조치 필요(warn) · 닫기 없음 · `내 작업함으로 →` 는 그대로다.
+    보는 사람은 내 작업함에서 그 건을 처리할 수 있는 사람이다 — WS 관리자, 그리고 활성 관리자가 없는 워크스페이스의 최고 관리자(승인 정책 3.3).
+    샘플 jh-jupyter-01(구동 중)에 연장 승인 대기를 두어 기본 화면 건수가 2건이다. 검토용 값이다.
 
   ── v0.34 (2026-11-03) ──
   · 개발룸 기획서 v0.34 · CDE 정책 v0.34 와 같은 버전이다.
@@ -1964,14 +1973,17 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
       <div id="quotaBox"></div>
       <div id="infoBox"></div>
 
-      <div id="pendBox"></div>
-
       <!-- 같은 개발룸을 대상으로 하는 목록 둘이라 탭으로 나눈다.
            배포 상세·워크스페이스 상세와 같은 구조다.
            섹션 제목을 따로 두지 않는다 — 탭 라벨과 같은 말이 두 번 나온다.
            액션은 그 액션이 걸리는 대상 옆에 둔다(공통정책 3.6) — `CDE 신청` 은 CDE 목록에 새 항목을
            더하는 것이라 목록 위 툴바에 둔다. 탭 줄에는 액션을 두지 않는다 -->
       <div class="tabs" id="cdeTabs"></div>
+
+      <!-- v0.35 · 승인 대기 안내는 CDE 탭 안 목록 위에 둔다. 안내가 걸리는 대상이 CDE 목록이다 —
+           신청은 승인되면 이 목록에 들어오고, 연장은 이 목록의 CDE 건이다. 라이브러리 알림 박스 위치 기준
+           `관련 섹션 상단` 그대로다. 탭 위에 두면 작업 이력 탭에서도 남는다. 작업 이력 탭에서는 그리지 않는다 -->
+      <div id="pendBox"></div>
 
       <div class="toolbar" id="cdeToolbar">
         <div class="searchzone">
@@ -2446,7 +2458,8 @@ const CDE = [
  {n:'sj-vscode-01', by:'임승주', id:'sj.lim', st:'절전', ide:'VS Code Web', fw:'TensorFlow 2.16',
   mode:'위임 할당', cpu:4, ram:16, accs:[], vol:5, at:'2026-07-22 14:30:00', until:'2026-09-12', reason:'전처리 파이프라인 개발', keys:[], apBy:'김병건(bg.kim)', apAt:'2026-07-22 11:04:22'},
  {n:'jh-jupyter-01', by:'유지현', id:'jh.yu', st:'구동 중', ide:'JupyterLab', fw:'PyTorch 2.4',
-  mode:'직접 할당', cpu:8, ram:32, accs:[{k:'furiosa',q:1}], vol:50, at:'2026-07-15 09:05:00', until:'2026-09-05', reason:'비전 모델 실험', keys:['gpt-oss-120b-symphony'], apBy:'김병건(bg.kim)', apAt:'2026-07-15 11:04:22'},
+  mode:'직접 할당', cpu:8, ram:32, accs:[{k:'furiosa',q:1}], vol:50, at:'2026-07-15 09:05:00', until:'2026-09-05', reason:'비전 모델 실험', keys:['gpt-oss-120b-symphony'], apBy:'김병건(bg.kim)', apAt:'2026-07-15 11:04:22',
+  extPend:true /* 검토용 값 — 이 CDE의 연장 신청이 승인 대기다. 승인 대기 안내 건수에만 쓴다. 실제 화면에는 없다 */},
  {n:'kh-jupyter-01', by:'오경환', id:'kh.oh', st:'승인 대기', ide:'JupyterLab', fw:'PyTorch 2.4',
   mode:'위임 할당', cpu:4, ram:16, accs:[{k:'nvidia-mig',q:1}], vol:20, at:'2026-08-11 16:44:00', until:'2026-09-11', reason:'벤치마크 재현', keys:[]},
  {n:'mj-vscode-01', by:'박민준', id:'mj.park', st:'만료', ide:'VS Code Web', fw:'PyTorch 2.4',
@@ -2832,7 +2845,7 @@ function drawQuota(){
     '<div class="dsec"><h4>개발룸 자원'
     /* 화면 최상단이라 위로 열면 잘린다. 아래로 연다 */
     + '<span class="tip-anchor below"><span class="tip-ic" tabindex="0">?</span>'
-    + '<span class="tip">개발룸이 최대로 쓸 수 있는 양입니다. 운영룸 자원이 부족해지면 이 중 일부가 회수되며, 실행 중인 작업은 대기 상태로 바뀌었다가 잔여가 생기면 다시 진행됩니다.</span></span></h4>'
+    + '<span class="tip">개발룸이 최대로 쓸 수 있는 양입니다. 관리자가 줄이거나 워크스페이스 할당량이 줄면 함께 줄어듭니다.</span></span></h4>'
     + '<div class="rsgrid">'
     + rows.map(function(r){
         const p = r[2]? Math.round(r[1]/r[2]*100) : 0;
@@ -2877,9 +2890,12 @@ function drawQuota(){
    GNB 내 작업함 배지는 모든 결재 건의 합이라 이 개발룸 몫을 따로 알 수 없다.
    라이브러리 알림 박스 `조치 필요` 규격 — 닫을 수 없고 실행 경로를 붙인다. 0건이면 두지 않는다 */
 function drawPend(){
-  const n = CDE.filter(m=>m.st==='승인 대기' && inRoom(m)).length;
-  document.getElementById('pendBox').innerHTML = (canApproveCde() && n)
-    ? alertBox('warn','승인 대기 중인 CDE 신청이 '+n+'건 있습니다.','승인·반려 처리는 내 작업함에서 합니다.',
+  /* CDE 신청과 CDE 연장 승인 대기를 함께 센다(REQ-CDE-010). 그래서 문구에 `CDE` 를 붙이지 않는다 — 라이브러리 예시 문구와 같다.
+     보는 사람은 그 건을 내 작업함에서 처리할 수 있는 사람이다. 최고 관리자는 활성 관리자가 없는 워크스페이스만이다(승인 정책 3.3 · canApproveCde) */
+  const n = CDE.filter(m=>m.st==='승인 대기' && inRoom(m)).length
+          + CDE.filter(m=>m.extPend && inRoom(m)).length;
+  document.getElementById('pendBox').innerHTML = (canApproveCde() && n && cdeTab!==1)
+    ? alertBox('warn','승인 대기 중인 신청이 '+n+'건 있습니다.','승인·반려 처리는 내 작업함에서 합니다.',
         '<button class="btn ghost sm" onclick="act(\'내 작업함으로 이동합니다.\')">내 작업함으로<span class="ar">→</span></button>')
     : '';
 }
@@ -3321,7 +3337,7 @@ function drawRoomCfg(){
            || rcAllZero();
   document.getElementById('roomForm').innerHTML =
      /* 워크스페이스 정책 5.1·5.2 — 기본값은 전부 운영룸이고 개발룸이 떼어 온다.
-        개발룸 자원은 최후 후순위라 운영룸이 부족해지면 회수된다 */
+        4.0은 운영룸이 부족해도 개발룸 자원을 자동으로 회수하지 않는다. 자동 회수는 4.1 범위다(워크스페이스 정책 5.2 · CDE 정책 4.5) */
      /* 워크스페이스 정책 5.2 — 회수는 임시 상태이고 작업은 종료가 아니라 지연된다.
         이 점을 빼면 회수를 데이터가 사라지는 것으로 읽는다 */
      (isSysWs
