@@ -1,5 +1,15 @@
 <!--
-  콘체르토 매니저 · 워크스페이스 화면 목업 v0.66 (2026-11-06)
+  콘체르토 매니저 · 워크스페이스 화면 목업 v0.67 (2026-11-09)
+
+  ── v0.67 (2026-11-09) ──
+  · 상세 멤버 · API Key 탭 목록에 페이지네이션을 두었다(WKSP-L01 3장 · 5.1 페이지네이션 · 7.4 · 7.9).
+    기획서는 상세 하위 목록에 페이지네이션을 둔다고 정했는데 목업에 빠져 있어, 멤버가 많으면
+    표가 끝없이 길어졌다.
+  · 건수는 페이지당 5/10/50건, 기본 10건이다. 상세 안에서 자원 현황 · 환경 섹션과 함께 보는
+    목록이라 목록 화면의 20건은 길다. 공통정책 3.7의 화면별 조정이다.
+  · 연동 탭은 목록이 아니라 설정값이라 페이지네이션을 두지 않는다.
+  · 탭을 바꾸거나 다른 워크스페이스 상세로 들어오면 1쪽으로 돌아간다. 고른 건수는 유지한다.
+    멤버를 제외하거나 키를 폐기해 마지막 쪽이 비면 앞쪽으로 옮긴다.
 
   ── v0.66 (2026-11-06) ──
      · 전용 저장소 접근 방식 선택지를 세로로 바꿨다. 가로 두 칸으로 두었는데 컴포넌트
@@ -3489,10 +3499,31 @@ function wtabs(){
   return t;
 }
 
-function setWTab(i){ wTab=i; drawDetail(); }
+function setWTab(i){ wTab=i; mPg.p=1; kPg.p=1; drawDetail(); }
+/* 상세 탭 목록 페이지네이션 — 페이지당 5/10/50건, 기본 10건(WKSP-L01 5.1 · 공통정책 3.7) */
+let mPg={p:1,n:10}, kPg={p:1,n:10}, pgCur=null;
+function detPager(k,total){
+  const st=k==='m'?mPg:kPg, last=Math.max(1,Math.ceil(total/st.n));
+  return '<div class="pager"><span>총 '+total+'건</span><div style="display:flex;align-items:center;gap:14px"><div class="pgnum">'
+   + '<button '+(st.p<=1?'disabled ':'')+'aria-label="이전" onclick="detPg(\''+k+'\','+(st.p-1)+')">‹</button>'
+   + '<input class="pgin" value="'+st.p+'" onchange="detPg(\''+k+'\',parseInt(this.value,10)||1)"><span class="pgtot">/ '+last+'</span>'
+   + '<button '+(st.p>=last?'disabled ':'')+'aria-label="다음" onclick="detPg(\''+k+'\','+(st.p+1)+')">›</button></div>'
+   + '<select class="sel" style="padding:7px 10px" onchange="detPgN(\''+k+'\',+this.value)">'
+   + [5,10,50].map(function(n){ return '<option value="'+n+'"'+(n===st.n?' selected':'')+'>'+n+'개씩 보기</option>'; }).join('')
+   + '</select></div></div>';
+}
+function detPg(k,p){ const st=k==='m'?mPg:kPg; st.p=Math.max(1,p); drawDetail(); }
+function detPgN(k,n){ const st=k==='m'?mPg:kPg; st.n=n; st.p=1; drawDetail(); }
+/* 지금 쪽이 마지막 쪽을 넘으면(제외 · 폐기로 줄었을 때) 마지막 쪽으로 옮기고 그 쪽의 범위를 돌려준다 */
+function pgRange(st,total){
+  const last=Math.max(1,Math.ceil(total/st.n)); if(st.p>last) st.p=last;
+  return [(st.p-1)*st.n, st.p*st.n];
+}
 function drawDetail(){
   if(!cur) return;
   const m=cur.m;
+  /* 다른 워크스페이스 상세로 들어오면 1쪽부터 보인다 */
+  if(pgCur!==m){ pgCur=m; mPg.p=1; kPg.p=1; }
   const cp=pct(m.use.cpu,m.quota.cpu), rp=pct(m.use.ram,m.quota.ram), gp=pct(m.use.gpu,m.quota.gpu);
   let h='';
   h+='<div class="dhead">'
@@ -3633,6 +3664,7 @@ function drawDetail(){
    + '</div>';
 
   if(CUR==='멤버'){
+    const mr=pgRange(mPg,m.members.length);
     h+='<div class="dsec"><h4>멤버 <span style="font-weight:400;color:var(--muted-foreground)">'+m.members.length+'명</span>'
      /* 공용은 초대·제외 진입점이 없어 그 이유를 밝힌다. 조치가 없는 정보이므로
         알럿이 아니라 섹션 도움말에 둔다(공통정책 4.7 · 개정 제안 7.10).
@@ -3675,8 +3707,10 @@ function drawDetail(){
                  : '<button class="d" onclick="rmMember('+i+')">'+((u.id==='yj.seong'&&canLeave(m))?'나가기':'제외')+'</button>')
                 + '</div></div></td>'
               : '')+'</tr>';
-       }).join('')
+       /* 행 번호(i)는 역할 변경 · 제외가 원래 목록을 가리키므로 전체를 그린 뒤 지금 쪽만 잘라 보인다 */
+       }).slice(mr[0],mr[1]).join('')
      + '</tbody></table></div>'
+     + detPager('m',m.members.length)
      + '</div>'
      /* 공용은 관리자를 지정하지 않으므로(최고 관리자가 겸한다) 관리자 수 안내를 두지 않는다.
         전원 자동 등록이라는 사실은 섹션 도움말에 두었다 — 조치가 없어 알럿을 쓰지 않는다 */
@@ -3717,6 +3751,7 @@ function drawDetail(){
   }
 
   if(CUR==='API Key'){
+    const kr=pgRange(kPg,m.keys.length);
     h+='<div class="dsec"><h4>API Key <span style="font-weight:400;color:var(--muted-foreground)">'+m.keys.length+'건</span>'
      + (canIssueKey()?'<span class="secbtns"><button class="btn sm" onclick="openKey()">API Key 발급</button></span>':'')
      + '</h4>'
@@ -3742,8 +3777,9 @@ function drawDetail(){
            ?'<div class="more" id="km'+i+'"><button class="morebtn" aria-label="작업" onclick="tgMore(event,\'km'+i+'\')">⋯</button><div class="rowmenu">'
              +'<button onclick="openKeyLim(\''+k.n+'\')">사용 한도 수정</button><hr>'
              +'<button class="d" onclick="revokeKey(\''+k.n+'\')">폐기</button></div></div>'
-           :'')+'</td></tr>').join('')
+           :'')+'</td></tr>').slice(kr[0],kr[1]).join('')
          + '</tbody></table></div>'
+         + detPager('k',m.keys.length)
        /* 발급 권한이 없는 사람에게 발급을 요청하지 않는다(공통정책 7.10 · UI 문구 규칙 2) */
        : '<div class="emptyline">API Key가 없습니다.'+(canIssueKey()? ' 외부 앱에서 배포 모델을 호출하려면 키를 발급해 주세요.' : '')+'</div>')
      + '</div>';
