@@ -3,6 +3,10 @@
 
   ── v0.36 (2026-11-11) ──
   · 개발룸 기획서 v0.36 · CDE 정책 v0.36 과 같은 버전이다.
+  · 에이전트 키 재발급 확인 알럿에 다시 기동의 영향을 실행 방식에 따라 더했다. 직접 할당은 실행 중인 작업도 끊긴다는 문장을,
+    모든 CDE에 이미 제출한 작업의 모델 호출이 실패할 수 있다는 문장을 보인다(CDE 정책 2.4 · 개발룸 기획서 5.1 · REQ-CDE-067).
+  · 접근 허용 모델 도움말(신청 폼 · CDE 상세)에 「이후 새로 배포한 모델을 쓰려면 키를 다시 발급해야 합니다.」를 더했다(CDE 정책 2.4).
+  · 작업 이력 탭 상태 · 유형 헤더 필터를 고르는 즉시 반영한다. [적용] 버튼을 뺐다. [초기화] 는 그대로다(공통정책 3.2).
   · 에이전트 키 재발급 확인 알럿 본문의 적용 시점을 결정에 맞췄다(CON-661 2026-10-06). 재발급하면 CDE가 자동으로 다시 기동되어
     접속 중인 세션이 한 번 끊기고, 다시 기동이 끝나면 새 키가 적용된다(CDE 정책 2.4 · 개발룸 기획서 5.1).
     종전 문구 `새 키가 적용되려면 CDE를 다시 기동해야 합니다.` 는 구조 확인 전에 둔 것이라 사용자가 직접 기동해야 하는 것처럼 읽혔다.
@@ -3028,8 +3032,7 @@ function jFilter(){
        return '<label><input type="checkbox" '+(jTmp.indexOf(o)>=0?'checked':'')
         + ' onchange="jPick(\''+o+'\',this.checked)">'+o+'<span class="fc">'+c+'</span></label>';
      }).join('')
-   + '<div class="fddfoot"><button class="lvclr" onclick="jReset()">초기화</button>'
-   + '<button class="btn sm" onclick="jApply()">적용</button></div>'
+   + '<div class="fddfoot"><button class="lvclr" onclick="jReset()">초기화</button></div>'
    + '</div>';
 }
 /* 유형 헤더 필터: 상태 필터와 같은 규격(REQ-CDE-076 · 기획서 7.6). 선택지는 검색 결과 안에 있는 값만 둔다 */
@@ -3047,8 +3050,7 @@ function tFilter(){
        return '<label><input type="checkbox" '+(tTmp.indexOf(o)>=0?'checked':'')
         + ' onchange="tPick(\''+o+'\',this.checked)">'+o+'<span class="fc">'+c+'</span></label>';
      }).join('')
-   + '<div class="fddfoot"><button class="lvclr" onclick="jReset()">초기화</button>'
-   + '<button class="btn sm" onclick="tApply()">적용</button></div>'
+   + '<div class="fddfoot"><button class="lvclr" onclick="jReset()">초기화</button></div>'
    + '</div>';
 }
 function tgTdd(e){
@@ -3057,12 +3059,14 @@ function tgTdd(e){
   document.querySelectorAll('th').forEach(function(x){ x.classList.remove('fdd-on'); });
   if(!o){ tTmp=tSel.slice(); th.classList.add('fdd-on'); }
 }
-function tPick(v,on){ const i=tTmp.indexOf(v); if(on && i<0) tTmp.push(v); if(!on && i>=0) tTmp.splice(i,1); }
+function tPick(v,on){ const i=tTmp.indexOf(v); if(on && i<0) tTmp.push(v); if(!on && i>=0) tTmp.splice(i,1); tApply(); }
 function tPickAll(){
   tTmp=[];
   const th=document.querySelector('th.fdd-on');
   if(th) th.querySelectorAll('.fdd label input').forEach(function(cb,i){ cb.checked=(i===0); });
+  tApply();
 }
+/* 공통정책 3.2 — 고르는 즉시 목록에 반영한다. 별도 적용 버튼을 두지 않는다 */
 function tApply(){
   const all=jBase();
   const opts=TOPTS.filter(function(o){ return all.some(function(j){ return tKo(j.t)===o; }); });
@@ -3082,11 +3086,13 @@ function jPick(v,on){
   const i=jTmp.indexOf(v);
   if(on && i<0) jTmp.push(v);
   if(!on && i>=0) jTmp.splice(i,1);
+  jApply();
 }
 function jPickAll(){
   jTmp=[];
   const th=document.querySelector('th.fdd-on');
   if(th) th.querySelectorAll('.fdd label input').forEach(function(cb,i){ cb.checked=(i===0); });
+  jApply();
 }
 function jApply(){
   const all=jBase();
@@ -3979,12 +3985,16 @@ function closeCde(){
   syncBc(); window.scrollTo(0,0);
 }
 /* 기존 키를 폐기하고 새로 발급한다. 접근 범위는 다시 고른다.
-   키는 CDE 에 주입되어 있어 재발급하면 CDE 가 자동으로 다시 기동된다. 접속 중인 세션은 한 번 끊긴다(CON-661 · CDE 정책 2.4) */
+   키는 CDE 에 주입되어 있어 재발급하면 CDE 가 자동으로 다시 기동된다. 접속 중인 세션은 한 번 끊긴다(CON-661 · CDE 정책 2.4).
+   다시 기동의 영향은 실행 방식에 따라 다르다(CDE 정책 2.4 재발급 영향). 실행 중인 작업이 끊긴다는 문장은 직접 할당일 때만 보인다 */
 function askReissue(name){
+  const m=cdCur||{};
   openConfirm('에이전트 키 재발급',
     '<b>'+name+'</b>의 에이전트 키를 폐기하고 새로 발급합니다.<br>'
     + '기존 키로 호출하던 요청은 더 이상 처리되지 않습니다.<br>'
-    + 'CDE가 다시 기동되어 접속 중인 세션이 끊깁니다. 다시 기동이 끝나면 새 키가 적용됩니다.',
+    + 'CDE가 다시 기동되어 접속 중인 세션이 끊깁니다. 다시 기동이 끝나면 새 키가 적용됩니다.'
+    + (m.mode==='직접 할당' ? '<br>CDE에서 실행 중인 작업도 함께 끊깁니다.' : '')
+    + '<br>이미 제출한 작업은 계속 실행되지만, 실행 중에 모델을 호출하면 실패할 수 있습니다.',
     function(){ toast('ok','에이전트 키 재발급을 요청했습니다. 접근할 모델을 다시 선택해 주세요.'); },
     '재발급');
 }
@@ -4053,7 +4063,7 @@ function drawCdeDetail(){
     + '<dt>IDE 유형</dt><dd>'+m.ide+'</dd>'
     + '<dt>이미지 태그</dt><dd>'+m.fw+'</dd>'
     + '<dt>실행 방식'+help('mode')+'</dt><dd>'+m.mode+'</dd>'
-    + '<dt>접근 허용 모델</dt><dd>'
+    + '<dt>접근 허용 모델'+help('keys')+'</dt><dd>'
     +   (km.length ? km.join(' · ')
         : '<span class="dash">에이전트 키를 발급하지 않았습니다</span>')+'</dd>'
     + '</dl></div>';
@@ -4326,7 +4336,7 @@ function drawForm(){
    /* 신청이 승인될 때 발급되는 에이전트 키의 접근 범위다(CDE 정책 2.4).
       고르지 않으면 키를 발급하지 않는다 — 배포 모델을 호출하지 않는 CDE 도 있다 */
    + row('접근 허용 모델', false, mselModels(),
-       '에이전트 키가 호출할 수 있는 배포입니다. 키는 신청이 승인될 때 발급되며, 고르지 않으면 발급하지 않습니다.')
+       '에이전트 키가 호출할 수 있는 배포입니다. 키는 신청이 승인될 때 발급되며, 고르지 않으면 발급하지 않습니다. 이후 새로 배포한 모델을 쓰려면 키를 다시 발급해야 합니다.')
    + '</div>';
 
   /* 만료일과 사유는 신청 시 받는 값이다. CDE 상세의 `신청 정보` 섹션과 이름을 맞춘다 —
@@ -4657,6 +4667,8 @@ function act(msg){ closeAllMore(); toast('ok',msg); }
 
 /* ═══════════ 공통 ═══════════ */
 const COLDEF={
+  /* CDE 상세 접근 허용 모델 — 발급 뒤 새로 배포한 모델은 키에 들어가지 않는다(CDE 정책 2.4) */
+  keys:'에이전트 키가 호출할 수 있는 배포입니다. 범위를 바꾸거나 이후 새로 배포한 모델을 쓰려면 키를 다시 발급해야 합니다.',
   /* 회수는 자원이 반환돼 값이 없다(CDE 정책 5.2). 왜 비었는지 열 도움말에서 알린다 */
   res:'개발룸 몫에서 차감 중인 자원입니다. 회수된 CDE는 개발룸으로 반환되어 표시하지 않습니다. 신청한 자원은 상세에서 볼 수 있습니다.',
   /* ⚠ 만료 처리 시각이 확정되지 않았다. 만료일 자정으로 두고 확인 대상으로 남긴다(정책 9. 16번) */
