@@ -1,5 +1,13 @@
 <!--
-  콘체르토 매니저 — 내 작업함 목업 v0.18 (2026-11-06)
+  콘체르토 매니저 — 내 작업함 목업 v0.19 (2026-11-11)
+
+  ── v0.19 (2026-11-11) ─────────────────────────────
+     · TASK-L01 v0.19 와 같은 버전이다.
+     · 만료 · 절전 CDE의 연장은 다시 기동할 개발룸 잔여가 부족하면 승인할 수 없다(CDE 정책 5.3 · REQ-TASK-042 · CON-1204).
+       총량 초과(REQ-TASK-040)와 같이 승인을 비활성으로 두고 사유 `다시 기동할 개발룸 잔여가 부족해 승인할 수 없습니다.` 를 보인다.
+       반려는 그대로 둔다. 결재 목록 응답에 잔여 부족 여부를 받기 전에는 누른 뒤 차단 안내 모달(제목 `개발룸 잔여가 부족해 승인할 수 없습니다`)로 막는다.
+       신규 CDE 신청의 잔여 부족은 지금처럼 경고만 하고 막지 않는다(CDE 정책 3.3).
+     · 데모 바 `연장 대상` 에 `잔여 부족` 을 더했다. 실제 화면에는 없는 검토용 처리다.
 
   ── v0.18 (2026-11-06) ─────────────────────────────
      · 워크스페이스 열에 헤더 필터를 더했다. 이 화면에는 워크스페이스 선택이 걸리지 않아
@@ -1961,7 +1969,8 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <button class="st" onclick="setState('error',this)">오류</button></span>
   <span class="dgrp"><span class="demo-label">연장 대상:</span>
   <button class="rc on" onclick="setReclaim(false,this)">회수 전</button>
-  <button class="rc" onclick="setReclaim(true,this)">회수 후</button></span>
+  <button class="rc" onclick="setReclaim(true,this)">회수 후</button>
+  <button class="rc" onclick="setExtShort(this)">잔여 부족</button></span>
   <span class="dgrp"><span class="demo-label">관리자 없음 건:</span>
   <button class="ab on" onclick="setAdminBack(false,this)">관리자 없음</button>
   <button class="ab" onclick="setAdminBack(true,this)">관리자 생김</button>
@@ -2337,10 +2346,14 @@ function expWhy(t){ return '만료 예정일('+expDate(t)+')이 지나 승인할
 function overWhy(t){ const o=(t&&t.over)||{}; return '요청한 '+o.n+' '+o.req+'장이 개발룸 배정 '+o.total+'장을 넘어 승인할 수 없습니다.'; }
 /* 승인을 처음부터 비활성으로 두는 사유. 둘 다 신청 내용과 개발룸 배정에서 화면이 미리 판정할 수 있는 값이다.
    반려는 그대로 둔다 — 승인 대기는 보유로 세므로 반려로 닫아야 신청자가 새로 신청할 수 있다(CDE 정책 6장) */
+/* 만료 · 절전 CDE의 연장은 다시 기동할 개발룸 잔여가 부족하면 승인할 수 없다(CDE 정책 5.3 · REQ-TASK-042 · CON-1204).
+   총량 초과(REQ-TASK-040)와 같은 처리다 */
+const EXT_SHORT_WHY='다시 기동할 개발룸 잔여가 부족해 승인할 수 없습니다.';
 function apvWhy(t){
   if(t.st!=='승인 대기') return '';
   if(expired(t)) return expWhy(t);
   if(t.overTotal) return overWhy(t);
+  if(t.extShort) return EXT_SHORT_WHY;
   return '';
 }
 
@@ -2693,7 +2706,7 @@ function setReclaim(on,btn){
   let idx=-1;
   TASKS.forEach(function(t,i){
     if(t.tgt==='jh-jupyter-01' && t.type==='CDE 연장'){
-      t.reclaimed=on;
+      t.reclaimed=on; t.extShort=false;
       /* 상세 `CDE 상태` 를 토글에 맞춘다. 회수되면 상태가 `회수` 로 바뀐다(CDE 정책 5.2·6장).
          값을 고치지 않으면 회수 후에도 `만료` 로 보여 승인이 왜 막히는지 드러나지 않는다 */
       (t.body||[]).forEach(function(r){ if(r[0]==='CDE 상태') r[1]= on? '회수' : '만료'; });
@@ -2709,6 +2722,24 @@ function setReclaim(on,btn){
   if(tab!==1) setTab(1);
   openDetail(idx);
 }
+/* 데모 — 만료된 CDE 연장 신청(jh-jupyter-01)을 승인하는 시점에 개발룸 잔여가 모자란 경우(CDE 정책 5.3 · REQ-TASK-042).
+   실제 화면에는 없는 검토용 처리다 */
+function setExtShort(btn){
+  let idx=-1;
+  TASKS.forEach(function(t,i){
+    if(t.tgt==='jh-jupyter-01' && t.type==='CDE 연장'){
+      t.reclaimed=false; t.extShort=true;
+      (t.body||[]).forEach(function(r){ if(r[0]==='CDE 상태') r[1]='만료'; });
+      idx=i;
+    }
+  });
+  document.querySelectorAll('#demoBar .rc').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  if(idx<0) return;
+  if(cur!==null){ cur=idx; drawDetail(); drawList(); return; }
+  if(tab!==1) setTab(1);
+  openDetail(idx);
+}
 function approveTask(i){
   const t=TASKS[i==null? cur : i];
   if(guardDone(t)) return;
@@ -2716,6 +2747,7 @@ function approveTask(i){
   /* 화면을 연 뒤 날짜가 바뀌어 서버가 거절한 경우도 이 자리다. 고칠 칸이 없어 토스트가 아니라 차단 안내 모달이다(TASK-L01 5.2 · 10-28 결정) */
   if(apvWhy(t)){
     if(expired(t)) openConfirm('만료 예정일이 지나 승인할 수 없습니다', '만료 예정일('+expDate(t)+')이 지났습니다. 이 신청은 반려할 수 있습니다.', null, null, '확인');
+    else if(t.extShort) openConfirm('개발룸 잔여가 부족해 승인할 수 없습니다', '이 CDE를 다시 기동할 개발룸 잔여가 부족합니다. 이 신청은 반려할 수 있습니다.', null, null, '확인');
     else openConfirm('개발룸 배정을 넘어 승인할 수 없습니다', overWhy(t)+' 이 신청은 반려할 수 있습니다.', null, null, '확인');
     return;
   }
