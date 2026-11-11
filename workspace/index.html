@@ -1,5 +1,24 @@
 <!--
-  콘체르토 매니저 · 워크스페이스 화면 목업 v0.67 (2026-11-09)
+  콘체르토 매니저 · 워크스페이스 화면 목업 v0.68 (2026-11-11)
+
+  ── v0.68 (2026-11-11) ──
+  · WKSP-L01 v0.68 · 워크스페이스 정책 v0.69 와 같은 버전이다.
+  · Hugging Face 연동에서 프록시를 뺐다(워크스페이스 정책 8.1 · WKSP-L01 7.8). 연동 설정 모달의 프록시 사용 · 서버 · 포트 ·
+    인증 계정 · 인증 비밀번호 · 연결 확인과 상세 연동 영역의 프록시 줄을 지웠다. 폐쇄망은 기본 URL 에 내부 미러 주소를 넣는다.
+  · 운영룸 생성 · 설정에 게이트웨이 설정 묶음을 더했다. 최대 요청 크기(1~100MB, 기본 50) · HTTP/2 창 크기(1~64MB, 기본 8) ·
+    연결 유휴 시간(1~86,400초) · 요청 헤더 수신 시간(1~600초). 시간 두 항목은 비우면 설치 기본값이다. 범위 밖은
+    `{최소}~{최대} 사이의 정수를 입력해 주세요.` 인라인 에러와 첫 오류 필드 포커스. 저장 즉시 적용되고 배포는 다시 기동하지 않는다.
+    운영룸 화면 게이트웨이 섹션에 네 값을 보이고, 비운 시간 항목은 `설치 기본값`으로 둔다(워크스페이스 정책 3.4 · WKSP-L01 7.6 · 7.7 · CON-1227).
+  · API Key 토큰 한도의 기준 시간에서 분당을 뺐다. 시간당 · 일당 · 주당만 둔다(정책 7장 · WKSP-L01 7.10 · 7.11 · REQ-WKSP-103 · CON-1193).
+    토큰 사용량은 모아서 반영하므로 1분 구간으로는 한도를 지킬 수 없고, 분 단위 과부하는 배포의 요청 수 제한이 맡는다.
+  · 발급 모달의 기준 시간 기본값을 분당에서 일당으로 바꿨다. 하루 단위 사용량 할당에 맞췄다.
+  · 이미 분당으로 저장된 키는 목록 한도 열에 `{n}토큰/분` 그대로 보인다. 한도 수정 모달은 기준 시간을 비워 열고
+    `분당은 더 이상 쓸 수 없습니다. 기준 시간을 다시 골라 주세요.` 를 보이며, 기준 시간을 고르기 전에는 저장을 비활성으로 둔다(WKSP-L01 7.11).
+    샘플 batch-infer-key 에 50,000토큰/분을 두었다. 검토용 값이다.
+  · 상세 환경 섹션의 개발룸 미생성 안내에서, 만들 권한이 없는 역할에게는 버튼 대신 `워크스페이스 관리자에게 개발룸 생성을 요청해 주세요.`
+    (공용 워크스페이스는 `최고 관리자에게 …`)를 둔다. 같은 섹션의 운영룸 미생성과 맞췄다(정책 3.3 · WKSP-L01 REQ-WKSP-026).
+    생성 버튼 판정도 운영룸과 같은 canMakeRoom 으로 바꿨다 — 공용 워크스페이스의 개발룸은 최고 관리자만 만든다(정책 6.1).
+    목록 카드는 그대로 상태만 둔다(정책 3.5).
 
   ── v0.67 (2026-11-09) ──
   · 상세 멤버 · API Key 탭 목록에 페이지네이션을 두었다(WKSP-L01 3장 · 5.1 페이지네이션 · 7.4 · 7.9).
@@ -370,28 +389,8 @@
   `삭제됨` 으로 두고 호버 시 사유를 알린다(공통정책 1.6).
   멤버 목록에서는 아예 빠진다 — 로그인할 수 없는 계정이 멤버로 남을 이유가 없다.
 
-  ── 연동 탭 프록시 (2026-08-24) ──────────────────
-  현행은 `프록시 서버 사용` 체크박스만 두고 주소를 받지 않는다. 확인 결과(연동 탭 프록시)
-  주소를 화면에서 받는 것이 맞다.
-
-  입력 항목은 서버 · 포트 · 인증 계정 · 인증 비밀번호 넷이다.
-  · 서버와 포트를 나눈다 — 한 칸에 받으면 포트를 빼먹거나 구분자를 잘못 쓰기 쉽고,
-    포트는 숫자라 따로 받으면 검증이 된다(Jenkins·Oracle 데스크톱 설정과 같은 형태)
-  · 인증은 프록시 서버에 로그인하는 계정이다. 액세스 토큰과 다른 값이다.
-    표준 형식은 http://user:pass@host:port 이나 한 칸에 넣으면 비밀번호가 그대로 보여
-    나눠 받고 마스킹한다
-  · 연결 확인 버튼을 둔다 — 플랫폼 설정 스토리지와 같은 규격이다
-
-  인증 비밀번호는 액세스 토큰과 같은 규격으로 둔다 — 저장한 값을 되돌려 주지 않고
-  `등록됨` 배지와 변경·삭제 버튼만 보인다. 빈 입력란을 두면 그대로 저장했을 때
-  지워지는지 유지되는지 알 수 없다.
-
-  ⚠ 프록시 예외 목록(NO_PROXY)은 여기 두지 않는다. 클러스터 내부 주소는 워크스페이스마다
-    다르지 않아 플랫폼 설정에 둔다. 예외에 넣지 않으면 MinIO·Harbor 로 가는 요청이
-    프록시로 나가 끊긴다.
-  ⚠ 프록시를 워크스페이스별로 관리할지, 플랫폼 설정에만 두고 여기서는 사용 여부만
-    정할지는 미결이다. 클러스터가 하나라 나가는 경로도 하나일 것으로 보인다 —
-    플랫폼 설정 검토 때 함께 다룬다.
+  ── 연동 탭 프록시 (2026-08-24 · v0.68 삭제) ──────
+  v0.68 에서 Hugging Face 연동의 프록시 입력을 뺐다(워크스페이스 정책 8.1). 08-24 에 정한 서버 · 포트 · 인증 입력은 쓰지 않는다.
 
   [검토용 임시 장치 — 확정 후 삭제]
   하단 데모 바(화면 · 데이터 상태 · 권한 · 테마)는 시안 확인용이다.
@@ -2025,7 +2024,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <label>토큰 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">기준 시간 동안 처리할 수 있는 토큰 수입니다. 입력·출력 토큰을 합쳐 세고, 키가 접근하는 모든 배포의 사용량을 함께 셉니다. 일당은 매일 0시, 주당은 매주 월요일 0시(한국 시간)에 새로 셉니다. API Key 인증을 끈 배포에는 적용되지 않습니다.</span></span></label>
         <div style="display:flex;gap:8px">
           <input class="inp" id="kTok" inputmode="numeric" autocomplete="off" style="flex:1;min-width:0" aria-label="토큰 수" oninput="kLimInput('kTok')" onblur="kLimBlur('kTok')">
-          <select class="inp" id="kTokWin" style="width:96px" aria-label="기준 시간" disabled><option value="분">분당</option><option value="시간">시간당</option><option value="일">일당</option><option value="주">주당</option></select>
+          <select class="inp" id="kTokWin" style="width:96px" aria-label="기준 시간" disabled><option value="시간">시간당</option><option value="일">일당</option><option value="주">주당</option></select>
         </div>
         <div class="hint">비우면 토큰 한도를 두지 않습니다.</div>
         <div class="errmsg" id="kTokErr">1 이상의 정수를 입력해 주세요.</div>
@@ -2049,12 +2048,14 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <label>토큰 한도<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">기준 시간 동안 처리할 수 있는 토큰 수입니다. 입력·출력 토큰을 합쳐 세고, 키가 접근하는 모든 배포의 사용량을 함께 셉니다. 일당은 매일 0시, 주당은 매주 월요일 0시(한국 시간)에 새로 셉니다. API Key 인증을 끈 배포에는 적용되지 않습니다.</span></span></label>
         <div style="display:flex;gap:8px">
           <input class="inp" id="lmTok" inputmode="numeric" autocomplete="off" style="flex:1;min-width:0" aria-label="토큰 수" oninput="lmInput('lmTok')" onblur="kLimBlur('lmTok')">
-          <select class="inp" id="lmTokWin" style="width:96px" aria-label="기준 시간" onchange="lmValid()"><option value="분">분당</option><option value="시간">시간당</option><option value="일">일당</option><option value="주">주당</option></select>
+          <select class="inp" id="lmTokWin" style="width:96px" aria-label="기준 시간" onchange="lmValid()"><option value="" hidden></option><option value="시간">시간당</option><option value="일">일당</option><option value="주">주당</option></select>
         </div>
         <div class="hint">비우면 토큰 한도를 두지 않습니다.</div>
         <div class="errmsg" id="lmTokErr">1 이상의 정수를 입력해 주세요.</div>
         <!-- v0.66 · 기준 시간을 바꾸면 새 구간부터 다시 센다(정책 7장 한도 수정 시 사용량 · WKSP-L01 7.11) -->
         <div class="hint" id="lmWinHint" style="display:none">기준 시간을 바꾸면 사용량을 새 구간부터 다시 셉니다.</div>
+        <!-- v0.68 · 분당으로 저장된 키는 기준 시간을 비워 열고 다시 고르게 한다(WKSP-L01 7.11 · CON-1193) -->
+        <div class="hint" id="lmLegacyHint" style="display:none">분당은 더 이상 쓸 수 없습니다. 기준 시간을 다시 골라 주세요.</div>
       </div>
     </div>
     <div class="mdfoot">
@@ -2164,43 +2165,6 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
       <div class="f">
         <label>기본 URL<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">폐쇄망에서는 내부 미러 주소를 입력합니다.</span></span></label>
         <input class="inp" id="cnUrl" value="https://huggingface.co" oninput="cnChanged()">
-      </div>
-      <div class="f">
-        <div class="optcard" id="cnProxyCard" onclick="cnToggle('proxy')">
-          <input type="checkbox" id="cnProxy" onclick="event.stopPropagation()" onchange="cnToggle('proxy',this.checked)">
-          <div><div class="oc-t">프록시 사용</div><div class="oc-d">외부 연결이 프록시를 거쳐야 하는 망에서 사용합니다.</div></div>
-        </div>
-      </div>
-      <!-- 서버와 포트를 나눠 받는다. 한 칸에 받으면 포트를 빼먹거나 구분자를 잘못 쓰기 쉽고
-           포트는 숫자라 따로 받으면 검증이 된다(Jenkins·Oracle 데스크톱 설정과 같은 형태).
-           인증은 프록시 서버에 로그인하는 계정이다. 액세스 토큰과 다른 값이다 —
-           표준 형식은 http://user:pass@host:port 이나 한 칸에 넣으면 비밀번호가 그대로 보여
-           나눠 받고 마스킹한다 -->
-      <div id="cnProxyWrap" style="display:none">
-        <div class="f2">
-          <div class="f" style="margin-bottom:0">
-            <label>프록시 서버<span class="req">*</span></label>
-            <input class="inp" placeholder="proxy.internal">
-          </div>
-          <div class="f" style="margin-bottom:0;max-width:140px">
-            <label>포트<span class="req">*</span></label>
-            <input class="inp" placeholder="3128" inputmode="numeric">
-          </div>
-        </div>
-        <!-- 인증은 세로로 쌓는다. 비밀번호가 등록되면 `등록됨` 배지와 변경·삭제 버튼이
-             들어가 절반 폭으로는 좁고, 계정과 나란히 두면 두 칸의 높이가 갈린다 -->
-        <div class="f" style="margin-top:14px">
-          <label>인증 계정<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">프록시 서버에 로그인이 필요한 경우에만 입력합니다.</span></span></label>
-          <input class="inp" placeholder="선택 입력">
-        </div>
-        <div class="f" style="margin-bottom:0">
-          <label>인증 비밀번호<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">저장한 값은 다시 조회할 수 없습니다. 바꾸려면 새 비밀번호를 입력해 저장합니다.</span></span></label>
-          <!-- 액세스 토큰과 같은 규격. 저장된 비밀값은 되돌려 주지 않고 등록 여부만 알린다 -->
-          <div id="cnPwBox"></div>
-        </div>
-        <div class="secact" style="margin-top:14px;margin-bottom:0">
-          <button class="btn ghost sm" onclick="act('프록시 연결을 확인했습니다.')">연결 확인</button>
-        </div>
       </div>
       <div class="f">
         <label>액세스 토큰<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">비공개 저장소에 접근할 때 사용합니다. 등록하지 않으면 플랫폼 전역 토큰을 사용합니다.</span></span></label>
@@ -2389,7 +2353,7 @@ const WS=[
     scope:['llama-3-2-1b-prod','gemma-4-12b-it-idle'], last:'2026-08-20 14:32:08',
     tok:{n:2000000,win:'주'}, use:{d:184230,w:1253880}},
    {n:'batch-infer-key',type:'일반',exp:'2026-09-30',at:'2026-07-14 16:40:21',by:'임승주(sj.lim)',
-    scope:['llama-3-2-1b-prod'], last:null, tok:null, use:null}],
+    scope:['llama-3-2-1b-prod'], last:null, tok:{n:50000,win:'분'}, use:null}],
   jobs:[{id:'job-8f2a',u:'yj.seong',t:'학습',fw:'PyTorch',dur:'1시간 24분',st:'완료'},
         {id:'job-3c91',u:'yj.seong',t:'전처리',fw:'PyTorch',dur:'12분',st:'실행 중'},
         {id:'job-b04e',u:'sj.lim',t:'학습',fw:'PyTorch',dur:'3분',st:'실패',err:'CUDA out of memory. 배치 크기를 줄이거나 가속기를 늘려 주세요.'},
@@ -3374,16 +3338,38 @@ function goDevRoom(){
 function backFromRoom(){ if(roomFrom==='list') listFromDetail(); else openDetail(); }
 /* 운영룸 생성 — 입력받을 값이 없어 확인 알럿으로 처리한다.
    대상 클러스터를 받게 되면 개발룸처럼 폼으로 바꾼다 */
-/* 운영룸 설정 — 호스트 도메인 하나를 받는다.
+/* 운영룸 설정 — 호스트 도메인과 게이트웨이 설정을 받는다.
    게이트웨이는 룸 단위 리소스이고 호스트는 그 리스너 속성이다(워크스페이스 정책 3.3).
    배포마다 받으면 같은 운영룸의 배포가 서로 다른 값을 넣었을 때 무엇을 쓸지 정할 수 없다.
    생성과 설정이 받는 값이 같아 같은 폼으로 처리한다 */
-let pcOpen=false, pcNew=false, PC={host:''};
+let pcOpen=false, pcNew=false, PC={host:''}, PCERR={};
+/* 운영룸 게이트웨이 설정 — 이 운영룸의 모든 배포에 같이 걸리는 리스너 값이다(워크스페이스 정책 3.4 · CON-1227).
+   저장하면 바로 적용되고 배포는 다시 기동하지 않는다. 시간 두 항목은 비우면 설치 기본값을 쓴다.
+   기본값 숫자를 화면에 고정하지 않는 것은 설치마다 값이 달라서다 */
+const GW_DEF={body:'50',h2:'8',idle:'',hdr:''};
+const GW_F=[
+  {k:'body',l:'최대 요청 크기',u:'MB',min:1,max:100,req:true,
+   tip:'요청 한 건의 본문으로 받을 수 있는 최대 크기입니다.',hint:'1~100MB. 기본 50MB입니다.'},
+  {k:'h2',l:'HTTP/2 창 크기',u:'MB',min:1,max:64,req:true,
+   tip:'HTTP/2 연결에서 상대의 확인을 기다리지 않고 한 번에 주고받을 수 있는 데이터 양입니다.',hint:'1~64MB. 기본 8MB입니다.'},
+  {k:'idle',l:'연결 유휴 시간',u:'초',min:1,max:86400,req:false,
+   tip:'요청이 오가지 않는 연결을 끊기까지 기다리는 시간입니다.',hint:'1~86,400초.'},
+  {k:'hdr',l:'요청 헤더 수신 시간',u:'초',min:1,max:600,req:false,
+   tip:'연결한 뒤 요청 헤더를 모두 받을 때까지 기다리는 시간입니다.',hint:'1~600초.'}
+];
+function gwOf(m){ return Object.assign({},GW_DEF,m.gw||{}); }
+function gwErr(f,v){
+  v=String(v).trim();
+  if(v==='') return f.req ? f.min.toLocaleString()+'~'+f.max.toLocaleString()+' 사이의 정수를 입력해 주세요.' : '';
+  if(!/^\d+$/.test(v) || +v<f.min || +v>f.max) return f.min.toLocaleString()+'~'+f.max.toLocaleString()+' 사이의 정수를 입력해 주세요.';
+  return '';
+}
 function openProdCfg(isNew){
   if(!cur) return;
-  pcNew=!!isNew; pcOpen=true;
-  /* 저장했으나 적용 전인 호스트가 있으면 그 값을 채운다. 사용자가 마지막에 정한 값이다(WKSP-L01 5.1) */
-  PC={host: isNew? '' : hostWanted(cur.m)};
+  pcNew=!!isNew; pcOpen=true; PCERR={};
+  /* 저장했으나 적용 전인 호스트가 있으면 그 값을 채운다. 사용자가 마지막에 정한 값이다(WKSP-L01 5.1).
+     게이트웨이 설정은 생성이면 기본값, 설정이면 지금 값으로 채운다(WKSP-L01 7.7) */
+  PC={host: isNew? '' : hostWanted(cur.m), gw: isNew? Object.assign({},GW_DEF) : gwOf(cur.m)};
   document.getElementById('pgRoom').style.display='none';
   document.getElementById('pgProdCfg').style.display='';
   drawProdCfg(); window.scrollTo(0,0);
@@ -3391,7 +3377,9 @@ function openProdCfg(isNew){
 function cancelProdCfg(){
   /* 입력값이 있으면 확인 알럿을 표시한다(공통정책 7.2) */
   const base = pcNew? '' : hostWanted(cur.m);
-  if(PC.host!==base){
+  const gbase = pcNew? GW_DEF : gwOf(cur.m);
+  const gchg = GW_F.some(function(f){ return String(PC.gw[f.k]).trim()!==String(gbase[f.k]); });
+  if(PC.host!==base || gchg){
     openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.',
       closeProdCfg, '취소', '계속 작성');
     return;
@@ -3407,12 +3395,20 @@ function closeProdCfg(){
 function submitProdCfg(){
   const m=cur.m;
   const nh=PC.host.trim();
+  /* 범위 밖은 인라인 에러로 알리고 첫 오류 필드로 포커스한다(공통정책 7.8) */
+  PCERR={};
+  GW_F.forEach(function(f){ const e=gwErr(f,PC.gw[f.k]); if(e) PCERR[f.k]=e; });
+  const bad=GW_F.filter(function(f){ return PCERR[f.k]; });
+  if(bad.length){ drawProdCfg(); const el=document.getElementById('gw_'+bad[0].k); if(el) el.focus(); return; }
+  const gw={}; GW_F.forEach(function(f){ gw[f.k]=String(PC.gw[f.k]).trim(); });
+  m.gw=gw;
   if(pcNew){
     m.host=nh;
     m.prod='생성 중';
     toast('ok','운영룸 생성을 요청했습니다. 준비가 끝나면 알림으로 안내됩니다.');
   } else {
-    /* 호스트 변경은 저장만 하고 다시 생성 때 적용한다(워크스페이스 정책 3.4 · 3.5).
+    /* 게이트웨이 설정은 위에서 바로 적용했다. 배포는 다시 기동하지 않는다(워크스페이스 정책 3.4).
+       호스트 변경은 저장만 하고 다시 생성 때 적용한다(워크스페이스 정책 3.4 · 3.5).
        적용하면 이 룸의 배포가 새 게이트웨이에 다시 연결되어 재시작 없는 수정 범위를 넘는다.
        적용 중인 값과 같아지면 대기를 지운다 */
     if(nh!==(m.host||'')) m.hostPending=nh; else delete m.hostPending;
@@ -3442,6 +3438,19 @@ function drawProdCfg(){
    +     '<div style="font-size:11.5px;color:var(--muted-foreground)">이 운영룸의 배포가 함께 쓰는 주소입니다. 요청 본문의 모델명으로 배포를 구분합니다.</div>'
    +   '</div>'
    + '</div></div>'
+   /* 게이트웨이 설정 — 생성과 설정 모두 같은 묶음이다. 생성은 기본값으로 채워 둔다(WKSP-L01 7.7) */
+   + '<div class="fsec"><h4>게이트웨이 설정</h4>'
+   + '<div class="hint" style="margin:-4px 0 12px">이 운영룸의 모든 배포에 같이 적용됩니다. 저장하면 바로 적용되며 배포는 다시 기동하지 않습니다.</div>'
+   + GW_F.map(function(f){
+       const err=PCERR[f.k]||'';
+       return '<div class="f"><label>'+f.l+' ('+f.u+')'+tip(f.tip,true)+'</label>'
+        + '<input class="inp'+(err?' err':'')+'" id="gw_'+f.k+'" inputmode="numeric" autocomplete="off" value="'+(PC.gw[f.k]||'')+'"'
+        +   (f.req? '' : ' placeholder="비우면 설치 기본값을 씁니다."')
+        +   ' oninput="PC.gw.'+f.k+'=this.value">'
+        + '<div class="hint">'+f.hint+'</div>'
+        + '<div class="errmsg'+(err?' show':'')+'">'+err+'</div></div>';
+     }).join('')
+   + '</div>'
    /* 자원 섹션을 두지 않는다 — 운영룸 자원은 정하는 값이 아니라
       워크스페이스 할당량에서 개발룸 몫을 뺀 결과다. 만든 뒤 운영룸 화면에서 본다 */
    + '<div class="formfoot">'
@@ -3610,7 +3619,10 @@ function drawDetail(){
    + roomFailAlert(m,'prod') + roomFailAlert(m,'dev')
    + (m.dev==='미생성'? alertBox('info','개발룸이 없습니다.',
        '개발룸을 만들면 멤버가 CDE를 신청할 수 있습니다. 할당한 자원만큼 운영룸 한도에서 옮겨집니다.',
-       canEditQuota()?'<button class="btn sm" onclick="act(\'개발룸 생성 화면으로 이동합니다.\')">개발룸 생성</button>':'', false) : '')
+       /* 만들 권한이 없으면 버튼 대신 요청 안내를 둔다. 같은 섹션의 운영룸 미생성과 같다(정책 3.3 · WKSP-L01 REQ-WKSP-026).
+          목록 카드는 훑는 자리라 상태만 둔다(roomBtn · 정책 3.5) */
+       canMakeRoom(m)?'<button class="btn sm" onclick="act(\'개발룸 생성 화면으로 이동합니다.\')">개발룸 생성</button>'
+         :'<p style="font-size:11.5px;color:var(--faint)">'+(isSysWs(m)?'최고 관리자':'워크스페이스 관리자')+'에게 개발룸 생성을 요청해 주세요.</p>', false) : '')
    + '<div class="tblwrap" style="border:0"><table class="tbl enter"><thead><tr><th>환경</th><th>상태</th><th>CPU</th><th>Memory</th><th>가속기</th><th>내역</th></tr></thead><tbody>'
    /* 개발룸 행은 룸 상태에 따라 진입을 가른다(워크스페이스 정책 3.5 상태별 제약 · WKSP-L01 3장·REQ-WKSP-026).
       조건은 카드 룸 버튼(roomBtn)과 같다 — 미생성은 생성 진입(워크스페이스 관리자 이상), 정상·오류는 진입.
@@ -3657,7 +3669,7 @@ function drawDetail(){
      액션이 걸리는 대상이 아니다 — 액션은 그 섹션 제목 옆에 둔다 */
   /* 탭 배지 — 그 건수가 탭을 열기 전 판단에 쓰일 때 둔다.
      멤버는 몇 명인지, 연동·API Key 는 걸려 있는 게 있는지가 판단 재료다 */
-  const TABCNT={'멤버':m.members.length, '연동':((m.hfToken||m.hfProxy)?1:0)+(m.byob?1:0), 'API Key':(m.keys||[]).length};
+  const TABCNT={'멤버':m.members.length, '연동':(m.hfToken?1:0)+(m.byob?1:0), 'API Key':(m.keys||[]).length};
   h+='<div class="wtabs">'
    + TABS.map((t,i)=>'<button class="'+(i===wTab?'on':'')+'" onclick="setWTab('+i+')">'+t
        +'<span class="cnt">'+(TABCNT[t]||0)+'</span></button>').join('')
@@ -3726,8 +3738,6 @@ function drawDetail(){
      + (canManageExt(m)?'<span class="secbtns"><button class="btn ghost sm" onclick="openConn()">연동 설정</button></span>':'')
      + '</h4><dl class="dl">'
      + '<dt>기본 URL</dt><dd>'+(m.hfUrl||'https://huggingface.co')+'</dd>'
-     /* 켜 두었으면 어디로 나가는지 보인다. `사용` 만으로는 확인이 안 된다 */
-   + '<dt>프록시</dt><dd>'+(m.hfProxy? (m.hfProxyAddr||'proxy.internal:3128') : '<span class="dash">사용 안 함</span>')+'</dd>'
      + '<dt>액세스 토큰'+tip('저장한 값은 다시 조회할 수 없습니다. 바꾸려면 새 토큰을 입력해 저장합니다.')+'</dt>'
      +   '<dd>'+(m.hfToken
          ? '<span class="stbadge ok">등록됨</span><span class="mver">'+(m.hfTokenAt||'')+'</span>'
@@ -3917,6 +3927,9 @@ function roomTab(m){
    /* 호스트명 · 호출 주소는 지금 적용 중인 값이다. 저장한 값은 따로 보인다(WKSP-L01 7.6) */
    + (m.hostPending!==undefined
       ? '<dt>적용 대기 호스트</dt><dd>'+(m.hostPending? m.hostPending : '<span class="dash">기본 도메인 사용</span>')+'</dd>' : '')
+   /* 게이트웨이 설정 값. 저장 즉시 적용되므로 적용 대기 행을 두지 않는다. 비운 시간 항목은 설치 기본값으로 보인다(WKSP-L01 7.6) */
+   + GW_F.map(function(f){ const v=gwOf(m)[f.k];
+       return '<dt>'+f.l+'</dt><dd>'+(v? Number(v).toLocaleString()+f.u : '<span class="dash">설치 기본값</span>')+'</dd>'; }).join('')
    + '</dl></div>';
   h+='<div class="dsec"><h4>자원 현황'
    +   tip(noQuota
@@ -5090,7 +5103,8 @@ function openKey(){
   document.getElementById('kNameErr').classList.remove('show'); document.getElementById('kName').classList.remove('err');
   document.getElementById('kScopeErr').classList.remove('show');
   ['kTok'].forEach(function(id){ document.getElementById(id).value=''; kLimShow(id,false); });
-  document.getElementById('kTokWin').value='분';
+  /* v0.68 · 기본 일당(WKSP-L01 7.10) */
+  document.getElementById('kTokWin').value='일';
   document.getElementById('kTokWin').disabled=true;
   setKeyType(); drawKScope(); kValid(); document.getElementById('mdKey').classList.add('on');
 }
@@ -5168,7 +5182,8 @@ function openKeyLim(name){
   lmKey=(cur.m.keys||[]).filter(function(k){ return k.n===name; })[0]; if(!lmKey) return;
   document.getElementById('lmDesc').textContent=name+'의 사용 한도를 수정합니다. 접근 허용 모델과 만료일은 바뀌지 않습니다.';
   document.getElementById('lmTok').value = lmKey.tok? String(lmKey.tok.n) : '';
-  document.getElementById('lmTokWin').value = lmKey.tok? lmKey.tok.win : '분';
+  /* v0.68 · 분당으로 저장된 키는 기준 시간을 비워 연다. 한도가 없던 키는 일당으로 채운다(WKSP-L01 7.10 · 7.11) */
+  document.getElementById('lmTokWin').value = lmKey.tok? (lmKey.tok.win==='분'? '' : lmKey.tok.win) : '일';
   ['lmTok'].forEach(function(id){ kLimShow(id,false); });
   lmToggleTok();
   lmInit=lmSnap(); lmValid();
@@ -5185,11 +5200,14 @@ function lmInput(id){
   lmValid();
 }
 function lmValid(){
-  document.getElementById('lmSubmit').disabled = lmSnap()===lmInit;
+  const lw=document.getElementById('lmTokWin').value, ltk=document.getElementById('lmTok').value.trim();
+  /* v0.68 · 토큰 수가 있는데 기준 시간이 비면(분당 키) 저장할 수 없다 */
+  document.getElementById('lmSubmit').disabled = lmSnap()===lmInit || (ltk!=='' && lw==='');
+  document.getElementById('lmLegacyHint').style.display = (lmKey && lmKey.tok && lmKey.tok.win==='분' && ltk!=='' && lw==='')? '' : 'none';
   /* 기준 시간을 바꾸면 새 구간부터 다시 센다. 토큰 한도가 있던 키에서 기준 시간만 다를 때 안내한다(WKSP-L01 7.11) */
   const tk=document.getElementById('lmTok').value.trim();
   document.getElementById('lmWinHint').style.display =
-    (lmKey && lmKey.tok && tk && document.getElementById('lmTokWin').value!==lmKey.tok.win)? '' : 'none';
+    (lmKey && lmKey.tok && tk && document.getElementById('lmTokWin').value!=='' && document.getElementById('lmTokWin').value!==lmKey.tok.win)? '' : 'none';
 }
 function submitKeyLim(){
   const bad=['lmTok'].filter(function(id){ const b=kLimBad(id); kLimShow(id,b); return b; });
@@ -5385,21 +5403,6 @@ let cnInit={};
    상태와 변경·삭제 버튼을 두어 무엇을 하는지 명시한다.
    빈 입력란을 두면 그대로 저장했을 때 지워지는지 유지되는지 알 수 없다 */
 let cnTokTouched=false, cnTokEdit=false;
-/* 저장된 프록시 비밀번호도 되돌려 주지 않는다. 액세스 토큰과 같은 규격이다 */
-let cnPwEdit=false, cnPwTouched=false;
-function cnPwMode(on){ cnPwEdit=on; cnPwTouched=false; drawCnPw(); cnChanged(); }
-function cnPwDel(){ cur.m.proxyPw=false; cnPwEdit=false; drawCnPw(); cnChanged(); }
-function drawCnPw(){
-  const box=document.getElementById('cnPwBox');
-  if(!box || !cur) return;
-  const has=!!cur.m.proxyPw;
-  box.innerHTML = (has && !cnPwEdit)
-    ? '<div class="credbox"><span class="stbadge ok">등록됨</span>'
-      + '<span class="credact"><button class="btn ghost sm" onclick="cnPwMode(true)">변경</button>'
-      + '<button class="btn danger-line sm" onclick="cnPwDel()">삭제</button></span></div>'
-    : '<input class="inp" type="password" placeholder="선택 입력" oninput="cnPwTouched=true;cnChanged()">'
-      + (has? '<div class="hint">새 비밀번호를 입력하면 기존 값이 바뀝니다. <button class="lnk" onclick="cnPwMode(false)">변경 취소</button></div>' : '');
-}
 function drawCnTok(){
   const box=document.getElementById('cnTokBox'); if(!box || !cur) return;
   const has=!!cur.m.hfToken;
@@ -5430,7 +5433,7 @@ function runSync(btn, fn){
 function nowStr(){ const d=new Date(); const p=function(n){return String(n).padStart(2,'0');};
   return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
 /* 전용 S3 를 켜면 엔드포인트 URL·버킷·액세스 키·시크릿 키를 받는다(정책 2.4 · CON-492).
-   시크릿 키는 되돌려 받지 않는다 — 등록돼 있으면 `등록됨` 배지와 `변경` 만 둔다(프록시 비밀번호와 같은 규격) */
+   시크릿 키는 되돌려 받지 않는다 — 등록돼 있으면 `등록됨` 배지와 `변경` 만 둔다(액세스 토큰과 같은 규격) */
 let byobInit=false, bySecEdit=false;
 function openByob(){
   const m=cur.m, c=m.s3||{};
@@ -5577,35 +5580,19 @@ function openConn(){
   cnTokTouched=false; cnTokEdit=false;
   const m=cur.m;
   document.getElementById('cnUrl').value = m.hfUrl||'https://huggingface.co';
-  drawCnTok(); cnPwEdit=false; cnPwTouched=false; drawCnPw();
-  document.getElementById('cnProxy').checked = !!m.hfProxy;
-  cnToggle('proxy', !!m.hfProxy);
-  cnInit={u:document.getElementById('cnUrl').value, p:!!m.hfProxy, pw:!!m.proxyPw};
+  drawCnTok();
+  cnInit={u:document.getElementById('cnUrl').value};
   document.getElementById('cnSubmit').disabled=true;
   document.getElementById('mdConn').classList.add('on');
 }
 function closeConn(){ document.getElementById('mdConn').classList.remove('on'); }
-function cnToggle(kind,val){
-  if(kind!=='proxy') return;
-  const cb=document.getElementById('cnProxy');
-  if(typeof val==='boolean') cb.checked=val; else cb.checked=!cb.checked;
-  document.getElementById('cnProxyCard').classList.toggle('on', cb.checked);
-  document.getElementById('cnProxyWrap').style.display = cb.checked?'':'none';
-  cnChanged();
-}
 function cnChanged(){
   const changed = document.getElementById('cnUrl').value!==cnInit.u
-    || document.getElementById('cnProxy').checked!==cnInit.p
-    || (function(){ const e=document.getElementById('cnTok'); return !!(e&&e.value); })()
-    || cnPwTouched || cnPwEdit || (cnInit.pw!==!!(cur&&cur.m.proxyPw));
+    || (function(){ const e=document.getElementById('cnTok'); return !!(e&&e.value); })();
   document.getElementById('cnSubmit').disabled=!changed;
 }
 function submitConn(){
   cur.m.hfUrl=document.getElementById('cnUrl').value;
-  cur.m.hfProxy=document.getElementById('cnProxy').checked;
-  /* 프록시 비밀번호도 값을 저장하지 않고 등록 여부만 남긴다 */
-  const pw=document.querySelector('#cnPwBox input');
-  if(pw && pw.value) cur.m.proxyPw=true;
   /* 저장한 값은 다시 조회할 수 없다. 등록 여부와 일시만 남긴다.
      비우고 저장하면 등록을 해제한다 */
   const el=document.getElementById('cnTok');
