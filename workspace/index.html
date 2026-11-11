@@ -3,6 +3,11 @@
 
   ── v0.68 (2026-11-11) ──
   · WKSP-L01 v0.68 · 워크스페이스 정책 v0.69 와 같은 버전이다.
+  · 주석의 네임스페이스 이름 규칙을 정책에 맞췄다. 운영룸 {접두}{slug}-prod · 개발룸 {접두}{slug}-dev(워크스페이스 정책 2.2 · CON-1200).
+    화면에는 네임스페이스를 보이지 않아 화면 변경은 없다.
+  · 헤더 필터를 고르는 즉시 목록에 반영한다. [확인] 버튼을 뺐다. [초기화] 는 그 열의 조건을 푼다(공통정책 3.2).
+    컴포넌트 라이브러리 v0.25 가 확인 버튼 방식이라 이 화면도 따랐는데, 공통정책 3.2 는 「필터 입력 시 즉시 목록을 갱신」이고
+    내 작업함 · 사용자 및 역할 · 감사 · 모니터링 등 다른 화면도 즉시 반영이다. 라이브러리 v0.26 에서 같이 맞췄다.
   · Hugging Face 연동에서 프록시를 뺐다(워크스페이스 정책 8.1 · WKSP-L01 7.8). 연동 설정 모달의 프록시 사용 · 서버 · 포트 ·
     인증 계정 · 인증 비밀번호 · 연결 확인과 상세 연동 영역의 프록시 줄을 지웠다. 폐쇄망은 기본 URL 에 내부 미러 주소를 넣는다.
   · 운영룸 생성 · 설정에 게이트웨이 설정 묶음을 더했다. 최대 요청 크기(1~100MB, 기본 50) · HTTP/2 창 크기(1~64MB, 기본 8) ·
@@ -2503,7 +2508,7 @@ const EXT_ON=false;
    근거 조항이 달라(6.1 저장소 · 6.1 관리자 겸임) 함수를 남겨 둔다 */
 const canManageStorage=(m)=>canAdminWs(m);
 /* 워크스페이스명은 생성 뒤 바꾸지 않는다. 일반 · 공용 모두다(정책 2.2 · 2.4 · 6.1).
-   슬러그가 이름에서 만들어져 네임스페이스 {slug} · {slug}-dev 로 쓰여, 이름만 바꾸면
+   슬러그가 이름에서 만들어져 네임스페이스 {접두}{slug}-prod · {접두}{slug}-dev 로 쓰여, 이름만 바꾸면
    화면의 이름과 네임스페이스가 갈린다. 생성 폼은 이 함수를 쓰지 않는다 */
 const canEditName =()=>false;
 /* 룸 생성·삭제·설정은 워크스페이스 관리자가 한다 */
@@ -2645,8 +2650,7 @@ function thFilter(k){
     + '<label><input type="checkbox" '+(on.length===0?'checked':'')+' onchange="fPickAll(\''+k+'\')">전체<span class="fc">'+list.length+'</span></label><hr>'
     + opts.map(o=>'<label><input type="checkbox" '+((ftmp[k]||on).includes(o)?'checked':'')+' onchange="fTmp(\''+k+'\',\''+o+'\')">'+o
         +'<span class="fc">'+list.filter(m=>m[k]===o).length+'</span></label>').join('')
-    + '<hr><div class="fbtns"><button onclick="fReset(\''+k+'\')">초기화</button>'
-    + '<button class="pri" onclick="fApply(\''+k+'\')">확인</button></div></div>';
+    + '<hr><div class="fbtns"><button onclick="fReset(\''+k+'\')">초기화</button></div></div>';
 }
 function thHelp(k,label){
   const def=COLDEF[k];
@@ -2656,15 +2660,18 @@ function thHelp(k,label){
 function tgFdd(e,k){e.stopPropagation();const th=e.target.closest('th');const o=th.classList.contains('fdd-on');
   document.querySelectorAll('th').forEach(x=>x.classList.remove('fdd-on'));
   if(!o){ ftmp[k]=(fsel[k]||[]).slice(); th.classList.add('fdd-on'); }}
-function fTmp(k,v){ ftmp[k]=ftmp[k]||[];
+function fTmp0(k,v){ ftmp[k]=ftmp[k]||[];
   const i=ftmp[k].indexOf(v); i<0?ftmp[k].push(v):ftmp[k].splice(i,1);
   const th=document.querySelector('th.fdd-on'); if(th){const cb=th.querySelector('.fdd label input'); if(cb) cb.checked=ftmp[k].length===0;} }
-function fPickAll(k){ ftmp[k]=[]; const th=document.querySelector('th.fdd-on');
+function fPickAll0(k){ ftmp[k]=[]; const th=document.querySelector('th.fdd-on');
   if(th) th.querySelectorAll('.fdd label input').forEach((cb,i)=>cb.checked=(i===0)); }
 function fReset(k){ ftmp[k]=[]; fsel[k]=[]; syncCondClr(); document.querySelectorAll('th').forEach(x=>x.classList.remove('fdd-on')); render(); }
 function fApply(k){ const f=axis(k); const opts=f.opts.filter(o=>base().some(m=>m[k]===o));
   let v=(ftmp[k]||[]).slice(); if(v.length===opts.length) v=[];
   fsel[k]=v; syncCondClr(); document.querySelectorAll('th').forEach(x=>x.classList.remove('fdd-on')); render(); }
+/* 공통정책 3.2 — 고르는 즉시 목록에 반영한다. 선택 값을 고친 뒤 바로 적용한다 */
+function fTmp(k,v){ fTmp0(k,v); fApply(k); }
+function fPickAll(k){ fPickAll0(k); fApply(k); }
 document.addEventListener('click',()=>document.querySelectorAll('th').forEach(x=>x.classList.remove('fdd-on')));
 
 let sortKey='at', sortDir='desc';
