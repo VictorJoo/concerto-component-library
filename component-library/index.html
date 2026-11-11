@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>콘체르토 매니저 · 컴포넌트 라이브러리 (v0.25)</title>
 <!--
+  v0.25 추가 정정 (2026-11-11). 버전은 올리지 않는다
+    · 컬럼 헤더 필터를 고르는 즉시 반영으로 정정. 데모의 [확인] 버튼과 「조건은 확인 버튼을 눌러 적용」 문장을 뺐다. [초기화] 는 남긴다.
+      공통정책 3.2 는 「필터 입력 시 즉시 목록을 갱신하고, 전체 초기화를 제공한다」이고, 내 작업함 · 사용자 및 역할 · 감사 · 모니터링 · 알림 목업도 즉시 반영이다.
+      이 문장을 따랐던 배포 · 모델 · 워크스페이스 · 개발룸 목업도 같은 날 맞췄다. 토큰 · 색 값 변경은 없다.
   v0.25 (2026-10-28) 추가
     · 10-28 재검증 정정(3차). 폼 · 입력 요소 절 머리 문장을 공통정책 7.1 개정과 같게(등록/저장 활성 조건과 제출 시 검증은 7.1, 제출 시 첫 오류 필드 포커스 7.8).
       숫자 스테퍼 데모 `배분 가능` 에 단위를 붙이고 가속기 단위를 `장` 으로. 데모 문구 `선택해 주세요.` · `다시 시도해 주세요.` 띄어쓰기.
@@ -1411,7 +1415,7 @@ a{color:inherit;text-decoration:none}
           <label><input type="checkbox" checked>캐싱됨<span class="fc">5</span></label>
           <label><input type="checkbox">미캐싱<span class="fc">6</span></label>
           <label><input type="checkbox">캐싱 중<span class="fc">1</span></label>
-          <hr><div class="fbtns"><button>초기화</button><button class="pri">확인</button></div>
+          <hr><div class="fbtns"><button>초기화</button></div>
         </div>
       </div>
       <div style="margin-top:18px">
@@ -1423,7 +1427,7 @@ a{color:inherit;text-decoration:none}
           <button class="clr">조건 초기화</button>
         </div>
       </div>
-      <div class="note">필터가 걸린 열은 아이콘에 강조를 준다. 조건은 확인 버튼을 눌러 적용하며, 작업 완료 후에는 초기화한다.</div>
+      <div class="note">필터가 걸린 열은 아이콘에 강조를 준다. 값을 고르는 즉시 목록에 반영하고 확인 버튼을 두지 않는다. [초기화] 는 그 열의 조건을 푼다. 등록·수정·삭제 완료 후에는 초기화한다(공통정책 3.2 · 3.3).</div>
     </div>
   </section>
 
