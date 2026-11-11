@@ -1,6 +1,12 @@
 <!--
-  콘체르토 매니저 — 모델 화면 목업 v0.41 (2026-11-06)
+  콘체르토 매니저 — 모델 화면 목업 v0.42 (2026-11-11)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다.
+
+  ── v0.42 (2026-11-11) ──
+  · MODEL-L01 v0.42 · 모델 정책 v0.34 와 같은 버전이다.
+  · 전역 모델 삭제를 최고 관리자에게만 노출한다. 목록 행 더보기 · 패널 · 상세 헤더 · 버전 탭 메뉴가 같은 기준이다(canDel).
+    전에는 삭제가 뷰어만 아니면 보였다. 수정은 이미 최고 관리자만이었다(canEditBasic). 전역 모델은 모든 워크스페이스가 참조해
+    한 워크스페이스가 지울 수 없다(모델 정책 원칙 3 · 1.1 · 2.5 · 7장). 권한이라 비활성이 아니라 미노출이다(공통정책 7.10).
 
   ── v0.41 (2026-11-06) ──
   · MODEL-L01 v0.41 · 모델 정책 v0.33 과 같은 버전이다.
@@ -2063,7 +2069,7 @@ function render(){
         ? disTipIf('<button onclick="openCache(\''+m.n+'\')"'+(cacheWhy(m)?' disabled':'')+'>노드 캐싱</button>', cacheWhy(m))+cdelBtn(m,'askCdel(\''+m.n+'\',\''+m.v+'\')')+deployBtn(m)
         : disTipIf('<button onclick="build(\''+m.n+'\')"'+(bwhy?' disabled':'')+'>이미지 빌드</button>', bwhy));
       const act=canWrite()
-        ? '<td onclick="event.stopPropagation()"><div class="more" id="m'+(isA?'i':'w')+idx+'"><button class="morebtn" onclick="tgMore(event,\'m'+(isA?'i':'w')+idx+'\')">⋯</button><div class="rowmenu">'+menu+'<hr>'+disTipIf('<button class="d"'+(m.reg==='등록 중'?' disabled':' onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+','+(m._vcnt||1)+','+isA+')"')+'>삭제</button>', m.reg==='등록 중'? lock : '')+'</div></div></td>'
+        ? '<td onclick="event.stopPropagation()"><div class="more" id="m'+(isA?'i':'w')+idx+'"><button class="morebtn" onclick="tgMore(event,\'m'+(isA?'i':'w')+idx+'\')">⋯</button><div class="rowmenu">'+menu+(canDel(m)? '<hr>'+disTipIf('<button class="d"'+(m.reg==='등록 중'?' disabled':' onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+','+(m._vcnt||1)+','+isA+')"')+'>삭제</button>', m.reg==='등록 중'? lock : '') : '')+'</div></div></td>'
         : '<td></td>';
       const TDM={
         cnode:'<td class="num">'+cnCell(m)+'</td>', use:'<td>'+useCell(m)+'</td>', eng:'<td>'+m.eng+'</td>', gpu:'<td>'+m.gpu+'</td>',
@@ -2224,6 +2230,9 @@ function lockMsg(m){
 }
 /* 기본 정보 수정은 전역 모델이면 최고 관리자만 한다(모델 정책 1.1). 권한이라 미노출이다(7.10) */
 const canEditBasic=m=>canWrite() && (m.scope!=='전역' || isSuper());
+/* 전역 모델 삭제는 최고 관리자만(모델 정책 1.1 · 2.5 · 7장). 모든 워크스페이스가 참조해 한 워크스페이스가 지울 수 없다(원칙 3).
+   권한이라 미노출이다(공통정책 7.10). 목록 행 · 패널 · 상세 헤더 · 버전 탭이 같은 기준이다 */
+const canDel=m=>canWrite() && (m.scope!=='전역' || isSuper());
 
 function openPanel(i){
   document.body.classList.add('panel-on');
@@ -2242,6 +2251,7 @@ function openPanel(i){
   const plock=lockMsg(m), pe=document.getElementById('pnEditBtn'), pd=document.getElementById('pnDelBtn');
   pe.style.display=canEditBasic(m)?'':'none'; setDisTip(pe, canEditBasic(m)? plock : '');
   const pdl = m.reg==='등록 중'? plock : ''; setDisTip(pd, pdl);
+  pd.style.display=canDel(m)?'':'none'; if(pd.previousElementSibling&&pd.previousElementSibling.tagName==='HR') pd.previousElementSibling.style.display=canDel(m)?'':'none';
   const pab=document.getElementById('pnActBtn');
   pab.textContent=isA?'노드 캐싱':'이미지 빌드';
   /* 캐시 삭제는 캐싱됨인 이미지에만 둔다. 목록 행 메뉴와 같은 기준(v0.35) */
@@ -2420,7 +2430,7 @@ function drawDetail(){
      `삭제` 는 모델 전체에 걸리므로 화면 헤더, `수정` 은 기본 정보 카드에 걸리므로 그 제목 옆,
      `＋ 버전 추가` 는 버전 목록에 걸리므로 그 탭 줄 우측이다 */
   const dlock = vers.some(function(x){ return x.reg==='등록 중'; })? '지금은 등록 중 상태라 실행할 수 없습니다.' : '';
-  document.getElementById('dAct').innerHTML = canWrite()
+  document.getElementById('dAct').innerHTML = canDel(m)
     ? (dlock? '<span class="tip-anchor"><button class="btn danger-line" disabled>삭제</button><span class="tip">'+dlock+'</span></span>'
             : '<button class="btn danger-line" onclick="del(\''+m.n+'\','+(useOf(m)==='배포 중')+','+vers.length+','+isA+')">삭제</button>')
     : '';
@@ -2510,9 +2520,9 @@ function drawDetail(){
                + (isA? cdelBtn(v,'askCdel(\''+v.n+'\',\''+v.v+'\')') : '')
                + (isA? deployBtn(v) : '')
                /* 배포에 쓰이는 버전은 삭제할 수 없다(정책 2.5). 등록 중인 버전도 삭제하지 않는다(정책 3.5) */
-               + '<hr>'+disTipIf('<button class="d"'+(v.use==='배포 중'||v.reg==='등록 중'?' disabled':'')
+               + (canDel(m)? '<hr>'+disTipIf('<button class="d"'+(v.use==='배포 중'||v.reg==='등록 중'?' disabled':'')
                + ' onclick="delVer(\''+v.v+'\')">삭제</button>',
-                  v.use==='배포 중'? '배포에 사용 중인 버전은 삭제할 수 없습니다.' : v.reg==='등록 중'? '지금은 등록 중 상태라 실행할 수 없습니다.' : '')
+                  v.use==='배포 중'? '배포에 사용 중인 버전은 삭제할 수 없습니다.' : v.reg==='등록 중'? '지금은 등록 중 상태라 실행할 수 없습니다.' : '') : '')
                + '</div></div>' : '')+'</td></tr>';
        }).join('')
      + '</tbody></table></div>';
