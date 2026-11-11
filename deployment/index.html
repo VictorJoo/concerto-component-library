@@ -4,6 +4,9 @@
 
   ── 변경 ────────────────────────────────────────
   ── v0.45 (2026-11-11) ──
+  · 헤더 필터를 고르는 즉시 목록에 반영한다. [확인] 버튼을 뺐다. [초기화] 는 그 열의 조건을 푼다(공통정책 3.2).
+    컴포넌트 라이브러리 v0.25 가 확인 버튼 방식이었고 이 화면도 따랐는데, 공통정책 3.2 는 「필터 입력 시 즉시 목록을 갱신」이고
+    내 작업함 · 사용자 및 역할 · 감사 · 모니터링 등 다른 화면도 즉시 반영이다. 라이브러리 v0.25 도 같은 날 같이 정정했다.
   · DEP-L01 v0.45 · 배포 정책 v0.34 와 같은 버전이다.
   · 03 게이트웨이 고급 설정에서 최대 요청 크기를 뺐다. 응답 대기 시간만 남는다. 최대 요청 크기는 운영룸 게이트웨이 설정에서 정한다
     (워크스페이스 정책 3.4 · DEP-L01 7.3 · CON-1227). 고급 설정 표시 개수와 작성 중 확인도 같이 정리했다.
@@ -2912,8 +2915,7 @@ function thFilter(k){
        return '<label><input type="checkbox" '+((ftmp[k]||on).indexOf(o)>=0?'checked':'')+' onchange="fTmp(\''+k+'\',\''+o+'\')">'+o
         + '<span class="fc">'+list.filter(function(m){return m[k]===o;}).length+'</span></label>';
      }).join('')
-   + '<hr><div class="fbtns"><button onclick="fReset(\''+k+'\')">초기화</button>'
-   + '<button class="pri" onclick="fApply(\''+k+'\')">확인</button></div></div>';
+   + '<hr><div class="fbtns"><button onclick="fReset(\''+k+'\')">초기화</button></div></div>';
 }
 function thHelp(k,label){
   const def=COLDEF[k];
@@ -2925,15 +2927,18 @@ function tgFdd(e,k){
   document.querySelectorAll('th').forEach(function(x){x.classList.remove('fdd-on');});
   if(!o){ ftmp[k]=(fsel[k]||[]).slice(); th.classList.add('fdd-on'); }
 }
-function fTmp(k,v){ ftmp[k]=ftmp[k]||[];
+function fTmp0(k,v){ ftmp[k]=ftmp[k]||[];
   const i=ftmp[k].indexOf(v); if(i<0) ftmp[k].push(v); else ftmp[k].splice(i,1);
   const th=document.querySelector('th.fdd-on'); if(th){const cb=th.querySelector('.fdd label input'); if(cb) cb.checked=ftmp[k].length===0;} }
-function fPickAll(k){ ftmp[k]=[]; const th=document.querySelector('th.fdd-on');
+function fPickAll0(k){ ftmp[k]=[]; const th=document.querySelector('th.fdd-on');
   if(th) th.querySelectorAll('.fdd label input').forEach(function(cb,i){cb.checked=(i===0);}); }
 function fReset(k){ ftmp[k]=[]; fsel[k]=[]; document.querySelectorAll('th').forEach(function(x){x.classList.remove('fdd-on');}); render(); }
 function fApply(k){ const f=axis(k); const opts=f.opts.filter(function(o){return base().some(function(m){return m[k]===o;});});
   let v=(ftmp[k]||[]).slice(); if(v.length===opts.length) v=[];
   fsel[k]=v; document.querySelectorAll('th').forEach(function(x){x.classList.remove('fdd-on');}); render(); }
+/* 공통정책 3.2 — 고르는 즉시 목록에 반영한다. 선택 값을 고친 뒤 바로 적용한다 */
+function fTmp(k,v){ fTmp0(k,v); fApply(k); }
+function fPickAll(k){ fPickAll0(k); fApply(k); }
 document.addEventListener('click',function(){document.querySelectorAll('th').forEach(function(x){x.classList.remove('fdd-on');});});
 
 /* 정렬 기본값 — 최근 변경일시 내림차순(DEP-L01 REQ-DEP-006 · 7.1) */
