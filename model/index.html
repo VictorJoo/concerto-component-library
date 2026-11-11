@@ -4,6 +4,9 @@
 
   ── v0.42 (2026-11-11) ──
   · MODEL-L01 v0.42 · 모델 정책 v0.34 와 같은 버전이다.
+  · 헤더 필터를 고르는 즉시 목록에 반영한다. [확인] 버튼을 뺐다. [초기화] 는 그 열의 조건을 푼다(공통정책 3.2).
+    컴포넌트 라이브러리 v0.25 가 확인 버튼 방식이었고 이 화면도 따랐는데, 공통정책 3.2 는 「필터 입력 시 즉시 목록을 갱신」이고
+    내 작업함 · 사용자 및 역할 · 감사 · 모니터링 등 다른 화면도 즉시 반영이다. 라이브러리 v0.25 도 같은 날 같이 정정했다.
   · 전역 모델 삭제를 최고 관리자에게만 노출한다. 목록 행 더보기 · 패널 · 상세 헤더 · 버전 탭 메뉴가 같은 기준이다(canDel).
     전에는 삭제가 뷰어만 아니면 보였다. 수정은 이미 최고 관리자만이었다(canEditBasic). 전역 모델은 모든 워크스페이스가 참조해
     한 워크스페이스가 지울 수 없다(모델 정책 원칙 3 · 1.1 · 2.5 · 7장). 권한이라 비활성이 아니라 미노출이다(공통정책 7.10).
@@ -1917,8 +1920,7 @@ function thFilter(k){
     + '<label><input type="checkbox" '+(on.length===0?'checked':'')+' onchange="fPickAll(\''+k+'\')">전체<span class="fc">'+list.length+'</span></label><hr>'
     + opts.map(o=>'<label><input type="checkbox" '+((ftmp[k]||on).includes(o)?'checked':'')+' onchange="fTmp(\''+k+'\',\''+o+'\')">'+o
         +'<span class="fc">'+list.filter(m=>fval(m,k)===o).length+'</span></label>').join('')
-    + '<hr><div class="fbtns"><button onclick="fReset(\''+k+'\')">초기화</button>'
-    + '<button class="pri" onclick="fApply(\''+k+'\')">확인</button></div></div>';
+    + '<hr><div class="fbtns"><button onclick="fReset(\''+k+'\')">초기화</button></div></div>';
 }
 function thHelp(k,label){
   const def=COLDEF[k];
@@ -1930,10 +1932,10 @@ function tgPop(e,el){e.stopPropagation();const th=el.closest('th');const o=th.cl
 function tgFdd(e,k){e.stopPropagation();const th=e.target.closest('th');const o=th.classList.contains('fdd-on');
   document.querySelectorAll('th').forEach(x=>x.classList.remove('pop-on','fdd-on'));
   if(!o){ ftmp[k]=(fsel[k]||[]).slice(); th.classList.add('fdd-on'); }}
-function fTmp(k,v){ ftmp[k]=ftmp[k]||[];
+function fTmp0(k,v){ ftmp[k]=ftmp[k]||[];
   const i=ftmp[k].indexOf(v); i<0?ftmp[k].push(v):ftmp[k].splice(i,1);
   const th=document.querySelector('th.fdd-on'); if(th){const cb=th.querySelector('.fdd label input'); if(cb) cb.checked=ftmp[k].length===0;} }
-function fPickAll(k){ ftmp[k]=[]; const th=document.querySelector('th.fdd-on');
+function fPickAll0(k){ ftmp[k]=[]; const th=document.querySelector('th.fdd-on');
   if(th) th.querySelectorAll('.fdd label input').forEach((cb,i)=>cb.checked=(i===0)); }
 function fReset(k){ ftmp[k]=[]; fsel[k]=[]; document.querySelectorAll('th').forEach(x=>x.classList.remove('fdd-on')); render(); }
 function fApply(k){ const f=axis(k);
@@ -1941,6 +1943,9 @@ function fApply(k){ const f=axis(k);
   let v=(ftmp[k]||[]).slice();
   if(v.length===opts.length) v=[];
   fsel[k]=v; document.querySelectorAll('th').forEach(x=>x.classList.remove('fdd-on')); render(); }
+/* 공통정책 3.2 — 고르는 즉시 목록에 반영한다. 선택 값을 고친 뒤 바로 적용한다 */
+function fTmp(k,v){ fTmp0(k,v); fApply(k); }
+function fPickAll(k){ fPickAll0(k); fApply(k); }
 document.addEventListener('click',()=>document.querySelectorAll('th').forEach(x=>x.classList.remove('pop-on','fdd-on')));
 /* ===== 검색 (공통정책 3.3) — 통합 검색
    · 검색 대상 열: 모델명 · 경로·출처 · 등록자 · 태그
