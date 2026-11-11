@@ -1,8 +1,28 @@
 <!--
-  콘체르토 매니저 · 배포 화면 목업 v0.44 (2026-11-06)
+  콘체르토 매니저 · 배포 화면 목업 v0.45 (2026-11-11)
   색·컴포넌트 규격은 워크스페이스 목업 v0.33 를 그대로 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
 
   ── 변경 ────────────────────────────────────────
+  ── v0.45 (2026-11-11) ──
+  · DEP-L01 v0.45 · 배포 정책 v0.34 와 같은 버전이다.
+  · 03 게이트웨이 고급 설정에서 최대 요청 크기를 뺐다. 응답 대기 시간만 남는다. 최대 요청 크기는 운영룸 게이트웨이 설정에서 정한다
+    (워크스페이스 정책 3.4 · DEP-L01 7.3 · CON-1227). 고급 설정 표시 개수와 작성 중 확인도 같이 정리했다.
+  · 가속기 메모리 사용률을 퍼센트 10~99 정수로 바꿨다. 생성은 선택칸(0.80~0.95)에서 입력란으로, 설정 변경은 0.1~1.0 에서 10~99 로.
+    기본 90. 범위 밖은 `10~99 사이의 정수를 입력해 주세요.` 인라인 에러. 백엔드에는 0.10~0.99 소수로 보낸다(배포 정책 5.2 · DEP-L01 5.3 · 7.3 · 7.7).
+    도움말은 할당 메모리에 가중치가 올라가고 나머지가 KV 캐시라는 것, 가중치보다 크게 잡아야 한다는 것이다. 가중치 대비 검사는 백엔드에 없어 안내만 한다.
+  · 배포명 형식(영문 소문자·숫자·하이픈) 검증은 목업에 있던 것이다. 이번에 배포 정책 2.5 · DEP-L01 5.3 · 7.3 에 옮겨 적었다.
+  · 02 자원 고급 설정에 `노드 그룹` 선택을 두었다(배포 정책 4.7 · DEP-L01 7.3 · REQ-DEP-105).
+    기본은 선택 안 함이다. 고르지 않으면 모델 캐시가 있는 노드 그룹에 자동으로 배치된다.
+    고른 모델이 캐싱되지 않은 그룹은 비활성으로 두고, option 에 말풍선을 붙일 수 없어 사유를 선택칸 아래에 둔다.
+    가속기 공유 · 01 모델 선택과 같은 처리다(DEP-L01 5.3 · REQ-DEP-031). 사유 `모델이 캐싱되지 않은 노드 그룹은 고를 수 없습니다.`
+    모델을 바꿔 고른 그룹에 캐시가 없게 되면 선택 안 함으로 되돌리고 `고른 노드 그룹에 모델이 캐싱되어 있지 않아 선택 안 함으로 되돌렸습니다.` 를 둔다.
+    노드 그룹 목록과 모델별 캐시 그룹은 검토용 샘플이다(NODE_GROUPS · MODELS[].cg). 라벨이 없는 노드는 선택지에 두지 않는다.
+  · 04 검수 자원 섹션 · 패널 모델·자원 · 상세 스펙에 노드 그룹을 보인다. 고르지 않은 배포와 외부 배포는 - 다(DEP-L01 7.2).
+  · 설정 변경 재기동 필요 구간에 노드 그룹을 두었다(DEP-L01 7.7 · REQ-DEP-106). 지금 값을 채워 연다.
+  · 가속기를 개수로 할당하는 클러스터는 고속 네트워크 항목도 두지 않는다. 가속기 공유와 같은 조건이다(배포 정책 4.4 · DEP-L01 5.1 · 7.3).
+    데모 바 `개수 할당 클러스터` 로 확인한다.
+  · 설정 변경 재기동 없음 구간 안내를 `저장하면 모델 서버 재시작 없이 적용됩니다. 상태가 잠시 생성 중으로 보일 수 있습니다.` 로 바꿨다(DEP-L01 7.7 · 배포 정책 2.6 · CON-1156).
+
   ── v0.44 · 11-05 추가 ──
   · 운영룸 삭제 실패 사유를 `…운영룸 삭제에 실패해 배포할 수 없습니다.` 로 나눴다. 종전에는 삭제 중과 같은 `삭제하는 중이라` 였다(DEP-L01 5.3).
   · 11-04 판과 11-05 판을 게시 전에 한 판으로 합쳤다. DEP-L01 v0.44 · 배포 정책 v0.33 과 같은 버전이다. 아래 11-04 묶음과 이 묶음이 함께 v0.44 다.
@@ -2616,7 +2636,7 @@ function gpuTotal(ws){ const w=WSQ[ws]; return w? w.gpu : 0; }
 
 const MODELS=[
  {n:'llama-3.2-1b-instruct', v:'latest', cached:false},
- {n:'qwen3-32b',              v:'v3.6',   cached:true,  kind:'gpu'},
+ {n:'qwen3-32b',              v:'v3.6',   cached:true,  kind:'gpu', cg:['h200-a','h100-a']},
  {n:'k-exaone-236b-a23b-nvfp4a16', v:'1.0.0', cached:false, kind:'gpu'},
  {n:'qwen3-6-35b-a3b-fp8', v:'1.0.0', cached:true},
  {n:'qwen3-5-122b-a10b-gptq-int4', v:'1.0.0', cached:false, cs:'캐싱 중'},
@@ -2635,9 +2655,15 @@ const MODELS=[
 /* 가속기 목록은 ACCS 하나로 둔다. 목록용·마법사용으로 나눠 두었더니
    H200 이 한쪽에만 있어 이름을 못 찾고 `-` 로 나왔다 */
 
+/* v0.45 · 노드 그룹(배포 정책 4.7). 운영룸 클러스터의 노드 그룹이다. 검토용 샘플이다.
+   cg 는 모델이 캐싱된 노드 그룹이다. 캐싱된 모델에 cg 가 없으면 h200-a 에만 캐싱된 것으로 본다 */
+const NODE_GROUPS=['h200-a','h200-b','h100-a','rngd-a'];
+function modelCg(m){ return (m && m.cached)? (m.cg || (m.kind==='npu'? ['rngd-a'] : ['h200-a'])) : []; }
+const NG_DIS='모델이 캐싱되지 않은 노드 그룹은 고를 수 없습니다.';
+const NG_RESET='고른 노드 그룹에 모델이 캐싱되어 있지 않아 선택 안 함으로 되돌렸습니다.';
 const DEPS=[
  {n:'llama-3-2-1b-prod', ws:'ai-service-team', model:'llama-3.2-1b-instruct', mver:'latest',
-  type:'자체 배포', st:'정상', rep:2, tgt:2, acc:'nvidia-h200', gpu:1, topo:'단일',
+  type:'자체 배포', st:'정상', rep:2, tgt:2, acc:'nvidia-h200', gpu:1, topo:'단일', ng:'h200-a',
   owner:'성유진(yj.seong)', at:'2026-08-12 14:20:17', upd:'2026-08-12 17:20:34', health:'위험',
   reasons:[{sv:'위험',k:'첫 토큰 지연',v:'6.1초',th:'5초',ag:'레플리카별 p95 중 최댓값 · 최근 5분',t:'첫 토큰 지연 6.1초(위험 기준 5초)'},{sv:'위험',k:'가속기 사용률',v:'97%',th:'95%',ag:'최근 5분 평균',t:'가속기 사용률 97%(위험 기준 95%)'},{sv:'주의',k:'토큰당 지연',v:'240ms',th:'200ms',ag:'p99 · 최근 5분',t:'토큰당 지연 240ms(주의 기준 200ms)'}], missing:['KV 캐시 사용률','가속기 온도'],
   ep:'https://gw.ai-service.concerto.io/v1',
@@ -3167,6 +3193,8 @@ function openPanel(i){
     ['가속기', d.gpu
        ? accName(d.acc)+' <span class="mver" style="margin:0">레플리카당 '+d.gpu+'장 · '+accVram(d.acc)+'</span>'
        : '<span class="dash">-</span>'],
+    /* v0.45 · 노드 그룹. 고르지 않은 배포와 외부 배포는 -(DEP-L01 7.2) */
+    ['노드 그룹', (d.type!=='외부 배포' && d.ng)? d.ng : '<span class="dash">-</span>'],
     ['총 사용량', d.gpu && d.rep!==null
        ? (d.gpu*(d.tgt||d.rep))+'장'
        : '<span class="dash">-</span>'],
@@ -3575,6 +3603,7 @@ function dOverview(d){
        ['가속기', d.gpu
           ? accName(d.acc)+' <span class="mver" style="margin:0">레플리카당 '+d.gpu+'장 · '+accVram(d.acc)+'</span>'
           : '<span class="dash">-</span>'],
+       ['노드 그룹', (d.type!=='외부 배포' && d.ng)? d.ng : '<span class="dash">-</span>'],
        /* 전체 점유량 — 없으면 화면에서 곱셈을 해야 한다 */
        ['총 사용량', d.gpu && d.rep!==null
           ? (d.gpu*(d.tgt||d.rep))+'장 <span class="mver" style="margin:0">레플리카 '+(d.tgt||d.rep)+'개 × '+d.gpu+'장</span>'
@@ -4012,7 +4041,7 @@ function newWF(){
     model:'qwen3-32b', mver:'v3.6',
     topo:'single',                    // single | pd
     /* 차트 model.args 의 명시 필드다. extraArgs 목록과 다른 층이라 따로 받는다 */
-    maxLen:'128K', gpuUtil:'0.90',
+    maxLen:'128K', gpuUtil:'90',
     /* 고급 — 엔진 인자. TUI 카탈로그 기준(vLLM v0.17.x).
        범위가 차트 값 전체로 넓어지면 목록만 늘리면 된다 */
     args:{},
@@ -4027,13 +4056,15 @@ function newWF(){
     rep:'2', gpu:'1',                 // 단일 · 디코드 풀
     preRep:'2', preGpu:'1',           // 프리필 풀
     rdma:false,
+    /* v0.45 · 노드 그룹. 빈 값이 선택 안 함이다(배포 정책 4.7) */
+    ng:'', ngNote:false,
     /* 03 게이트웨이 */
     name:'', nameChecked:false, ws:'',
     host:'', tls:false, auth:'true',
     /* v0.36 · 키 없는 요청 분당 한도. 인증을 끌 때만 쓴다(배포 정책 5.5 · CON-866 9항) */
     anon:'600',
     limit:false, limitReq:'600', limitUnit:'분',
-    timeout:'60초', maxBody:'50',
+    timeout:'60초',
     /* 04 검수 */
     obs:true
   };
@@ -4279,6 +4310,10 @@ function wApplyReq(){
      MPS 를 벗어나면 가속기 메모리 사용률을 처음 값으로 채운다. 빈 채로 두면 선택칸이 값 없이 열린다 */
   if(WF.share!=='none' && (CL_ALLOC!=='dra' || !accShareOk(WF.acc))) WF.share='none';
   if(WF.share==='mps'){ WF.topo='single'; WF.rep='1'; WF.gpu='1'; WF.gpuUtil=''; }
+  /* v0.45 · 개수 할당 클러스터는 고속 네트워크를 두지 않는다(배포 정책 4.4) */
+  if(CL_ALLOC!=='dra') WF.rdma=false;
+  /* v0.45 · 고른 노드 그룹에 모델 캐시가 없으면 선택 안 함으로 되돌리고 사유를 남긴다(DEP-L01 5.3 · REQ-DEP-105) */
+  if(WF.ng && modelCg(m).indexOf(WF.ng)<0){ WF.ng=''; WF.ngNote=true; }
   else if(WF.gpuUtil==='') WF.gpuUtil=newWF().gpuUtil;
 }
 
@@ -4397,10 +4432,10 @@ function wDirty(){
   const b=newWF();
   /* newWF 가 정하는 키를 모두 본다. 목록을 따로 두면 필드를 늘릴 때 빠뜨린다 */
   for(const k of ['model','mver','topo','maxLen','gpuUtil','scorer','share','tsInt','mpsComp','mpsMem','alloc','acc',
-                  'rep','gpu','preRep','preGpu','rdma',
+                  'rep','gpu','preRep','preGpu','rdma','ng',
                   'name','ws','tls','auth','anon',
                   'limit','limitReq','limitUnit',
-                  'timeout','maxBody','obs']){
+                  'timeout','obs']){
     if(String(WF[k])!==String(b[k])) return true;
   }
   if(Object.keys(WF.args||{}).some(function(k){ return String(WF.args[k]).trim()!==''; })) return true;
@@ -4416,7 +4451,8 @@ function wQuit(){
   backToList();
 }
 
-function wSet(k,v){ WF[k]=v; if(k==='model'||k==='acc'||k==='share') wApplyReq(); drawWiz(); }
+function wSet(k,v){
+  if(k==='ng') WF.ngNote=false; WF[k]=v; if(k==='model'||k==='acc'||k==='share') wApplyReq(); drawWiz(); }
 function wSetQuiet(k,v){ WF[k]=v; wRefreshFoot(); }
 function wBlur(k){ wShown[k]=true; drawWiz(); }
 function wTgAdv(k){ wAdv[k]=!wAdv[k]; drawWiz(); }
@@ -4427,6 +4463,9 @@ function wTgAdv(k){ wAdv[k]=!wAdv[k]; drawWiz(); }
 function wErrs(){
   const e=[];
   if(!WF.model) e.push({step:0, f:'model', m:'모델을 선택해 주세요.'});
+  /* v0.45 · 가속기 메모리 사용률은 10~99 정수(DEP-L01 5.3 · 배포 정책 5.2). Furiosa-LLM · MPS 는 항목이 없어 보지 않는다 */
+  if(!wFuriosa() && WF.share!=='mps' && !(/^\d+$/.test(String(WF.gpuUtil).trim()) && +WF.gpuUtil>=10 && +WF.gpuUtil<=99))
+    e.push({step:0, f:'gpuUtil', m:'10~99 사이의 정수를 입력해 주세요.'});
 
   if(!WF.acc) e.push({step:1, f:'acc', m:'가속기 종류를 선택해 주세요.'});
   const rep=parseInt(WF.rep), gpu=parseInt(WF.gpu);
@@ -4510,8 +4549,8 @@ function drawWiz(){
 const WADV={0:'고급 설정', 1:'고급 설정', 2:'고급 설정'};
 function wAdvCount(i){
   if(i===0) return argCount();
-  if(i===1) return (WF.scorer!=='prefix-cache' ? 1 : 0) + (WF.share!=='none' ? 1 : 0);
-  if(i===2) return (WF.timeout!=='60초'?1:0) + (WF.maxBody!=='50'?1:0);
+  if(i===1) return (WF.scorer!=='prefix-cache' ? 1 : 0) + (WF.share!=='none' ? 1 : 0) + (WF.ng ? 1 : 0);
+  if(i===2) return (WF.timeout!=='60초'?1:0);
   return 0;
 }
 function wPane(){
@@ -4722,9 +4761,11 @@ function paneModelAdv(){
           : '한 번에 처리할 토큰 수입니다.')
    /* v0.40 · Furiosa-LLM 배포에는 가속기 메모리 사용률을 두지 않는다(배포 정책 5.3) */
    /* v0.43 · 가속기 공유가 MPS 여도 두지 않는다. 메모리 지분이 대신 정한다(배포 정책 4.6 · DEP-L01 7.3) */
+   /* v0.45 · 퍼센트 10~99 정수로 받는다. 생성과 설정 변경이 같다. 백엔드에는 0.10~0.99 소수로 보낸다(DEP-L01 7.3 · 배포 정책 5.2) */
    +   (fur || WF.share==='mps' ? '' : fld('가속기 메모리 사용률','gpuUtil',
-        selBox('gpuUtil',['0.80','0.85','0.90','0.95'],WF.gpuUtil),
-        '높이면 더 많은 요청을 담지만 남는 메모리가 줄어듭니다.'))
+        '<span class="stfield">'+inp('gpuUtil','value="'+WF.gpuUtil+'" inputmode="numeric" style="width:90px"'
+          +' oninput="wSetQuiet(\'gpuUtil\',this.value)" onblur="wBlur(\'gpuUtil\')"')+'<span class="stunit">%</span></span>',
+        '할당한 가속기 메모리에 모델 가중치가 올라가고, 나머지는 KV 캐시로 쓰입니다. 모델 가중치보다 크게 잡아 주세요. 10~99 사이로 지정합니다.'))
    + '</div>'
    + '<h4 class="advsub">엔진 인자</h4>'
    + (fur
@@ -4749,7 +4790,7 @@ function lockVal(k){
   switch(k){
     case '--model': return WF.model || '-';
     case '--max-model-len': return WF.maxLen || '-';
-    case '--gpu-memory-utilization': return WF.gpuUtil || '-';
+    case '--gpu-memory-utilization': return WF.gpuUtil? (Number(WF.gpuUtil)/100).toFixed(2) : '-';
 
     case '--tensor-parallel-size': return WF.gpu || '-';
 
@@ -4855,7 +4896,8 @@ function paneRes(){
       고속 네트워크는 이와 별개로 고를 수 있는 네트워크 옵션이라 남긴다 */
    /* 켜고 끄는 값이라 카드가 과하다. 세그먼트로 두고 설명은 아래 한 줄에.
       고른 것에 따라 문구가 바뀌어 앞선 선택과 이어진다 */
-   + '<div class="fsec"><h4>고속 네트워크</h4>'
+   /* v0.45 · 개수 할당 클러스터는 고속 네트워크를 두지 않는다(배포 정책 4.4 · DEP-L01 7.3) */
+   + (CL_ALLOC!=='dra'? '' : '<div class="fsec"><h4>고속 네트워크</h4>'
    +   '<div class="segrow"><div class="segmented">'
    +     '<button class="'+(String(WF.rdma)==='true'?'on':'')+'" onclick="wSet(\'rdma\',\'true\')">사용</button>'
    +     '<button class="'+(String(WF.rdma)!=='true'?'on':'')+'" onclick="wSet(\'rdma\',\'false\')">사용 안 함</button>'
@@ -4864,7 +4906,7 @@ function paneRes(){
        ? (pd ? '풀 사이 KV 캐시 전송에 씁니다. 지금 구성에서 효과가 큽니다.'
              : '노드 간 전송에 씁니다. 분리 배치에서 효과가 큽니다.')
        : '일반 네트워크로 전송합니다.')+'</p>'
-   + '</div>'
+   + '</div>')
 
    + '<div class="pools">'
    +   (pd? poolBlock('프리필 풀','preRep','preGpu','프롬프트를 분석해 KV 캐시를 만듭니다.') : '')
@@ -5008,7 +5050,18 @@ function paneResAdv(){
         ], WF.scorer),
         '요청을 어느 레플리카로 보낼지 정하는 기준입니다.')
    +   shareFields()
+   +   ngField()
    + '</div>';
+}
+/* v0.45 · 노드 그룹(배포 정책 4.7 · DEP-L01 7.3 · REQ-DEP-105). 기본 선택 안 함.
+   모델이 캐싱되지 않은 그룹은 비활성으로 두고 option 에 말풍선을 붙일 수 없어 사유를 선택칸 아래에 둔다(가속기 공유와 같은 처리) */
+function ngField(){
+  const cg=modelCg(wModelOf());
+  return fld('노드 그룹'+tip('배포할 노드를 노드 그룹으로 좁힙니다. 고르면 레플리카가 그 그룹의 노드에만 배치됩니다. 고르지 않으면 모델 캐시가 있는 노드 그룹에 자동으로 배치됩니다.'),'ng',
+      selBox('ng',[{v:'',t:'선택 안 함'}].concat(NODE_GROUPS.map(function(g){
+        return {v:g, t:g, dis: cg.indexOf(g)<0};
+      })), WF.ng),
+      WF.ngNote? NG_RESET : (NODE_GROUPS.some(function(g){ return cg.indexOf(g)<0; })? NG_DIS : ''));
 }
 /* v0.43 · 가속기 공유(배포 정책 4.6 · DEP-L01 7.3 · REQ-DEP-100~102).
    개수 할당 클러스터는 항목을 두지 않는다. 공유할 수 없는 가속기는 시분할 · MPS 를 비활성으로 두고 option 에 말풍선을 붙일 수 없어 사유를 선택칸 아래에 둔다.
@@ -5036,7 +5089,8 @@ function paneGwAdv(){
    + '<div class="fgrid">'
    +   fld('응답 대기 시간','timeout', selBox('timeout',['60초','120초','300초'],WF.timeout),
         '이 시간을 넘으면 요청이 끊깁니다.')
-   +   fld('최대 요청 크기','maxBody', step('maxBody',WF.maxBody,'MB',1,100,50), '')
+ /* 최대 요청 크기는 운영룸 게이트웨이 설정으로 옮겼다. 운영룸마다 게이트웨이가 하나라
+    배포마다 받은 값을 적용할 자리가 없다(워크스페이스 정책 3.4 · CON-1227) */
    + '</div>';
 }
 
@@ -5133,6 +5187,9 @@ function paneReview(){
          WF.model+' · '+(WF.topo==='pd'?'프리필·디코드 분리':'단일'),
          row('모델', WF.model+' <span class="mver">('+WF.mver+')</span>')
        + row('서빙 방식', WF.topo==='pd'?'프리필·디코드 분리':'단일')
+       /* v0.45 · 가속기 메모리 사용률 오류는 다른 입력 오류처럼 그 자리에 문구를 둔다. 오류가 없으면 줄을 두지 않는다(아래 주석) */
+       + (wErrOf('gpuUtil') || errs.some(function(x){ return x.f==='gpuUtil'; })
+          ? row('가속기 메모리 사용률', '<span class="rvmsg">'+(errs.find(function(x){ return x.f==='gpuUtil'; })||{}).m+'</span>', true) : '')
        /* 최대 컨텍스트 길이·가속기 메모리 사용률은 엔진 인자로 옮겼다.
           설정했으면 고급 설정 요약에 나온다 — 여기서 또 쓰지 않는다 */
        + advRows())
@@ -5145,6 +5202,8 @@ function paneReview(){
             + row('디코드 풀', WF.rep+'개 · 레플리카당 '+WF.gpu+'장')
           : row('서빙 풀', WF.rep+'개 · 레플리카당 '+WF.gpu+'장'))
        + (CL_ALLOC==='dra'? row('가속기 공유', sh[0], sh[1]) : '')
+       /* v0.45 · 노드 그룹(배포 정책 4.7) */
+       + row('노드 그룹', WF.ng || '선택 안 함')
        + row('총 사용량', '<b>'+wTotalGpu()+'장</b>'))
    +   sec(2,'게이트웨이',
          (WF.name||'배포명 없음')+' · https://'+(prodHost() || 'gw.concerto.okestro.io')+'/v1',
@@ -5221,7 +5280,7 @@ function demoDeployRej(){
   toast('ok','검토용: 마지막 단계에서 배포를 누르면 거절됩니다.');
 }
 /* v0.43 · 검토용 처리. 실제 화면에는 없다.
-   클러스터 할당 방식을 바꾸고 생성 02 자원 고급 설정을 연다. 개수 할당이면 가속기 공유 항목이 없다(배포 정책 4.6) */
+   클러스터 할당 방식을 바꾸고 생성 02 자원 고급 설정을 연다. 개수 할당이면 가속기 공유 · 고속 네트워크 항목이 없다(배포 정책 4.4 · 4.6) */
 function setClAlloc(v,btn){
   CL_ALLOC=v;
   document.querySelectorAll('#demoBar .ca').forEach(function(b){ b.classList.toggle('on', b===btn || (!btn && b.textContent.indexOf(v==='dra'?'DRA':'개수')===0)); });
@@ -5585,7 +5644,7 @@ function cfgDef(d){
     rep: String(d.tgt||1),
     /* ⚠ CPU · 메모리는 화면에서 받은 적이 없다 — TUI · 현행 생성 화면 어디에도 없다.
        추론 기본값도 근거가 없어 뺐다. 현행 Configure 모달 내용은 관측되지 않았다 */
-    maxLen: String(d.maxLen||''), gpuUtil: String(d.gpuUtil||'0.9'),
+    maxLen: String(d.maxLen||''), gpuUtil: String(d.gpuUtil||'90'),
     auth: d.auth!==false,
     /* v0.36 · 키 없는 요청 분당 한도(배포 정책 5.5 · CON-866 9항). 재기동 없음 구간이다 */
     anon: String(anonOf(d)),
@@ -5594,7 +5653,9 @@ function cfgDef(d){
     /* v0.40 · 지표 · 추적 수집. 재기동 필요 구간이다(배포 정책 2.6 · DEP-L01 7.7) */
     obs: !!d.obs,
     /* v0.43 · 가속기 공유. 없음 · 시분할 배포만 바꾼다. MPS 배포는 표시 전용이다(DEP-L01 7.7 · 배포 정책 2.6 · 4.6) */
-    share: (d.share && d.share.mode) || 'none', tsInt: (d.share && d.share.int) || 'long'
+    share: (d.share && d.share.mode) || 'none', tsInt: (d.share && d.share.int) || 'long',
+    /* v0.45 · 노드 그룹. 재기동 필요 구간이다(DEP-L01 7.7 · 배포 정책 2.6) */
+    ng: d.ng || ''
   };
 }
 /* 검토용: 저장 시 서버가 배포 조건으로 거절하는 경우. 실제 화면에는 없다 */
@@ -5624,7 +5685,7 @@ function cfgChg(){
   const o=cfgDef(cur.d);
   return {
     live: ['temp','topP','sysPrompt'].some(function(k){ return CFG[k]!==o[k]; }),
-    rest: ['rep','cpu','mem','maxLen','gpuUtil','obs','share','tsInt'].some(function(k){ return CFG[k]!==o[k]; }),
+    rest: ['rep','cpu','mem','maxLen','gpuUtil','obs','share','tsInt','ng'].some(function(k){ return CFG[k]!==o[k]; }),
     /* 인증은 재기동이 따르지 않는다. 끄던 것을 켜면 기존 호출이 막히므로 그때만 알린다 */
     /* v0.36 · 인증을 끈 채 한도만 바꿔도 저장할 수 있다. 재기동 판정(rest)에는 넣지 않는다 */
     auth: CFG.auth!==o.auth || (!CFG.auth && CFG.anon!==o.anon),
@@ -5686,7 +5747,7 @@ function drawCfg(){
    /* v0.40 · Furiosa-LLM 배포에는 가속기 메모리 사용률을 두지 않는다(배포 정책 5.3 · DEP-L01 7.7) */
    /* v0.43 · 가속기 공유가 MPS 인 배포도 두지 않는다. 메모리 지분이 대신 정한다(DEP-L01 7.7 · REQ-DEP-103) */
    + (depFuriosa(d) || depMps(d) ? ''
-      : cfgStep('gpuUtil','가속기 메모리 사용률','',0.1,1.0,0.1,'높이면 더 많은 요청을 담지만 남는 메모리가 줄어듭니다. 0.1~1.0 사이로 지정합니다.','id="cfgGpuUtil"',!!CFG.utilErr)
+      : cfgStep('gpuUtil','가속기 메모리 사용률','%',10,99,1,'할당한 가속기 메모리에 모델 가중치가 올라가고, 나머지는 KV 캐시로 쓰입니다. 모델 가중치보다 크게 잡아 주세요. 10~99 사이로 지정합니다.','id="cfgGpuUtil"',!!CFG.utilErr)
         + (CFG.utilErr? '<p class="ferr" style="text-align:right">'+CFG.utilErr+'</p>' : ''))
    + '</div>';
 
@@ -5721,6 +5782,23 @@ function drawCfg(){
      + '</div>';
   }
 
+  /* v0.45 · 노드 그룹. 재기동 필요 구간이다. 모델이 캐싱되지 않은 그룹은 고를 수 없다(DEP-L01 7.7 · REQ-DEP-106 · 5.3) */
+  if(d.type!=='외부 배포'){
+    const dm=MODELS.find(function(x){ return x.n===d.model; });
+    /* 이미 떠 있는 배포라 모델이 캐싱된 그룹이 하나 이상 있다. 샘플 모델 이름이 MODELS 와 다르면 h200-a 에 캐싱된 것으로 본다. 지금 그룹은 늘 고를 수 있다 */
+    const dcg=((dm && dm.cached)? modelCg(dm) : ['h200-a']).concat(d.ng? [d.ng] : []);
+    h+='<div class="cfggrp"><div class="gh"><h5>배치</h5><span class="gtag rst">재기동 필요</span></div>'
+     + '<div class="gd">저장하면 배포가 다시 기동됩니다.</div>'
+     + '<div class="cfgrow"><label>노드 그룹'+tip('고르면 레플리카가 그 그룹의 노드에만 배치됩니다. 고르지 않으면 모델 캐시가 있는 노드 그룹에 자동으로 배치됩니다.')+chgMark('ng')+'</label>'
+     +   '<select class="inp" style="width:auto" onchange="cSet(\'ng\',this.value)">'
+     +     '<option value=""'+(CFG.ng===''?' selected':'')+'>선택 안 함</option>'
+     +     NODE_GROUPS.map(function(g){ const ok=dcg.indexOf(g)>=0;
+             return '<option value="'+g+'"'+(CFG.ng===g?' selected':'')+(ok?'':' disabled')+'>'+g+'</option>'; }).join('')
+     +   '</select></div>'
+     + (NODE_GROUPS.some(function(g){ return dcg.indexOf(g)<0; })? '<div class="gd" style="margin:8px 0 0">'+NG_DIS+'</div>' : '')
+     + '</div>';
+  }
+
   /* 구간 순서는 재기동 필요 → 변경 불가 → 재기동 없음이다(DEP-L01 7.7).
      바꿀 수 없는 값도 자리를 둔다 — 없으면 어디서 바꾸는지 찾아 헤맨다 */
   h+='<div class="cfggrp"><div class="gh"><h5>병렬 처리</h5><span class="gtag">변경 불가</span></div>'
@@ -5737,7 +5815,8 @@ function drawCfg(){
   /* API Key 인증 — 재기동이 따르지 않아 용량·엔진 설정과 구간을 나눈다.
      `즉시 반영` 이라 쓰지 않는다. 저장을 눌러야 반영되는 것은 같다(배포 정책 2.6) */
   h+='<div class="cfggrp"><div class="gh"><h5>접근 설정</h5><span class="gtag">재기동 없음</span></div>'
-   + '<div class="gd">저장하면 바로 적용되며 배포는 다시 기동되지 않습니다.</div>'
+   /* v0.45 · 모델 서버는 다시 뜨지 않고 상태가 잠시 생성 중으로 보일 수 있다(DEP-L01 7.7 · 배포 정책 2.6 · CON-1156) */
+   + '<div class="gd">저장하면 모델 서버 재시작 없이 적용됩니다. 상태가 잠시 생성 중으로 보일 수 있습니다.</div>'
    + '<div class="cfgrow"><label>API Key 인증'+tip('끄면 키 없이 호출할 수 있고, 잘못된 키를 실은 요청은 거부합니다. API Key 사용 한도는 적용되지 않습니다.')+chgMark('auth')+'</label>'
    /* 생성 마법사 03과 같은 선택 상자다(DEP-L01 7.3 · 7.7) */
    +   '<select class="inp" style="width:auto" onchange="cSet(\'auth\',this.value===\'true\')">'
@@ -5791,8 +5870,9 @@ function submitCfg(){
   CFG.err = (ml && !(isInt(ml) && parseInt(ml,10)>=1)) ? '1 이상의 정수를 입력해 주세요.'
     : (q.ctx && ml && (parseInt(ml)||0)>q.ctx)
     ? '이 모델의 최대 컨텍스트 길이는 '+ctxN(q.ctx)+' 토큰입니다. '+ctxN(q.ctx)+' 이하로 입력해 주세요.' : '';
+  /* v0.45 · 10~99 정수(DEP-L01 7.7 · 배포 정책 5.2) */
   const gu=String(CFG.gpuUtil).trim(), guN=Number(gu);
-  CFG.utilErr = (!depFuriosa(d) && !depMps(d) && (gu==='' || isNaN(guN) || guN<0.1 || guN>1)) ? '0.1~1.0 사이의 값을 입력해 주세요.' : '';
+  CFG.utilErr = (!depFuriosa(d) && !depMps(d) && !(isInt(gu) && guN>=10 && guN<=99)) ? '10~99 사이의 정수를 입력해 주세요.' : '';
   CFG.anonErr = (!CFG.auth && !anonOk(CFG.anon)) ? '1~1,000,000 사이의 정수를 입력해 주세요.' : '';
   /* v0.44 · 허용 요청 수는 1 이상의 정수(DEP-L01 5.3) */
   CFG.limErr = !CFG.lim ? '' : (String(CFG.limReq==null?'':CFG.limReq).trim()==='' ? '값을 입력해 주세요.' : (!(isInt(CFG.limReq) && parseInt(CFG.limReq,10)>=1) ? '1 이상의 정수를 입력해 주세요.' : ''));
@@ -5824,6 +5904,7 @@ function submitCfg(){
     d.maxLen=CFG.maxLen; d.gpuUtil=CFG.gpuUtil; d.obs=CFG.obs;
     /* v0.43 · 없음 · 시분할 배포만 공유 설정을 바꾼다. MPS 배포는 그대로다 */
     if(!depMps(d)) d.share = CFG.share==='none'? null : {mode:'ts', int:CFG.tsInt};
+    d.ng = CFG.ng || '';
     /* 엔드포인트는 운영룸 호스트로 정해져 재기동해도 바뀌지 않는다(5.1). 최근 변경일시를 갱신한다(5.1) */
     d.st='생성 중'; d.rep=0; d.upd=nowStr();
     toast('ok','설정 변경을 요청했습니다. 다시 기동되면 알림으로 안내됩니다.');
