@@ -1,5 +1,11 @@
 <!--
-  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.36 (2026-11-11)
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.37 (2026-11-12)
+
+  ── v0.37 (2026-11-12) ──
+  · 패널이 열려 목록 폭이 줄면 덜 중요한 열부터 숨기던 처리를 뺐다. 열은 그대로 두고 표가 가로로 스크롤된다. 기획서 · 공통정책에 없는 목업 전용 처리였다(공통정책 4.2.4는 패널이 목록을 덮지 않는다는 것까지만 정한다).
+  · 개발룸 기획서 v0.37 · CDE 정책 v0.37 과 같은 버전이다.
+  · 작업 이력 목록과 작업 상세의 실행 시간 자리에 대기 순서를 둔다. 대기 중이면 `대기 N번째`, 순번이 오지 않으면 - (CON-753 · CDE 정책 4.5).
+    실행 시간 열 도움말을 새로 두고, 상태 도움말의 대기 설명에 가속기 종류별 선입선출을 밝혔다. 데모 대기 작업 job-20260821-01 에 2번째를 둔다(검토용 값).
 
   ── v0.36 (2026-11-11) ──
   · 개발룸 기획서 v0.36 · CDE 정책 v0.36 과 같은 버전이다.
@@ -1336,9 +1342,6 @@ table.tbl tr.need td{background:color-mix(in srgb,var(--destructive) 5%,transpar
 .cfggrp .gh .gtag.now{background:color-mix(in srgb,var(--success) 14%,transparent);color:var(--success)}
 .cfggrp .gh .gtag.rst{background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)}
 .cfggrp .gd{font-size:11.5px;color:var(--faint);line-height:1.55;margin-bottom:10px}
-.cfgrow{display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:center;padding:7px 0}
-.cfgrow label{font-size:12.5px;color:var(--foreground)}
-.cfgrow .chgd{font-size:10.5px;color:var(--warning);margin-left:6px}
 .rstwarn{display:flex;gap:9px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 9%,transparent);border-radius:9px;font-size:12px;line-height:1.6;color:var(--foreground);margin-top:14px}
 .rstwarn b{color:var(--warning)}
 
@@ -2410,7 +2413,7 @@ const JOBS = [
      실행 시간은 아직 없어 `-` 다(공통정책 1.7).
      ⚠ 표본 시점은 서로 맞추지 않았다. 이 대기 작업 뒤에 제출된 같은 종류 작업이 실행된 것으로 보이나, 실제로는
      같은 종류에 먼저 대기 중인 작업이 있으면 뒤 작업도 기다리고 제출 순서대로 실행된다(CDE 정책 4.5). 실제 화면에는 없는 검토용 배치다 */
-  {id:'job-20260821-01', at:'2026-08-21 08:40:11', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', tm:'lora', acc:'NVIDIA-H200', gpu:1, disk:40, dur:'-', st:'대기',
+  {id:'job-20260821-01', at:'2026-08-21 08:40:11', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', tm:'lora', acc:'NVIDIA-H200', gpu:1, disk:40, dur:'-', st:'대기', qp:2,
    chk:{r:'경고', why:'제출할 때 개발룸에 요청한 가속기 잔여가 부족해 대기 상태로 접수되었습니다.', cde:'CPU 8 Cores · Memory 32 Gi · NVIDIA-H200 1장', room:{n:'NVIDIA-H200', left:0, total:2, q:0}},
    mt:null, out:null},
   {id:'job-20260820-01', at:'2026-08-20 09:14:02', u:'성유진(yj.seong)', uid:'yj.seong', cde:'yj-jupyter-01', t:'train', tm:'lora', acc:'NVIDIA-H200', gpu:1, disk:50,  dur:'1시간 22분', st:'완료',
@@ -2448,6 +2451,13 @@ const JOBS = [
    out:{path:'/workspace/outputs/job-20260801-02/', size:'2.3 GB', kind:'safetensors'}}
 ];
 /* 중단됨은 실패와 가른다 — 실패는 시스템 사유이고 중단은 사람의 판단이다(기획서 5.1) */
+/* 대기 중이면 실행 시간 자리에 대기 순서를 둔다. 순번은 같은 워크스페이스에서 가속기 종류별로 1부터 센다.
+   순번이 오지 않으면(제출 직후 그 사이 실행이 시작된 경우 등) - 로 둔다(CDE 정책 4.5 · CON-753 2026-11-12).
+   대기 · 실행 중인 작업이 있으면 작업 이력과 작업 상세를 주기적으로 다시 불러온다(CDE 목록 자동 갱신과 같은 방식) */
+function runCell(j){
+  if(j.st==='대기') return j.qp? '대기 '+j.qp+'번째' : '<span class="dash">-</span>';
+  return j.dur!=='-'? j.dur : '<span class="dash">-</span>';
+}
 const JB={'대기':'mu','실행 중':'ac load','완료':'ok','실패':'cr','중단됨':'mu'};
 /* 작업 유형 원천값 train · eval · compile · data-import 를 화면 문구로 받는다(CON-527 2026-09-15 · 공통정책 7.9).
    목록에서는 텍스트로 둔다. 상태 배지가 이미 있어 배지를 더 두지 않는다(공통정책 1.9 · 기획서 5.1) */
@@ -3158,7 +3168,7 @@ function drawJobs(){
          /* 이름 → 상태 → 유형 → 담당자 순(공통정책 2.2). CDE 목록과 같은 순서다 */
          + '<th>작업 ID</th>'
          + '<th class="thcell">'+jFilter()+'</th>'
-         + '<th class="thcell">'+tFilter()+'</th><th>제출자</th><th>CDE</th><th>자원</th><th>실행 시간</th>'
+         + '<th class="thcell">'+tFilter()+'</th><th>제출자</th><th>CDE</th><th>자원</th><th class="thcell">'+thHelp('run','실행 시간')+'</th>'
          + '<th style="width:100px">로그</th>'
          + '</tr></thead><tbody>'
          + J.map(function(j,i){
@@ -3175,7 +3185,7 @@ function drawJobs(){
               /* concerto run 에 넘긴 값이다. 자원이 얼마나 물려 있는지 알아야
                  실행 중인 작업이 개발룸 몫을 얼마나 잡고 있는지 판단이 선다 */
               + '<td class="num">'+jobRes(j)+'</td>'
-              + '<td>'+(j.dur!=='-'? j.dur : '<span class="dash">-</span>')+'</td>'
+              + '<td>'+runCell(j)+'</td>'
               /* 할 수 있는 작업이 하나뿐이라 더보기 메뉴로 감싸지 않는다. 감싸면 두 번 눌러야 한다.
                  끝난 작업에만 로그가 남는다 — 끝나기 전에는 비활성 + 사유(logWhy).
                  작업 중단은 작업 상세 헤더에 둔다(기획서 7.4 · CDE 정책 4.5). 행에도 두면 액션이 둘이 되어
@@ -3748,7 +3758,7 @@ function drawJobDetail(){
     + '<dt>제출자</dt><dd>'+userRef(j.u)+'</dd>'
     + '<dt>CDE</dt><dd>'+(j.cde? j.cde : '<span class="dash">반납됨</span>')+'</dd>'
     + '<dt>제출일시</dt><dd>'+j.at+'</dd>'
-    + '<dt>실행 시간</dt><dd>'+(j.dur!=='-'? j.dur : '<span class="dash">-</span>')+'</dd>'
+    + '<dt>실행 시간</dt><dd>'+runCell(j)+'</dd>'
     + '<dt>자원</dt><dd>'+jobRes(j)+'</dd>'
     + (j.t==='train'? '' : '<dt></dt><dd></dd>')
     + '</dl>'
@@ -4675,11 +4685,13 @@ const COLDEF={
   exp:'사용 기간이 끝나는 날입니다. 이 날짜가 지나면 접속할 수 없습니다. 개인 볼륨은 회수 뒤 7일 동안 보존됩니다.',
   /* 배치 작업 상태 — 기술문서 6.2 Pending / Running / Succeeded / Failed */
   jst:'CDE 터미널에서 제출한 작업의 진행 단계입니다.<dl>'
-     +'<dt>대기</dt><dd>자원을 기다리고 있습니다.</dd>'
+     +'<dt>대기</dt><dd>자원이 확보될 때까지 기다리는 중입니다. 같은 가속기 종류에서 먼저 제출된 작업부터 실행됩니다.</dd>'
      +'<dt>실행 중</dt><dd>연산을 수행하고 있습니다.</dd>'
      +'<dt>완료</dt><dd>정상적으로 완료되었습니다.</dd>'
      +'<dt>실패</dt><dd>오류로 종료되었습니다. 로그에서 원인을 확인합니다.</dd>'
      +'<dt>중단됨</dt><dd>사용자가 중단했습니다.</dd></dl>',
+  /* 대기 중인 작업은 실행 시간 자리에 대기 순서를 둔다(CDE 정책 4.5 · CON-753 2026-11-12) */
+  run:'작업이 실행된 시간입니다. 대기 중이면 대기 순서를 표시합니다.',
   /* 항목 설명에 쓴다. 공유 정책은 사용자에게 알릴 내용이 아니다(라이브러리 툴팁 기준) */
   own:'CDE 를 구분하는 이름입니다. 시스템이 만들며 바꿀 수 없습니다.',
   /* 이 목록에 나오는 값만 설명한다. 승인 대기·반려·종료는 목록에서 빠져 있다.
@@ -4904,38 +4916,6 @@ setRole('super'); render();
   window.addEventListener('resize', sync);
 })();
 
-/* 패널이 열리면 목록 폭이 줄어든다. 열을 그대로 두면 오른쪽 열이 잘려 보이므로
-   덜 중요한 열부터 접는다(값은 패널에 다 있다). 폭이 다시 넓어지면 되돌린다.
-   접는 순서는 목록에서 판단에 덜 쓰이는 것부터다 — 자세한 값은 패널·상세에서 본다 */
-(function(){
-  const ORDER=['등록자','제출자','최소 vRAM','요구 가속기','엔진','캐싱 노드','용량','자원','워크스페이스','영역','실행 시간','표시 범위'];
-  function cols(t){
-    const ths=[...t.querySelectorAll('thead th')];
-    return ths.map((th,i)=>({i, name:th.innerText.replace(/[?▼▲\s]/g,'')}));
-  }
-  function setCol(t, idx, show){
-    t.querySelectorAll('thead th').forEach((th,i)=>{ if(i===idx) th.style.display = show?'':'none'; });
-    t.querySelectorAll('tbody tr').forEach(tr=>{ const td=tr.children[idx]; if(td) td.style.display = show?'':'none'; });
-  }
-  function fit(){
-    const wrap=document.querySelector('.tblwrap'); if(!wrap) return;
-    const t=wrap.querySelector('table'); if(!t) return;
-    const list=cols(t);
-    list.forEach(c=>setCol(t,c.i,true));
-    if(!document.body.classList.contains('panel-on')) return;
-    for(const nm of ORDER){
-      if(t.scrollWidth<=wrap.clientWidth) break;
-      const c=list.find(x=>x.name===nm.replace(/\s/g,''));
-      if(c) setCol(t,c.i,false);
-    }
-  }
-  window.fitPanelCols=fit;
-  new MutationObserver(function(muts){
-    if(muts.some(m=>m.target===document.body && m.attributeName==='class')) fit();
-    else if(muts.some(m=>m.type==='childList')) fit();
-  }).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class'],childList:true});
-  window.addEventListener('resize', fit);
-})();
 
 </script>
 </body></html>
