@@ -1,7 +1,17 @@
 <!--
-  콘체르토 매니저 — 모니터링 목업 v0.36 (2026-11-11)
+  콘체르토 매니저 — 모니터링 목업 v0.37 (2026-11-12)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다 —
   필요하면 라이브러리에 먼저 올리고 이력을 남긴 뒤 가져다 쓴다.
+
+  ── v0.37 (2026-11-12) ──────────────────────
+  · 알림 규칙 추가 · 수정 모달 [취소] 는 바로 닫는다. 모달 안에서는 확인 알럿을 띄우지 않는다(컴포넌트 라이브러리 · 공통정책 7.2 · 4.5).
+  · MON-L01 v0.37 · 모니터링 정책 v0.28 과 같은 버전이다.
+  · 배포 · 인프라 지표 카드, 인프라 추이 차트 범례, 저활용 건전성 사유, 알림 규칙 지표 이름의 `가속기 사용률` 을 `가속기 코어 사용률` 로 바꿨다.
+    값은 GPU · NPU 연산 코어 사용률이다. 메모리 쪽(VRAM 할당량 · KV 캐시 사용률)과 헷갈리지 않게 한다(모니터링 정책 5.1 · CON-1242).
+  · 개요 카드의 `가속기 사용률` 은 그대로 둔다. 쓰는 가속기 장 수의 비율이라 코어 사용률과 다른 값이다(MON-L01 7.4).
+  · 시스템 기본 규칙에 `GPU Xid 오류`(판정표 오류 등급 코드, 표준 등급, 심각도 오류)를 더해 5종으로. GPU 건전성은 슬롯에 따로 표시하지 않고 이 알림으로 확인한다(모니터링 정책 6.4).
+  · 알림 규칙 추가에서 스위처가 전체면 워크스페이스를 비워 두고 받는다. 첫 워크스페이스를 미리 고르지 않는다(MON-L01 7.3). 고르지 않고 저장하면 인라인 에러.
+  · 배포 상태에서 삭제 실패를 뺐다(배포 정책 v0.35). 확인 필요 항목은 지연 사유가 붙은 삭제 중을 위험으로 올린다(모니터링 정책 4.4).
 
   ── v0.36 (2026-11-11) ──────────────────────
   · MON-L01 v0.36 과 같은 버전이다.
@@ -93,7 +103,7 @@
   ── v0.31 (2026-10-29) ──────────────────────
   · 배포 성능 탭 인프라 차트 계열 정정(모니터링 정책 5.1 · MON-L01 REQ-MON-090). 둘째 계열을 VRAM에서 KV 캐시 사용률로.
     VRAM은 서빙 엔진이 기동할 때 미리 잡아 늘 높고 평평해 추이가 보이지 않는다(정책 5.2). VRAM은 카드로만 둔다.
-    KV 캐시 사용률은 서빙 엔진 지표지만 가속기 사용률과 같은 단위(%)라 한 축에서 연산과 메모리 부하를 함께 읽는다. 서빙 엔진 계층은 그대로다.
+    KV 캐시 사용률은 서빙 엔진 지표지만 가속기 코어 사용률과 같은 단위(%)라 한 축에서 연산과 메모리 부하를 함께 읽는다. 서빙 엔진 계층은 그대로다.
 
   ── v0.30 (2026-10-28) ──────────────────────
   · 10-28 VRAM 기준 재정정(6차, CON-963 · 모니터링 정책 6.4). 시스템 기본 규칙 VRAM은 배분받은 VRAM 대비 사용률이 90%를 넘는 상태가 1분 이어지면 오류다.
@@ -134,7 +144,7 @@
     위험 기준으로 쓰지 않고 판정 유형으로 계산한다. 오류 규칙 폼은 같은 범위에 주의 규칙이 있으면 이 값이 위험 기준이라고,
     없으면 이 값이 위험 기준이고 주의 기준은 거꾸로 계산한 값(초과형 절반, 여유형은 위험 기준에서 남은 여유를 2배로 잡은 지점)이라고 안내한다.
     주의 규칙 폼은 같은 범위 오류 규칙이 있으면 그 값을 위험 기준으로 안내한다.
-    주의까지만 판정하는 지표(가속기 사용률 · 대기 요청 · 선점)의 오류 규칙은 알림만 보낸다고, 오류 규칙만 있으면 주의 기준과 주의까지만 판정한다고 안내한다.
+    주의까지만 판정하는 지표(가속기 코어 사용률 · 대기 요청 · 선점)의 오류 규칙은 알림만 보낸다고, 오류 규칙만 있으면 주의 기준과 주의까지만 판정한다고 안내한다.
     여유형에서 거꾸로 계산한 주의 기준이 위험 기준의 절반보다 낮으면 절반으로 안내한다(위험 40%면 주의 20%). 위험 기준이 50% 이하면
     계산값이 0 이하가 되어 늘 주의가 되기 때문이다(정책 5.2).
   · 시스템 기본 규칙 템플릿 샘플의 `응답 지연 증가`(P99 2,000ms)를 `첫 토큰 지연 증가`(P95 3,000ms 주의)로 바꿨다(정책 6.4 · 10-27 결정).
@@ -252,7 +262,7 @@
   · 4.1 범위 데모의 건전성 점수 구간을 85/50 가안에서 모니터링 정책 5.2 판정 기준(잠정)의 점수 축(70 미만 주의 · 40 미만 위험)으로 맞췄다.
     4.0 범위는 지금처럼 서버 판정 라벨을 그대로 쓴다. 데모 배포 llama 의 점수를 82 에서 35 로 낮춰 위험 라벨과 맞췄다(사유 여러 개 데모).
   · 확인 필요 항목과 개요 배포 카드의 배포 기준을 배포 상태로 가른다(모니터링 정책 4.4 · depBad).
-    오류·생성 실패·삭제 실패·연결 불가는 위험, 정상은 건전성대로, 생성 중·유휴·중지됨·삭제 중·확인 불가는 올리지 않는다.
+    오류·생성 실패·연결 불가는 위험, 정상은 건전성대로, 생성 중·유휴·중지됨·삭제 중·확인 불가는 올리지 않는다.
     전에는 데모 라벨 값(유휴·중지됨)에 기대어 빠졌다. 서버는 중지된 배포를 위험으로 줄 수 있다.
   · 게이트웨이 처리량·에러율·요청 건수 도움말에 인증·한도로 거절된 요청은 세지 않는다고 밝혔다(모니터링 정책 5.1).
   · 건전성 판정 사유를 4.0 범위로 둔다(모니터링 정책 5.2 · REQ-MON-044). 사유의 값은 백엔드 판정값이 정본이다.
@@ -1300,13 +1310,7 @@ table.tbl tr.need td{background:color-mix(in srgb,var(--destructive) 5%,transpar
 .cfggrp .gh .gtag.rst{background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)}
 .cfggrp .gh .gtag{background:var(--muted);color:var(--muted-foreground)}
 .cfggrp .gh .gtag.now{background:color-mix(in srgb,var(--success) 14%,transparent);color:var(--success)}
-.cfgrow .sw{justify-self:end}
-.cfgrow .stepper{justify-self:end}
-.cfgrow .dash{font-size:12.5px}
 .cfggrp .gd{font-size:11.5px;color:var(--faint);line-height:1.55;margin-bottom:10px}
-.cfgrow{display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:center;padding:7px 0}
-.cfgrow label{font-size:12.5px;color:var(--foreground)}
-.cfgrow .chgd{font-size:10.5px;color:var(--warning);margin-left:6px}
 .rstwarn{display:flex;gap:9px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 9%,transparent);border-radius:9px;font-size:12px;line-height:1.6;color:var(--foreground);margin-top:14px}
 .rstwarn b{color:var(--warning)}
 
@@ -2828,7 +2832,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     <button class="ng" onclick="setGrpScale('many',this)">12개 · 노드 46대</button>
     <button class="ng" onclick="setGrpScale('none',this)">노드 그룹 없음(0~1개)</button></span>
   <!-- v0.28 새 상태로 바로 가기. 검토용 처리. 실제 화면에는 없다 -->
-  <span class="dgrp"><span class="demo-label">v0.28 확인:</span>
+  <span class="dgrp"><span class="demo-label">알림 규칙 · 성능:</span>
     <button onclick="demoMigDep()">MIG 배포 성능</button>
     <button onclick="demoMigSlot()">MIG 슬롯 펼침</button>
     <button onclick="demoDevSel()">가속기 모델 선택</button>
@@ -2839,9 +2843,9 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
     <button onclick="demoErrHint()">오류 규칙 안내</button>
     <button onclick="demoSrcLink()">기준 출처</button></span>
   <!-- v0.29 새 상태로 바로 가기. 검토용 처리. 실제 화면에는 없다 -->
-  <span class="dgrp"><span class="demo-label">v0.29 확인:</span>
+  <span class="dgrp"><span class="demo-label">Grafana:</span>
     <button onclick="demoGrafanaOff()">Grafana 비활성</button></span>
-  <span class="dgrp"><span class="demo-label">v0.32 확인: Grafana 열기 오류</span>
+  <span class="dgrp"><span class="demo-label">Grafana 열기 오류:</span>
     <button onclick="demoGrafanaErr('SERVING_DEPLOYMENT_NOT_FOUND')">배포 없음</button>
     <button onclick="demoGrafanaErr('SERVING_OBSERVABILITY_DISABLED')">수집 꺼짐</button>
     <button onclick="demoGrafanaErr('OBS_GRAFANA_NO_METRICS')">지표 없음</button>
@@ -3176,7 +3180,7 @@ const PERF={
        외부 배포도 같다. 도움말은 값의 출처에 따라 바뀐다 — 목업은 실측 문구만 둔다(BE accelerator_count_source live · registered · none) */
     {t:'가속기',        v:'4',    u:'장 · 실시간', fixed:true,  /* 값은 배포별 DEPM.infra 첫 칸 */
      d:'이 배포가 지금 점유하고 있는 장치 수입니다(실측).'},
-    {t:'가속기 사용률',  v:'58',   u:'% · 최근 1시간 평균', fixed:true, hk:'가속기 사용률',
+    {t:'가속기 코어 사용률',  v:'58',   u:'% · 최근 1시간 평균', fixed:true, hk:'가속기 코어 사용률',
      d:'가속기의 연산 코어가 쓰인 비율입니다.'},
     /* 사용률 없이 할당량만 둔다. 서빙 엔진이 메모리를 미리 잡아 사용률은 늘 높게 나온다(모니터링 정책 5.1 · 5.2) */
     {t:'VRAM 할당량',   v:'407',  u:'GB · 실시간', fixed:true,
@@ -3187,7 +3191,7 @@ const PERF={
      d:'이 배포가 쓰는 가속기의 소모 전력 합입니다.'}
   ]
 };
-/* 인사이트 칩을 붙이지 않은 지표 — 방향이 하나가 아니거나(가속기 사용률: 너무 낮아도
+/* 인사이트 칩을 붙이지 않은 지표 — 방향이 하나가 아니거나(가속기 코어 사용률: 너무 낮아도
    너무 높아도 문제) 절대량이라 보편적 기준을 세울 수 없다(VRAM 할당량·전력·처리량류).
    억지로 임계값을 넣느니 비워 두는 쪽을 택했다 */
 
@@ -3241,7 +3245,7 @@ const DEPM={
      사용자가 일부러 띄워 둔 배포라 확인 필요 항목에 올리지 않는다(정책 4.4). 점수는 4.1 범위 데모용으로 두되 라벨을 다시 뽑지 않는다.
      ⚠ 지표·점수는 검토용 데모다 */
   'gpt-oss-120b-symphony': {
-    score:12, label:'주의', reason:'UNDER_UTILIZATION', reasonText:'저활용 · 가속기 사용률 3%', why:'', todo:'',
+    score:12, label:'주의', reason:'UNDER_UTILIZATION', reasonText:'저활용 · 가속기 코어 사용률 3%', why:'', todo:'',
     /* 부하가 없으면 점수가 0 에 가깝다. 점수 조건은 부하가 있을 때만 걸고, 이 배포는 저활용 사유로 주의다(모니터링 정책 5.2) */
     items:['4','88','79','52','0'],
     /* 저활용 조건(최근 1시간 처리량 0 · 실행 중 요청 0)에 맞춘다(모니터링 정책 5.2). 요청이 없어 지연 값도 없다 */
@@ -3327,11 +3331,13 @@ let dep = DEPS[0].n;
    건전성 라벨(주의·위험) 하나로 기준을 통일한다 — `유휴`·`중지됨`은 의도된
    상태라 확인 필요가 아니다 */
 /* 확인 필요 항목의 배포 기준(모니터링 정책 4.4).
-   진행 중이거나 의도한 상태는 올리지 않는다. 생성 실패·삭제 실패·연결 불가는 조치할 실패 상태라 위험으로 올린다 */
+   진행 중이거나 의도한 상태는 올리지 않는다. 생성 실패·연결 불가는 조치할 실패 상태라 위험으로 올린다.
+   배포에는 삭제 실패가 없다. 지연 사유가 붙은 삭제 중을 같은 이유로 위험으로 올린다(모니터링 정책 4.4 · 배포 정책 2.7) */
 /* 확인 필요에 올리지 않는 배포 상태(모니터링 정책 4.4) */
 const NOPODS=['생성 중','유휴','중지됨','삭제 중','확인 불가'];
-const FAILST=['오류','생성 실패','삭제 실패','연결 불가'];
+const FAILST=['오류','생성 실패','연결 불가'];
 function depBad(d){
+  if(d.st==='삭제 중' && d.delay) return {sev:'위험', why:'자원 정리가 늦어지고 있습니다.'};
   if(NOPODS.indexOf(d.st)>=0) return null;
   if(FAILST.indexOf(d.st)>=0){ const m0=DEPM[d.n]; return {sev:'위험', why:(m0&&m0.why)||('배포가 '+d.st+' 상태입니다.')}; }
   const m=DEPM[d.n];
@@ -3500,7 +3506,7 @@ let RULES=[
   /* 시스템 기본 규칙의 원본. 공용 워크스페이스에 속한 전역 규칙이고 최고 관리자만 고친다(모니터링 정책 6.1 · 6.4). 시스템이 만들어 등록자가 없다.
      gid 는 원본과 복제본을 잇는 검토용 키다. 연결된 복제본(linked)은 원본의 임계값 · 연산자 · 심각도 · 채널을 따른다(정책 6.4).
      첫 규칙은 KV 캐시 사용률(1분 평균) 90% 초과 주의다. 서빙 엔진 · 가속기 계열(GPU · NPU) 구분 없이 같은 항목으로 평가한다(정책 6.4).
-     엔진별 VRAM 기본 규칙은 두지 않는다. 기본 규칙은 4종이다 */
+     엔진별 VRAM 기본 규칙은 두지 않는다. 기본 규칙은 5종이다(v0.37 GPU Xid 오류 추가) */
   {n:'KV 캐시 사용률 초과', metric:'kv_cache_usage_1m', op:'초과', th:90, dur:1, sev:'주의',
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g1'},
   {n:'첫 토큰 지연 증가', metric:'ttft_p95_ms', op:'초과', th:3000, dur:1, sev:'주의',
@@ -3509,6 +3515,10 @@ let RULES=[
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g3'},
   {n:'가속기 온도 주의', metric:'gpu_temp', op:'초과', th:80, dur:1, sev:'주의',
    ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g4'},
+  /* v0.37 · GPU 건전성은 슬롯에 따로 표시하지 않고 이 기본 규칙의 알림으로 확인한다(모니터링 정책 6.4 · MON-L01 댓글 2안 2026-11-12).
+     판정표에서 오류 등급인 코드를 표준 등급으로 알린다. 코드 목록은 백엔드 Xid 판정표를 따르고 아래 값은 검토용이다 */
+  {n:'GPU Xid 오류', metric:'gpu_xid', xids:[48,64,74,79,95,119], xmode:'표준 등급', dur:1, sev:'오류',
+   ws:'공용 워크스페이스', scope:'전체', ch:[], by:null, at:'2026-09-01 09:00:00', fires:[], gid:'g5'},
   /* ai-service-team 의 복제본. `첫 토큰 지연 증가` · `가속기 온도 주의` 는 연결되어 있다. `가속기 온도 오류` 복제본은 지웠다 —
      사용자 규칙 `가속기 온도 이상` 이 같은 범위 · 메트릭 · 심각도라 함께 둘 수 없다(정책 6.3 중복). 지운 복제본의 지표는 전역 규칙으로 판정한다(정책 6.4).
      `KV 캐시 사용률 초과` 복제본은 연결된 상태다. 같은 범위의 사용자 규칙 `KV 캐시 포화`(주의)는 직접 중지라 기본 규칙을 끄지 않는다(정책 6.4).
@@ -3555,7 +3565,7 @@ const PROFILES=['GPU','NPU','서빙 엔진','게이트웨이','노드'];
    건전성 반영 메트릭의 표준 임계값은 정책 5.2 기본 임계다. 이름은 화면 표기 검토용이다.
    NPU 열·전력 제한 발생은 건전성 반영(Furiosa) · `0 초과` 주의다(결정 사항 댓글 3493265556 알림 항목 표). 주의까지만 판정한다(모니터링 정책 5.2 표 밖의 판정) */
 const CATALOG=[
-  {k:'gpu_util',       p:'GPU',      t:'가속기 사용률',   u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room', nocrit:true},
+  {k:'gpu_util',       p:'GPU',      t:'가속기 코어 사용률',   u:'%',  sev:'주의', op:'초과', th:90,   on:true, hb:'room', nocrit:true},
   /* VRAM은 장치마다 메모리 크기가 달라 KV 캐시 지표를 내지 않는 엔진의 시스템 기본 규칙은 사용률(%)로 본다. 배분받은 VRAM 대비다(정책 6.4 · CON-963).
      사용량(GB)은 카탈로그에 남아 사용자가 직접 규칙을 만들 수 있다. 창은 `PCIe 재전송(1시간)` 처럼 이름 뒤 괄호로 적는다 */
   {k:'vram_pct',       p:'GPU',      t:'VRAM 사용률', u:'%', sev:'오류', op:'초과', th:90, on:true},
@@ -5147,7 +5157,7 @@ const XTICK={
 /* 지표마다 범위가 다르다. 사용률은 0~100 이 고정이고 처리량은 값에 따라 달라진다.
    최댓값을 안 보이면 선이 위로 붙었을 때 그것이 한계인지 아닌지 알 수 없다 */
 const YMAX={
-  '가속기 사용률':'100%', 'KV 캐시 사용률':'100%', '에러율':'100%',
+  '가속기 코어 사용률':'100%', 'KV 캐시 사용률':'100%', '에러율':'100%',
   '게이트웨이':'2,000 req/s', '서빙 엔진':'8,000 ms', '인프라':'100%'  /* v0.33 · 서빙 엔진 차트 계열이 TTFT · TPOT(ms)라 축도 ms. v0.31에 계열만 바꾸고 축을 tok/s로 둔 것을 고침 */
 };
 
@@ -5522,13 +5532,15 @@ function openRule(i){
   const opts=ruleWsOpts();
   RF={n:r.n, metric:r.metric, op:r.op||'초과', th:r.th==null?'':String(r.th), dur:String(r.dur), scope:r.scope, ch:r.ch.slice(),
       sev: r.sev || '주의', xids:(r.xids||[]).slice(), xmode:r.xmode||'표준 등급',
-      ws: r.ws || (wsCur==='전체'? (opts[0]||'') : wsCur), dupErr:false};
+      /* v0.37 · 스위처가 전체면 비워 두고 받는다. 미리 고르면 다른 워크스페이스에 규칙이 생길 수 있다(MON-L01 7.3 · 공통정책 7.8) */
+      ws: r.ws || (wsCur==='전체'? '' : wsCur), dupErr:false};
   document.getElementById('ruleTitle').textContent = i<0? '알림 규칙 추가' : '알림 규칙 수정';
   RF.shown=false; rfInit=rfSnap();
   drawRuleForm();
   document.getElementById('mdRule').classList.add('on');
 }
 function closeRule(){ document.getElementById('mdRule').classList.remove('on'); }
+/* 입력이 바뀌었으면 작성 취소를 확인받는다(공통정책 7.2 · 4.5) */
 
 function rfSet(k,v){
   RF[k]=v;
@@ -5796,7 +5808,7 @@ function drawRuleForm(){
             + '<div class="ro">'+RF.ws+'</div>'
             + '<div class="hint">만든 뒤에는 바꿀 수 없습니다.</div></div>'
           : '<div class="fld"><label>워크스페이스<span class="req">*</span></label>'
-            + selBox('ws', ruleWsOpts().map(function(w){ return {v:w, t:w}; }), RF.ws, !!rm.ws)
+            + selBox('ws', (RF.ws? [] : [{v:'',t:'선택해 주세요.'}]).concat(ruleWsOpts().map(function(w){ return {v:w, t:w}; })), RF.ws, !!rm.ws)
             + (rm.ws? '<p class="ferr">'+rm.ws+'</p>' : '')
             + '<div class="hint">고른 워크스페이스의 대상만 감시합니다.</div></div>')
     /* 대상 범위는 그 워크스페이스 안에서 전체인지 특정 배포인지다 —
