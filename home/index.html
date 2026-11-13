@@ -1,7 +1,11 @@
 <!doctype html>
 <!--
-  콘체르토 매니저 — 홈 목업 v0.19 (2026-11-06)
+  콘체르토 매니저 — 홈 목업 v0.20 (2026-11-12)
   색·컴포넌트 규격의 정본은 컴포넌트 라이브러리다. 이 파일에서 새 값을 만들지 않는다.
+
+  ── v0.20 (2026-11-12) ──
+  · HOME-L01 v0.20 과 같은 버전이다(CON-1228 · 알림 정책 5.4).
+  · 최근 알림 항목 제목을 한 줄 말줄임에서 줄바꿈으로 바꿨다. 제목 끝의 상태가 가려지지 않게 한다. 최근 알림 시각은 데모 문자열이라 절대 시각 표시는 알림 목업에서 본다.
 
   ── v0.19 (2026-11-06) ──
   · HOME-L01 v0.19 와 같은 버전이다(v0.18 은 목업 변경 없음).
@@ -239,8 +243,9 @@
   .noti-item.unread{border-left-color:var(--primary);background:var(--selected-soft)}
   .noti-item:last-child{border-bottom:0}
   .noti-r1{display:flex;align-items:center;gap:7px;margin-bottom:5px}
-  .noti-t{font-size:13px;font-weight:600;color:var(--foreground);flex:1;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  /* 제목은 한 줄로 자르지 않는다. 상태가 바뀐 사건은 바뀐 상태가 제목 끝에 와서 잘리면 뜻이 사라진다(알림 정책 5.4 · CON-1228) */
+  .noti-t{font-size:13px;font-weight:600;color:var(--foreground);flex:1;min-width:0;
+    overflow-wrap:anywhere}
   .noti-at{font-size:11.5px;color:var(--faint);flex:0 0 auto}
   .noti-b{font-size:12.5px;color:var(--muted-foreground);line-height:1.5;margin:0}
   /* 이동 대상 — 호버 전에는 흐리게 두고 호버하면 드러낸다 */
