@@ -1,6 +1,15 @@
 <!--
-  콘체르토 매니저 · 플랫폼 설정 | 보안 및 감사 목업 v0.21 (2026-11-11)
+  콘체르토 매니저 · 플랫폼 설정 | 보안 및 감사 목업 v0.22 (2026-11-12)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
+
+  ── v0.22 (2026-11-12) ──
+  · 알림 채널 등록 · 수정 모달 [취소] 는 바로 닫는다. 모달 안에서는 확인 알럿을 띄우지 않는다(컴포넌트 라이브러리 · 공통정책 7.2 · 4.5).
+  · 패널이 열려 목록 폭이 줄면 덜 중요한 열부터 숨기던 처리를 뺐다. 열은 그대로 두고 표가 가로로 스크롤된다. 기획서 · 공통정책에 없는 목업 전용 처리였다(공통정책 4.2.4는 패널이 목록을 덮지 않는다는 것까지만 정한다).
+  · SET-AUDIT-L01 v0.22 와 같은 버전이다.
+  · 감사로그 정책 v0.22 에서 늘어난 행위의 라벨을 더했다(결재 취소 · 워크스페이스 나가기 · API Key 발급 · 폐기 · 한도 수정 · 에이전트 키 재발급 · Hugging Face 연동 설정 변경 · 이미지 빌드 · 노드 캐싱 · 캐시 삭제 · 저장소 동기화 · 외부 배포 가져오기 · 등록 해제 · 벤치마크 실행 · 중단). 필터에서 보이게 데모 기록 네 건을 넣었다.
+  · 감사 로그 목록 둘째 열 머리글과 원본 모달 부제 라벨을 `작업` 에서 `작업 내역` 으로 바꿨다. 끝 열 `작업`([로그 보기] 자리, 공통정책 2.2 7번)과 머리글이 겹쳤다.
+    값(로그인 · 배포 생성 등)과 필터 묶음 이름 `작업` 은 그대로다. 용어집이 이 값을 작업이라 부른다(용어집 5장 대상 · 접속 IP).
+  · 같은 표 코드를 쓰는 플랫폼 설정 목업(통합본 · 카탈로그 · 인프라 자원 · 연동 및 알림)도 같은 줄을 함께 고쳤다. 그 파일들의 버전은 올리지 않는다.
 
   ── v0.21 (2026-11-11) ──
   · SET-AUDIT-L01 v0.21 과 같은 버전이다(v0.20 은 목업 변경 없음). 근거는 감사로그 정책 v0.21 3.3 WORKSPACE · 4.2.
@@ -46,7 +55,7 @@
     IMPORT_CDE_DATA)이다. 라벨은 정책 3.3 행위명 `배치 작업 제출·중단` · `데이터 반입` 을 나눠 옮겼다.
     화면 말 `중단` 은 CDE 정책 4.5 의 작업 동작 이름이다(백엔드 이름은 cancel).
   · 배치 작업 완료·실패는 기록하지 않는다(감사로그 정책 2.2). 작업값을 두지 않는다.
-  · 새 데모 기록 세 건의 행위자는 다른 데모 기록에 이미 쓰인 데모 사용자 김병건(bg.kim)으로 두었다.
+  · 새 데모 기록 세 건의 행위자는 다른 데모 기록에 이미 쓰인 데모 사용자로 두었다.
   · SSO 4종(`SSO 계정 연결` · `SSO 연결 거절` · `SSO 이메일 동기화` · `SSO 이메일 동기화 건너뜀`)은
     v0.15 에 이미 있다. 정책 3.3 행위명과 맞아 그대로 둔다.
 
@@ -1139,13 +1148,7 @@ table.tbl tr.need td{background:color-mix(in srgb,var(--destructive) 5%,transpar
 .cfggrp .gh .gtag.rst{background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)}
 .cfggrp .gh .gtag{background:var(--muted);color:var(--muted-foreground)}
 .cfggrp .gh .gtag.now{background:color-mix(in srgb,var(--success) 14%,transparent);color:var(--success)}
-.cfgrow .sw{justify-self:end}
-.cfgrow .stepper{justify-self:end}
-.cfgrow .dash{font-size:12.5px}
 .cfggrp .gd{font-size:11.5px;color:var(--faint);line-height:1.55;margin-bottom:10px}
-.cfgrow{display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:center;padding:7px 0}
-.cfgrow label{font-size:12.5px;color:var(--foreground)}
-.cfgrow .chgd{font-size:10.5px;color:var(--warning);margin-left:6px}
 .rstwarn{display:flex;gap:9px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 9%,transparent);border-radius:9px;font-size:12px;line-height:1.6;color:var(--foreground);margin-top:14px}
 .rstwarn b{color:var(--warning)}
 
@@ -2447,7 +2450,17 @@ const ACTKO={
   /* 알림 채널 수정 — 수신 대상 · 최소 심각도가 바뀌면 받는 사람이 달라진다(감사로그 정책 3.3 SYSTEM · SET-INTEG-L01 REQ-056).
      ⚠ 키 이름은 가안. 지금 구현은 채널 수정을 기록하지 않는다 */
   NOTIFICATION_CHANNEL_CREATED:'알림 채널 등록', NOTIFICATION_CHANNEL_UPDATED:'알림 채널 수정', NOTIFICATION_CHANNEL_DELETED:'알림 채널 삭제',
-  AUDIT_LOG_VIEWED:'감사 로그 조회', AUDIT_LOG_EXPORTED:'감사 로그 다운로드'
+  AUDIT_LOG_VIEWED:'감사 로그 조회', AUDIT_LOG_EXPORTED:'감사 로그 다운로드',
+  /* v0.22 · 감사로그 정책 v0.22 에서 늘어난 행위(3.3). 결재 취소는 위 결재 값과 같은 묶음이다.
+     ⚠ 키 이름은 가안. 백엔드 확인 대상 */
+  APPROVAL_CANCELED:'결재 취소',
+  WORKSPACE_MEMBER_LEFT:'워크스페이스 나가기',
+  API_KEY_CREATED:'API Key 발급', API_KEY_REVOKED:'API Key 폐기', API_KEY_LIMIT_UPDATED:'API Key 사용 한도 수정',
+  CDE_AGENT_KEY_REISSUED:'에이전트 키 재발급',
+  WORKSPACE_HF_UPDATED:'Hugging Face 연동 설정 변경',
+  MODEL_IMAGE_BUILT:'이미지 빌드', MODEL_CACHE_REQUESTED:'노드 캐싱', MODEL_CACHE_DELETED:'캐시 삭제', MODEL_REGISTRY_SYNCED:'저장소 동기화',
+  DEPLOYMENT_IMPORTED:'외부 배포 가져오기', DEPLOYMENT_UNREGISTERED:'외부 배포 등록 해제',
+  BENCHMARK_STARTED:'벤치마크 실행', BENCHMARK_STOPPED:'벤치마크 중단'
 };
 /* ⚠ 매핑에 없는 값은 원시값이 그대로 나온다. 현행 작업값 전수를 받아야 한다
    — 확인 요청 항목 10번 */
@@ -2484,6 +2497,12 @@ const AUDIT=[
   /* 운영룸 다시 생성 · 알림 채널 수정(v0.19). 비밀값은 전후를 남기지 않는다(정책 4.2) */
   {at:'2026-08-20 13:22:18', cat:'WORKSPACE', ip:'192.168.1.10', act:'ROOM_REISSUE', who:'bg.kim', name:'김병건', tgt:'ai-service-team 운영룸', d:'워크스페이스: ai-service-team\n다시 연결한 배포: 3'},
   /* 개발룸 · 운영룸 설정 변경(v0.21). 바뀐 항목만 전후를 남긴다(정책 4.2) */
+  /* v0.22 · 감사로그 정책 v0.22 에서 늘어난 행위를 필터에서 볼 수 있게 한 건씩 둔다. 실제 화면에는 없는 검토용 데이터다.
+     키 · 토큰 값은 남기지 않는다(감사로그 정책 4.2) */
+  {at:'2026-08-20 14:21:03', cat:'WORKSPACE', ip:'192.168.1.10', act:'API_KEY_LIMIT_UPDATED', who:'bg.kim', name:'김병건', tgt:'yj-jupyter-01 에이전트 키', d:'사용 한도: 시간당 3,000,000토큰 → 시간당 5,000,000토큰\n워크스페이스: ai-service-team'},
+  {at:'2026-08-20 14:18:40', cat:'WORKSPACE', ip:'192.168.1.10', act:'WORKSPACE_HF_UPDATED', who:'bg.kim', name:'김병건', tgt:'ai-service-team', d:'기본 URL: - → https://hf-mirror.okestro.com\n액세스 토큰: 등록'},
+  {at:'2026-08-20 13:52:11', cat:'MODEL', ip:'192.168.1.42', act:'MODEL_CACHE_DELETED', who:'yj.seong', name:'성유진', tgt:'gemma-4-12b-it:1.0.0', d:'-'},
+  {at:'2026-08-20 13:40:05', cat:'DEPLOYMENT', ip:'192.168.1.42', act:'BENCHMARK_STARTED', who:'yj.seong', name:'성유진', tgt:'llama-3-2-1b-prod', d:'-'},
   {at:'2026-08-20 14:05:37', cat:'WORKSPACE', ip:'192.168.1.10', act:'DEVROOM_UPDATED', who:'bg.kim', name:'김병건', tgt:'ai-service-team 운영룸', d:'최대 요청 크기: 50MB → 80MB\n연결 유휴 시간: - → 3600초\n워크스페이스: ai-service-team'},
   {at:'2026-08-20 13:40:51', cat:'SYSTEM', ip:'192.168.1.10', act:'NOTIFICATION_CHANNEL_UPDATED', who:'bg.kim', name:'김병건', tgt:'ops-webhook', d:'최소 심각도: 모두 → 오류만\n서명 키: 교체'},
   /* 노드 중지 · 재개. 메모를 적었으면 내용에 남고, 적지 않았으면 메모 항목을 두지 않는다(정책 4.2) */
@@ -3104,7 +3123,7 @@ function openRaw(i){
      대상은 원본에 있으므로 부제에 두지 않는다 — 어느 건인지 알아보는 자리다 */
   $('rawAt').innerHTML = '<dl class="dl two" style="margin-top:10px">'
    + '<dt>일시</dt><dd>'+r.at+'</dd>'
-   + '<dt>작업</dt><dd>'+actKo(r.act)+'</dd>'
+   + '<dt>작업 내역</dt><dd>'+actKo(r.act)+'</dd>'
    + '<dt>행위자</dt><dd>'+(actorRef(r))+'</dd>'
    + '<dt>카테고리</dt><dd>'+(CATKO[r.cat]||'<span class="dash">-</span>')+'</dd>'
    + '</dl>';
@@ -3159,7 +3178,7 @@ function audFilter(){
   const opts=Object.keys(ACTKO).filter(function(k){
     return AUDIT.some(function(r){return r.act===k;}); });
   const on = aSel.length || aCat.length;
-  return '<span class="thwrap">작업'
+  return '<span class="thwrap">작업 내역'
    + '<span class="thic" tabindex="0">?</span>'
    + '<button class="thfilter'+(on?' on':'')+'" onclick="tgFdd(event,\'act\')" title="필터">'
    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button></span>'
@@ -3616,6 +3635,8 @@ function delCh(i){
 
 function openCh(){ $('mdCh').classList.add('on'); }
 function closeCh(){ $('mdCh').classList.remove('on'); }
+/* 작성 취소 확인(공통정책 7.2). 연 때의 입력값과 지금 값을 견준다 */
+
 
 /* ══════════ 외부 연동 ══════════ */
 let eTab=0;
@@ -3919,38 +3940,6 @@ go('aud');
   window.addEventListener('resize', sync);
 })();
 
-/* 패널이 열리면 목록 폭이 줄어든다. 열을 그대로 두면 오른쪽 열이 잘려 보이므로
-   덜 중요한 열부터 접는다(값은 패널에 다 있다). 폭이 다시 넓어지면 되돌린다.
-   접는 순서는 목록에서 판단에 덜 쓰이는 것부터다 — 자세한 값은 패널·상세에서 본다 */
-(function(){
-  const ORDER=['등록자','제출자','최소 vRAM','요구 가속기','엔진','캐싱 노드','용량','자원','워크스페이스','영역','실행 시간','표시 범위'];
-  function cols(t){
-    const ths=[...t.querySelectorAll('thead th')];
-    return ths.map((th,i)=>({i, name:th.innerText.replace(/[?▼▲\s]/g,'')}));
-  }
-  function setCol(t, idx, show){
-    t.querySelectorAll('thead th').forEach((th,i)=>{ if(i===idx) th.style.display = show?'':'none'; });
-    t.querySelectorAll('tbody tr').forEach(tr=>{ const td=tr.children[idx]; if(td) td.style.display = show?'':'none'; });
-  }
-  function fit(){
-    const wrap=document.querySelector('.tblwrap'); if(!wrap) return;
-    const t=wrap.querySelector('table'); if(!t) return;
-    const list=cols(t);
-    list.forEach(c=>setCol(t,c.i,true));
-    if(!document.body.classList.contains('panel-on')) return;
-    for(const nm of ORDER){
-      if(t.scrollWidth<=wrap.clientWidth) break;
-      const c=list.find(x=>x.name===nm.replace(/\s/g,''));
-      if(c) setCol(t,c.i,false);
-    }
-  }
-  window.fitPanelCols=fit;
-  new MutationObserver(function(muts){
-    if(muts.some(m=>m.target===document.body && m.attributeName==='class')) fit();
-    else if(muts.some(m=>m.type==='childList')) fit();
-  }).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class'],childList:true});
-  window.addEventListener('resize', fit);
-})();
 
 </script>
 </body>
