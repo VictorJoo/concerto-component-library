@@ -1,5 +1,10 @@
 <!--
-  콘체르토 매니저 — 내 작업함 목업 v0.19 (2026-11-11)
+  콘체르토 매니저 — 내 작업함 목업 v0.20 (2026-11-12)
+
+  ── v0.20 (2026-11-12) ──
+  · 반려 사유 모달 [취소] 는 바로 닫는다. 모달 안에서는 확인 알럿을 띄우지 않는다(컴포넌트 라이브러리 · 공통정책 7.2 · 4.5).
+  · TASK-L01 v0.20 과 같은 버전이다(기획서 8장 검증 줄 정정은 목업 변경 없음).
+  · 패널이 열려 목록 폭이 줄면 덜 중요한 열부터 숨기던 처리를 뺐다. 열은 그대로 두고 표가 가로로 스크롤된다. 기획서 · 공통정책에 없는 목업 전용 처리였다(공통정책 4.2.4는 패널이 목록을 덮지 않는다는 것까지만 정한다).
 
   ── v0.19 (2026-11-11) ─────────────────────────────
      · TASK-L01 v0.19 와 같은 버전이다.
@@ -924,13 +929,7 @@ table.tbl tr.need td{background:color-mix(in srgb,var(--destructive) 5%,transpar
 .cfggrp .gh .gtag.rst{background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)}
 .cfggrp .gh .gtag{background:var(--muted);color:var(--muted-foreground)}
 .cfggrp .gh .gtag.now{background:color-mix(in srgb,var(--success) 14%,transparent);color:var(--success)}
-.cfgrow .sw{justify-self:end}
-.cfgrow .stepper{justify-self:end}
-.cfgrow .dash{font-size:12.5px}
 .cfggrp .gd{font-size:11.5px;color:var(--faint);line-height:1.55;margin-bottom:10px}
-.cfgrow{display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:center;padding:7px 0}
-.cfgrow label{font-size:12.5px;color:var(--foreground)}
-.cfgrow .chgd{font-size:10.5px;color:var(--warning);margin-left:6px}
 .rstwarn{display:flex;gap:9px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 9%,transparent);border-radius:9px;font-size:12px;line-height:1.6;color:var(--foreground);margin-top:14px}
 .rstwarn b{color:var(--warning)}
 
@@ -2792,6 +2791,7 @@ function rjErr(msg){
   $('rjBody').classList.toggle('err', !!msg);
 }
 function closeReject(){ $('mdReject').classList.remove('on'); }
+/* 반려 사유를 적었으면 작성 취소를 확인받는다(공통정책 7.2 · 4.5) */
 function submitReject(){
   const v=$('rjBody').value.trim();
   if(!v){ rjErr('반려 사유를 입력해 주세요.'); $('rjBody').focus(); return; }   /* 제출 시 검증(공통정책 7.8) */
@@ -2926,38 +2926,6 @@ drawList();
   window.addEventListener('resize', sync);
 })();
 
-/* 패널이 열리면 목록 폭이 줄어든다. 열을 그대로 두면 오른쪽 열이 잘려 보이므로
-   덜 중요한 열부터 접는다(값은 패널에 다 있다). 폭이 다시 넓어지면 되돌린다.
-   접는 순서는 목록에서 판단에 덜 쓰이는 것부터다 — 자세한 값은 패널·상세에서 본다 */
-(function(){
-  const ORDER=['등록자','제출자','최소 vRAM','요구 가속기','엔진','캐싱 노드','용량','자원','워크스페이스','영역','실행 시간','표시 범위'];
-  function cols(t){
-    const ths=[...t.querySelectorAll('thead th')];
-    return ths.map((th,i)=>({i, name:th.innerText.replace(/[?▼▲\s]/g,'')}));
-  }
-  function setCol(t, idx, show){
-    t.querySelectorAll('thead th').forEach((th,i)=>{ if(i===idx) th.style.display = show?'':'none'; });
-    t.querySelectorAll('tbody tr').forEach(tr=>{ const td=tr.children[idx]; if(td) td.style.display = show?'':'none'; });
-  }
-  function fit(){
-    const wrap=document.querySelector('.tblwrap'); if(!wrap) return;
-    const t=wrap.querySelector('table'); if(!t) return;
-    const list=cols(t);
-    list.forEach(c=>setCol(t,c.i,true));
-    if(!document.body.classList.contains('panel-on')) return;
-    for(const nm of ORDER){
-      if(t.scrollWidth<=wrap.clientWidth) break;
-      const c=list.find(x=>x.name===nm.replace(/\s/g,''));
-      if(c) setCol(t,c.i,false);
-    }
-  }
-  window.fitPanelCols=fit;
-  new MutationObserver(function(muts){
-    if(muts.some(m=>m.target===document.body && m.attributeName==='class')) fit();
-    else if(muts.some(m=>m.type==='childList')) fit();
-  }).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class'],childList:true});
-  window.addEventListener('resize', fit);
-})();
 
 </script>
 </body>
