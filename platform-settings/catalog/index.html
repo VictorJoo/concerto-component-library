@@ -2,6 +2,9 @@
   콘체르토 매니저 — 플랫폼 설정 | 카탈로그 목업 v0.13 (2026-10-28)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
 
+  ── v0.13 (2026-11-12). 버전은 올리지 않는다 ──
+  · 알림 채널 등록 · 수정 모달 [취소] 는 바로 닫는다. 모달 안에서는 확인 알럿을 띄우지 않는다(컴포넌트 라이브러리 · 공통정책 7.2 · 4.5).
+
   ── v0.13 (2026-10-28) ──
   · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다). 연결 탭 복사본의 `산출물` 을 `실험 결과` · `모델` 로(용어집 4장).
     라이선스 산정 주석의 직위 언급과 「장수」를 지웠다(주석에 사람을 쓰지 않는다).
@@ -1035,13 +1038,7 @@ table.tbl tr.need td{background:color-mix(in srgb,var(--destructive) 5%,transpar
 .cfggrp .gh .gtag.rst{background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)}
 .cfggrp .gh .gtag{background:var(--muted);color:var(--muted-foreground)}
 .cfggrp .gh .gtag.now{background:color-mix(in srgb,var(--success) 14%,transparent);color:var(--success)}
-.cfgrow .sw{justify-self:end}
-.cfgrow .stepper{justify-self:end}
-.cfgrow .dash{font-size:12.5px}
 .cfggrp .gd{font-size:11.5px;color:var(--faint);line-height:1.55;margin-bottom:10px}
-.cfgrow{display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:center;padding:7px 0}
-.cfgrow label{font-size:12.5px;color:var(--foreground)}
-.cfgrow .chgd{font-size:10.5px;color:var(--warning);margin-left:6px}
 .rstwarn{display:flex;gap:9px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 9%,transparent);border-radius:9px;font-size:12px;line-height:1.6;color:var(--foreground);margin-top:14px}
 .rstwarn b{color:var(--warning)}
 
@@ -2783,7 +2780,7 @@ function openRaw(i){
      대상은 원본에 있으므로 부제에 두지 않는다 — 어느 건인지 알아보는 자리다 */
   $('rawAt').innerHTML = '<dl class="dl two" style="margin-top:10px">'
    + '<dt>일시</dt><dd>'+r.at+'</dd>'
-   + '<dt>작업</dt><dd>'+actKo(r.act)+'</dd>'
+   + '<dt>작업 내역</dt><dd>'+actKo(r.act)+'</dd>'
    + '<dt>행위자</dt><dd>'+(r.name? userRef(r.who) : '<span class="sub">'+r.who+'</span>')+'</dd>'
    + '<dt>카테고리</dt><dd>'+(CATKO[r.cat]||'<span class="dash">-</span>')+'</dd>'
    + '</dl>';
@@ -2816,7 +2813,7 @@ function audFilter(){
   const opts=Object.keys(ACTKO).filter(function(k){
     return AUDIT.some(function(r){return r.act===k;}); });
   const on = aSel.length || aCat.length;
-  return '<span class="thwrap">작업'
+  return '<span class="thwrap">작업 내역'
    + '<span class="thic" tabindex="0">?</span>'
    + '<button class="thfilter'+(on?' on':'')+'" onclick="tgFdd(event,\'act\')" title="필터">'
    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button></span>'
@@ -3274,6 +3271,8 @@ function delCh(i){
 
 function openCh(){ $('mdCh').classList.add('on'); }
 function closeCh(){ $('mdCh').classList.remove('on'); }
+/* 작성 취소 확인(공통정책 7.2). 연 때의 입력값과 지금 값을 견준다 */
+
 
 /* ══════════ 외부 연동 ══════════ */
 let eTab=0;
