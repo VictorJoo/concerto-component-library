@@ -2,6 +2,10 @@
   콘체르토 매니저 — 플랫폼 설정 | 사용자 및 역할 목업 v0.17 (2026-10-28 · 2026-11-11 정정)
   색·컴포넌트 규격은 컴포넌트 라이브러리 v0.6 을 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
 
+  ── v0.17 (2026-11-12). 버전은 올리지 않는다 ──
+  · 알림 채널 등록 · 수정 모달 [취소] 는 바로 닫는다. 모달 안에서는 확인 알럿을 띄우지 않는다(컴포넌트 라이브러리 · 공통정책 7.2 · 4.5).
+  · 사용자 추가 · 수정 화면 [취소] 에도 같은 확인을 더했다.
+
   ── v0.17 추가 정정 (2026-11-11). 버전은 올리지 않는다 ──
   · 사용자 목록 빈 상태 판정을 고쳤다. 검색어만 보고 있어 헤더 필터(역할 · 상태 · 인증)만 걸었을 때
     `사용자가 없습니다` + `사용자 추가` 가 나왔다. 조건이 하나라도 걸려 있으면 `검색 결과가 없습니다` + `조건 초기화` 다
@@ -1156,13 +1160,7 @@ table.tbl tr.need td{background:color-mix(in srgb,var(--destructive) 5%,transpar
 .cfggrp .gh .gtag.rst{background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)}
 .cfggrp .gh .gtag{background:var(--muted);color:var(--muted-foreground)}
 .cfggrp .gh .gtag.now{background:color-mix(in srgb,var(--success) 14%,transparent);color:var(--success)}
-.cfgrow .sw{justify-self:end}
-.cfgrow .stepper{justify-self:end}
-.cfgrow .dash{font-size:12.5px}
 .cfggrp .gd{font-size:11.5px;color:var(--faint);line-height:1.55;margin-bottom:10px}
-.cfgrow{display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:center;padding:7px 0}
-.cfgrow label{font-size:12.5px;color:var(--foreground)}
-.cfgrow .chgd{font-size:10.5px;color:var(--warning);margin-left:6px}
 .rstwarn{display:flex;gap:9px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 9%,transparent);border-radius:9px;font-size:12px;line-height:1.6;color:var(--foreground);margin-top:14px}
 .rstwarn b{color:var(--warning)}
 
@@ -2332,7 +2330,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <span class="dgrp"><span class="demo-label">최고 관리자 수:</span>
   <button class="ac on" onclick="setAdminCnt('multi',this)">여럿</button>
   <button class="ac" onclick="setAdminCnt('single',this)">마지막 1명</button></span>
-  <span class="dgrp"><span class="demo-label">v0.17 확인:</span>
+  <span class="dgrp"><span class="demo-label">계정 승격:</span>
   <button onclick="demoPromote('sj.lim')">비밀번호 없는 계정</button>
   <button onclick="demoPromote('tg.kim')">연결 계정 승격</button></span>
   <span class="dgrp"><span class="demo-label">테마:</span>
@@ -3358,7 +3356,7 @@ function openUserAt(i){ openUsrDetail(i); udEdit=true; drawUsrDetail(); }
 /* 목록에서 열면 목록으로, 상세에서 열면 상세로 돌아간다 */
 function openUsrForm(){
   $('pgUsr').style.display='none'; $('pgUsrD').style.display='none';
-  $('pgUsrF').style.display=''; drawUserModal(); window.scrollTo(0,0);
+  $('pgUsrF').style.display=''; drawUserModal(); window.scrollTo(0,0); ufInit=formSnap('pgUsrF');
 }
 function closeUsrForm(){
   $('pgUsrF').style.display='none';
@@ -3376,7 +3374,7 @@ function drawUserModal(){
   /* 생성은 곧바로 임시 비밀번호 발급으로 이어진다. 관리자가 값을 전달해야 하므로
      만든 직후에 준다 */
   $('ufFoot').innerHTML =
-     '<button class="btn ghost" onclick="closeUsrForm()">취소</button>'
+     '<button class="btn ghost" onclick="askCancel(formSnap(\'pgUsrF\')!==ufInit, closeUsrForm)">취소</button>'
    /* 계정은 회원가입과 관리자 등록 두 경로가 있어 `생성` 이 한쪽만 가리킨다.
       진입 버튼이 `사용자 추가` 이므로 실행 버튼도 같은 말로 둔다(용어집 7) */
    /* 입력 상태와 무관하게 활성. 누르면 전체를 검증한다(공통정책 7.1·7.8) */
@@ -3674,7 +3672,7 @@ function openRaw(i){
      대상은 원본에 있으므로 부제에 두지 않는다 — 어느 건인지 알아보는 자리다 */
   $('rawAt').innerHTML = '<dl class="dl two" style="margin-top:10px">'
    + '<dt>일시</dt><dd>'+r.at+'</dd>'
-   + '<dt>작업</dt><dd>'+actKo(r.act)+'</dd>'
+   + '<dt>작업 내역</dt><dd>'+actKo(r.act)+'</dd>'
    + '<dt>행위자</dt><dd>'+(r.name? userRef(r.who) : '<span class="sub">'+r.who+'</span>')+'</dd>'
    + '<dt>카테고리</dt><dd>'+(CATKO[r.cat]||'<span class="dash">-</span>')+'</dd>'
    + '</dl>';
@@ -3707,7 +3705,7 @@ function audFilter(){
   const opts=Object.keys(ACTKO).filter(function(k){
     return AUDIT.some(function(r){return r.act===k;}); });
   const on = aSel.length || aCat.length;
-  return '<span class="thwrap">작업'
+  return '<span class="thwrap">작업 내역'
    + '<span class="thic" tabindex="0">?</span>'
    + '<button class="thfilter'+(on?' on':'')+'" onclick="tgFdd(event,\'act\')" title="필터">'
    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button></span>'
@@ -4164,6 +4162,11 @@ function delCh(i){
 
 function openCh(){ $('mdCh').classList.add('on'); }
 function closeCh(){ $('mdCh').classList.remove('on'); }
+let ufInit='';
+/* 작성 취소 확인(공통정책 7.2). 연 때의 입력값과 지금 값을 견준다 */
+function formSnap(id){ const r=document.getElementById(id); if(!r) return ''; return [].map.call(r.querySelectorAll('input,textarea,select'),function(e){ return (e.type==='checkbox'||e.type==='radio')? String(e.checked) : e.value; }).join('\u0001'); }
+function askCancel(dirty, close){ if(!dirty){ close(); return; } openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.', close, '취소', '계속 작성'); }
+
 
 /* ══════════ 외부 연동 ══════════ */
 let eTab=0;
