@@ -1,5 +1,14 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.22 (2026-11-06)
+  콘체르토 매니저 — 플랫폼 설정 | 연동 및 알림 목업 v0.23 (2026-11-12)
+
+  ── v0.23 (2026-11-12) ──
+  · 모델 가져오기 기본 URL을 저장할 때 형식을 검증한다. http(s) 주소가 아니면 인라인 에러 `올바른 주소 형식이 아닙니다.` (허용 목록과 같은 기준 · 공통정책 7.8)
+  · 알림 채널 등록 · 수정 모달 [취소] 는 바로 닫는다. 모달 안에서는 확인 알럿을 띄우지 않는다(컴포넌트 라이브러리 · 공통정책 7.2 · 4.5).
+  · SET-INTEG-L01 v0.23 과 같은 버전이다.
+  · `모델 가져오기` 탭을 모델 저장소 다음에 두었다. 플랫폼 전역 Hugging Face 연결(기본 URL · 액세스 토큰 · 연결 확인)이다(SET-INTEG-L01 7.8 · 워크스페이스 정책 8.1).
+    워크스페이스 연동 탭과 같은 두 값이고, 워크스페이스에 토큰이 있으면 그것을 먼저 쓴다. 빈 상태를 두지 않는다 — 기본 URL 은 비우면
+    https://huggingface.co 이고 공개 모델은 토큰 없이 가져온다. 토큰은 선택이라 `삭제` 를 둔다. 연결 확인 실패 문구는 워크스페이스 연동 설정과 같다.
+  · 인증 기관 등록 · 수정 취소 알럿을 제목 `작성 취소` · 본문 `작성 중인 내용은 저장되지 않습니다.` 로 맞췄다(공통정책 7.2).
 
   ── v0.22 (2026-11-06) ──
   · SET-INTEG-L01 v0.22 와 같은 버전이다(v0.21 은 목업 변경 없음).
@@ -1228,13 +1237,7 @@ table.tbl tr.need td{background:color-mix(in srgb,var(--destructive) 5%,transpar
 .cfggrp .gh .gtag.rst{background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)}
 .cfggrp .gh .gtag{background:var(--muted);color:var(--muted-foreground)}
 .cfggrp .gh .gtag.now{background:color-mix(in srgb,var(--success) 14%,transparent);color:var(--success)}
-.cfgrow .sw{justify-self:end}
-.cfgrow .stepper{justify-self:end}
-.cfgrow .dash{font-size:12.5px}
 .cfggrp .gd{font-size:11.5px;color:var(--faint);line-height:1.55;margin-bottom:10px}
-.cfgrow{display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:center;padding:7px 0}
-.cfgrow label{font-size:12.5px;color:var(--foreground)}
-.cfgrow .chgd{font-size:10.5px;color:var(--warning);margin-left:6px}
 .rstwarn{display:flex;gap:9px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 9%,transparent);border-radius:9px;font-size:12px;line-height:1.6;color:var(--foreground);margin-top:14px}
 .rstwarn b{color:var(--warning)}
 
@@ -2504,7 +2507,9 @@ const EXT={
   allow:['https://s3.ap-northeast-2.amazonaws.com','https://minio.lab.okestro.com:9000'],
   harbor:{ url:'http://192.168.102.131:30002', robot:'robot$concerto-admin', secret:true,
            model:'model-registry', engine:'llm-runtime' },
-  hf:{ url:'', proxy:false, token:true },
+  /* 플랫폼 전역 Hugging Face 연결(SET-INTEG-L01 7.8 · 워크스페이스 정책 8.1). 기본 URL 이 비면 https://huggingface.co 를 쓴다.
+     토큰은 등록 여부만 보인다. 플랫폼 설정 응답에 등록 일시가 없다(SET-INTEG-L01 5.1 비밀값) */
+  hf:{ url:'', token:true },
   /* 메일 서버 — 설치 때 넣은 값이 처음 값이다(CON-961). 값은 데모용이다 */
   mail:{ host:'smtp.okestro.com', port:'587', sec:'STARTTLS', user:'concerto-noti', secret:true, from:'concerto@okestro.com' }
 };
@@ -2538,7 +2543,7 @@ function setPwless(n,btn){
      다른 탭에 머문 채 누르면 아무 변화가 없어 죽은 토글로 보인다 — 단일 로그인 탭으로 옮긴다.
      수정 화면에 있을 때는 거기서도 제한이 보이므로 화면을 옮기지 않는다 */
   if(view==='sso'){ drawSsoForm(); return; }
-  eTab=2; drawExt(); drawSso();
+  eTab=3; drawExt(); drawSso();
 }
 
 /* 다운로드 — 공통정책 3.5. 필터가 적용된 목록 기준으로 전체를 뽑는다.
@@ -3063,8 +3068,12 @@ function ssoSave(){
   act(was? '인증 기관 정보를 저장했습니다.' : '인증 기관을 등록했습니다.');
 }
 function ssoCancel(){
-  /* 입력값이 있으면 확인을 받는다(공통정책 7.2). 데모라 값 비교는 두지 않는다 */
-  go('ext');
+  /* 처음 값과 다르면 확인을 받는다(공통정책 7.2 · SET-INTEG-L01 5.2). 문구는 공통정책 7.2 와 같다 */
+  const iss=(($('ssoIss')||{}).value||'').trim(), cid=(($('ssoCid')||{}).value||'').trim();
+  const sec=ssoSecInput(), sv=sec? (sec.value||'').trim() : '';
+  const dirty = SSO.on? (!issSame(iss, SSO_VAL.iss) || cid!==SSO_VAL.cid || !!sv) : !!(iss||cid||sv);
+  if(!dirty){ go('ext'); return; }
+  openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.', function(){ go('ext'); }, '취소', '계속 작성');
 }
 
 /* ══════════ 보안 및 감사 ══════════ */
@@ -3221,7 +3230,7 @@ function openRaw(i){
      대상은 원본에 있으므로 부제에 두지 않는다 — 어느 건인지 알아보는 자리다 */
   $('rawAt').innerHTML = '<dl class="dl two" style="margin-top:10px">'
    + '<dt>일시</dt><dd>'+r.at+'</dd>'
-   + '<dt>작업</dt><dd>'+actKo(r.act)+'</dd>'
+   + '<dt>작업 내역</dt><dd>'+actKo(r.act)+'</dd>'
    + '<dt>행위자</dt><dd>'+(r.name? userRef(r.who) : '<span class="sub">'+r.who+'</span>')+'</dd>'
    + '<dt>카테고리</dt><dd>'+(CATKO[r.cat]||'<span class="dash">-</span>')+'</dd>'
    + '</dl>';
@@ -3254,7 +3263,7 @@ function audFilter(){
   const opts=Object.keys(ACTKO).filter(function(k){
     return AUDIT.some(function(r){return r.act===k;}); });
   const on = aSel.length || aCat.length;
-  return '<span class="thwrap">작업'
+  return '<span class="thwrap">작업 내역'
    + '<span class="thic" tabindex="0">?</span>'
    + '<button class="thfilter'+(on?' on':'')+'" onclick="tgFdd(event,\'act\')" title="필터">'
    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button></span>'
@@ -3912,8 +3921,11 @@ function openCh(i){
   }
   chDraw();
   $('mdCh').classList.add('on');
+ 
 }
 function closeCh(){ $('mdCh').classList.remove('on'); }
+/* 작성 취소 확인(공통정책 7.2). 연 때의 입력값과 지금 값을 견준다 */
+
 
 /* ══════════ 외부 연동 ══════════ */
 let eTab=0;
@@ -3924,6 +3936,8 @@ let eTab=0;
    폼 안에서 확인한다(문구 스킬 3 — 시스템 명칭 노출 금지) */
 const ETABS=[['스토리지','모델 가중치와 실험 결과를 저장합니다. 모델을 등록할 때 여기서 파일을 읽습니다.'],
              ['모델 저장소','모델과 서빙 엔진 이미지를 저장합니다. 배포할 때 여기서 이미지를 받습니다.'],
+             /* v0.23 · 플랫폼 전역 Hugging Face 연결. 모델 저장소 다음에 둔다 — 둘 다 모델을 들여오는 자리다(SET-INTEG-L01 1장) */
+             ['모델 가져오기','Hugging Face에서 모델을 가져올 때 쓰는 연결입니다. 워크스페이스에 토큰이 없으면 이 토큰을 씁니다.'],
              ['단일 로그인','기업 계정으로 로그인하도록 연결합니다. 연결하면 계정을 따로 등록하지 않아도 됩니다.'],
              /* 알림 채널보다 앞에 둔다. 이메일 채널은 메일 서버가 있어야 등록할 수 있다(기획서 1장) */
              ['메일 서버','이메일 알림을 보낼 메일 서버를 연결합니다. 이메일 채널은 이 서버로 보냅니다.'],
@@ -3942,8 +3956,8 @@ function drawExt(){
      알림 채널은 목록이라 `채널 추가` 를 툴바에 둔다 */
   $('extTabAct').innerHTML = '';
   $('extAct').innerHTML = '';
-  $('extBody').innerHTML = eTab===0? extStorage() : eTab===1? extModel()
-                        : eTab===2? ssoPane() : eTab===3? extMail() : notiPane();
+  $('extBody').innerHTML = eTab===0? extStorage() : eTab===1? extModel() : eTab===2? extHf()
+                        : eTab===3? ssoPane() : eTab===4? extMail() : notiPane();
 }
 
 /* 저장한 비밀값은 다시 보여주지 않는다. 바꿀 때만 새로 받는다 */
@@ -3982,7 +3996,7 @@ function secDel(k){
       /* 다시 그려도 입력 중이던 다른 값은 남긴다 */
       const box = k==='sso'? $('ssoForm') : $('extBody');
       const keep = [].map.call(box.querySelectorAll('input.inp:not([type=password])'), function(i){ return i.value; });
-      if(k==='sso'){ SSO.sec=false; drawSsoForm(); } else if(k==='mail'){ EXT.mail.secret=false; drawExt(); } else { EXT.s3.secret=false; drawExt(); }
+      if(k==='sso'){ SSO.sec=false; drawSsoForm(); } else if(k==='mail'){ EXT.mail.secret=false; drawExt(); } else if(k==='hf'){ EXT.hf.token=false; drawExt(); } else { EXT.s3.secret=false; drawExt(); }
       [].forEach.call(box.querySelectorAll('input.inp:not([type=password])'), function(i,n){ if(keep[n]!==undefined) i.value=keep[n]; });
       if(k==='sso') ssoChk();
       toast('ok','비밀값을 삭제했습니다.');
@@ -4013,6 +4027,9 @@ function secActs(key, title, done){
         + (key==='mail'
            /* 메일 서버는 포트 · 발신자 주소 형식을 저장할 때 검증한다(기획서 7.7 · 공통정책 7.8) */
            ? '<button class="btn sm" onclick="mailSave()">저장</button>'
+           : key==='hf'
+           /* 모델 가져오기 기본 URL도 저장할 때 형식을 검증한다. 허용 목록과 같은 기준 · 문구(7.8) */
+           ? '<button class="btn sm" onclick="hfSave()">저장</button>'
            : '<button class="btn sm" onclick="tgEdit(\''+key+'\');act(\''+title+' 설정을 저장했습니다.\')">저장</button>')
       /* 설정 전에는 확인할 값이 없다. 결과는 토스트가 아니라 폼 위 알림으로 남긴다 —
          실패 사유를 읽고 값을 고쳐야 하는데 토스트는 사라진다 */
@@ -4040,7 +4057,11 @@ const CONN_FAIL={
     ['IAM_SSO_NOT_CONFIGURED','연결된 인증 기관이 없습니다.'],
     ['IAM_SSO_PROVIDER_UNREACHABLE','인증 기관에 연결할 수 없습니다.'],
     ['IAM_SSO_DISCOVERY_INVALID','인증 기관 정보를 읽을 수 없습니다. 발급자 주소를 확인해 주세요.'],
-    ['IAM_SSO_CLIENT_AUTH_FAILED','클라이언트 인증에 실패했습니다. 클라이언트 시크릿을 확인해 주세요.']]
+    ['IAM_SSO_CLIENT_AUTH_FAILED','클라이언트 인증에 실패했습니다. 클라이언트 시크릿을 확인해 주세요.']],
+  /* 워크스페이스 연동 설정의 Hugging Face 연결 확인과 같은 문구다(WKSP-L01 5.2) */
+  hf:[
+    ['HF_UNREACHABLE','Hugging Face에 연결할 수 없습니다. 기본 URL과 네트워크 경로를 확인해 주세요.'],
+    ['HF_TOKEN_INVALID','액세스 토큰이 유효하지 않습니다. 토큰을 확인해 주세요.']]
 };
 const CONN_FAIL_ETC='연결하지 못했습니다. 주소와 인증 정보를 확인해 주세요.';
 function connFailMsg(key, code){
@@ -4240,7 +4261,39 @@ function setMail(v,btn){
   EXT.mail = v? { host:'smtp.okestro.com', port:'587', sec:'STARTTLS', user:'concerto-noti', secret:true, from:'concerto@okestro.com' }
               : { host:'', port:'', sec:'STARTTLS', user:'', secret:false, from:'' };
   /* 앞서 본 연결 확인 결과는 다른 설정의 것이라 지운다 */
-  delete connRes.mail; editSec=''; eTab=3; drawExt();
+  delete connRes.mail; editSec=''; eTab=4; drawExt();
+}
+
+/* 모델 가져오기 — 플랫폼 전역 Hugging Face 연결(SET-INTEG-L01 7.8 · 워크스페이스 정책 8.1 · v0.23).
+   워크스페이스 연동 탭과 같은 두 값(기본 URL · 액세스 토큰)이다. 워크스페이스에 토큰이 있으면 그것을 먼저 쓴다.
+   빈 상태를 두지 않는다 — 기본 URL 은 비우면 https://huggingface.co 이고 공개 모델은 토큰 없이 가져온다.
+   그래서 연결 확인도 늘 누를 수 있다. 토큰은 선택이라 `삭제` 를 둔다(REQ-SET-INTEG-003) */
+function extHf(){
+  const on = editSec==='hf', h=EXT.hf;
+  return connBox('hf')
+   + '<div class="ssec"><div class="ssechd"><div><h4>Hugging Face Hub</h4></div>'
+   +   '<div class="secbtns">'+secActs('hf','Hugging Face 연결', true)+'</div>'
+   + '</div>'
+   + (on
+      ? '<div class="fgrid">'
+        + '<div class="fld"><label>기본 URL'+tabTip('폐쇄망에서는 내부 미러 주소를 입력합니다.')+'</label>'
+        +   '<input class="inp" id="hfUrl" value="'+esc(h.url)+'" placeholder="https://huggingface.co">'
+        +   '<div class="errmsg" id="hfUrlErr"></div>'
+        +   '<div class="hint">비워 두면 https://huggingface.co 를 씁니다.</div></div>'
+        +   secretField('액세스 토큰', h.token, '비공개 모델과 이용 동의가 필요한 모델을 가져올 때 씁니다. 워크스페이스에 토큰이 있으면 그 토큰을 먼저 씁니다.', '', '', 'hf')
+        + '</div>'
+      : dl([['기본 URL', h.url? esc(h.url) : 'https://huggingface.co'],
+            ['액세스 토큰', secretRead(h.token)]]))
+   + '</div>';
+}
+
+function hfSave(){
+  const inp=$('hfUrl'), err=$('hfUrlErr'), v=inp.value.trim();
+  if(v && !/^https?:\/\/[^\s/]+/.test(v)){
+    err.textContent='올바른 주소 형식이 아닙니다.';
+    err.classList.add('show'); inp.classList.add('err'); inp.focus(); return;
+  }
+  EXT.hf.url=v; editSec=''; drawExt(); act('Hugging Face 연결 설정을 저장했습니다.');
 }
 
 function extModel(){
