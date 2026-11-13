@@ -1,5 +1,11 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 인프라 자원 목업 v0.18 (2026-11-11)
+  콘체르토 매니저 — 플랫폼 설정 | 인프라 자원 목업 v0.19 (2026-11-12)
+
+  ── v0.19 (2026-11-12) ──
+  · 알림 채널 등록 · 수정 모달 [취소] 는 바로 닫는다. 모달 안에서는 확인 알럿을 띄우지 않는다(컴포넌트 라이브러리 · 공통정책 7.2 · 4.5).
+  · SET-INFRA-L01 v0.19 와 같은 버전이다.
+  · 노드 표에 모델 캐시 열을 더했다. 캐시 그룹에 들지 않은 가속기 노드는 캐시 불가와 사유 툴팁(CON-1244 · 모델 정책 4.1). 데모 gpu-svr-07.
+  · 중지 · 재개 동작은 그대로다. 점검이던 노드는 재개하면 점검으로 돌아간다(CON-1243 · 5.1).
 
   ── v0.18 (2026-11-11) ──
   · SET-INFRA-L01 v0.18 과 같은 버전이다.
@@ -1139,13 +1145,7 @@ table.tbl tr.need td{background:color-mix(in srgb,var(--destructive) 5%,transpar
 .cfggrp .gh .gtag.rst{background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)}
 .cfggrp .gh .gtag{background:var(--muted);color:var(--muted-foreground)}
 .cfggrp .gh .gtag.now{background:color-mix(in srgb,var(--success) 14%,transparent);color:var(--success)}
-.cfgrow .sw{justify-self:end}
-.cfgrow .stepper{justify-self:end}
-.cfgrow .dash{font-size:12.5px}
 .cfggrp .gd{font-size:11.5px;color:var(--faint);line-height:1.55;margin-bottom:10px}
-.cfgrow{display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:center;padding:7px 0}
-.cfgrow label{font-size:12.5px;color:var(--foreground)}
-.cfgrow .chgd{font-size:10.5px;color:var(--warning);margin-left:6px}
 .rstwarn{display:flex;gap:9px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 9%,transparent);border-radius:9px;font-size:12px;line-height:1.6;color:var(--foreground);margin-top:14px}
 .rstwarn b{color:var(--warning)}
 
@@ -2952,7 +2952,7 @@ function openRaw(i){
      대상은 원본에 있으므로 부제에 두지 않는다 — 어느 건인지 알아보는 자리다 */
   $('rawAt').innerHTML = '<dl class="dl two" style="margin-top:10px">'
    + '<dt>일시</dt><dd>'+r.at+'</dd>'
-   + '<dt>작업</dt><dd>'+actKo(r.act)+'</dd>'
+   + '<dt>작업 내역</dt><dd>'+actKo(r.act)+'</dd>'
    + '<dt>행위자</dt><dd>'+(r.name? userRef(r.who) : '<span class="sub">'+r.who+'</span>')+'</dd>'
    + '<dt>카테고리</dt><dd>'+(CATKO[r.cat]||'<span class="dash">-</span>')+'</dd>'
    + '</dl>';
@@ -2985,7 +2985,7 @@ function audFilter(){
   const opts=Object.keys(ACTKO).filter(function(k){
     return AUDIT.some(function(r){return r.act===k;}); });
   const on = aSel.length || aCat.length;
-  return '<span class="thwrap">작업'
+  return '<span class="thwrap">작업 내역'
    + '<span class="thic" tabindex="0">?</span>'
    + '<button class="thfilter'+(on?' on':'')+'" onclick="tgFdd(event,\'act\')" title="필터">'
    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button></span>'
@@ -3283,7 +3283,8 @@ const NODES=[
   {n:'gpu-svr-04', g:'serving-gpu', st:'정상',      since:'2026-09-28 10:12', acc:'NVIDIA-H200 8장'},
   {n:'gpu-svr-05', g:'serving-gpu', st:'정상',      since:'2026-09-28 10:12', acc:'NVIDIA-H200 8장'},
   {n:'gpu-svr-06', g:'dev-gpu',     st:'정상',      since:'2026-10-02 14:30', acc:'NVIDIA-A100 4장'},
-  {n:'gpu-svr-07', g:'dev-gpu',     st:'정상',      since:'2026-10-02 14:30', acc:'NVIDIA-L40S 4장'},
+  /* 캐시 그룹에 들지 않은 가속기 노드 — 모델 캐시 열에 캐시 불가와 사유를 보인다(SET-INFRA-L01 7.2 · CON-1244). 검토용 값이다 */
+  {n:'gpu-svr-07', g:'dev-gpu',     st:'정상',      since:'2026-10-02 14:30', acc:'NVIDIA-L40S 4장', nocache:true},
   {n:'npu-svr-03', g:'serving-npu', st:'정상',      since:'2026-09-28 10:12', acc:'Furiosa RNGD 8장'}
 ];
 /* 노드 그룹(v0.13). 운영자가 노드에 붙인 라벨이다. 화면에서는 조회만 한다(모니터링 정책 4.1).
@@ -3359,7 +3360,7 @@ function nodeTable(){
    + '<div class="tblwrap ndtbl"><table class="tbl"><thead><tr>'
    /* 정렬은 값을 견주는 컬럼(노드 이름·상태 시작 시각)에 둔다. 상태 시작 시각은 헤더 도움말을 함께 둔다 */
    + sortTh('nd','n','노드') + (on? ngTh() : '') + '<th class="thcell">'+thHelp('nst','상태')+'</th>'
-   + ndSinceTh() + '<th>가속기</th>'
+   + ndSinceTh() + '<th>가속기</th><th>모델 캐시</th>'
    /* 이 화면 전체가 최고 관리자 전용이다(9.4). 권한이 없으면 화면 자체가 막혀 작업 열을 따로 가르지 않는다 */
    + '<th style="width:96px">작업</th>'
    + '</tr></thead><tbody>'
@@ -3379,6 +3380,9 @@ function nodeTable(){
         + '<td><span class="stbadge '+(NODEB[nd.st]||'mu')+'">'+nd.st+'</span></td>'
         + '<td class="ndwhen">'+nd.since+'</td>'
         + '<td>'+acc+'</td>'
+        /* 캐시 그룹 밖 가속기 노드는 캐시 불가. 배포에 쓸 수 없어 배분 가능한 양에서 빠진다(모델 정책 4.1 · 워크스페이스 정책 5.1).
+           가속기가 없는 노드는 캐시 대상이 아니라 - */
+        + '<td>'+(!nd.acc ? '<span class="dash">-</span>' : nd.nocache ? '캐시 불가 <span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">캐시를 둘 수 없는 노드라 배포에 쓸 수 없습니다.</span></span>' : '가능')+'</td>'
         + '<td>'+btn+'</td></tr>';
      }).join('')
    + '</tbody></table></div>'
@@ -3818,8 +3822,11 @@ function openCh(i){
   }
   chDraw();
   $('mdCh').classList.add('on');
+ 
 }
 function closeCh(){ $('mdCh').classList.remove('on'); }
+/* 작성 취소 확인(공통정책 7.2). 연 때의 입력값과 지금 값을 견준다 */
+
 
 
 /* ══════════ 외부 연동 ══════════ */
