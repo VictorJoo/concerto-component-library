@@ -1,5 +1,24 @@
 <!--
-  콘체르토 매니저 · 워크스페이스 화면 목업 v0.68 (2026-11-11)
+  콘체르토 매니저 · 워크스페이스 화면 목업 v0.69 (2026-11-12)
+
+  ── v0.69 (2026-11-12) ──
+  · 작성 중 이탈: 메뉴 · 브레드크럼 · 워크스페이스 전환으로 나가도 [취소]와 같은 확인 알럿을 거친다(공통정책 7.2 · 워크스페이스 정책 「작성 중 이탈」). 브레드크럼이 확인 없이 목록으로 가던 것을 고쳤다.
+  · Hugging Face 연결 확인 실패 문구 셋(등록된 토큰을 읽을 수 없음 · 외부 연결 경로 · 그 밖의 오류)을 데모 바 「HF 연결 확인」으로 볼 수 있게 했다(WKSP-L01 5.2).
+  · 멤버 초대 모달의 역할 선택을 관리자 · 편집자 · 뷰어 한 줄 세 칸으로 둔다. 공용 워크스페이스는 관리자를 빼 두 칸으로 채운다.
+  · WKSP-L01 v0.69 와 같은 버전이다.
+  · Hugging Face 연동 설정 모달에 연결 확인을 되살렸다(WKSP-L01 REQ-WKSP-114 · 5.1 · 5.2 · 7.8).
+    v0.68 에서 프록시를 뺄 때 버튼이 프록시 묶음 안에 있어 같이 지워졌는데, 연결 확인은 기본 URL · 액세스 토큰으로도 시험한다.
+    프록시와 상관없이 액세스 토큰 아래에 둔다. 저장하지 않고 입력값으로 시험하고, 토큰을 비우면 등록된 토큰으로 시험한다.
+    결과는 버튼 아래 모달 안 알림으로 남긴다. 값을 고쳐야 하는 결과라 토스트로 두지 않는다(저장소 설정 연결 확인과 같은 자리).
+  · 데모: 기본 URL 이 http(s) 주소가 아니면 연결 실패, 새 토큰에 bad 가 들어가면 토큰 오류, 그 밖에는 통과로 보인다. 검토용 처리다.
+  · 운영룸 게이트웨이 설정 4번째 값 `요청 헤더 수신 시간` 을 `요청 수신 제한 시간` 으로 바꿨다. 게이트웨이는 헤더만이 아니라
+    본문까지 요청 전체를 받는 시간으로만 정할 수 있다. 도움말에 느린 회선으로 큰 본문을 올리면 끊길 수 있다는 것을 넣었다(워크스페이스 정책 3.4 · CON-1242).
+  · 운영룸 화면 [설정] 을 삭제 중 · 삭제 실패 운영룸에서 비활성으로 두고 사유를 붙인다. 정책 3.5 가 그 두 상태의 수정을 막는다(WKSP-L01 5.1 · CON-1242).
+  · CDE 에이전트 키 행에도 `사용 한도 수정` 을 둔다. 기본 한도는 키당 시간당 300만 토큰이고, 수정은 워크스페이스 관리자 이상만 보인다(정책 7장 · CON-1261). 데모 에이전트 키 한 행을 더했다(검토용 값).
+  · 운영룸 화면 기본 정보에 접속 주소를 더했다. 호출 주소 아래, 도움말에 사용 방법, 게이트웨이가 준비되기 전에는 `준비 중`(WKSP-L01 7.6 · CON-1251).
+    호스트를 이 주소에 연결하는 Workspace Admin 이상에게만 보인다. 멤버는 호출 주소로 부른다.
+  · 운영룸 생성 · 설정과 워크스페이스 생성(운영룸 함께 생성)의 호스트 도메인에 형식 검증을 더했다. 입력란을 벗어날 때와 저장할 때 인라인 오류(WKSP-L01 5.1 · 워크스페이스 정책 3.3, TUI 대조표 호스트명 규칙).
+  · 검색 함수 머리 주석이 파일 머리(검색 조건 누적은 기획서를 따르고 목업에 그리지 않음)와 반대로 읽혀 맞췄다. 화면 동작은 그대로다.
 
   ── v0.68 (2026-11-11) ──
   · WKSP-L01 v0.68 · 워크스페이스 정책 v0.69 와 같은 버전이다.
@@ -11,7 +30,7 @@
   · Hugging Face 연동에서 프록시를 뺐다(워크스페이스 정책 8.1 · WKSP-L01 7.8). 연동 설정 모달의 프록시 사용 · 서버 · 포트 ·
     인증 계정 · 인증 비밀번호 · 연결 확인과 상세 연동 영역의 프록시 줄을 지웠다. 폐쇄망은 기본 URL 에 내부 미러 주소를 넣는다.
   · 운영룸 생성 · 설정에 게이트웨이 설정 묶음을 더했다. 최대 요청 크기(1~100MB, 기본 50) · HTTP/2 창 크기(1~64MB, 기본 8) ·
-    연결 유휴 시간(1~86,400초) · 요청 헤더 수신 시간(1~600초). 시간 두 항목은 비우면 설치 기본값이다. 범위 밖은
+    연결 유휴 시간(1~86,400초) · 요청 수신 제한 시간(1~600초). 시간 두 항목은 비우면 설치 기본값이다. 범위 밖은
     `{최소}~{최대} 사이의 정수를 입력해 주세요.` 인라인 에러와 첫 오류 필드 포커스. 저장 즉시 적용되고 배포는 다시 기동하지 않는다.
     운영룸 화면 게이트웨이 섹션에 네 값을 보이고, 비운 시간 항목은 `설치 기본값`으로 둔다(워크스페이스 정책 3.4 · WKSP-L01 7.6 · 7.7 · CON-1227).
   · API Key 토큰 한도의 기준 시간에서 분당을 뺐다. 시간당 · 일당 · 주당만 둔다(정책 7장 · WKSP-L01 7.10 · 7.11 · REQ-WKSP-103 · CON-1193).
@@ -1341,9 +1360,6 @@ table.tbl tr.need td{background:color-mix(in srgb,var(--destructive) 5%,transpar
 .cfggrp .gh .gtag.now{background:color-mix(in srgb,var(--success) 14%,transparent);color:var(--success)}
 .cfggrp .gh .gtag.rst{background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)}
 .cfggrp .gd{font-size:11.5px;color:var(--faint);line-height:1.55;margin-bottom:10px}
-.cfgrow{display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:center;padding:7px 0}
-.cfgrow label{font-size:12.5px;color:var(--foreground)}
-.cfgrow .chgd{font-size:10.5px;color:var(--warning);margin-left:6px}
 .rstwarn{display:flex;gap:9px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--warning) 32%,transparent);background:color-mix(in srgb,var(--warning) 9%,transparent);border-radius:9px;font-size:12px;line-height:1.6;color:var(--foreground);margin-top:14px}
 .rstwarn b{color:var(--warning)}
 
@@ -1987,7 +2003,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
       </div>
       <div class="f" style="margin-bottom:0">
         <label>역할</label>
-        <div class="pick" id="iRole">
+        <div class="pick pick3" id="iRole">
           <label id="iRoleAdm"><input type="radio" name="irole" value="관리자"><span>관리자</span><small>멤버·설정 관리</small></label>
           <label><input type="radio" name="irole" value="편집자"><span>편집자</span><small>CDE·배포 생성</small></label>
           <label><input type="radio" name="irole" value="뷰어" checked><span>뷰어</span><small>조회만</small></label>
@@ -2175,6 +2191,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
         <label>액세스 토큰<span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">비공개 저장소에 접근할 때 사용합니다. 등록하지 않으면 플랫폼 전역 토큰을 사용합니다.</span></span></label>
         <div id="cnTokBox"></div>
       </div>
+      <!-- 연결 확인 — 입력값으로 저장 전에 시험한다(REQ-WKSP-114). 프록시와 상관없이 둔다.
+           결과는 모달 안 알림으로 남긴다. 저장소 설정 연결 확인과 같은 자리다(WKSP-L01 5.1) -->
+      <div style="margin-top:4px"><button class="btn ghost sm" id="cnVerifyBtn" onclick="cnVerify()">연결 확인</button></div>
+      <div id="cnVerifyRes" style="margin-top:10px"></div>
     </div>
     <div class="mdfoot">
       <button class="btn ghost" onclick="closeConn()">취소</button>
@@ -2251,12 +2271,18 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <button class="vw" onclick="goDemo('new',this)">생성</button>
   <button class="vw" onclick="goDemo('req',this)">신청</button></span>
   <!-- v0.62 새 상태로 바로 가기. 검토용 처리. 실제 화면에는 없다 -->
-  <span class="dgrp"><span class="demo-label">v0.62 확인:</span>
+  <span class="dgrp"><span class="demo-label">운영룸 상태:</span>
   <button class="vw" onclick="demoProdError(this)">운영룸 오류</button>
   <button class="vw" onclick="demoProdFail(this)">운영룸 생성 실패</button></span>
   <span class="dgrp"><span class="demo-label">저장 시 범위 초과:</span>
   <button class="qf on" onclick="setQfail(false,this)">끔</button>
   <button class="qf" onclick="setQfail(true,this)">켬</button></span>
+  <!-- v0.69 · Hugging Face 연결 확인 결과(WKSP-L01 5.2). 다음 연결 확인에 이 결과를 낸다. 검토용 처리. 실제 화면에는 없다 -->
+  <span class="dgrp"><span class="demo-label">HF 연결 확인:</span>
+  <button class="hfr on" onclick="setHfRes('',this)">입력값대로</button>
+  <button class="hfr" onclick="setHfRes('stale',this)">토큰 못 읽음</button>
+  <button class="hfr" onclick="setHfRes('egress',this)">외부 연결 경로</button>
+  <button class="hfr" onclick="setHfRes('etc',this)">그 밖의 오류</button></span>
   <span class="dgrp"><span class="demo-label">데이터:</span>
   <button class="st on" onclick="setState('default',this)">기본</button>
   <button class="st" onclick="setState('empty',this)">빈 상태</button>
@@ -2358,7 +2384,11 @@ const WS=[
     scope:['llama-3-2-1b-prod','gemma-4-12b-it-idle'], last:'2026-08-20 14:32:08',
     tok:{n:2000000,win:'주'}, use:{d:184230,w:1253880}},
    {n:'batch-infer-key',type:'일반',exp:'2026-09-30',at:'2026-07-14 16:40:21',by:'임승주(sj.lim)',
-    scope:['llama-3-2-1b-prod'], last:null, tok:{n:50000,win:'분'}, use:null}],
+    scope:['llama-3-2-1b-prod'], last:null, tok:{n:50000,win:'분'}, use:null},
+   /* CDE 에이전트 키 — CDE 신청 승인 때 발급되고 기본 한도 키당 시간당 300만 토큰이 걸린다(정책 7장 · CDE 정책 2.4 · CON-1261).
+      만료일은 따로 없고 CDE 수명을 따른다. 검토용 값이다 */
+   {n:'cde-agent-yj-jupyter-01',type:'CDE 에이전트',exp:'-',at:'2026-08-19 09:02:11',by:'성유진(yj.seong)',
+    scope:['llama-3-2-1b-prod'], last:'2026-08-20 13:40:22', tok:{n:3000000,win:'시간'}, use:{d:412300,w:1820450}}],
   jobs:[{id:'job-8f2a',u:'yj.seong',t:'학습',fw:'PyTorch',dur:'1시간 24분',st:'완료'},
         {id:'job-3c91',u:'yj.seong',t:'전처리',fw:'PyTorch',dur:'12분',st:'실행 중'},
         {id:'job-b04e',u:'sj.lim',t:'학습',fw:'PyTorch',dur:'3분',st:'실패',err:'CUDA out of memory. 배치 크기를 줄이거나 가속기를 늘려 주세요.'},
@@ -2560,6 +2590,8 @@ const isMyKey =(k)=>k.by==='성유진(yj.seong)';
 /* 퇴사·이동한 멤버의 키를 정리할 주체가 필요해 관리자에게 폐기를 연다(정책 7.1).
    키값은 여전히 누구도 볼 수 없다 */
 const canRevoke=(k)=>isMyKey(k) || isWsAdmin();
+/* CDE 에이전트 키의 한도는 워크스페이스 관리자 이상만 바꾼다. 키를 쓰는 CDE 사용자 본인은 바꿀 수 없다(정책 7장 · CON-1261 2026-11-12) */
+const canLimit=(k)=>k.type==='CDE 에이전트' ? isWsAdmin() : canRevoke(k);
 const canCreateWs =()=>isSuper();
 const canRequestWs=()=>!isSuper();    /* 일반 사용자는 신청 */
 /* 계정은 플랫폼 설정에서 관리한다(공통정책 2.1 — 다른 리소스는 링크로만).
@@ -2580,8 +2612,7 @@ function goUserSetting(e,id){
 
 /* ===== 검색 ===== */
 let sq='';
-/* 검색 조건 누적을 두지 않는다. 조건이 쌓이면 칩 줄이 늘어 도구 영역 높이가 흔들리고,
-   워크스페이스 목록은 항목 수가 적어 누적 검색의 이점이 크지 않다 */
+/* 검색 조건 누적은 목업에 그리지 않았다. 기획서 REQ-WKSP-006 · 공통정책 3.3 을 따른다. 열을 골라 검색하는 기능은 두지 않는다(공통정책 3.3) */
 /* 공통정책 3.3 — 검색어 입력 후 엔터 시 검색한다. 한 글자마다 조회하지 않는다 */
 function onSearchKey(e){
   if(e.key!=='Enter') return;
@@ -3234,9 +3265,9 @@ function syncView(){
      목록은 소속 개수와 무관하게 항상 존재한다(정책 2.7) */
   const bc=document.querySelector('.breadcrumb');
   /* 브레드크럼으로 목록에 돌아오면 상세 진입 전 범위로 되돌린다(listFromDetail) */
-  const root='<a href="#" onclick="listFromDetail();return false">콘체르토 플랫폼</a>';
-  const wsStep = '<a href="#" onclick="listFromDetail();return false">워크스페이스</a>';
-  const detailStep = '<a href="#" onclick="openDetail();return false">상세</a>';
+  const root='<a href="#" onclick="wsLeave(listFromDetail);return false">콘체르토 플랫폼</a>';
+  const wsStep = '<a href="#" onclick="wsLeave(listFromDetail);return false">워크스페이스</a>';
+  const detailStep = '<a href="#" onclick="wsLeave(openDetail);return false">상세</a>';
   if(view==='detail')      bc.innerHTML=root+' / '+wsStep+' / <b>상세</b>';
   else if(view==='room')   bc.innerHTML=root+' / '+wsStep+' / '+detailStep+' / <b>운영룸</b>';
   else if(view==='form')   bc.innerHTML=
@@ -3361,10 +3392,23 @@ const GW_F=[
    tip:'HTTP/2 연결에서 상대의 확인을 기다리지 않고 한 번에 주고받을 수 있는 데이터 양입니다.',hint:'1~64MB. 기본 8MB입니다.'},
   {k:'idle',l:'연결 유휴 시간',u:'초',min:1,max:86400,req:false,
    tip:'요청이 오가지 않는 연결을 끊기까지 기다리는 시간입니다.',hint:'1~86,400초.'},
-  {k:'hdr',l:'요청 헤더 수신 시간',u:'초',min:1,max:600,req:false,
-   tip:'연결한 뒤 요청 헤더를 모두 받을 때까지 기다리는 시간입니다.',hint:'1~600초.'}
+  {k:'hdr',l:'요청 수신 제한 시간',u:'초',min:1,max:600,req:false,
+   tip:'연결한 뒤 본문을 포함한 요청 전체를 받을 때까지 기다리는 시간입니다. 느린 회선으로 큰 본문을 올릴 때 짧으면 업로드가 끊길 수 있습니다.',hint:'1~600초.'}
 ];
 function gwOf(m){ return Object.assign({},GW_DEF,m.gw||{}); }
+/* v0.69 · 호스트 도메인 형식(워크스페이스 정책 3.3 · WKSP-L01 5.1). 점으로 나눈 각 부분은 영문 소문자 · 숫자 · 하이픈,
+   처음과 끝은 하이픈이 아니고 63자 이하, 전체 253자 이하다. 점이 하나 이상 있어야 하고 마지막 부분이 숫자만이면(IP) 받지 않는다.
+   백엔드 운영룸 호스트 검증(WS_ROOM_HOST_DOMAIN_INVALID)과 같은 규칙이다. 비우면 기본 도메인이라 오류가 아니다 */
+function hostErr(v){
+  v=String(v||'').trim(); if(!v) return '';
+  if(!/^[a-z0-9.-]+$/.test(v)) return '영문 소문자·숫자·하이픈·점만 사용할 수 있습니다.';
+  const parts=v.split('.');
+  if(parts.length<2) return '점으로 나눈 전체 호스트를 입력해 주세요. 예: room.example.com';
+  if(parts.some(function(p){ return p==='' || /^-|-$/.test(p); })) return '점으로 나눈 각 부분은 비울 수 없고, 처음과 끝에 하이픈을 쓸 수 없습니다.';
+  if(/^[0-9]+$/.test(parts[parts.length-1])) return 'IP 주소는 입력할 수 없습니다. 호스트 이름을 입력해 주세요.';
+  if(v.length>253 || parts.some(function(p){ return p.length>63; })) return '점으로 나눈 각 부분은 63자, 전체는 253자 이하로 입력해 주세요.';
+  return '';
+}
 function gwErr(f,v){
   v=String(v).trim();
   if(v==='') return f.req ? f.min.toLocaleString()+'~'+f.max.toLocaleString()+' 사이의 정수를 입력해 주세요.' : '';
@@ -3404,8 +3448,10 @@ function submitProdCfg(){
   const nh=PC.host.trim();
   /* 범위 밖은 인라인 에러로 알리고 첫 오류 필드로 포커스한다(공통정책 7.8) */
   PCERR={};
+  const he=hostErr(nh); if(he) PCERR.host=he;
   GW_F.forEach(function(f){ const e=gwErr(f,PC.gw[f.k]); if(e) PCERR[f.k]=e; });
   const bad=GW_F.filter(function(f){ return PCERR[f.k]; });
+  if(he){ drawProdCfg(); const el=document.getElementById('pcHost'); if(el) el.focus(); return; }
   if(bad.length){ drawProdCfg(); const el=document.getElementById('gw_'+bad[0].k); if(el) el.focus(); return; }
   const gw={}; GW_F.forEach(function(f){ gw[f.k]=String(PC.gw[f.k]).trim(); });
   m.gw=gw;
@@ -3435,8 +3481,9 @@ function drawProdCfg(){
    + '<div class="f"><label>호스트 도메인'
    +   tip('이 운영룸에 배포한 모델을 외부에서 호출할 때 쓰는 주소의 앞부분입니다. 이 운영룸의 모든 배포가 같은 값을 쓰며 배포 화면에서는 바꿀 수 없습니다.', true)
    +   '</label>'
-   +   '<input class="inp" value="'+(PC.host||'')+'" placeholder="비우면 기본 도메인을 사용합니다."'
-   +     ' oninput="PC.host=this.value;drawProdCfg()">'
+   +   '<input class="inp'+(PCERR.host?' err':'')+'" id="pcHost" value="'+(PC.host||'')+'" placeholder="비우면 기본 도메인을 사용합니다."'
+   +     ' oninput="PC.host=this.value" onblur="PCERR.host=hostErr(PC.host);drawProdCfg()">'
+   +   (PCERR.host? '<div class="errmsg" style="display:block">'+PCERR.host+'</div>' : '')
    /* 무엇이 만들어지는지 값으로 보인다. 이 운영룸의 배포가 함께 쓰는 주소다(배포 정책 2.5) */
    +   '<div class="subbox" style="margin-top:10px;gap:6px">'
    +     '<div class="sbt">호출 주소</div>'
@@ -3495,7 +3542,10 @@ function drawRoom(){
    /* 운영룸은 호스트 도메인을 정하므로 설정 화면을 둔다(워크스페이스 정책 3.3·3.4) */
    + ((isSysWs(m)? isSuper() : isWsAdmin()) && m.prod!=='미생성'
       ? '<div class="dact">'
-        + '<button class="btn ghost sm" onclick="openProdCfg(false)">설정</button>'
+        /* 삭제 중 · 삭제 실패 운영룸은 수정할 수 없다(워크스페이스 정책 3.5 · WKSP-L01 5.1) */
+        + ((m.prod==='삭제 중'||m.prod==='삭제 실패')
+            ? disTip('<button class="btn ghost sm" disabled>설정</button>', m.prod==='삭제 중'? '삭제 중인 운영룸은 설정을 바꿀 수 없습니다.' : '삭제에 실패한 운영룸은 설정을 바꿀 수 없습니다.')
+            : '<button class="btn ghost sm" onclick="openProdCfg(false)">설정</button>')
         + '<button class="btn danger-line sm" onclick="delProdRoom()">삭제</button>'
         + '</div>' : '')
    + '</div>';
@@ -3789,11 +3839,13 @@ function drawDetail(){
            +'<td>'+(k.last? k.last : '<span class="dash">-</span>')+'</td>'
            +'<td>'+k.exp+'</td><td>'+userRef(k.by)+'</td><td>'+(k.at||'<span class="dash">-</span>')+'</td>'
            /* 본인 키만 지운다. 남의 키는 사용 현황만 본다(정책 7.1) */
-       /* 작업이 둘이라 더보기 메뉴로 둔다(공통정책 3.6). 한도 수정은 폐기와 같은 범위에 노출한다(정책 7장) */
-       +'<td onclick="event.stopPropagation()">'+(canRevoke(k)
+       /* 작업이 둘이라 더보기 메뉴로 둔다(공통정책 3.6). 한도 수정은 폐기와 같은 범위에 노출한다(정책 7장).
+          CDE 에이전트 키의 한도 수정만 워크스페이스 관리자 이상이다(canLimit) */
+       +'<td onclick="event.stopPropagation()">'+((canLimit(k)||canRevoke(k))
            ?'<div class="more" id="km'+i+'"><button class="morebtn" aria-label="작업" onclick="tgMore(event,\'km'+i+'\')">⋯</button><div class="rowmenu">'
-             +'<button onclick="openKeyLim(\''+k.n+'\')">사용 한도 수정</button><hr>'
-             +'<button class="d" onclick="revokeKey(\''+k.n+'\')">폐기</button></div></div>'
+             +(canLimit(k)?'<button onclick="openKeyLim(\''+k.n+'\')">사용 한도 수정</button>':'')
+             +(canLimit(k)&&canRevoke(k)?'<hr>':'')
+             +(canRevoke(k)?'<button class="d" onclick="revokeKey(\''+k.n+'\')">폐기</button>':'')+'</div></div>'
            :'')+'</td></tr>').slice(kr[0],kr[1]).join('')
          + '</tbody></table></div>'
          + detPager('k',m.keys.length)
@@ -3931,6 +3983,11 @@ function roomTab(m){
    + '<dt>호스트 도메인</dt><dd>'
    +   (m.host? m.host : '<span class="dash">기본 도메인 사용</span>')+'</dd>'
    + '<dt>호출 주소</dt><dd>https://'+(m.host||'gw.concerto.okestro.io')+'/v1</dd>'
+   /* 접속 주소는 네트워크가 실제로 닿는 게이트웨이 주소다. 자체 구축은 IP, 클라우드 로드밸런서는 호스트 이름이 온다.
+      주소가 여럿이면 하나만 보이고 IP 를 먼저 쓴다. 게이트웨이가 준비되기 전에는 값이 없어 준비 중으로 둔다.
+      호스트를 이 주소에 연결하는 Workspace Admin 이상에게만 보인다. 멤버는 호출 주소로 부른다(WKSP-L01 7.6 · CON-1251). 데모 값 192.0.2.10 은 검토용이다 */
+   + (!canAdminWs(m)? '' : '<dt>접속 주소'+tip('게이트웨이에 실제로 연결되는 주소입니다. 호스트가 DNS에 없으면 IP는 hosts 파일에, 호스트 이름은 DNS CNAME으로 호스트를 이 주소에 연결해 주세요.')+'</dt><dd>'
+   +   ((st==='정상'||st==='오류')? (m.gwAddr||'192.0.2.10') : '<span class="dash">준비 중</span>')+'</dd>')
    /* 호스트명 · 호출 주소는 지금 적용 중인 값이다. 저장한 값은 따로 보인다(WKSP-L01 7.6) */
    + (m.hostPending!==undefined
       ? '<dt>적용 대기 호스트</dt><dd>'+(m.hostPending? m.hostPending : '<span class="dash">기본 도메인 사용</span>')+'</dd>' : '')
@@ -4403,7 +4460,8 @@ function drawForm(){
      /* 함께 생성이면 호스트 도메인을 받는다. 비우면 기본 도메인이다(WKSP-L01 3장 7번 · 7.3 · 7.7) */
      + (NF.mkProd
         ? '<div class="f" style="margin:14px 0 0"><label>호스트 도메인'+tip('이 운영룸에 배포한 모델을 외부에서 호출할 때 쓰는 주소입니다. 이 운영룸의 모든 배포가 같은 값을 씁니다.')+'</label>'
-          + '<input class="inp" value="'+(NF.prodHost||'')+'" placeholder="비우면 기본 도메인을 사용합니다." oninput="NF.prodHost=this.value">'
+          + '<input class="inp'+(NF.hostErr?' err':'')+'" id="nfHost" value="'+(NF.prodHost||'')+'" placeholder="비우면 기본 도메인을 사용합니다." oninput="NF.prodHost=this.value" onblur="NF.hostErr=hostErr(NF.prodHost);drawForm()">'
+          + (NF.hostErr? '<div class="errmsg" style="display:block">'+NF.hostErr+'</div>' : '')
           + '</div>'
         : '')
      + '</div>';
@@ -4916,6 +4974,8 @@ function cancelForm(){
   backToList();
 }
 function submitForm(){
+  /* v0.69 · 함께 생성하는 운영룸의 호스트 도메인 형식(WKSP-L01 5.1) */
+  if(NF.mkProd){ NF.hostErr=hostErr(NF.prodHost); if(NF.hostErr){ drawForm(); const el=document.getElementById('nfHost'); if(el) el.focus(); return; } }
   /* 제출 시 전체 검증. 실패한 필드마다 인라인 에러를 보이고 첫 오류 필드로 포커스한다(공통정책 7.1 · 7.8) */
   if(!formValid()){
     shownF={name:true,rsn:true,owner:true,q:true,s3:true};
@@ -4974,6 +5034,8 @@ function openInvite(){
   document.getElementById('iUser').classList.remove('err'); document.getElementById('iUserErr').classList.remove('show');
   /* 공용은 관리자 역할을 최고 관리자 계정에만 준다(정책 6.2) */
   document.getElementById('iRoleAdm').style.display = isSysWs(cur.m)? 'none' : '';
+  /* 역할이 셋이라 한 줄에 셋을 둔다. 공용 워크스페이스는 관리자를 빼 둘이므로 두 칸으로 채운다 */
+  document.getElementById('iRole').classList.toggle('pick3', !isSysWs(cur.m));
   document.querySelector('input[name=irole][value="뷰어"]').checked=true;
   document.getElementById('mdInvite').classList.add('on');
   setTimeout(function(){ document.getElementById('iUser').focus(); },0);
@@ -5590,6 +5652,7 @@ function openConn(){
   drawCnTok();
   cnInit={u:document.getElementById('cnUrl').value};
   document.getElementById('cnSubmit').disabled=true;
+  document.getElementById('cnVerifyRes').innerHTML='';
   document.getElementById('mdConn').classList.add('on');
 }
 function closeConn(){ document.getElementById('mdConn').classList.remove('on'); }
@@ -5597,6 +5660,28 @@ function cnChanged(){
   const changed = document.getElementById('cnUrl').value!==cnInit.u
     || (function(){ const e=document.getElementById('cnTok'); return !!(e&&e.value); })();
   document.getElementById('cnSubmit').disabled=!changed;
+}
+/* Hugging Face 연결 확인 — 저장하지 않는다. 토큰을 비우면 등록된 토큰으로 시험한다(WKSP-L01 5.1).
+   문구는 WKSP-L01 5.2 「Hugging Face 연결 확인 실패」 행. 데모 판정은 검토용 처리다 */
+/* [검토용] 데모 바에서 고른 연결 확인 결과 */
+let HFRES='';
+function setHfRes(v,b){ HFRES=v; document.querySelectorAll('.hfr').forEach(function(x){ x.classList.toggle('on', x===b); }); }
+function cnVerify(){
+  const b=document.getElementById('cnVerifyBtn'); b.disabled=true; b.innerHTML='<span class="spin"></span>연결 확인'; /* 라벨 유지 + 스피너(공통정책 7.3 · 라이브러리) */
+  setTimeout(function(){
+    const url=document.getElementById('cnUrl').value.trim();
+    const el=document.getElementById('cnTok'); const tok=el? el.value.trim() : '';
+    const hasTok = !!tok || !!cur.m.hfToken;
+    let ok=true, msg='연결을 확인했습니다.'+(hasTok? ' (concerto-admin 계정)' : '');
+    if(url && !/^https?:\/\//.test(url)){ ok=false; msg='Hugging Face에 연결할 수 없습니다. 기본 URL과 네트워크 경로를 확인해 주세요.'; }
+    else if(tok && /bad/i.test(tok)){ ok=false; msg='액세스 토큰이 유효하지 않습니다. 토큰을 확인해 주세요.'; }
+    else if(HFRES==='stale'){ ok=false; msg='등록된 액세스 토큰을 읽을 수 없습니다. 새 토큰을 입력해 주세요.'; }
+    else if(HFRES==='egress'){ ok=false; msg='외부 연결 경로에 연결할 수 없습니다. 관리자에게 문의해 주세요.'; }
+    else if(HFRES==='etc'){ ok=false; msg='Hugging Face에서 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'; }
+    document.getElementById('cnVerifyRes').innerHTML =
+      '<div class="alertbox '+(ok?'info':'crit')+'" style="margin-bottom:0"><div class="atx"><b>'+(ok?'연결 확인 통과':'연결 확인 실패')+'</b><div>'+msg+'</div></div></div>';
+    b.disabled=false; b.textContent='연결 확인';
+  }, 600);
 }
 function submitConn(){
   cur.m.hfUrl=document.getElementById('cnUrl').value;
@@ -5793,6 +5878,18 @@ function drawWsDd(keepFocus){
    목록은 아직 대상을 고르지 않은 상태의 화면이다 */
 /* 작성 중인 입력이 있으면 확인받는다(공통정책 7.2). 필터를 바꾸면 목록으로 돌아가
    폼을 벗어나게 된다 */
+/* 작성 중 이탈 — 생성 · 신청 · 할당량 폼에서 브레드크럼 · 메뉴로 나가도 [취소]와 같은 확인 알럿을 거친다(워크스페이스 정책 「작성 중 이탈」 · 공통정책 7.2) */
+function wsLeave(go){
+  if(formDirty()){ openConfirm('작성 취소','작성 중인 내용은 저장되지 않습니다.', go, '취소', '계속 작성'); return; }
+  go();
+}
+/* 목업의 메뉴는 연결되지 않은 링크라, 확인 뒤에는 목록으로 돌아가는 것으로 대신한다. 검토용 처리다 */
+document.addEventListener('click',function(e){
+  const a=e.target.closest && e.target.closest('.gnb a');
+  if(!a || !formDirty()) return;
+  e.preventDefault(); e.stopPropagation();
+  wsLeave(backToList);
+},true);
 function formDirty(){
   if(view!=='form') return false;
   if(formKind==='quotaReq') return qReqDirty();
