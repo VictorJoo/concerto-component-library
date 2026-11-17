@@ -1,5 +1,16 @@
 <!--
-  콘체르토 매니저 — 플랫폼 설정 | 인프라 자원 목업 v0.19 (2026-11-12)
+  콘체르토 매니저 — 플랫폼 설정 | 인프라 자원 목업 v0.20 (2026-11-16)
+
+  ── v0.20 (2026-11-16) ──
+  · SET-INFRA-L01 v0.20 과 같은 버전이다.
+  · 노드 중지 확인 알럿의 [중지] 를 기본 버튼으로 바꿨다. 재개로 되돌릴 수 있어 파괴적 액션이 아니다(컴포넌트 라이브러리 4.5). 모니터링 알림 규칙 중지와 같다.
+  · 캐시 불가를 노드 그룹이 지정되지 않은 가속기 노드로 판정한다. 4.0에서는 캐시 그룹과 노드 그룹이 같은 노드 집합이라
+    미지정 가속기 노드가 곧 캐시 불가이며, 설치 구성이 빠진 경우다(모델 정책 4.1 · 배포 정책 4.7 · CON-1249).
+    데모 gpu-svr-07 을 노드 그룹 미지정으로 바꿨다(v0.19 는 dev-gpu 에 든 채 캐시 불가라 새 기준과 맞지 않았다).
+    데모 바 `노드 그룹: 없음` 이면 가속기 노드가 모두 미지정 · 캐시 불가로 보인다. 노드 그룹이 하나도 없는 구성도 설치 구성이 빠진 경우다.
+  · 노드 그룹 헤더 도움말과 캐시 불가 툴팁에 설치 구성이 빠진 경우임을 밝혔다.
+  · 노드 표 열 이름을 `상태 시작 일시` 로, 값을 YYYY-MM-DD HH:mm:ss 로 고쳤다(SET-INFRA-L01 7.2 · 공통정책 1.3).
+  · 라이선스 기본 정보 라벨을 `만료일자` 로 고쳤다(SET-INFRA-L01 7.3 · 공통정책 1.3).
 
   ── v0.19 (2026-11-12) ──
   · 알림 채널 등록 · 수정 모달 [취소] 는 바로 닫는다. 모달 안에서는 확인 알럿을 띄우지 않는다(컴포넌트 라이브러리 · 공통정책 7.2 · 4.5).
@@ -74,17 +85,17 @@
   · 노드 행 작업을 `중지`·`재개` 버튼에서 `⋯` 더보기 메뉴로 옮겼다. 공통정책 3.6 「행 단위 작업 액션은
     개수와 무관하게 더보기 메뉴로 통일」을 따른다(SET-INFRA-L01 7.2 · REQ-SET-INFRA-014). 확인 알럿은 그대로다.
   SET-INFRA-L01 v0.12(2026-10-14) 5.1 「정렬·페이지네이션」 개정에 맞췄다.
-  · 노드 표에 정렬을 두었다. 기본은 상태 시작 시각 최신순이다(공통정책 3.1 날짜·시간 내림차순).
+  · 노드 표에 정렬을 두었다. 기본은 상태 시작 일시 최신순이다(공통정책 3.1 날짜·시간 내림차순).
     방금 상태가 바뀐 노드가 위에 온다. 노드 이름 헤더도 정렬한다. 상태·가속기·작업은 견줄 값이 아니라 두지 않는다.
   · 노드 표 아래에 페이지네이션을 두었다. 페이지당 20건이 기본이다(공통정책 3.7).
     노드는 열 개를 넘을 수 있다(모니터링 정책 4.4 ⚠). 데모 노드는 여섯이라 한 쪽이다.
-  · 상태 시작 시각 헤더는 정렬과 도움말을 함께 둔다.
+  · 상태 시작 일시 헤더는 정렬과 도움말을 함께 둔다.
 
   ── v0.12 변경 (2026-10-12) ─────────────────────
   SET-INFRA-L01 v0.12 와 같은 버전이다. 근거는 구분안 #7(pageId 3451060356, 2026-10-06) ·
   CON-709 · 모니터링 정책 4.5(신설) · SET-INFRA-L01 REQ-SET-INFRA-012~015·030·031 · 5.1 · 5.2 · 7.2.
   · 클러스터 탭의 클러스터 표 아래에 노드 표를 두었다(REQ-SET-INFRA-012). 컬럼은
-    노드 · 상태 · 상태 시작 시각 · 가속기 · 작업(7.2 노드 표).
+    노드 · 상태 · 상태 시작 일시 · 가속기 · 작업(7.2 노드 표).
     화면 명칭은 `서버` 가 아니라 `노드` 다 — 이 화면 7.2·REQ-SET-INFRA-011 이 이미 `노드` 를 쓰고
     모니터링 정책 4.1 계층도 `노드` 다(공통정책 1.1). 대상이 VM 까지 넓어지면 다시 본다.
   · 상태는 다섯 값이다 — 정상 · 점검 · 연결 불가 · 사라짐 · 중지(모니터링 정책 4.5).
@@ -93,7 +104,7 @@
     상태 헤더 도움말에 값별 의미를 둔다(공통정책 2.3).
   · 연결 불가·사라짐 노드의 가속기 칸은 마지막으로 확인된 구성을 그대로 둔다
     (REQ-SET-INFRA-013 · CON-709 last_known_accelerators). 보조 표기를 붙이지 않는다.
-    같은 행의 상태 배지와 상태 시작 시각이 지금 읽은 값이 아님을 보인다(2026-10-26).
+    같은 행의 상태 배지와 상태 시작 일시이 지금 읽은 값이 아님을 보인다(2026-10-26).
   · 가속기 구성 값에 단위 `장` 을 붙였다(용어집 1장 단위 · 5장 장). 모니터링 목업 노드 부제와 같은 표기다(2026-10-26).
   · 작업 열 — `중지` 상태면 `재개`, 그 외 상태면 `중지` 를 노출한다(REQ-SET-INFRA-014).
     원문은 동작과 메모 선택만 준다. 어느 상태에서 중지를 막는지 정하지 않아 상태로 막지 않는다.
@@ -104,7 +115,7 @@
     되돌릴 수 있는 조작이라 이름 재입력을 두지 않는다(공통정책 7.5 `복구할 수 없는 것에만`).
     최종 실행은 중지 `.btn.danger`, 재개 `.btn`.
   · 토스트 — `노드를 중지했습니다.` · `노드를 재개했습니다.` 동기 응답(CON-709 응답 InfraServerDTO)이라
-    완료형이다(공통정책 7.7). 실행 후 그 행의 상태와 상태 시작 시각을 바꾼다.
+    완료형이다(공통정책 7.7). 실행 후 그 행의 상태와 상태 시작 일시을 바꾼다.
   · 노드를 찾을 수 없으면(CON-709 INFRA_SERVER_NOT_FOUND) `노드를 찾을 수 없습니다.` 실패 토스트 후
     노드 목록을 다시 조회한다(5.2 · 공통정책 7.6). 데모에서는 하단 바 `노드 없음` 으로 재현한다 —
     실제 화면에는 없는 검토용 처리다.
@@ -200,7 +211,7 @@
   비활성 사유는 둘이다 — 관리자 차단 · 로그인 실패 누적. 목록에서는 `비활성` 으로 같게 두고
   상세에서 사유를 밝힌다. 조치 버튼은 사유에 따라 갈린다 — 잠김은 `잠금 해제`,
   관리자 차단은 `활성`. 같은 버튼으로 두면 관리자가 끈 계정을 실수로 푼다.
-  ⚠ 백엔드에 사유 필드가 있는지 확인이 필요하다(확인 요청 항목 9번).
+  ⚠ 서버에 사유 필드가 있는지 확인이 필요하다(확인 요청 항목 9번).
 
   삭제하면 목록에서 뺀다. 참조하는 자리(감사 로그 행위자 등)에서는 이름을 보이지 않고
   `삭제됨` 으로 두고 호버 시 사유를 알린다(공통정책 1.6).
@@ -398,8 +409,8 @@
     키 순서도 고정되어 있지 않다. 확인 요청 항목 10번.
 
   ── 확인 대기 ───────────────────────────────────
-  라이선스   에디션·만료일은 근거 없이 넣은 값이다. 기술문서에 라이선스 서술이 없고
-             회의록 셋뿐이다. 담을 항목·산정 기준·만료 시 동작 모두 미정(확인 1·2번)
+  라이선스   v0.14 에서 정했다. 에디션 · 만료일자는 라이선스 키에 담긴 값이고, 만료 처리는
+             SET-INFRA-L01 5.2 · 알림 정책 3.4 를 따른다
   CDE 이미지 현행은 v1, 기술문서는 v2.3·v2.5·warboy·rngd. `(기본)` 의 뜻도 미정.
              CDE 신청 화면과 같은 데이터라 CDE 정책 9. 30번에서 함께 다룬다
   서빙 엔진   제공하는 것만 둔다. 상태 컬럼을 둘지, 실제 엔진이 무엇인지 미정(확인 5번)
@@ -731,7 +742,7 @@ tr:hover .mname{text-decoration-color:var(--foreground)}
 .cfname label b{color:var(--foreground);font-weight:600}
 /* 확인 알럿 안 선택 메모 — 이름 재입력과 같은 자리 규격(.cfname)을 쓴다 */
 .cfname textarea.inp{resize:vertical;min-height:72px;line-height:1.55}
-/* 노드 표 — 상태 시작 시각 */
+/* 노드 표 — 상태 시작 일시 */
 .ndwhen{font-variant-numeric:tabular-nums;white-space:nowrap}
 .f{margin-bottom:16px}
 /* 폼 라벨 — 라이브러리 .field > label 규격. 굵기를 주지 않아 입력값이 앞선다 */
@@ -2444,7 +2455,7 @@ function dlName(menu){
    + '_' + p(d.getHours())+p(d.getMinutes());
 }
 /* 형식은 CSV 하나다(공통정책 3.5). UTF-8 BOM · 쉼표 이스케이프 · 일시 문자열은
-   백엔드가 처리한다 — 화면은 범위와 파일명만 정한다 */
+   서버가 처리한다 — 화면은 범위와 파일명만 정한다 */
 function askDownload(menu, filtered, total){
   const scope = filtered<total
     ? '조건에 맞는 <b>'+filtered+'건</b>을 내려받습니다.'
@@ -2623,7 +2634,7 @@ function userRef(id){
    일시는 최신이 먼저다(공통정책 3.1) */
 const SORT={usr:{k:'at',d:'desc'}, aud:{k:'at',d:'desc'},
             eng:{k:'n',d:'asc'}, img:{k:'t',d:'asc'}, ch:{k:'at',d:'desc'},
-            /* 노드 — 상태 시작 시각 최신순(SET-INFRA-L01 5.1 · 공통정책 3.1). 방금 상태가 바뀐 노드가 위에 온다 */
+            /* 노드 — 상태 시작 일시 최신순(SET-INFRA-L01 5.1 · 공통정책 3.1). 방금 상태가 바뀐 노드가 위에 온다 */
             nd:{k:'since',d:'desc'}};
 /* 조회 전용이라도 정렬·페이지네이션을 둔다. 이미지는 런타임 버전이 오르면 계속 늘어난다.
    건수가 적을 때 안 보이는 것이 아니라, 규격을 지켜 두고 늘어나면 그대로 쓴다 */
@@ -2701,7 +2712,7 @@ const COLDEF={
     +'<dt>중지</dt><dd>최고 관리자가 중지했습니다.</dd></dl>',
   nsince:'지금 상태가 시작된 시각입니다.',
   /* 라벨 부여는 화면이 아니라 설치 · 운영 절차라 왜 미지정인지 밝힌다. 노드 그룹을 확인할 수 없는 노드는 캐싱 요청이 거절된다(MODEL-L01 5.3) */
-  ng:'운영자가 노드에 붙인 라벨로 정한 묶음입니다. 라벨이 없는 노드는 미지정이며, 이 노드에는 모델 캐싱을 요청할 수 없습니다.',
+  ng:'운영자가 노드에 붙인 라벨로 정한 묶음입니다. 라벨이 없는 노드는 미지정이며, 이 노드에는 모델 캐싱을 요청할 수 없습니다. 가속기 노드가 미지정이면 설치 구성이 빠진 것입니다.',
   cls:'클러스터에 연결할 수 있는지를 나타냅니다.'
     +'<dl><dt>정상</dt><dd>룸을 만들고 자원을 배정할 수 있습니다.</dd>'
     +'<dt>오류</dt><dd>연결에 실패했습니다.</dd>'
@@ -2881,8 +2892,8 @@ function drawAudit(){
 
 /* 상세정보는 `키: 값` 을 ` / ` 로 이은 문자열이다(현행 관측).
    ⚠ 구조화되어 오는지, 변경 전값도 남기는지 확인이 필요하다 — 확인 요청 항목 10번 */
-/* 화면이 가공해 보이는 값의 원본이다. 실제 형태는 백엔드 확인 대상(확인 요청 항목 10번) */
-/* 원본은 백엔드가 남긴 기록이다. 다만 `details` 를 한 줄 문자열로 두면 줄바꿈이
+/* 화면이 가공해 보이는 값의 원본이다. 실제 형태는 서버 확인 대상(확인 요청 항목 10번) */
+/* 원본은 서버가 남긴 기록이다. 다만 `details` 를 한 줄 문자열로 두면 줄바꿈이
    `\n` 으로 박혀 읽을 수 없다 — 원본을 보는 목적이 사라진다. 줄로 쪼개 배열로 둔다.
    ⚠ 실제로 구조화되어 오는지는 확인 대상이다(확인 요청 항목 10번) */
 function auditJson(r){
@@ -2935,9 +2946,9 @@ function openAudPanel(i){
           return '<dt>'+esc(p[0])+'</dt><dd>'+esc(p[1])+'</dd>'; }).join('')+'</dl>'
       : '<div class="hint">남은 내용이 없습니다.</div>')
    + '</div>'
-   /* 기술문서 11.4 — 상세 JSON 페이로드. 백엔드가 남긴 원본이다.
+   /* 기술문서 11.4 — 상세 JSON 페이로드. 서버가 남긴 원본이다.
       확인 수단이지 읽을 대상이 아니라 접어 둔다(배포 목업 `생성될 설정(YAML)` 과 같다) */
-   /* 백엔드가 남긴 원본이다. 확인 수단이라 패널에서는 앞부분만 보이고 전문은 모달에서 본다 —
+   /* 서버가 남긴 원본이다. 확인 수단이라 패널에서는 앞부분만 보이고 전문은 모달에서 본다 —
       패널 폭이 440px 이라 들여쓴 JSON 이 가로로 넘친다 */
    + '<div class="ssec"><div class="ssechd"><div><h4>원본</h4></div>'
    +   '<div class="secbtns"><button class="btn ghost sm" onclick="openRaw('+i+')">전체 보기</button></div></div>'
@@ -3274,18 +3285,18 @@ function runCluster(){
            (CON-709 last_known_accelerators)
    ⚠ 노드의 소속 클러스터는 CON-709 servers[] 에 없다. 컬럼으로 두지 않았다 — 확인 대상 */
 const NODES=[
-  {n:'gpu-svr-01', g:'serving-gpu', st:'정상',      since:'2026-09-28 10:12', acc:'NVIDIA-H200 8장'},
-  {n:'gpu-svr-02', g:'dev-gpu',     st:'점검',      since:'2026-10-12 08:40', acc:'NVIDIA-A100 4장 · NVIDIA-L40S 2장'},
-  {n:'gpu-svr-03', g:'serving-gpu', st:'연결 불가', since:'2026-10-12 09:41', acc:'NVIDIA-H200 4장'},
-  {n:'npu-svr-01', g:'serving-npu', st:'중지',      since:'2026-10-11 18:05', acc:'Furiosa RNGD 8장'},
-  {n:'npu-svr-02', g:'serving-npu', st:'정상',      since:'2026-09-28 10:12', acc:'Furiosa RNGD-S 6장'},
-  {n:'cpu-svr-01', g:null,          st:'정상',      since:'2026-09-28 10:12', acc:''},
-  {n:'gpu-svr-04', g:'serving-gpu', st:'정상',      since:'2026-09-28 10:12', acc:'NVIDIA-H200 8장'},
-  {n:'gpu-svr-05', g:'serving-gpu', st:'정상',      since:'2026-09-28 10:12', acc:'NVIDIA-H200 8장'},
-  {n:'gpu-svr-06', g:'dev-gpu',     st:'정상',      since:'2026-10-02 14:30', acc:'NVIDIA-A100 4장'},
-  /* 캐시 그룹에 들지 않은 가속기 노드 — 모델 캐시 열에 캐시 불가와 사유를 보인다(SET-INFRA-L01 7.2 · CON-1244). 검토용 값이다 */
-  {n:'gpu-svr-07', g:'dev-gpu',     st:'정상',      since:'2026-10-02 14:30', acc:'NVIDIA-L40S 4장', nocache:true},
-  {n:'npu-svr-03', g:'serving-npu', st:'정상',      since:'2026-09-28 10:12', acc:'Furiosa RNGD 8장'}
+  {n:'gpu-svr-01', g:'serving-gpu', st:'정상',      since:'2026-09-28 10:12:00', acc:'NVIDIA-H200 8장'},
+  {n:'gpu-svr-02', g:'dev-gpu',     st:'점검',      since:'2026-10-12 08:40:00', acc:'NVIDIA-A100 4장 · NVIDIA-L40S 2장'},
+  {n:'gpu-svr-03', g:'serving-gpu', st:'연결 불가', since:'2026-10-12 09:41:00', acc:'NVIDIA-H200 4장'},
+  {n:'npu-svr-01', g:'serving-npu', st:'중지',      since:'2026-10-11 18:05:00', acc:'Furiosa RNGD 8장'},
+  {n:'npu-svr-02', g:'serving-npu', st:'정상',      since:'2026-09-28 10:12:00', acc:'Furiosa RNGD-S 6장'},
+  {n:'cpu-svr-01', g:null,          st:'정상',      since:'2026-09-28 10:12:00', acc:''},
+  {n:'gpu-svr-04', g:'serving-gpu', st:'정상',      since:'2026-09-28 10:12:00', acc:'NVIDIA-H200 8장'},
+  {n:'gpu-svr-05', g:'serving-gpu', st:'정상',      since:'2026-09-28 10:12:00', acc:'NVIDIA-H200 8장'},
+  {n:'gpu-svr-06', g:'dev-gpu',     st:'정상',      since:'2026-10-02 14:30:00', acc:'NVIDIA-A100 4장'},
+  /* v0.20 · 노드 그룹이 지정되지 않은 가속기 노드. 설치 구성이 빠진 경우다. 모델 캐시 열에 캐시 불가와 사유를 보인다(SET-INFRA-L01 7.2 · 모델 정책 4.1 · CON-1249). 검토용 값이다 */
+  {n:'gpu-svr-07', g:null,          st:'정상',      since:'2026-10-02 14:30:00', acc:'NVIDIA-L40S 4장'},
+  {n:'npu-svr-03', g:'serving-npu', st:'정상',      since:'2026-09-28 10:12:00', acc:'Furiosa RNGD 8장'}
 ];
 /* 노드 그룹(v0.13). 운영자가 노드에 붙인 라벨이다. 화면에서는 조회만 한다(모니터링 정책 4.1).
    g 가 없으면 `미지정`(용어집 5장). 데모 그룹 이름 · 구성은 모니터링 목업 v0.28 과 같은 검토용 값이다 */
@@ -3358,7 +3369,7 @@ function nodeTable(){
   const list=NODES.filter(function(nd){ return !on || !ngSel.length || ngSel.indexOf(ndGrp(nd))>=0; });
   return '<div class="resblock"><div class="rh"><h5>노드</h5><span class="cnt">'+list.length+'</span></div>'
    + '<div class="tblwrap ndtbl"><table class="tbl"><thead><tr>'
-   /* 정렬은 값을 견주는 컬럼(노드 이름·상태 시작 시각)에 둔다. 상태 시작 시각은 헤더 도움말을 함께 둔다 */
+   /* 정렬은 값을 견주는 컬럼(노드 이름·상태 시작 일시)에 둔다. 상태 시작 일시은 헤더 도움말을 함께 둔다 */
    + sortTh('nd','n','노드') + (on? ngTh() : '') + '<th class="thcell">'+thHelp('nst','상태')+'</th>'
    + ndSinceTh() + '<th>가속기</th><th>모델 캐시</th>'
    /* 이 화면 전체가 최고 관리자 전용이다(9.4). 권한이 없으면 화면 자체가 막혀 작업 열을 따로 가르지 않는다 */
@@ -3382,18 +3393,19 @@ function nodeTable(){
         + '<td>'+acc+'</td>'
         /* 캐시 그룹 밖 가속기 노드는 캐시 불가. 배포에 쓸 수 없어 배분 가능한 양에서 빠진다(모델 정책 4.1 · 워크스페이스 정책 5.1).
            가속기가 없는 노드는 캐시 대상이 아니라 - */
-        + '<td>'+(!nd.acc ? '<span class="dash">-</span>' : nd.nocache ? '캐시 불가 <span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">캐시를 둘 수 없는 노드라 배포에 쓸 수 없습니다.</span></span>' : '가능')+'</td>'
+        /* v0.20 · 4.0은 노드 그룹이 지정되지 않은 가속기 노드가 캐시 불가다(모델 정책 4.1 · CON-1249) */
+        + '<td>'+(!nd.acc ? '<span class="dash">-</span>' : ndGrp(nd)==='미지정' ? '캐시 불가 <span class="tip-anchor"><span class="tip-ic" tabindex="0">?</span><span class="tip">노드 그룹이 지정되지 않아 캐시를 둘 수 없습니다. 배포에 쓸 수 없으며, 설치 구성이 빠진 경우입니다.</span></span>' : '가능')+'</td>'
         + '<td>'+btn+'</td></tr>';
      }).join('')
    + '</tbody></table></div>'
    /* 4.0 기준 규모는 노드 20대다(모니터링 정책 4.4). 페이지당 20건(SET-INFRA-L01 5.1 · 공통정책 3.7) */
    + pagerBar(list.length) + '</div>';
 }
-/* 상태 시작 시각 — 정렬 헤더에 도움말을 함께 둔다. sortTh 와 같은 정렬 표시 규격이다 */
+/* 상태 시작 일시 — 정렬 헤더에 도움말을 함께 둔다. sortTh 와 같은 정렬 표시 규격이다 */
 function ndSinceTh(){
   const s=SORT.nd, on=s.k==='since';
   return '<th class="thcell sortable'+(on?' on':'')+'" onclick="tgSort(\'nd\',\'since\')">'
-   + thHelp('nsince','상태 시작 시각')
+   + thHelp('nsince','상태 시작 일시')
    + (on? ' <span class="sar">'+(s.d==='asc'?'▲':'▼')+'</span>' : '')+'</th>';
 }
 /* 중지·재개 — 확인 알럿을 거치고 메모를 선택으로 받는다(REQ-SET-INFRA-015 · 5.1).
@@ -3427,7 +3439,7 @@ function runNode(name, stop, memo){
 }
 function nowMin(){
   const d=new Date(), z=function(n){ return (n<10?'0':'')+n; };
-  return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())+' '+z(d.getHours())+':'+z(d.getMinutes());
+  return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())+' '+z(d.getHours())+':'+z(d.getMinutes())+':'+z(d.getSeconds());
 }
 
 /* ══════════ 라이선스 ══════════ */
@@ -3465,7 +3477,7 @@ function licPane(){
     + '<dl class="dl two">'
     +   '<dt>에디션</dt><dd>'+LIC.edition+'</dd>'
     /* 영구 라이선스는 만료일이 없다(1.7). 유예 중 · 유예 종료면 유예 종료일을 함께 둔다 */
-    +   '<dt>만료일</dt><dd>'+(LIC.st==='perpetual'? '<span class="dash">-</span>' : LIC.until
+    +   '<dt>만료일자</dt><dd>'+(LIC.st==='perpetual'? '<span class="dash">-</span>' : LIC.until
           + ((LIC.st==='grace'||ended)? ' <span class="sub">유예 종료 '+LIC.graceEnd+'</span>' : ''))+'</dd>'
     + '</dl></div>'
     /* 테이블은 `.tblwrap` 이 테두리를 가지므로 카드로 또 감싸지 않는다.
@@ -4014,7 +4026,7 @@ function openConfirm(title,body,onOk,okLabel,cancelLabel,confirmName,withMemo){
   document.getElementById('cfBody').innerHTML=body;
   const ok=document.getElementById('cfOk');
   ok.textContent=okLabel||'확인';
-  ok.className='btn'+(['삭제','종료','취소','중단','일시중지','해제','중지'].indexOf(okLabel)>=0?' danger':'');
+  ok.className='btn'+(['삭제','종료','취소','중단','해제'].indexOf(okLabel)>=0?' danger':'');
   ok.style.display=onOk?'':'none';
   const mw=document.getElementById('cfMemoWrap'), mm=document.getElementById('cfMemo');
   mw.style.display=withMemo?'':'none'; mm.value='';
