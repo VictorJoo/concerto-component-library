@@ -1,13 +1,40 @@
 <!--
-  콘체르토 매니저 · 배포 화면 목업 v0.46 (2026-11-12)
+  콘체르토 매니저 · 배포 화면 목업 v0.47 (2026-11-16)
   색·컴포넌트 규격은 워크스페이스 목업 v0.33 를 그대로 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
 
   ── 변경 ────────────────────────────────────────
+  ── v0.47 (2026-11-16) ──
+  · DEP-L01 v0.47 · 배포 정책 v0.36 과 같은 버전이다.
+  · 배포 일시중지 확인 알럿의 [일시중지] 를 기본 버튼으로 바꿨다. 다시 시작할 수 있어 파괴적 액션이 아니다(컴포넌트 라이브러리 4.5).
+  · 데모 바 검수 `통과` 가 입력 오류 · 잔여 초과로 통과가 아니던 것을 고쳤다. 데모 바로 04 검수를 열면 배포 전 검사 결과까지 내려 보여 준다(검토용).
+  · 응답 대기 시간을 1~3600 정수(초) 직접 입력으로 바꿨다. 비우면 3600초이고 입력란에 3600을 흐리게 둔다.
+    범위 밖은 `1~3600 사이의 정수를 입력해 주세요.` 인라인 에러(입력란을 벗어날 때, 04 검수에서 한 번 더). 설정 변경 게이트웨이 섹션에도 두었다.
+    재기동 없음 구간이다. 응답 대기 시간만 바꾸면 재기동 경고가 나오지 않는다(DEP-L01 3장 · 7.3 · 7.7 · 배포 정책 2.6 · 5.2 · CON-1320).
+  · 게이트웨이 설정 반영 실패 사유를 두었다. 상태는 정상 그대로, 상태 배지 도움말 · 패널 · 상세에 역할별 문구(DEP-L01 5.3).
+    데모 바 `게이트웨이 반영` 으로 확인한다.
+  · 클러스터에 없는 가속기 종류를 02 자원에서 비활성 + ` · 클러스터에 없음`, 선택칸 아래 사유. 다시 시작 · 재시작 · 다시 시도 · 설정 변경이 이 이유로 거절되면 실패 토스트.
+    클러스터에 가속기가 하나도 없으면 배포 전 검사 ⚠ `클러스터에서 감지된 가속기가 없습니다. …`, 조치 문구 없음(DEP-L01 5.3 · 배포 정책 2.3 · 4.2 · CON-1307).
+    데모 바 `클러스터 가속기` 로 확인한다.
+  · 모니터링 탭 처리량을 초당 요청 수 · 초당 생성 토큰 수로, 차트 제목을 `생성 토큰 처리량 추이` 로, 카드 · 차트는 30초마다 다시 부른다(DEP-L01 7.6 · 모니터링 정책 2.3 · 5.1 · CON-1338).
+  · 노드 그룹 잔여는 그 그룹에서 고른 모델이 캐싱된 노드의 빈 가속기 수다. 운영룸 잔여와 그룹 잔여 중 작은 값을 보인다(배포 정책 4.7 · CON-1244).
+    노드 그룹 목록이 비어 오면 노드 그룹 칸을 두지 않고 자동 배치로 둔다(REQ-DEP-105 · CON-1249). 데모 바 `노드 그룹 목록` 으로 확인한다.
+  · 같은 운영룸에 같은 모델명으로 호출되는 배포가 이미 있으면 04 검수 배포 전 검사 ✕, 01 모델 단계에 묶는다(배포 정책 2.5 · DEP-L01 5.3 · 7.3).
+    서버 검사 결과라 데모 바 `같은 모델명 배포` 로 확인한다. 실제 화면에는 없는 검토용 처리다.
+  · 설정 변경에서 재기동 없는 값만 바꿀 때 띄우던 `저장하는 동안 상태가 잠시 생성 중으로 보일 수 있습니다.` 를 지웠다.
+    정상 배포는 상태가 바뀌지 않는다(서버 GW-TIMEOUT-PATCH-1 · 배포 정책 2.6).
+  · 요청 분배 기준을 기본 · 권장 · 직접 설정으로 바꿨다. 기본은 첫 요청 분산만(단일 1 · 프리필 1 · 디코드 3), 권장은 단일 서빙에서만 접두 캐시 2 · 첫 요청 분산 1 · 부하 기반 1.
+    직접 설정은 기준 3종(접두 캐시 · 첫 요청 분산 · 부하 기반)마다 사용 체크와 0~9 가중치, 옆에 몫(%)을 읽기 전용으로 보인다. 단일 서빙은 한 열, 프리필·디코드 분리는 프리필 · 디코드 두 열.
+    직전 선택의 값을 채워 연다. NPU 면 접두 캐시 행과 권장을 비활성 + 사유. 서빙 방식을 바꾸면 기본 값으로 다시 채운다(REQ-DEP-108 · DEP-L01 5.3 · 7.3 · 배포 정책 4.8).
+    설정 변경에도 같은 칸을 두고 재기동 경고를 띄우지 않는다(REQ-DEP-109 · DEP-L01 7.7 · 배포 정책 2.6).
+  · 설정 변경에서 가속기 공유가 시분할 · MPS 인 배포는 노드 그룹 칸을 비활성 + 사유 `가속기를 공유하는 배포는 노드 그룹을 바꿀 수 없습니다.`(REQ-DEP-106 · DEP-L01 5.3 · 배포 정책 4.7).
+  · 04 검수 아래 배포 전 검사 결과의 ✕ 사유 줄을 링크로 두었다. 검수 구역은 입력 오류만 다루고 배포 전 검사 ✕ 를 싣지 않는다. 같은 문장이 위아래에 두 번 나왔다. 누르면 그 값을 정한 단계로 가서 입력 칸으로 스크롤 · 포커스하고, 칸이 고급 설정 안에 있으면 펼친다.
+    칸이 화면에 없으면 단계 제목 아래 알림 박스로 간다. 단계 화면 알림 박스는 배포 전 검사 결과와 같은 문구로 사유만 한 줄씩 적는다(REQ-DEP-107 · DEP-L01 7.3).
+  · 게이트웨이 연결 중 사유를 두었다. 상태는 바꾸지 않고 상태 배지 도움말 · 패널 · 상세에 같은 문구(DEP-L01 5.3 · 배포 정책 3.1). 데모 바 `게이트웨이 연결` 로 확인한다. 검토용 처리다.
   ── v0.46 (2026-11-12) ──
   · 작성 중 이탈: 메뉴 · 브레드크럼 · 워크스페이스 전환으로 나가도 [취소]와 같은 확인 알럿을 거친다(공통정책 7.2 · REQ-DEP-045). 브레드크럼이 확인 없이 목록으로 가던 것을 고쳤다.
   · DEP-L01 v0.46 · 배포 정책 v0.35 와 같은 버전이다. 배포 전 검사를 TUI 배포 전 검사와 맞췄다(배포 전 검사 항목 대조표 11-12).
   · 배포 전 검사에 ✕ 를 더했다. 모델 캐싱(고른 뒤 캐시가 지워짐), 노드 그룹 캐시 불일치, 모델과 계열이 다른 가속기.
-    셋 다 화면이 이미 막는 값의 마지막 확인이다(배포 정책 2.3). TUI 의 모니터링 엔드포인트 검사는 4.0 백엔드 검사에 없어 넣지 않았다.
+    셋 다 화면이 이미 막는 값의 마지막 확인이다(배포 정책 2.3). TUI 의 모니터링 엔드포인트 검사는 4.0 서버 검사에 없어 넣지 않았다.
   · 가속기 잔여 초과를 ⚠ 에서 ✕ 로 바꿨다. 잔여를 넘으면 배포 버튼을 막는데(배포 정책 4.2) 기호가 ⚠ 라 맞지 않았다. MPS 는 종전대로 막지 않는다.
   · 배포명 규칙에 처음과 끝 하이픈 금지와 2~50자를 더했다(배포 정책 2.5 · CON-1243). 문구는 DEP-L01 5.3.
   · 생성 레플리카 수를 1~10 정수로 맞췄다. 설정 변경과 같은 범위다(4.0 지원 범위 정책 1장 · DEP-L01 5.3 · 7.3).
@@ -19,11 +46,11 @@
     모델 요구 값이 있거나 MPS 면 종전처럼 잠근다. 레플리카 수 증감 버튼 상한을 16 에서 10 으로 맞췄다(입력 검증과 같은 범위).
   · 설정 변경에서 재기동 필요 구간의 값을 바꿨는데 운영룸 잔여가 모자라면 확인 알럿 `중단 후 반영` 을 띄운다. 진행하면 모두 내린 뒤 다시 올리고
     상태는 생성 중이다(배포 정책 2.6 · DEP-L01 5.3 · CON-1263). 데모 바 `설정 저장 · 자원 부족` 으로 본다. 검토용 처리다.
-  · 백엔드가 중단 후 반영을 받기 전의 저장 거절을 데모 바 `설정 저장 · 자원 부족 거절` 로 본다. 모달 상단에
+  · 서버가 중단 후 반영을 받기 전의 저장 거절을 데모 바 `설정 저장 · 자원 부족 거절` 로 본다. 모달 상단에
     `자원이 부족해 지금 반영할 수 없습니다. 배포를 일시중지한 뒤 다시 저장해 주세요.` 를 두고 입력값을 남긴다(DEP-L01 5.3).
   · 재시작 토스트에 `처리가 끝나면 알림으로 안내됩니다.` 를 붙였다. 모델을 다시 올리는 동안 몇 분이 걸려 결과를 알림으로 받는다(알림 정책 3.1). 일시중지는 목록 상태로 바로 보여 그대로 둔다.
   · 배포 전 검사에 ⚠ 한 줄을 더했다. 프리필 · 디코드 분리인데 고속 네트워크를 쓰지 않을 때다(배포 정책 2.3 · DEP-L01 5.3).
-    백엔드가 함께 보내는 운영룸 사용률 경고는 표시하지 않는다. 배포 생성자가 조치할 수 없고 사용량 · 잔여는 02 자원에 이미 보인다.
+    서버가 함께 보내는 운영룸 사용률 경고는 표시하지 않는다. 배포 생성자가 조치할 수 없고 사용량 · 잔여는 02 자원에 이미 보인다.
   · gpt-oss-120b-furiosa 의 레플리카당 가속기 수 요구 값을 8 에서 4 로 고쳤다. NPU 모델은 컴파일한 장수로 고정되고 이 모델은 RNGD 4장이다(모델 정책 2.9 · 모델 운영 판단 가이드 2.4).
   · 엔진 인자 예약어 거절 문구를 인자마다 정하는 자리로 바꿨다. TP 는 02 자원에서 정한다(DEP-L01 5.3).
   · 설정 변경 모달을 라이브러리 입력 모달 형식으로 다시 짰다. 섹션은 생성 마법사 단계와 같게 모델 · 자원 · 게이트웨이, 지표 · 추적 수집은 모니터링(상세 탭 이름).
@@ -58,8 +85,8 @@
   · 03 게이트웨이 고급 설정에서 최대 요청 크기를 뺐다. 응답 대기 시간만 남는다. 최대 요청 크기는 운영룸 게이트웨이 설정에서 정한다
     (워크스페이스 정책 3.4 · DEP-L01 7.3 · CON-1227). 고급 설정 표시 개수와 작성 중 확인도 같이 정리했다.
   · 가속기 메모리 사용률을 퍼센트 10~99 정수로 바꿨다. 생성은 선택칸(0.80~0.95)에서 입력란으로, 설정 변경은 0.1~1.0 에서 10~99 로.
-    기본 90. 범위 밖은 `10~99 사이의 정수를 입력해 주세요.` 인라인 에러. 백엔드에는 0.10~0.99 소수로 보낸다(배포 정책 5.2 · DEP-L01 5.3 · 7.3 · 7.7).
-    도움말은 할당 메모리에 가중치가 올라가고 나머지가 KV 캐시라는 것, 가중치보다 크게 잡아야 한다는 것이다. 가중치 대비 검사는 백엔드에 없어 안내만 한다.
+    기본 90. 범위 밖은 `10~99 사이의 정수를 입력해 주세요.` 인라인 에러. 서버에는 0.10~0.99 소수로 보낸다(배포 정책 5.2 · DEP-L01 5.3 · 7.3 · 7.7).
+    도움말은 할당 메모리에 가중치가 올라가고 나머지가 KV 캐시라는 것, 가중치보다 크게 잡아야 한다는 것이다. 가중치 대비 검사는 서버에 없어 안내만 한다.
   · 배포명 형식(영문 소문자·숫자·하이픈) 검증은 목업에 있던 것이다. 이번에 배포 정책 2.5 · DEP-L01 5.3 · 7.3 에 옮겨 적었다.
   · 02 자원 고급 설정에 `노드 그룹` 선택을 두었다(배포 정책 4.7 · DEP-L01 7.3 · REQ-DEP-105).
     기본은 선택 안 함이다. 고르지 않으면 모델 캐시가 있는 노드 그룹에 자동으로 배치된다.
@@ -116,7 +143,7 @@
     가속기 지정 · 지분 프리셋 · 공유 가속기 잔여는 두지 않는다. 최소 메모리 지분은 화면이 계산하지 않고 배포 전 검사가 판정한다.
     지분을 비우면 `값을 입력해 주세요.`, 범위 밖이면 `1~98 사이의 정수를 입력해 주세요.`(연산) · `1~90 사이의 정수를 입력해 주세요.`(메모리).
     연산 지분 상한 98 은 한 공유 가속기의 연산 지분 합 상한과 같다. 99 는 혼자서도 배치되지 않는다(배포 정책 4.6).
-    시간 간격 등급 `드라이버 기본` 은 가속기 드라이버의 기본 간격을 쓰는 값이다. 김으로 채우는 것은 비워 보내면 김으로 보내는 백엔드 동작과 같다(배포 정책 4.6).
+    시간 간격 등급 `드라이버 기본` 은 가속기 드라이버의 기본 간격을 쓰는 값이다. 김으로 채우는 것은 비워 보내면 김으로 보내는 서버 동작과 같다(배포 정책 4.6).
     시분할 배포의 총 사용량은 레플리카 수와 관계없이 풀마다 레플리카당 가속기 수만큼 센다(배포 정책 4.3 · 4.6 · DEP-L01 REQ-DEP-035).
     MPS 배포는 기존 공유 가속기에 합류하면 0장, 새 공유 가속기를 잡으면 1장이라 배치 전에는 확정할 수 없어 최대값 1장으로 보인다(배포 정책 4.2 · 4.3 · DEP-L01 REQ-DEP-035).
     입력란을 벗어날 때 띄우고 04 검수에서 한 번 더 잡는다(공통정책 7.8).
@@ -155,7 +182,7 @@
     비우고 보내면 칸 아래 인라인 에러 `API Key를 입력해 주세요.` 와 칸 포커스(공통정책 7.8). 보내기는 요청 칸만 보고 켜 둔다(공통정책 7.1).
     게이트웨이가 키를 거절하면 응답 자리에 `API Key가 올바르지 않거나 이 배포를 호출할 수 없는 키입니다. 키를 확인해 주세요.`
     키는 상세를 다시 열면 비운다 — 저장하지 않는다. 인증을 끈 배포 · 외부 배포는 칸이 없다.
-    동작 확인은 운영룸 게이트웨이를 거치고 프리필·디코드 분리 배포도 보낼 수 있다(배포 정책 6장 「경로」, 백엔드 10-28 045531dc).
+    동작 확인은 운영룸 게이트웨이를 거치고 프리필·디코드 분리 배포도 보낼 수 있다(배포 정책 6장 「경로」, 서버 10-28 045531dc).
     데모 바 `v0.40 동작 확인: 키 거절` 은 다음 보내기 한 번을 거절로 돌려준다. 실제 화면에는 없는 검토용 처리다.
   · 삭제 확정 지연 · 강제 삭제(댓글 3510272146(2026-10-28) ② ③ · 배포 정책 2.5 · 2.7 · 3.2 · 3.3 · 9장 · DEP-L01 5.1 · 5.2 · 5.3 · REQ-DEP-097~099).
     종료 알럿을 확인하면 행이 `삭제 중` 으로 남는다(종료 토스트는 종전 접수형 그대로). 자원 정리가 확인되면 목록에서 사라진다 — 목업은 사라지는 시점을 두지 않는다.
@@ -166,7 +193,7 @@
     확인 알럿 제목 `{배포} 강제 삭제`, 배포명 재입력 뒤에만 최종 `강제 삭제`(.btn.danger)가 켜진다(공통정책 7.5). 실행하면 `{배포}을(를) 강제 삭제했습니다.` 와 함께 목록에서 지운다.
     생성 03 게이트웨이에서 삭제 중인 배포와 같은 이름으로 중복 확인하면 배포명 칸 인라인 에러
     `같은 이름의 배포를 삭제하는 중입니다. 삭제가 끝난 뒤 다시 만들거나 다른 이름을 입력해 주세요.` 와 포커스, 04 검수 배포 전 검사도 같은 문구로 ✕.
-    샘플 행 · 30분 판정은 검토용 값이다. 30분은 지금 백엔드 값이며 실측 뒤 바뀔 수 있다.
+    샘플 행 · 30분 판정은 검토용 값이다. 30분은 지금 서버 값이며 실측 뒤 바뀔 수 있다.
   · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다). 벤치마크 결과 모달의 조회 오류도 같다.
   · KServe 범용 준비 상태 확인이 누를 때마다 준비됨 · 준비 안 됨을 번갈아 보인다(DEP-L01 6장 결과 둘). 데모 바 외부 배포에 `기타` 를 더했다.
   · 설정 변경 모달 부제를 `{배포}의 설정을 수정합니다.` 로 — 구간(용량 · 엔진 설정 · 수집 · 병렬 처리 · 접근 설정)에 묶이지 않게.
@@ -273,11 +300,11 @@
           거절 분기를 보이기 위한 검토용 처리이며 실제 화면에는 없다.
 
   ── v0.37 (2026-10-22) ──
-        · 판정 사유가 여럿일 때의 표시를 정했다(배포 정책 3.4 · DEP-L01 v0.37 7.2 · 7.6 · 모니터링 정책 5.2). 값은 백엔드 판정값이 정본이다.
+        · 판정 사유가 여럿일 때의 표시를 정했다(배포 정책 3.4 · DEP-L01 v0.37 7.2 · 7.6 · 모니터링 정책 5.2). 값은 서버 판정값이 정본이다.
           패널 헬스 행은 한 줄 자리라 가장 심각한 사유와 `외 N건` 만 두고, 마우스를 올리면 전체를 보인다.
           모니터링 탭은 헬스 카드 아래 전체 폭에 안내 박스를 둔다(주의 · 위험만). 박스 머리 줄 오른쪽 `사유 N건 모두 보기` 로
           심각도 · 지표 · 현재 값 · 기준 · 집계(방식 · 창) 표를 그 자리에서 펼친다. 측정하지 못한 지표는 구분선 아래 한 줄.
-          순서는 백엔드가 보낸 순서(심각도 높은 순)다. 사유가 없으면(안정) 두지 않는다.
+          순서는 서버가 보낸 순서(심각도 높은 순)다. 사유가 없으면(안정) 두지 않는다.
           샘플 llama-3-2-1b-prod 를 위험 · 사유 셋 · 측정 못 한 지표 둘로, gpt-oss-120b-symphony 는 저활용 하나로 두었다.
           모니터링 목업 v0.27 과 같은 배포 · 같은 값이다(검토용).
 
@@ -316,7 +343,7 @@
 
   v0.35 (2026-10-19) · 모니터링 4.0 범위 정정 · 모니터링 값 표시 규약 · 운영룸 공용 엔드포인트를 한 판에 담는다.
         · 모니터링 값 표시 규약에 맞췄다(배포 정책 3.4 · DEP-L01 v0.35 7.6 · 모니터링 정책 5.1·5.3 ·
-          MON-L01 댓글 2026-10-15 백엔드 응답).
+          MON-L01 댓글 2026-10-15 서버 응답).
         · 정상이 아닌 배포의 지표를 - 로 둔다. 앞서 유휴는 - 라고 적었으나 running() 이 유휴·오류를 포함해 값이 나오고
           있었다. 오류는 응답하지 않아 지표가 없다(모니터링 정책 5.1). running() 은 일시중지 가능 여부에도 쓰여 그대로 둔다.
           주요 이벤트는 레플리카가 있는 배포(정상·오류)에 남는다(hasPods).
@@ -374,7 +401,7 @@
           하나면 미리 고른다. 모델을 바꿔 고른 종류가 맞지 않게 되면 선택을 비운다(8/19 회의 4.2).
         · 레플리카당 가속기 수는 모델 요구 값이 있으면 잠근다. 분리면 풀마다 잠근다.
         · 고른 가속기가 지원하지 않는 서빙 방식은 비활성으로 둔다. 분리를 고른 상태였으면 단일로 되돌린다.
-          분리 가능 여부를 알려 주는 가속기 데이터는 없다. 백엔드와 같이 Furiosa 가속기에서 분리를 막는다
+          분리 가능 여부를 알려 주는 가속기 데이터는 없다. 서버와 같이 Furiosa 가속기에서 분리를 막는다
           (CON-596 117756 SERVING_NPU_PD_UNSUPPORTED). 샘플의 noPd 는 그 판정을 목업에서 흉내 낸 값이다.
         · 최대 컨텍스트 길이 선택지는 모델 상한 이하만 둔다. 설정 변경에서 상한을 넘기면 저장 시 인라인 에러.
         · 배포 전 검사에 배포 조건 불일치 항목을 더했다. 화면이 이미 막아 데모에서는 나오지 않는다.
@@ -382,7 +409,7 @@
           모델의 kind 는 요구 가속기의 계열(GPU·NPU)이다. 모델 목업의 요구 가속기와 같게 두었고, `제한 없음` 인
           모델은 kind 를 두지 않아 제한하지 않는다. 판정은 계열 단위라 H200 모델에 H200 MIG 도 고를 수 있다.
         · 토큰 수는 천 단위 쉼표로 쓴다. 고급 설정 선택지 라벨(4K·32K 등)은 종전대로 둔다.
-        ⚠ GPU↔NPU 교차 배포를 백엔드도 거절하는지는 백엔드 확인 전이다(CON-596 117756 회신 확인 항목).
+        ⚠ GPU↔NPU 교차 배포를 서버도 거절하는지는 서버 확인 전이다(CON-596 117756 회신 확인 항목).
 
   v0.33 · 스크린 ID 주석을 기획서·IA 기준으로 맞췄다(DEP-L01 v0.33). 화면은 바뀌지 않는다.
           · 설정 변경 `DEP-L01.M01` → `DEP-L01.D01.M01`
@@ -470,7 +497,7 @@
           평균만 보면 꼬리 지연이 가려진다.
         · 실패 행에 사유를 호버로 둔다. 종전에는 `-` 만 있어 왜 실패했는지 알 수 없었다.
         · 결과 내려받기는 종전대로 행 끝에 둔다. 행 클릭과 겹치지 않게 전파를 막는다.
-        ⚠ 진행률·리포트 항목을 백엔드가 내려주는지는 확인 대상이다.
+        ⚠ 진행률·리포트 항목을 서버가 내려주는지는 확인 대상이다.
 
   v0.2  8/19 회의 결과로 생성 마법사를 재구성했다.
         · 6단계 → 4단계. 사용자가 정하는 것이 모델·자원·게이트웨이 넷이고
@@ -529,7 +556,7 @@
           생성일시는 상세 헤더에 있다.
           ⚠ 공통정책 2.2 는 생성일시를 필수 컬럼으로 둔다. 목록에서 궁금한 것이
           지금 상태가 언제부터인지라 여기서는 최근 변경일시만 둔다 — 개정 제안 대상.
-          DB 컬럼 처리는 백엔드 확인 대상이다.
+          DB 컬럼 처리는 서버 확인 대상이다.
         · 라이브러리 v0.4 규격에서 벗어나 있던 것을 맞췄다 — 포커스 링(box-shadow) ·
           필수 표시 여백 · 페이지네이션 · 버튼 font-family · 모달 그림자 토큰화 ·
           등장 애니메이션(min·tin). 모달 폭(440px)·좌측 단계 sticky·테이블 헤더
@@ -604,7 +631,7 @@
   [검토용 임시 장치 — 확정 후 삭제]
   하단 데모 바(화면 · 데이터 상태 · 권한 · 테마)는 시안 확인용이다.
   기획서에 담기는 내용이 아니며 확정되면 삭제한다.
-  검토 중인 사안은 화면에 노출하지 않고 이 주석과 안건 트래커에만 남긴다.
+  검토 중인 사안은 화면에 노출하지 않고 이 주석과 확인 요청 항목에만 남긴다.
 
   ── 이 목업의 범위 ──────────────────────────────
   · 포함 — DEP-L01 목록 / DEP-L01.P01 패널 / DEP-L01.D01 상세(탭 3) / DEP-W01 생성 마법사
@@ -730,7 +757,7 @@
   ── 상태 ────────────────────────────────────────
   · 배포 상태는 생성 중 · 정상 · 오류 · 유휴 · 중지됨 · 생성 실패 · 삭제 중 · 삭제 실패 8종으로 둔다.
     룸과 같은 인프라 리소스라 헬스 어휘(정상·오류)를 쓰고 생성·삭제의 진행과 실패를 상태로 관리한다.
-    ⚠ 원천값 전수는 미확인이다. 백엔드 확인 후 확정한다
+    ⚠ 원천값 전수는 미확인이다. 서버 확인 후 확정한다
   · 유휴와 중지됨을 나눈다 — 유휴는 호출이 없어 자동으로 내려간 것이고
     중지됨은 사용자가 멈춘 것이다. 다시 올라오는 조건이 달라 한 값으로 묶으면 안 된다
   · 헬스(안정·주의·위험)는 상태와 다른 축이다. 공통정책 5.1 이 정의한 상태값 축 중 하나이고
@@ -2522,6 +2549,23 @@ body.panel-on .cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
   <button class="br" onclick="setBmRep('loading',this)">로딩</button>
   <button class="br" onclick="setBmRep('error',this)">오류</button>
   <button class="br" onclick="setBmRep('dlfail',this)">내려받기 실패</button>
+  <!-- v0.47 · 검토용 분기. 실제 화면에는 없다 -->
+  <span class="demo-label" style="margin-left:12px;">게이트웨이 반영:</span>
+  <button class="gf on" onclick="setGwFail(false,this)">반영</button>
+  <button class="gf" onclick="setGwFail(true,this)">반영 실패</button>
+  <span class="demo-label" style="margin-left:12px;">게이트웨이 연결:</span>
+  <button class="gc on" onclick="setGwConn(false,this)">완료</button>
+  <button class="gc" onclick="setGwConn(true,this)">연결 중</button>
+  <span class="demo-label" style="margin-left:12px;">클러스터 가속기:</span>
+  <button class="ca on" onclick="setClAcc('ok',this)">정상</button>
+  <button class="ca" onclick="setClAcc('mig',this)">MIG 없음</button>
+  <button class="ca" onclick="setClAcc('none',this)">감지 안 됨</button>
+  <span class="demo-label" style="margin-left:12px;">노드 그룹 목록:</span>
+  <button class="ne on" onclick="setNgEmpty(false,this)">있음</button>
+  <button class="ne" onclick="setNgEmpty(true,this)">비어 있음</button>
+  <span class="demo-label" style="margin-left:12px;">같은 모델명 배포:</span>
+  <button class="sm2 on" onclick="setSameModel(false,this)">없음</button>
+  <button class="sm2" onclick="setSameModel(true,this)">있음</button>
   <span class="demo-label" style="margin-left:12px;">설정 저장:</span>
   <button class="cr on" onclick="setCfgRej(false,this)">반영</button>
   <button class="cr" onclick="setCfgRej(true,this)">조건 거절</button>
@@ -2696,13 +2740,22 @@ const MODELS=[
 const NODE_GROUPS=['h200-a','h200-b','h100-a','rngd-a'];
 function modelCg(m){ return (m && m.cached)? (m.cg || (m.kind==='npu'? ['rngd-a'] : ['h200-a'])) : []; }
 const NG_DIS='모델이 캐싱되지 않은 노드 그룹은 고를 수 없습니다.';
-/* v0.46 · 노드 그룹별 남은 가속기 장 수(그 그룹 노드의 빈 장 수). 검토용 값이다.
-   노드 그룹을 고르면 배치할 수 있는 수는 워크스페이스 잔여와 그 그룹 잔여 중 작은 값이다(배포 정책 4.7 · CON-1244 기획 의견) */
+/* v0.47 · 노드 그룹별 남은 가속기 장 수. 그 그룹에서 고른 모델이 캐싱된 노드의 빈 장 수다(배포 정책 4.7 · CON-1244). 검토용 값이다.
+   노드 그룹을 고르면 배치할 수 있는 수는 운영룸 잔여와 그 그룹 잔여 중 작은 값이다. 서버가 주는 두 값 중 작은 값을 화면이 고른다 */
 const NG_FREE={'h200-a':2,'h200-b':16,'h100-a':8,'rngd-a':8};
 function wFree(){
   if(!WF.ws) return 0;
   const f=gpuFree(WF.ws);
   return WF.ng && NG_FREE[WF.ng]!==undefined ? Math.min(f, NG_FREE[WF.ng]) : f;
+}
+/* v0.47 · 검토용: 노드 그룹 목록이 비어 오는 구성(설치 구성이 빠진 경우). 실제 화면에는 없다 */
+let NG_EMPTY=false;
+function setNgEmpty(v,btn){
+  NG_EMPTY=v; if(v && WF){ WF.ng=''; }
+  document.querySelectorAll('#demoBar .ne').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  /* 02 자원 고급 설정에서 노드 그룹 칸이 빠지는 것을 보인다 */
+  demoWiz(1, 'resAdv');
 }
 const NG_SHORT='고른 노드 그룹에 남은 가속기가 부족합니다. 레플리카 수를 줄이거나 다른 노드 그룹을 골라 주세요.';
 const NG_RESET='고른 노드 그룹에 모델이 캐싱되어 있지 않아 선택 안 함으로 되돌렸습니다.';
@@ -2804,7 +2857,7 @@ const HB={'안정':'ok','주의':'wa','위험':'cr','-':'mu'};
    사유가 없으면(안정) 두지 않는다. 헬스 값의 뜻은 도움말(COLDEF.health)이 밝힌다 */
 /* 판정 사유 박스 — 주의 · 위험이면 헬스 카드 아래 전체 폭에 둔다(DEP-L01 7.6 · 모니터링 정책 5.2).
    첫 줄은 가장 심각한 사유와 외 N건, 머리 줄 오른쪽 버튼으로 그 자리에서 표를 펼친다. 모달을 쓰지 않는다.
-   순서는 백엔드가 보낸 순서(심각도 높은 순), 값은 백엔드 판정값을 그대로 쓴다 */
+   순서는 서버가 보낸 순서(심각도 높은 순), 값은 서버 판정값을 그대로 쓴다 */
 let rsOpen=false;
 function reasonBox(d){
   const a=d.reasons||[];
@@ -2861,6 +2914,29 @@ function failText(d){ return FAILR[d.reason] || '기동 중 문제가 생겼습�
    강제 삭제는 최고 관리자 · 워크스페이스 관리자만(배포 정책 9장). 할 수 없는 역할에는 조치 대신 문의를 안내한다(UI 문구 규칙 2) */
 function stalled(d){ return !!d && d.st==='삭제 중' && !!d.stalled; }
 function canForce(){ return role==='super' || role==='admin'; }
+/* v0.47 · 게이트웨이 설정 반영 실패(DEP-L01 5.3). 상태는 정상 그대로 두고 사유를 붙인다. 사유 값은 노출하지 않는다(공통정책 7.9) */
+function gwFail(d){ return !!d && d.st==='정상' && !!d.gwFail; }
+function gwFailText(){
+  return canDeploy()? '게이트웨이 설정이 반영되지 않았습니다. 설정 변경에서 다시 저장해 주세요.'
+                    : '게이트웨이 설정이 반영되지 않았습니다. 워크스페이스 관리자에게 문의해 주세요.';
+}
+/* v0.47 · 게이트웨이 연결 중(배포 정책 3.1 · DEP-L01 5.3). 상태는 바꾸지 않고 사유를 붙인다. 역할과 관계없이 같은 문구다 */
+const GW_CONN='게이트웨이에 연결하고 있습니다. 연결이 끝나면 호출할 수 있습니다.';
+function gwConn(d){ return !!d && d.st==='정상' && !!d.gwConn; }
+function setGwConn(v,btn){
+  const i=DEPS.findIndex(function(x){ return x.st==='정상' && x.type!=='외부 배포'; });
+  DEPS.forEach(function(x){ x.gwConn=false; }); if(v && i>=0) DEPS[i].gwConn=true;
+  document.querySelectorAll('#demoBar .gc').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  if(v && i>=0) openDetailAt(i); else if(view==='detail') drawDetail(); else render();
+}
+function setGwFail(v,btn){
+  const i=DEPS.findIndex(function(x){ return x.st==='정상' && x.type!=='외부 배포'; });
+  DEPS.forEach(function(x){ x.gwFail=false; }); if(v && i>=0) DEPS[i].gwFail=true;
+  document.querySelectorAll('#demoBar .gf').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  if(v && i>=0) openDetailAt(i); else if(view==='detail') drawDetail(); else render();
+}
 function stallText(){
   return canForce()? '자원 정리가 늦어지고 있습니다. 관리자가 강제 삭제할 수 있습니다.'
                    : '자원 정리가 늦어지고 있습니다. 관리자에게 문의해 주세요.';
@@ -3072,6 +3148,8 @@ function stBadge(st, withTip, d){
   const b='<span class="stbadge '+(RB[st]||'mu')+'">'+st+'</span>';
   /* v0.40 · 삭제 지연 사유는 목록에서도 배지 도움말로 보인다(DEP-L01 5.3) */
   if(stalled(d)) return '<span class="tip-anchor stwrap">'+b+'<span class="tip">'+ST_DESC[st]+' '+stallText()+'</span></span>';
+  if(gwFail(d)) return '<span class="tip-anchor stwrap">'+b+'<span class="tip">'+gwFailText()+'</span></span>';
+  if(gwConn(d)) return '<span class="tip-anchor stwrap">'+b+'<span class="tip">'+GW_CONN+'</span></span>';
   /* 정상은 사유를 붙이지 않는다. 문제 없는 값에 설명을 달면 볼 것이 없는데 열게 된다
      (워크스페이스 목업이 활성일 때 툴팁을 붙이지 않는 것과 같은 기준) */
   if(!withTip || st==='정상' || !ST_DESC[st]) return b;
@@ -3202,6 +3280,8 @@ function openPanel(i){
     b.push(alertBox('crit','요청을 처리하지 못하고 있습니다.','조치는 상세 화면에서 확인합니다.',
       '<button class="btn ghost sm" onclick="openDetail()">상세 열기</button>', false));
   /* v0.40 · 삭제 지연. 강제 삭제는 상세 · 행 메뉴에서 한다 — 패널은 조회 전용이다 */
+  if(gwFail(d)) b.push(alertBox('warn','',gwFailText(),'',false));
+  if(gwConn(d)) b.push(alertBox('info','',GW_CONN,'',false));
   if(stalled(d))
     b.push(alertBox('warn','',stallText(), canForce()? '<button class="btn ghost sm" onclick="openDetail()">상세 열기</button>' : '', false));
   if(d.st==='생성 실패')
@@ -3393,6 +3473,10 @@ function drawDetail(){
    + (needDiag(d)? diagBox(d) : '')
    /* v0.40 · 삭제 지연 안내(DEP-L01 5.3) */
    + (stalled(d)? '<div style="margin-bottom:14px">'+alertBox('warn','',stallText(),'',false)+'</div>' : '')
+   /* v0.47 · 게이트웨이 설정 반영 실패(DEP-L01 5.3) */
+   /* v0.47 · 게이트웨이 연결 중(DEP-L01 5.3) */
+   + (gwConn(d)? '<div style="margin-bottom:14px">'+alertBox('info','',GW_CONN,'',false)+'</div>' : '')
+   + (gwFail(d)? '<div style="margin-bottom:14px">'+alertBox('warn','',gwFailText(), canDeploy()? '<button class="btn ghost sm" onclick="openCfg('+DEPS.indexOf(d)+')">설정 변경</button>' : '',false)+'</div>' : '')
    /* 요약 카드 — 상세에 들어와 탭을 열기 전에 알아야 하는 것만 둔다.
       무엇을 서비스하나 · 어디로 호출하나 · 몇 개 떠 있나.
       아래 본문에서 같은 값을 다시 쓰지 않는다 */
@@ -3713,8 +3797,9 @@ function dMonitor(d){
   const lo = d.hreason==='UNDER_UTILIZATION';
   return '<div class="mgrid">'
    /* 4.0 범위 지표는 지금 수집되는 것만 싣는다(DEP-L01 7.6 · 모니터링 정책 5.1).
-      처리량은 초당 요청 수와 초당 처리 토큰 수 두 값이다. 값이 없으면 0 이 아니라 - 로 둔다 */
-   + (!eng? '' : mv('처리량', on? (lo?'<b>0.1</b><small> req/s · </small><b>6</b><small> tok/s</small>':'<b>4.2</b><small> req/s · </small><b>182</b><small> tok/s</small>') : '<b>-</b>','최근 1시간 평균')
+      처리량은 초당 요청 수와 초당 생성 토큰 수 두 값이다. 생성 토큰은 모델이 새로 만든 토큰으로 게이트웨이의 입출력 토큰 처리량과 다르다(v0.47 · DEP-L01 7.6 · 모니터링 정책 5.1).
+      카드와 차트는 30초마다 다시 부른다. 모니터링 화면과 같은 주기다(모니터링 정책 2.3). 값이 없으면 0 이 아니라 - 로 둔다 */
+   + (!eng? '' : mv('처리량', on? (lo?'<b>0.1</b><small> req/s · </small><b>6</b><small> tok/s</small>':'<b>4.2</b><small> req/s · </small><b>182</b><small> tok/s</small>') : '<b>-</b>','최근 1시간 평균','초당 요청 수와 초당 생성 토큰 수입니다. 생성 토큰은 모델이 새로 만든 토큰입니다.')
    + mv('P99 지연 시간','<b>'+(on?(lo?'410':'640'):'-')+'</b>'+(on?'<small> ms</small>':''),'최근 1시간 최대')
    + mv('대기 중인 요청','<b>'+(on?(lo?'0':'3'):'-')+'</b>','실시간'))
    + mv('가속기 코어 사용률','<b>'+(on?(lo?'3.1':'74.2'):'-')+'</b>'+(on?'<small> %</small>':''),'최근 1시간 평균')
@@ -3740,14 +3825,14 @@ function dMonitor(d){
       배포를 골라 보는 드롭다운이 있다. 여기서는 이 배포가 지금 어떤지만 보여주고 넘긴다 */
    /* v0.40 · 엔진 종류가 LLM이 아닌 외부 배포는 처리량 추이를 두지 않고 이동 버튼만 남긴다(모니터링 정책 5.3) */
    + (eng
-      ? '<div class="dsec"><h4>처리량 추이'+tip('최근 1시간입니다. 시간 범위를 바꾸거나 게이트웨이·엔진·가속기 지표를 나눠 보려면 모니터링 화면에서 확인합니다.')+'</h4>'
+      ? '<div class="dsec"><h4>생성 토큰 처리량 추이'+tip('최근 1시간입니다. 30초마다 다시 불러옵니다. 시간 범위를 바꾸거나 게이트웨이·엔진·가속기 지표를 나눠 보려면 모니터링 화면에서 확인합니다.')+'</h4>'
         /* 값이 없으면 낮은 막대로 채우지 않는다. 작았던 값으로 읽힌다 */
         + (on ? '<div class="chart">'+bars+'</div>' : '<div class="emptyline">아직 값이 들어오지 않습니다.</div>')
       : '<div class="dsec">')
    + '<div class="secact" style="margin-top:14px">'
    +   '<button class="btn ghost sm" onclick="act(\'모니터링 화면의 배포 성능 탭으로 이동합니다.\')">상세 지표<span class="ar">→</span></button>'
    /* Grafana 열기 — 이 배포의 Grafana 대시보드를 새 탭으로 연다(모니터링 정책 5.4 · DEP-L01 7.6).
-      열람 권한은 백엔드가 판정해 역할로 가르지 않고 배포 상태로도 가르지 않는다.
+      열람 권한은 서버가 판정해 역할로 가르지 않고 배포 상태로도 가르지 않는다.
       지표 · 추적 수집을 사용하지 않는 배포는 대시보드가 없어 비활성으로 두고 사유를 단다.
       v0.40 · 지표 · 추적 수집을 설정 변경에서 바꿀 수 있게 되어, 설정 변경 권한이 있는 역할(편집자 이상)에게는 켜는 곳을 함께 말한다.
       뷰어와 외부 배포(설정 변경이 없다)는 상태만 말한다(모니터링 정책 5.4 · DEP-L01 7.6) */
@@ -4068,6 +4153,105 @@ let wStep=0, wShown={}, WF=null, wAdv={};
 let rvOpen={};
 function rvTg(k, cur){ rvOpen[k] = !cur; drawWiz(); }
 
+/* ── v0.47 · 요청 분배(배포 정책 4.8 · DEP-L01 5.3 · 7.3 · 7.7 · REQ-DEP-108 · 109) ─────────
+   기준 3종 × 열(단일 · 프리필 · 디코드). 칸마다 [사용, 가중치]. 몫은 같은 열에서 켠 기준 가중치 합으로 나눈 내림 값이다 */
+const RT_CRIT=[
+  {k:'pc', t:'접두 캐시', d:'같은 앞부분을 이미 처리한 레플리카로 보냅니다. 같은 시스템 프롬프트나 긴 문서를 반복해 보내는 요청에 유리합니다.'},
+  {k:'fr', t:'첫 요청 분산', d:'캐시가 맞지 않는 요청을 최근에 덜 받은 레플리카로 보냅니다.'},
+  {k:'ld', t:'부하 기반', d:'대기 중인 요청이 적은 레플리카로 보냅니다.'}
+];
+const RT_NPU='NPU 가속기는 접두 캐시 기준을 쓸 수 없습니다.';
+const RT_TOPO='서빙 방식이 바뀌어 요청 분배 가중치를 기본값으로 다시 채웠습니다.';
+const RT_REC_PD='권장은 단일 서빙에서만 쓸 수 있어 기본으로 되돌렸습니다.';
+function rtCols(topo){ return topo==='pd'? [['pre','프리필'],['dec','디코드']] : [['single','']]; }
+function rtDef(mode,topo){
+  const w={};
+  rtCols(topo).forEach(function(c){
+    if(mode==='rec' && topo!=='pd') w[c[0]]={pc:[true,'2'], fr:[true,'1'], ld:[true,'1']};
+    else w[c[0]]={pc:[false,'0'], fr:[true, c[0]==='dec'?'3':'1'], ld:[false,'0']};
+  });
+  return w;
+}
+function rtClone(w){ return JSON.parse(JSON.stringify(w)); }
+function rtWOk(v){ return /^\d$/.test(String(v).trim()); }
+/* 열마다 오류. 가중치 형식이 먼저, 그다음 켠 기준 없음 · 합 0 */
+function rtErrs(o,topo){
+  const e={};
+  rtCols(topo).forEach(function(c){
+    const col=o.rw[c[0]]||{};
+    const on=RT_CRIT.filter(function(r){ return col[r.k] && col[r.k][0]; });
+    if(on.some(function(r){ return !rtWOk(col[r.k][1]); })) e[c[0]]='0에서 9 사이의 정수로 입력해 주세요.';
+    else if(!on.length || on.reduce(function(s,r){ return s+(+col[r.k][1]); },0)<1) e[c[0]]='기준을 하나 이상 켜고 가중치를 1 이상 입력해 주세요.';
+  });
+  return e;
+}
+function rtShare(col,k){
+  const on=RT_CRIT.filter(function(r){ return col[r.k] && col[r.k][0] && rtWOk(col[r.k][1]); });
+  const sum=on.reduce(function(s,r){ return s+(+col[r.k][1]); },0);
+  if(!(col[k] && col[k][0]) || !rtWOk(col[k][1]) || sum<1) return '-';
+  return Math.floor((+col[k][1])*100/sum)+'%';
+}
+/* 가속기 · 서빙 방식이 바뀌면 다시 맞춘다. o 는 WF 또는 CFG */
+function rtAdjust(o,topo,npu){
+  if(o.rtTopo!==topo){
+    if(o.rt==='rec' && topo==='pd'){ o.rt='default'; o.rw=rtDef('default',topo); o.rtNote=RT_REC_PD; }
+    else if(o.rt==='custom'){ o.rw=rtDef('default',topo); o.rtNote=RT_TOPO; }
+    else o.rw=rtDef(o.rt,topo);
+    o.rtTopo=topo;
+  }
+  if(npu && !o.rtNpu){
+    if(o.rt==='rec'){ o.rt='default'; o.rw=rtDef('default',topo); }
+    Object.keys(o.rw).forEach(function(c){ if(o.rw[c].pc) o.rw[c].pc=[false,'0']; });
+  }
+  o.rtNpu=npu;
+}
+function rtObj(s){ return s==='C'? CFG : WF; }
+function rtRedraw(s){ if(s==='C') drawCfg(); else drawWiz(); }
+function rtMode(s,v){
+  const o=rtObj(s), topo=o.rtTopo;
+  /* 직접 설정은 직전 선택의 값을 채워 연다(배포 정책 4.8) */
+  if(v!=='custom') o.rw=rtDef(v,topo);
+  o.rt=v; o.rtNote=''; rtRedraw(s);
+}
+function rtOn(s,c,k,on){ const o=rtObj(s); o.rw[c][k][0]=on; o.rtNote=''; rtRedraw(s); }
+function rtW(s,c,k,v){ const o=rtObj(s); o.rw[c][k][1]=v; }
+/* 생성 02 자원 고급 · 설정 변경 자원 섹션이 같이 쓴다. showErr 는 오류를 보일 때인지 */
+function rtHtml(s,showErr){
+  const o=rtObj(s), topo=o.rtTopo, npu=o.rtNpu, cols=rtCols(topo);
+  const opts=[{v:'default',t:'기본'}].concat(topo==='pd'? [] : [{v:'rec',t:'권장',dis:npu}]).concat([{v:'custom',t:'직접 설정'}]);
+  let h='<select class="inp" onchange="rtMode(\''+s+'\',this.value)">'
+    + opts.map(function(x){ return '<option value="'+x.v+'"'+(o.rt===x.v?' selected':'')+(x.dis?' disabled':'')+'>'+x.t+'</option>'; }).join('')
+    + '</select>';
+  const errs=showErr? rtErrs(o,topo) : {};
+  if(o.rt==='custom'){
+    h+='<table class="rttbl" style="width:100%;margin-top:10px;border-collapse:collapse;font-size:13px">'
+      + '<thead><tr><th style="text-align:left;padding:6px 4px;font-weight:500;color:var(--muted-foreground)">기준</th>'
+      + cols.map(function(c){ return '<th colspan="2" style="text-align:left;padding:6px 4px;font-weight:500;color:var(--muted-foreground)">'
+          +(c[1]? c[1]+' · ' : '')+'가중치 · 몫'+tip('몫은 켠 기준 가중치 합에서 이 기준이 차지하는 비중입니다. 요청이 나뉘는 비율이 아닙니다.')+'</th>'; }).join('')
+      + '</tr></thead><tbody>'
+      + RT_CRIT.map(function(r){
+          const off=npu && r.k==='pc';
+          return '<tr style="border-top:1px solid var(--border)"><td style="padding:6px 4px;white-space:nowrap'+(off?';color:var(--muted-foreground)':'')+'">'+r.t+tip(r.d)+'</td>'
+            + cols.map(function(c){
+                const cell=o.rw[c[0]][r.k];
+                return '<td style="padding:6px 4px;white-space:nowrap"><label class="chk" style="display:inline-flex;align-items:center;gap:6px">'
+                  + '<input type="checkbox"'+(cell[0]?' checked':'')+(off?' disabled':'')+' onchange="rtOn(\''+s+'\',\''+c[0]+'\',\''+r.k+'\',this.checked)"><span class="cbx"></span></label> '
+                  + '<input class="inp'+(errs[c[0]] && cell[0] && !rtWOk(cell[1])?' err':'')+'" style="width:52px;display:inline-block;margin-left:6px" inputmode="numeric" value="'+cell[1]+'"'
+                  + (off||!cell[0]?' disabled':'')+' oninput="rtW(\''+s+'\',\''+c[0]+'\',\''+r.k+'\',this.value)" onblur="rtRedraw(\''+s+'\')"></td>'
+                  + '<td style="padding:6px 4px;color:var(--muted-foreground);min-width:44px">'+rtShare(o.rw[c[0]],r.k)+'</td>';
+              }).join('')
+            + '</tr>';
+        }).join('')
+      + '</tbody></table>'
+      + cols.map(function(c){ return errs[c[0]]? '<p class="ferr">'+(c[1]? c[1]+': ' : '')+errs[c[0]]+'</p>' : ''; }).join('');
+  }
+  const note=[];
+  if(npu) note.push(RT_NPU);
+  if(o.rtNote) note.push(o.rtNote);
+  if(note.length) h+='<div class="hint">'+note.join(' ')+'</div>';
+  return h;
+}
+
 function newWF(){
   return {
     /* 01 모델 */
@@ -4080,7 +4264,8 @@ function newWF(){
     args:{},
     customArgs:[],
     /* 02 자원 */
-    scorer:'prefix-cache',
+    /* v0.47 · 요청 분배 기준(배포 정책 4.8). default 기본 · rec 권장 · custom 직접 설정 */
+    rt:'default', rw:rtDef('default','single'), rtNote:'', rtTopo:'single', rtNpu:false,
     /* v0.43 · 가속기 공유(배포 정책 4.6 · DEP-L01 7.3). none 없음 · ts 시분할 · mps MPS. 시간 간격 등급은 김(long)으로 채운다.
        지분은 비워 두고 직접 받는다 */
     share:'none', tsInt:'long', mpsComp:'', mpsMem:'',
@@ -4097,7 +4282,8 @@ function newWF(){
     /* v0.36 · 키 없는 요청 분당 한도. 인증을 끌 때만 쓴다(배포 정책 5.5 · CON-866 9항) */
     anon:'600',
     limit:false, limitReq:'600', limitUnit:'분',
-    timeout:'60초',
+    /* v0.47 · 응답 대기 시간(초). 비우면 3600초다(DEP-L01 7.3) */
+    timeout:'',
     /* 04 검수 */
     obs:true
   };
@@ -4285,6 +4471,18 @@ function gpuSel(key){
   return selBox(key, GPU_OPTS.map(function(v){ return {v:String(v), t:v+'장'}; }), String(WF[key]));
 }
 function accOf(k){ return ACCS.find(function(a){return a.k===k;}) || ACCS[0]; }
+/* v0.47 · 클러스터 가속기 상태(검토용). none 은 감지된 가속기 없음, mig 는 NVIDIA-H200 MIG 가 클러스터에서 사라짐.
+   워크스페이스 할당은 남아 있으나 클러스터에 없는 종류다(워크스페이스 정책 5.1 · DEP-L01 5.3). 실제 화면에는 없는 검토용 처리다 */
+let CL_ACC='ok';
+function accGone(k){ return CL_ACC==='none' ? !!k : (CL_ACC==='mig' && k==='nvidia-h200-mig'); }
+function accGoneMsg(k){ return '요청한 가속기('+accOf(k).n+')가 지금 클러스터에 없습니다. 관리자에게 문의해 주세요.'; }
+function setClAcc(v,btn){
+  CL_ACC=v;
+  document.querySelectorAll('#demoBar .ca').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  /* none 은 04 검수 배포 전 검사, mig 는 02 자원 가속기 종류에서 보인다 */
+  if(v==='none') demoWiz(3); else if(v==='mig') demoWiz(1); else if(view==='wiz' && WF) drawWiz(); else render();
+}
 
 /* 모델 배포 조건(모델 정책 2.9 · 배포 정책 2.3)
    kind 는 요구 가속기 계열(gpu·npu)이다. 값이 없는 모델은 제한하지 않는다.
@@ -4299,7 +4497,7 @@ function accReqName(m){
   return ok.length? ok.join(' · ') : KIND_LABEL[m.kind];
 }
 /* 가속기마다 지원하는 서빙 방식이 정해져 있다(배포 정책 4.5). 이를 알려 주는 가속기 데이터는 없고,
-   백엔드는 Furiosa 가속기 + 분리를 거절한다(117756). 목업은 noPd 로 같은 판정을 흉내 낸다 */
+   서버는 Furiosa 가속기 + 분리를 거절한다(117756). 목업은 noPd 로 같은 판정을 흉내 낸다 */
 function accNoPd(k){ return !!(k && accOf(k).noPd); }
 /* v0.43 · 가속기 공유(배포 정책 4.6 · DEP-L01 5.1 · 5.3 · 7.3 · REQ-DEP-100~102).
    가속기를 개수로 할당하는 클러스터는 항목을 두지 않는다. 목업은 CL_ALLOC 으로 클러스터 할당 방식을 흉내 낸다. 표준은 DRA 다(배포 정책 4.4).
@@ -4384,10 +4582,10 @@ function openWiz(){
   view='wiz'; cur=null; closePanel(); syncView(); drawWiz(); vwBtn(2);
 }
 /* ── 배포 전 검사(dry-run) ─────────────────────
-   실행하지 않고 검사만 수행해 결과를 받는다. 백엔드 제공 가능(2026-09-02 확인).
+   실행하지 않고 검사만 수행해 결과를 받는다. 서버 제공 가능(2026-09-02 확인).
    검수 단계에 들어오면 자동으로 돌리고, 앞 단계를 고치고 돌아오면 다시 돌린다.
    ✕ 가 하나라도 있으면 배포 버튼을 막는다.
-   ⚠ 결과 값은 데모용이다. 실제로는 백엔드가 내려준다.
+   ⚠ 결과 값은 데모용이다. 실제로는 서버가 내려준다.
    ⚠ 인자명은 화면 라벨로 바꿔 보인다(공통정책 7.9) */
 let DRY = null;      /* null 미실행 · 'run' 검사 중 · 객체 결과 */
 let dryKey = '';     /* 어떤 입력으로 돌렸는지. 값이 바뀌면 다시 돌린다 */
@@ -4402,8 +4600,17 @@ function chkName(){
   }
   WF.nameTerm=false; WF.nameChecked=true; wBlur('name'); toast('ok','사용할 수 있는 배포명입니다.');
 }
+/* v0.47 · 검토용: 같은 모델명 배포가 운영룸에 이미 있는 경우. 서버 검사 결과라 화면이 미리 알 수 없다. 실제 화면에는 없다 */
+let SAME_MODEL=false;
+function setSameModel(v,btn){
+  SAME_MODEL=v;
+  document.querySelectorAll('#demoBar .sm2').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  /* 04 검수 배포 전 검사에서 보인다 */
+  DRY=null; demoWiz(3);
+}
 function drySnap(){
-  return [WF.model,WF.acc,WF.topo,WF.rep,WF.gpu,WF.preRep,WF.preGpu,WF.maxLen,WF.name,WF.share,WF.tsInt,WF.mpsComp,WF.mpsMem,WF.ng].join('|');
+  return [WF.model,WF.acc,WF.topo,WF.rep,WF.gpu,WF.preRep,WF.preGpu,WF.maxLen,WF.name,WF.share,WF.tsInt,WF.mpsComp,WF.mpsMem,WF.ng,CL_ACC,SAME_MODEL].join('|');
 }
 function dryRun(){
   dryKey = drySnap();
@@ -4414,47 +4621,59 @@ function dryRun(){
     const rows = [];
     rows.push({t:'ok', m:'설정 확인'});
     /* v0.40 · 같은 이름의 배포가 삭제 중이면 ✕(배포 정책 2.5 · DEP-L01 5.3) */
-    if(nameTerminating(WF.name.trim())){ WF.nameTerm=true; rows.push({t:'err', s:2, m:NAME_TERM}); }
+    if(nameTerminating(WF.name.trim())){ WF.nameTerm=true; rows.push({t:'err', s:2, f:'name', m:NAME_TERM}); }
     /* 자원 초과는 화면도 잡지만 여기서는 클러스터 잔여 기준으로 다시 본다 */
     const need = wTotalGpu(), free = wFree();
     /* 워크스페이스를 고르지 않았으면 자원을 판정하지 않는다. 배정이 0장이면 줄여도 풀리지 않아 상태만 쓴다(5.3 · 공통정책 7.9) */
     /* 운영룸 배정은 가속기 종류별이다(워크스페이스 정책 5.4). 표본 워크스페이스는 운영룸 배정이 한 종류라 합계가 곧 그 종류의 잔여다 */
     /* v0.43 · MPS 는 공유 가속기에 합류하면 할당량을 쓰지 않아 잔여로 판정하지 않는다(배포 정책 4.2 · 4.6) */
     /* v0.46 · 잔여를 넘으면 배포를 막으므로(배포 정책 4.2) ✕ 로 둔다 */
-    if(WF.ws && WF.share!=='mps' && need > free) rows.push({t:'err', s:1, m:'요청 '+accOf(WF.acc).n+' '+need+'장 · '+(WF.ng && free<gpuFree(WF.ws)? WF.ng+' 노드 그룹' : accOf(WF.acc).n)+' 잔여 '+free+'장',
+    if(WF.ws && WF.share!=='mps' && need > free) rows.push({t:'err', s:1, f:(WF.ng && free<gpuFree(WF.ws)? 'ng' : (WF.topo==='pd'?'preRep':'rep')), m:'요청 '+accOf(WF.acc).n+' '+need+'장 · '+(WF.ng && free<gpuFree(WF.ws)? WF.ng+' 노드 그룹' : accOf(WF.acc).n)+' 잔여 '+free+'장',
       d: (WF.ng && free<gpuFree(WF.ws)) ? NG_SHORT : gpuTotal(WF.ws)===0
         ? '이 워크스페이스에 배정된 가속기가 없어 배포할 수 없습니다.'
         : accOf(WF.acc).n+' 잔여를 넘습니다. '+(WF.share==='ts'? '레플리카당 가속기 수를 줄여 주세요.' : '레플리카 수나 레플리카당 가속기 수를 줄여 주세요.')});
     /* v0.46 · 프리필·디코드 분리인데 고속 네트워크를 쓰지 않으면 ⚠. 배포는 막지 않는다(배포 정책 2.3).
-       백엔드가 보내는 운영룸 사용률 경고는 표시하지 않는다. 배포 생성자가 조치할 수 없고 사용량 · 잔여는 02 자원에 보인다 */
+       서버가 보내는 운영룸 사용률 경고는 표시하지 않는다. 배포 생성자가 조치할 수 없고 사용량 · 잔여는 02 자원에 보인다 */
     if(WF.topo==='pd' && String(WF.rdma)!=='true')
       rows.push({t:'warn', m:'고속 네트워크 없이 프리필·디코드 풀이 다른 노드에 놓이면 응답이 느려질 수 있습니다.', d:CL_ALLOC==='dra' && accOf(WF.acc).kind!=='npu'? '02 자원에서 고속 네트워크를 켤 수 있습니다.' : ''});
+    /* v0.47 · 클러스터에서 감지된 가속기가 없으면 ⚠. 이 화면에서 할 수 있는 일이 없어 조치 문구를 두지 않는다(DEP-L01 5.3 · 배포 정책 2.3) */
+    if(CL_ACC==='none' && WF.acc) rows.push({t:'warn', m:'클러스터에서 감지된 가속기가 없습니다. 가속기가 준비될 때까지 이 배포는 시작되지 않습니다.', d:''});
+    /* v0.47 · 같은 운영룸에 같은 모델명으로 호출되는 배포가 있으면 ✕. 01 모델 단계에 묶는다(배포 정책 2.5 · DEP-L01 5.3 · 7.3) */
+    if(SAME_MODEL && WF.model) rows.push({t:'err', s:0, f:'model', m:'이 운영룸에 같은 모델명으로 호출되는 배포가 이미 있습니다.', d:'다른 모델을 고르거나 기존 배포를 정리해 주세요.'});
     /* 모델 배포 조건. 화면이 이미 막으므로 마지막 확인이다(배포 정책 2.3) */
     const q=modelReq(WF.model)||{}, wm=wModelOf();
     /* v0.46 · 마지막 확인으로 다시 본다. 고른 뒤 상태가 바뀔 수 있다(배포 정책 2.3) */
-    if(wm && !wm.cached) rows.push({t:'err', s:0, m:'노드에 캐싱되지 않은 모델은 배포할 수 없습니다.', d:'모델 화면에서 노드 캐싱을 먼저 해 주세요.'});
-    if(wm && WF.acc && !accOk(wm, WF.acc)) rows.push({t:'err', s:1, m:'이 모델은 '+accReqName(wm)+'용입니다.', d:'가속기 종류를 다시 골라 주세요.'});
-    if(wm && wm.cached && WF.ng && modelCg(wm).indexOf(WF.ng)<0) rows.push({t:'err', s:1, m:'고른 노드 그룹에 모델이 캐싱되어 있지 않습니다.', d:'노드 그룹을 다시 골라 주세요.'});
+    if(wm && !wm.cached) rows.push({t:'err', s:0, f:'model', m:'노드에 캐싱되지 않은 모델은 배포할 수 없습니다.', d:'모델 화면에서 노드 캐싱을 먼저 해 주세요.'});
+    if(wm && WF.acc && !accOk(wm, WF.acc)) rows.push({t:'err', s:1, f:'acc', m:'이 모델은 '+accReqName(wm)+'용입니다.', d:'가속기 종류를 다시 골라 주세요.'});
+    if(wm && wm.cached && WF.ng && modelCg(wm).indexOf(WF.ng)<0) rows.push({t:'err', s:1, f:'ng', m:'고른 노드 그룹에 모델이 캐싱되어 있지 않습니다.', d:'노드 그룹을 다시 골라 주세요.'});
     if(q.gpu && (String(WF.gpu)!==String(q.gpu) || (WF.topo==='pd' && String(WF.preGpu)!==String(q.gpu))))
-      rows.push({t:'err', s:1, m:'레플리카당 가속기 수가 모델 요구 값('+q.gpu+'장)과 다릅니다.'});
+      rows.push({t:'err', s:1, f:(WF.topo==='pd'?'preGpu':'gpu'), m:'레플리카당 가속기 수가 모델 요구 값('+q.gpu+'장)과 다릅니다.'});
     if(q.ctx && ctxTok(WF.maxLen)>q.ctx)
-      rows.push({t:'err', s:0, m:'최대 컨텍스트 길이가 모델 상한('+ctxN(q.ctx)+' 토큰)을 넘습니다.'});
+      rows.push({t:'err', s:0, f:'maxLen', m:'최대 컨텍스트 길이가 모델 상한('+ctxN(q.ctx)+' 토큰)을 넘습니다.'});
     if(accNoPd(WF.acc) && WF.topo==='pd')
-      rows.push({t:'err', s:1, m:'이 가속기에서는 프리필·디코드 분리를 지원하지 않습니다.'});
+      rows.push({t:'err', s:1, f:'topo', m:'이 가속기에서는 프리필·디코드 분리를 지원하지 않습니다.'});
     /* v0.43 · 가속기 공유 거절(배포 정책 4.6 · DEP-L01 5.3). 사유 값 대신 문구를 쓴다. 목업은 데모 바에서 사유를 고른다 */
-    if(WF.share!=='none' && SHREJ) rows.push({t:'err', s:1, m:shareRejMsg(SHREJ)});
+    if(WF.share!=='none' && SHREJ) rows.push({t:'err', s:1, f:(SHREJ==='SERVING_SHARING_SHARE_INVALID'? 'mpsMem' : 'share'), m:shareRejMsg(SHREJ)});
     /* 엔진 인자 중복 — 목록에서 고른 인자를 직접 입력으로 또 넣었거나 직접 입력끼리 겹치면 서버가 거절한다(DEP-L01 5.3) */
     const ck=WF.customArgs.map(function(r){ return r.key; }).filter(function(k){ return k; });
     if(ck.some(function(k,ix){ return ck.indexOf(k)!==ix || (WF.args[k]!==undefined && String(WF.args[k]).trim()!==''); }))
-      rows.push({t:'err', s:0, m:'같은 엔진 인자가 두 번 들어갔습니다. 하나만 남겨 주세요.'});
+      rows.push({t:'err', s:0, f:'args', m:'같은 엔진 인자가 두 번 들어갔습니다. 하나만 남겨 주세요.'});
     /* 인자 충돌 — 데모로 하나만 둔다 */
     if(WF.maxLen==='4K' || WF.maxLen==='8K')
-      rows.push({t:'err', s:0, m:'최대 배치 토큰 수는 최대 컨텍스트 길이보다 클 수 없습니다.',
+      rows.push({t:'err', s:0, f:'args', m:'최대 배치 토큰 수는 최대 컨텍스트 길이보다 클 수 없습니다.',
         d:'최대 컨텍스트 길이를 늘리거나 고급 설정에서 최대 배치 토큰 수를 줄여 주세요.'});
     DRY = rows;
     drawWiz();
+    /* 검토용: 데모 바로 04 검수를 열면 배포 전 검사 결과까지 내려 보여 준다. 실제 화면에는 없는 처리다 */
+    if(window._demoDry && rows.some(function(r){ return r.t!=='ok'; })){
+      const d=document.querySelector('#wizBody .drybox'); if(d) d.scrollIntoView({block:'center'});
+    }
+    window._demoDry=false;
   }, 700);
 }
+/* 검토용: 데모 바를 누른 직후의 검사 결과만 내려 보여 준다 */
+document.addEventListener('click',function(e){ if(e.target.closest && e.target.closest('#demoBar')){ window._demoDry=true; setTimeout(function(){ window._demoDry=false; },2500); } },true);
+document.addEventListener('change',function(e){ if(e.target.closest && e.target.closest('#demoBar')){ window._demoDry=true; setTimeout(function(){ window._demoDry=false; },2500); } },true);
 function dryHasErr(){ return Array.isArray(DRY) && DRY.some(function(r){ return r.t==='err'; }); }
 function dryBox(){
   if(DRY==='run'){
@@ -4468,7 +4687,11 @@ function dryBox(){
    +   '<button class="btn ghost sm" onclick="dryRun()">다시 검사</button></span></div>'
    + '<div class="drybd">'
    + DRY.map(function(r){
-       return '<div class="dryr '+r.t+'"><i>'+ico[r.t]+'</i><span>'+r.m
+       /* v0.47 · ✕ 사유 줄은 링크로 두어 누르면 그 값을 정한 단계의 입력 칸으로 간다. 검수 구역의 사유 줄은 링크가 아니다(REQ-DEP-107 · DEP-L01 7.3). ⚠ · ✓ 줄은 링크가 아니다 */
+       const msg = (r.t==='err' && r.s!==undefined)
+         ? '<a class="rvlink" href="javascript:void(0)" style="color:inherit;text-decoration:underline" onclick="wJump('+r.s+',\''+(r.f||'')+'\')">'+r.m+'</a>'
+         : r.m;
+       return '<div class="dryr '+r.t+'"><i>'+ico[r.t]+'</i><span>'+msg
         + (r.d? '<span class="dryd">'+r.d+'</span>' : '')+'</span></div>';
      }).join('')
    + '</div></div>';
@@ -4488,13 +4711,14 @@ function wGo(i){
 function wDirty(){
   const b=newWF();
   /* newWF 가 정하는 키를 모두 본다. 목록을 따로 두면 필드를 늘릴 때 빠뜨린다 */
-  for(const k of ['model','mver','topo','maxLen','gpuUtil','scorer','share','tsInt','mpsComp','mpsMem','alloc','acc',
+  for(const k of ['model','mver','topo','maxLen','gpuUtil','rt','share','tsInt','mpsComp','mpsMem','alloc','acc',
                   'rep','gpu','preRep','preGpu','rdma','ng',
                   'name','ws','tls','auth','anon',
                   'limit','limitReq','limitUnit',
                   'timeout','obs']){
     if(String(WF[k])!==String(b[k])) return true;
   }
+  if(JSON.stringify(WF.rw)!==JSON.stringify(b.rw)) return true;
   if(Object.keys(WF.args||{}).some(function(k){ return String(WF.args[k]).trim()!==''; })) return true;
   if((WF.customArgs||[]).some(function(r){ return r.key.trim()||String(r.val).trim(); })) return true;
   return false;
@@ -4509,7 +4733,8 @@ function wQuit(){
 }
 
 function wSet(k,v){
-  if(k==='ng') WF.ngNote=false; WF[k]=v; if(k==='model'||k==='acc'||k==='share') wApplyReq(); drawWiz(); }
+  if(k==='ng') WF.ngNote=false; WF[k]=v; if(k==='model'||k==='acc'||k==='share') wApplyReq();
+  rtAdjust(WF, WF.topo==='pd'?'pd':'single', !!WF.acc && accOf(WF.acc).kind==='npu'); drawWiz(); }
 function wSetQuiet(k,v){ WF[k]=v; wRefreshFoot(); }
 function wBlur(k){ wShown[k]=true; drawWiz(); }
 function wTgAdv(k){ wAdv[k]=!wAdv[k]; drawWiz(); }
@@ -4566,8 +4791,13 @@ function wErrs(){
     e.push({step:2, f:'limitReq', m:'값을 입력해 주세요.'});
   else if((WF.limit==='true'||WF.limit===true) && !(/^\d+$/.test(String(WF.limitReq).trim()) && parseInt(WF.limitReq,10)>=1))
     e.push({step:2, f:'limitReq', m:'1 이상의 정수를 입력해 주세요.'});
+  /* v0.47 · 요청 분배 직접 설정. 입력란을 벗어날 때 띄우고 04 검수에서 한 번 더 잡는다(DEP-L01 5.3 · 배포 정책 4.8) */
+  if(WF.rt==='custom'){ const re=rtErrs(WF,WF.rtTopo), rk=Object.keys(re); if(rk.length) e.push({step:1, f:'rt', m:re[rk[0]]}); }
+  /* v0.47 · 응답 대기 시간 1~3600 정수. 비우면 3600초라 오류가 아니다(DEP-L01 7.3) */
+  if(!toOk(WF.timeout)) e.push({step:2, f:'timeout', m:'1~3600 사이의 정수를 입력해 주세요.'});
   return e;
 }
+function toOk(v){ const t=String(v==null?'':v).trim(); return !t || (/^\d+$/.test(t) && +t>=1 && +t<=3600); }
 /* 단계 오류 — 입력 오류와, 지금 입력 기준으로 돌린 배포 전 검사의 ✕ 중 그 단계에 묶인 것(DEP-L01 5.3 · 7.3). 검수 구역과 같은 기준이다 */
 /* 배포 전 검사 ✕ 목록. 같은 사유가 입력 검증에도 있으면 하나만 둔다 — 잔여 초과는 입력 검증(자원 단계 안내)과 검사 결과가 같은 말이다 */
 function dryErrs(){
@@ -4628,8 +4858,8 @@ function drawWiz(){
 const WADV={0:'고급 설정', 1:'고급 설정', 2:'고급 설정'};
 function wAdvCount(i){
   if(i===0) return argCount();
-  if(i===1) return (WF.scorer!=='prefix-cache' ? 1 : 0) + (WF.share!=='none' ? 1 : 0) + (WF.ng ? 1 : 0);
-  if(i===2) return (WF.timeout!=='60초'?1:0);
+  if(i===1) return (WF.rt!=='default' ? 1 : 0) + (WF.share!=='none' ? 1 : 0) + (WF.ng && !NG_EMPTY ? 1 : 0);
+  if(i===2) return (String(WF.timeout).trim()?1:0);
   return 0;
 }
 function wPane(){
@@ -4646,7 +4876,8 @@ function wPane(){
 function wDryBox(i){
   const rs=wStepDry(i); if(!rs.length) return '';
   return alertBox('crit','배포 전 검사에서 막힌 항목이 있습니다.',
-    rs.map(function(r){ return '<div>'+r.m+(r.d? ' '+r.d : '')+'</div>'; }).join(''),'',false);
+    /* v0.47 · 그 단계에 묶인 사유를 배포 전 검사 결과와 같은 문구로 한 줄씩(DEP-L01 7.3) */
+    rs.map(function(r){ return '<div>'+r.m+'</div>'; }).join(''),'',false);
 }
 /* 알림 박스는 단계 제목 아래, 입력 위에 둔다(라이브러리 알림 박스 위치 「관련 섹션 상단」) */
 function wAfterHead(html,box){
@@ -4654,12 +4885,28 @@ function wAfterHead(html,box){
   const k=html.indexOf('</p></div>');
   return k<0? box+html : html.slice(0,k+10)+box+html.slice(k+10);
 }
+/* v0.47 · 배포 전 검사 ✕ 사유 줄을 누르면 그 값을 정한 단계로 가서 입력 칸으로 스크롤 · 포커스한다.
+   칸이 고급 설정 안에 있으면 고급 설정을 펼친다. 칸이 화면에 없으면 단계 제목 아래 알림 박스로 간다(REQ-DEP-107 · DEP-L01 7.3) */
+const W_ADVF={maxLen:'modelAdv', args:'modelAdv', share:'resAdv', mpsComp:'resAdv', mpsMem:'resAdv', ng:'resAdv', rt:'resAdv', timeout:'gwAdv'};
+function wJump(step,key){
+  wShown['_v'+step]=true;
+  if(key && W_ADVF[key]) wAdv[W_ADVF[key]]=true;
+  wGo(step);
+  setTimeout(function(){
+    const box=document.querySelector('#wizBody [data-wf="'+key+'"]');
+    const el=box || document.querySelector('#wizBody .alertbox.crit');
+    if(!el) return;
+    el.scrollIntoView({block:'center'});
+    const fc=box && (box.matches('input,select,button,[tabindex]')? box : box.querySelector('input:not([disabled]),select:not([disabled]),button:not([disabled])'));
+    if(fc) fc.focus({preventScroll:true});
+  },0);
+}
 function wHead(t,d){ return '<div class="whead"><h3>'+t+'</h3><p>'+d+'</p></div>'; }
 
 /* 입력 — 오류가 있으면 인라인으로 붙인다(공통정책 7.8) */
 function fld(label,key,body,hint,req){
   const err=wErrOf(key);
-  return '<div class="fld"><label>'+label+(req?'<span class="req">*</span>':'')+'</label>'
+  return '<div class="fld" data-wf="'+key+'"><label>'+label+(req?'<span class="req">*</span>':'')+'</label>'
    + body
    + (err? '<p class="ferr">'+err+'</p>' : (hint? '<div class="hint">'+hint+'</div>' : ''))
    + '</div>';
@@ -4853,13 +5100,13 @@ function paneModelAdv(){
           : '한 번에 처리할 토큰 수입니다.')
    /* v0.40 · Furiosa-LLM 배포에는 가속기 메모리 사용률을 두지 않는다(배포 정책 5.3) */
    /* v0.43 · 가속기 공유가 MPS 여도 두지 않는다. 메모리 지분이 대신 정한다(배포 정책 4.6 · DEP-L01 7.3) */
-   /* v0.45 · 퍼센트 10~99 정수로 받는다. 생성과 설정 변경이 같다. 백엔드에는 0.10~0.99 소수로 보낸다(DEP-L01 7.3 · 배포 정책 5.2) */
+   /* v0.45 · 퍼센트 10~99 정수로 받는다. 생성과 설정 변경이 같다. 서버에는 0.10~0.99 소수로 보낸다(DEP-L01 7.3 · 배포 정책 5.2) */
    +   (fur || WF.share==='mps' ? '' : fld('가속기 메모리 사용률','gpuUtil',
         '<span class="stfield">'+inp('gpuUtil','value="'+WF.gpuUtil+'" inputmode="numeric" style="width:90px"'
           +' oninput="wSetQuiet(\'gpuUtil\',this.value)" onblur="wBlur(\'gpuUtil\')"')+'<span class="stunit">%</span></span>',
         '할당한 가속기 메모리에 모델 가중치가 올라가고, 나머지는 KV 캐시로 쓰입니다. 모델 가중치보다 크게 잡아 주세요. 10~99 사이로 지정합니다.'))
    + '</div>'
-   + '<h4 class="advsub">엔진 인자</h4>'
+   + '<h4 class="advsub" data-wf="args" tabindex="-1">엔진 인자</h4>'
    + (fur
       /* 둘뿐이라 그룹 탐색 없이 한 목록으로 둔다. 목록 밖 인자 직접 입력도 두지 않는다 */
       ? '<p class="advnote">이 배포는 Furiosa-LLM 엔진으로 실행되어 아래 인자만 넣을 수 있습니다. 비워 두면 엔진 자체 값을 따릅니다.</p>'
@@ -4955,13 +5202,15 @@ function paneRes(){
       ? wsGoBox('<b>'+WF.ws+' 운영룸에 배정된 가속기가 없습니다.</b>'
                 +'배포에 쓸 자원이 없어 생성할 수 없습니다.')
       : '')
-   + '<div class="fsec"><h4>가속기 종류</h4>'
+   + '<div class="fsec" data-wf="acc"><h4>가속기 종류</h4>'
    +   '<div style="max-width:340px">'
    /* 모델 요구 가속기에 맞지 않는 종류는 비활성으로 두고 사유를 안내한다(REQ-DEP-086).
       option 에는 말풍선을 붙일 수 없어 사유를 선택칸 아래에 둔다 */
    +     selBox('acc', (WF.acc? [] : [{v:'',t:'가속기 종류를 선택해 주세요',dis:true}]).concat(ACCS.map(function(a){
-           return {v:a.k, t:a.n+' · '+a.vram, dis:!accOk(wModelOf(),a.k)};
+           /* v0.47 · 클러스터에 없는 종류는 비활성 + ` · 클러스터에 없음`(DEP-L01 5.3) */
+           return {v:a.k, t:a.n+' · '+a.vram+(CL_ACC==='mig' && accGone(a.k)? ' · 클러스터에 없음' : ''), dis:!accOk(wModelOf(),a.k) || (CL_ACC==='mig' && accGone(a.k))};
          })), WF.acc)
+   +     (CL_ACC==='mig'? '<div class="hint">클러스터에 없는 가속기는 고를 수 없습니다.</div>' : '')
    +     (wModelOf() && wModelOf().kind && ACCS.some(function(a){ return !accOk(wModelOf(),a.k); })
           ? '<div class="hint">이 모델은 '+accReqName(wModelOf())+'용입니다.</div>' : '')
    +     (wErrOf('acc')? '<p class="ferr">'+wErrOf('acc')+'</p>' : '')
@@ -4972,7 +5221,7 @@ function paneRes(){
       "풀 사이 전송"이 읽힌다. TUI 도 레플리카를 먼저 받고 배치·RDMA 를 뒤에 둔다.
       앞선 선택이 뒤의 이유가 되게 쓴다 — 분리를 골랐기 때문에 KV 캐시가 오가고,
       그래서 고속 네트워크가 의미를 갖는다 */
-   + '<div class="fsec"><h4>서빙 방식<span class="req">*</span></h4>'
+   + '<div class="fsec" data-wf="topo"><h4>서빙 방식<span class="req">*</span></h4>'
    +   pick('topo', WF.topo, [
          {v:'single', t:'단일', rec:true,
           d:'한 곳에서 프롬프트 분석과 토큰 생성을 함께 처리합니다'},
@@ -5057,7 +5306,7 @@ function paneRes(){
 /* ── 03 게이트웨이 ──────────────────────────────────
    어디로 호출하나 */
 /* 운영룸 게이트웨이의 호스트. 워크스페이스마다 다르다.
-   ⚠ 데모용 값이다. 실제로는 백엔드가 내려준다 */
+   ⚠ 데모용 값이다. 실제로는 서버가 내려준다 */
 const PROD_HOST={ 'ai-service-team':'gw.ai-service.concerto.io' };
 function prodHost(){ return PROD_HOST[WF.ws] || ''; }
 
@@ -5138,15 +5387,11 @@ function paneGw(){
    플랫폼 기본값으로 둔다 ───────────────────────── */
 function paneResAdv(){
   return wHead('고급 설정','비워 두면 플랫폼 기본값으로 동작합니다.')
-   + '<div style="max-width:340px">'
-   +   fld('요청 분배 기준','scorer',
-        selBox('scorer',[
-          {v:'prefix-cache', t:'캐시 적중 우선'},
-          {v:'precise-prefix-cache', t:'캐시 적중 우선(정밀)'},
-          {v:'load-aware', t:'부하 우선'},
-          {v:'no-hit-lru', t:'오래된 것부터'}
-        ], WF.scorer),
-        '요청을 어느 레플리카로 보낼지 정하는 기준입니다.')
+   + '<div style="max-width:520px">'
+   /* v0.47 · 기본 · 권장 · 직접 설정(REQ-DEP-108 · 배포 정책 4.8). 옛 기준 4종(캐시 적중 우선 등)은 뺐다 */
+   +   '<div class="fld"><label>요청 분배 기준'+tip('요청을 어느 레플리카로 보낼지 정하는 기준입니다. 기본은 첫 요청 분산만 씁니다. 권장은 접두 캐시 · 첫 요청 분산 · 부하 기반을 함께 씁니다.')+'</label>'
+   +     rtHtml('W', !!wErrOf('rt'))
+   +   '</div>'
    +   shareFields()
    +   ngField()
    + '</div>';
@@ -5154,6 +5399,8 @@ function paneResAdv(){
 /* v0.45 · 노드 그룹(배포 정책 4.7 · DEP-L01 7.3 · REQ-DEP-105). 기본 선택 안 함.
    모델이 캐싱되지 않은 그룹은 비활성으로 두고 option 에 말풍선을 붙일 수 없어 사유를 선택칸 아래에 둔다(가속기 공유와 같은 처리) */
 function ngField(){
+  /* v0.47 · 노드 그룹 목록이 비어 오면 칸을 두지 않고 자동 배치로 둔다. 정상 구성이 아니라 그때를 위한 화면을 두지 않는다(REQ-DEP-105 · 배포 정책 4.7 · CON-1249) */
+  if(NG_EMPTY) return '';
   const cg=modelCg(wModelOf());
   return fld('노드 그룹'+tip('배포할 노드를 노드 그룹으로 좁힙니다. 고르면 레플리카가 그 그룹의 노드에만 배치됩니다. 고르지 않으면 모델 캐시가 있는 노드 그룹에 자동으로 배치됩니다.'),'ng',
       selBox('ng',[{v:'',t:'선택 안 함'}].concat(NODE_GROUPS.map(function(g){
@@ -5186,8 +5433,11 @@ function shareFields(){
 function paneGwAdv(){
   return wHead('고급 설정','비워 두면 기본값으로 동작합니다.')
    + '<div class="fgrid">'
-   +   fld('응답 대기 시간','timeout', selBox('timeout',['60초','120초','300초'],WF.timeout),
-        '이 시간을 넘으면 요청이 끊깁니다.')
+   /* v0.47 · 1~3600 정수 직접 입력. 비우면 3600초(DEP-L01 7.3 · 배포 정책 5.2) */
+   +   fld('응답 대기 시간'+tip('요청 하나의 응답을 기다리는 최대 시간입니다. 이 시간을 넘으면 요청이 끊깁니다.'),'timeout',
+        '<span class="stfield">'+inp('timeout','value="'+WF.timeout+'" placeholder="3600" inputmode="numeric" style="width:110px"'
+          +' oninput="wSetQuiet(\'timeout\',this.value)" onblur="wBlur(\'timeout\')"')+'<span class="stunit">초</span></span>',
+        '1~3600 사이로 지정합니다. 비우면 3600초입니다.')
  /* 최대 요청 크기는 운영룸 게이트웨이 설정으로 옮겼다. 운영룸마다 게이트웨이가 하나라
     배포마다 받은 값을 적용할 자리가 없다(워크스페이스 정책 3.4 · CON-1227) */
    + '</div>';
@@ -5211,8 +5461,8 @@ function paneReview(){
      사용자가 연 것은 유지한다 */
   function sec(step, title, sum, rows){
     /* 배포 전 검사 ✕ 도 그 값을 정한 단계 구역에 확인 필요로 묶는다. 위 검수 영역과 아래 검사 결과가 서로 다른 말을 하지 않게 한다(DEP-L01 5.3) */
-    const mine = errs.filter(function(e){ return e.step===step; })
-      .concat(dryErrs().filter(function(r){ return r.s===step; }));
+    /* 검수 구역은 입력 오류만 다룬다. 배포 전 검사 ✕ 는 아래 배포 전 검사 결과에서 알리고 그 줄을 눌러 칸으로 간다(DEP-L01 7.3) */
+    const mine = errs.filter(function(e){ return e.step===step; });
     const key = 'rv'+step;
     /* 처음에는 오류가 있는 곳만 펼치고, 그 뒤에는 사용자가 정한다.
        강제로 펼쳐 두면 확인한 단계를 접을 수 없다. 접어도 헤더에 상태가 남는다 */
@@ -5230,6 +5480,7 @@ function paneReview(){
         ? '<div class="rvbody">' + rows
           /* 항목 행에 붙지 않은 사유(범위 밖 값 · 배포 전 검사 ✕)는 구역 안에 적는다. 확인 필요만 보이고 이유가 없으면 무엇을 고칠지 모른다 */
           + mine.filter(function(e){ return !(e.f && shownF.indexOf(e.f)>=0); })
+              /* 검수 구역의 사유 줄은 글로 둔다. 이 구역에서 고치러 가는 길은 「수정하기」 하나다. 칸으로 바로 가는 링크는 아래 배포 전 검사 상자의 ✕ 줄에 둔다(REQ-DEP-107) */
               .map(function(e){ return '<div class="rvr bad"><span class="rvmsg">'+e.m+'</span></div>'; }).join('')
           + (mine.length
              ? '<button class="rvfix" onclick="wShown[\'_v'+step+'\']=true;wGo('+step+')">수정하기<span class="ar">→</span></button>'
@@ -5283,9 +5534,9 @@ function paneReview(){
 
   return wHead('검수','입력한 내용을 확인하고 배포합니다.')
 
-   /* 건수에 배포 전 검사 ✕ 도 센다. 구역 상태와 숫자가 맞아야 한다 */
-   + ((errs.length + dryErrs().length)
-      ? '<div class="rverr"><b>확인이 필요한 항목이 '+(errs.length + dryErrs().length)+'건 있습니다.</b>'
+   /* 검수는 입력 오류만 센다. 배포 전 검사 결과는 아래 배포 전 검사가 알린다(DEP-L01 7.3) */
+   + (errs.length
+      ? '<div class="rverr"><b>확인이 필요한 항목이 '+errs.length+'건 있습니다.</b>'
         + '<span>아래에서 해당 항목을 확인해 주세요.</span></div>'
       : '')
 
@@ -5321,7 +5572,9 @@ function paneReview(){
           ? row('API Key 인증', '사용')
           : row('API Key 인증', an[0], an[1]))
        + row('요청 수 제한', (WF.limit==='true'||WF.limit===true)
-          ? Number(WF.limitReq).toLocaleString('en-US')+'회/'+WF.limitUnit : '사용 안 함'))
+          ? Number(WF.limitReq).toLocaleString('en-US')+'회/'+WF.limitUnit : '사용 안 함')
+       /* v0.47 · 응답 대기 시간(DEP-L01 7.3) */
+       + row('응답 대기 시간', String(WF.timeout).trim()? WF.timeout+'초' : '3600초'))
    /* 플랫폼 값은 바꿀 수 없어 확인 표시를 두지 않는다 */
    +   '<div class="rvsec lock'+(rvOpen.rvlock?' open':'')+'">'
    +     '<button class="rvh" onclick="rvTg(\'rvlock\','+(!!rvOpen.rvlock)+')"><h5>플랫폼 기본값</h5>'
@@ -5431,6 +5684,8 @@ function submitWiz(){
 /* ===== 라이프사이클 ===== */
 function startDep(i){
   const d=DEPS[i];
+  /* v0.47 · 클러스터에서 사라진 가속기 종류면 서버가 거절한다(DEP-L01 5.3 · 배포 정책 4.2) */
+  if(accGone(d.acc)){ toast('cr', accGoneMsg(d.acc)); return; }
   toast('ok', d.st==='생성 실패'
     ? '다시 시도를 요청했습니다. 기동이 끝나면 알림으로 안내됩니다.'
     : '배포 시작을 요청했습니다. 기동이 끝나면 알림으로 안내됩니다.');
@@ -5443,7 +5698,7 @@ function pauseDep(i){
 function restartDep(i){
   const d=DEPS[i];
   openConfirm('배포 재시작','<b>'+d.n+'</b>'+jo(d.n,'을')+' 재시작하면 처리 중인 요청이 중단됩니다.',
-    function(){ toast('ok','재시작을 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.'); }, '재시작');
+    function(){ if(accGone(d.acc)){ toast('cr', accGoneMsg(d.acc)); return; } toast('ok','재시작을 요청했습니다. 처리가 끝나면 알림으로 안내됩니다.'); }, '재시작');
 }
 /* 되돌릴 수 없고 호출이 끊기는 작업은 이름을 다시 받는다(공통정책 7.5) */
 function delDep(i){
@@ -5549,6 +5804,17 @@ function setState(s,btn){
   render(true);
 }
 /* 검수 케이스 — 통과·확인 필요 두 상태를 견주기 위한 시안 장치 */
+/* v0.47 · 데모 바 분기 토글이 결과가 보이는 자리로 옮긴다. 다른 화면에 머문 채 누르면 변화가 없다. 실제 화면에는 없는 검토용 처리다 */
+function demoWiz(step, adv){
+  if(!canDeploy()) setRole('editor');
+  if(view!=='wiz' || !WF) openWiz();
+  if(!WF) return;
+  WF.name='llama-prod'; WF.ws='ai-service-team';
+  wShown['_v0']=true; wShown['_v1']=true; wShown['_v2']=true;
+  if(adv) wAdv[adv]=true;
+  wStep=step; drawWiz();
+  if(step===3) dryRun();
+}
 function setReview(k, btn){
   document.querySelectorAll('.demo-bar .rv').forEach(function(b){ b.classList.remove('on'); });
   if(btn) btn.classList.add('on');
@@ -5556,10 +5822,11 @@ function setReview(k, btn){
   if(!canDeploy()) setRole('editor');
   if(view!=='wiz' || !WF) openWiz();
   if(!WF) return;
-  if(k==='ok'){ WF.name='llama-prod'; WF.ws='ai-service-team'; }
-  else { WF.name=''; WF.ws=''; }
+  if(k==='ok'){ WF.name='llama-prod'; WF.nameChecked=true; WF.ws='ai-service-team'; WF.rep='1'; wApplyReq(); }
+  else { WF.name=''; WF.nameChecked=false; WF.ws=''; }
   wShown['_v0']=true; wShown['_v1']=true; wShown['_v2']=true;
-  wStep=3; drawWiz();
+  /* 04 검수로 옮기며 배포 전 검사도 돌린다. 통과는 입력 오류와 검사 ✕ 가 없는 상태다 */
+  wGo(WSTEPS.length-1);
 }
 
 /* 자원 케이스 — 배정·잔여 상태에 따라 안내가 갈리는 것을 견주기 위한 시안 장치다.
@@ -5699,7 +5966,7 @@ function openConfirm(title,body,onOk,okLabel,cancelLabel,confirmName){
   document.getElementById('cfBody').innerHTML=body;
   const ok=document.getElementById('cfOk');
   ok.textContent=okLabel||'확인';
-  ok.className='btn'+(['삭제','종료','취소','중단','일시중지','해제','등록 해제','강제 삭제'].indexOf(okLabel)>=0?' danger':'');
+  ok.className='btn'+(['삭제','종료','취소','중단','해제','등록 해제','강제 삭제'].indexOf(okLabel)>=0?' danger':'');
   ok.style.display=onOk?'':'none';
   ok.onclick=function(){ closeConfirm(); if(onOk) onOk(); };
   document.querySelector('#mdConfirm .btn.ghost').textContent = cancelLabel || (onOk?'취소':'닫기');
@@ -5774,7 +6041,12 @@ function cfgDef(d){
     /* v0.43 · 가속기 공유. 없음 · 시분할 배포만 바꾼다. MPS 배포는 표시 전용이다(DEP-L01 7.7 · 배포 정책 2.6 · 4.6) */
     share: (d.share && d.share.mode) || 'none', tsInt: (d.share && d.share.int) || 'long',
     /* v0.45 · 노드 그룹. 재기동 필요 구간이다(DEP-L01 7.7 · 배포 정책 2.6) */
-    ng: d.ng || ''
+    ng: d.ng || '',
+    /* v0.47 · 응답 대기 시간. 재기동 없음 구간이다(DEP-L01 3장 · 7.7) */
+    timeout: String(d.timeout||''),
+    /* v0.47 · 요청 분배. 재기동 없음 구간이다(REQ-DEP-109 · 배포 정책 2.6 · 4.8). 지금 값을 채워 연다 */
+    rt: d.rt||'default', rw: rtClone(d.rw||rtDef(d.rt||'default', d.topo==='프리필·디코드 분리'?'pd':'single')), rtNote:'',
+    rtTopo: d.topo==='프리필·디코드 분리'?'pd':'single', rtNpu: accOf(d.acc).kind==='npu'
   };
 }
 /* 검토용: 저장 시 서버가 배포 조건으로 거절하는 경우. 실제 화면에는 없다 */
@@ -5784,7 +6056,7 @@ let CFG_SHORT=false, CFG_SHORT_OK=false;
 function setCfgShort(btn){
   setCfgRej(false,btn); CFG_SHORT=true;
 }
-/* 검토용: 백엔드가 중단 후 반영을 받기 전에는 자원 부족이면 저장을 거절한다(DEP-L01 5.3 · CON-1263). 실제 화면에는 없다 */
+/* 검토용: 서버가 중단 후 반영을 받기 전에는 자원 부족이면 저장을 거절한다(DEP-L01 5.3 · CON-1263). 실제 화면에는 없다 */
 let CFG_SHORT_REJ=false;
 function setCfgShortRej(btn){
   setCfgRej(false,btn); CFG_SHORT_REJ=true;
@@ -5820,6 +6092,10 @@ function cfgChg(){
     auth: CFG.auth!==o.auth || (!CFG.auth && CFG.anon!==o.anon),
     /* v0.44 · 요청 수 제한도 재기동이 따르지 않는다 */
     lim: CFG.lim!==o.lim || (CFG.lim && (CFG.limReq!==o.limReq || CFG.limUnit!==o.limUnit)),
+    /* v0.47 · 응답 대기 시간도 재기동이 따르지 않는다 */
+    to: String(CFG.timeout).trim()!==String(o.timeout).trim(),
+    /* v0.47 · 요청 분배도 재기동이 따르지 않는다(배포 정책 2.6 · 4.8) */
+    rtc: CFG.rt!==o.rt || JSON.stringify(CFG.rw)!==JSON.stringify(o.rw),
     authOn: CFG.auth && !o.auth
   };
 }
@@ -5901,11 +6177,20 @@ function drawCfg(){
     const dm=MODELS.find(function(x){ return x.n===d.model; });
     const dcg=((dm && dm.cached)? modelCg(dm) : ['h200-a']).concat(d.ng? [d.ng] : []);
     const anyDis=NODE_GROUPS.some(function(g){ return dcg.indexOf(g)<0; });
-    r+=cfgF('노드 그룹','배포할 노드를 노드 그룹으로 좁힙니다. 고르면 레플리카가 그 그룹의 노드에만 배치됩니다. 고르지 않으면 모델 캐시가 있는 노드 그룹에 자동으로 배치됩니다.',
+    /* v0.47 · 노드 그룹 목록이 비면 두지 않는다(REQ-DEP-105) */
+    /* v0.47 · 가속기 공유가 시분할 · MPS 인 배포는 노드 그룹을 바꿀 수 없다. 공유 가속기가 지금 그룹 노드에 있다(REQ-DEP-106 · DEP-L01 5.3 · 배포 정책 4.7) */
+    const ngLock=!!(d.share && (d.share.mode==='ts' || d.share.mode==='mps'));
+    if(!NG_EMPTY && ngLock) r+=cfgF('노드 그룹','배포할 노드를 노드 그룹으로 좁힙니다. 고르면 레플리카가 그 그룹의 노드에만 배치됩니다. 고르지 않으면 모델 캐시가 있는 노드 그룹에 자동으로 배치됩니다.',
+       '<select class="inp" disabled><option>'+(d.ng||'선택 안 함')+'</option></select><div class="hint">가속기를 공유하는 배포는 노드 그룹을 바꿀 수 없습니다.</div>');
+    if(!NG_EMPTY && !ngLock) r+=cfgF('노드 그룹','배포할 노드를 노드 그룹으로 좁힙니다. 고르면 레플리카가 그 그룹의 노드에만 배치됩니다. 고르지 않으면 모델 캐시가 있는 노드 그룹에 자동으로 배치됩니다.',
        /* 선택지에 그룹 잔여를 보인다(생성 02 자원과 같음 · CON-1244). 지금 이 배포가 쓰는 장수는 다시 기동할 때 돌려받아 그 그룹 잔여에 더한다 */
        cfgSel('ng',[['','선택 안 함']].concat(NODE_GROUPS.map(function(g){ const own=((d.ng||dcg[0])===g)? (d.gpu||0)*(d.tgt||1) : 0;
          return [g,g+(NG_FREE[g]!==undefined? ' · 잔여 '+(NG_FREE[g]+own)+'장' : ''),dcg.indexOf(g)<0]; })))+(anyDis?'<div class="hint">'+NG_DIS+'</div>':''));
   }
+  /* v0.47 · 요청 분배 기준. 생성 02 자원과 같은 칸 · 같은 검증이다(DEP-L01 7.7 · REQ-DEP-109) */
+  if(d.type!=='외부 배포')
+    r+='<div class="f"><label>요청 분배 기준'+tip('요청을 어느 레플리카로 보낼지 정하는 기준입니다. 기본은 첫 요청 분산만 씁니다. 권장은 접두 캐시 · 첫 요청 분산 · 부하 기반을 함께 씁니다.')+'</label>'
+      + rtHtml('C', !!CFG.rtShow)+'</div>';
   h+=cfgSec('자원',r);
 
   /* ── 게이트웨이 ── 생성 03. 다시 기동하지 않고 적용한다(DEP-L01 7.7 · 배포 정책 2.6 · CON-1156) */
@@ -5924,6 +6209,11 @@ function drawCfg(){
     n+=cfgF('허용 요청 수','',cfgStepCtl('limReq','회',1,1000000,100,'id="cfgLimReq"',!!CFG.limErr),CFG.limErr);
     n+=cfgF('기준 시간','',cfgSel('limUnit',[['분','분당'],['시간','시간당']]));
   }
+  /* v0.47 · 응답 대기 시간(DEP-L01 7.7). 지금 값을 채워 연다. 비우면 3600초로 저장한다 */
+  n+=cfgF('응답 대기 시간','요청 하나의 응답을 기다리는 최대 시간입니다. 저장하면 바로 반영됩니다.',
+     '<span class="stfield"><input class="inp" id="cfgTo" value="'+CFG.timeout+'" placeholder="3600" inputmode="numeric" style="width:110px"'
+     +' oninput="CFG.timeout=this.value" onblur="CFG.toErr=toOk(CFG.timeout)?\'\':\'1~3600 사이의 정수를 입력해 주세요.\';drawCfg()"><span class="stunit">초</span></span>',
+     CFG.toErr, '1~3600 사이로 지정합니다. 비우면 3600초입니다.');
   h+=cfgSec('게이트웨이',n);
 
   /* ── 모니터링 ── 생성 04 검수의 값. 상세 탭 이름을 따른다 */
@@ -5935,14 +6225,14 @@ function drawCfg(){
   /* 재기동이 걸리는 값을 건드렸을 때만 알린다(REQ-DEP-053). 인증은 켜는 방향만(배포 정책 2.6) */
   /* 재기동 필요 값과 함께 바꾼 게이트웨이 값도 다시 기동이 끝날 때 한꺼번에 적용한다(DEP-L01 7.7) */
   if(chg.rest) h+=alertBox('warn','재기동','저장하면 배포가 다시 기동되며, 그동안 호출이 실패할 수 있습니다.'
-     +((chg.auth||chg.lim||chg.live)?' 함께 바꾼 값도 다시 기동이 끝나면 적용됩니다.':''),'',false);
-  /* 재기동이 걸리지 않는 값만 바꿨을 때. 반영하는 동안 상태가 잠시 생성 중으로 보인다(DEP-L01 7.7 · CON-1156) */
-  else if(chg.auth||chg.lim||chg.live) h+=alertBox('info','','저장하는 동안 상태가 잠시 생성 중으로 보일 수 있습니다.','',false);
+     +((chg.auth||chg.lim||chg.live||chg.to||chg.rtc)?' 함께 바꾼 값도 다시 기동이 끝나면 적용됩니다.':''),'',false);
+  /* v0.47 · 재기동이 걸리지 않는 값만 바꿨을 때는 안내를 두지 않는다. 정상 배포는 저장하는 동안에도 상태가 정상 그대로다
+     (서버 GW-TIMEOUT-PATCH-1 · 배포 정책 2.6). 할 일도 영향도 없어 저장 결과 토스트로 충분하다(공통정책 7.6 · 7.7) */
   if(chg.authOn) h+=alertBox('warn','인증','지금까지 키 없이 호출하던 요청은 더 이상 처리되지 않습니다.','',false);
 
   document.getElementById('cfgBody').innerHTML=h;
   document.getElementById('cfgSub').textContent = d.n+'의 설정을 수정합니다.';
-  document.getElementById('cfgSave').disabled = !(chg.live || chg.rest || chg.auth || chg.lim);
+  document.getElementById('cfgSave').disabled = !(chg.live || chg.rest || chg.auth || chg.lim || chg.to || chg.rtc);
 }
 
 function submitCfg(){
@@ -5976,10 +6266,13 @@ function submitCfg(){
   if(SHREJ && (CFG.share!==o0.share || CFG.tsInt!==o0.tsInt) && !(CFG.repErr || CFG.err || CFG.utilErr || CFG.anonErr)){
     CFG.reject=shareRejMsg(SHREJ); drawCfg(); return;
   }
-  if(CFG.repErr || CFG.err || CFG.utilErr || CFG.anonErr || CFG.limErr){
+  CFG.toErr = toOk(CFG.timeout)? '' : '1~3600 사이의 정수를 입력해 주세요.';
+  /* v0.47 · 요청 분배 직접 설정은 저장 전에 한 번 더 잡는다(DEP-L01 5.3) */
+  CFG.rtShow = CFG.rt==='custom' && Object.keys(rtErrs(CFG,CFG.rtTopo)).length>0;
+  if(CFG.repErr || CFG.err || CFG.utilErr || CFG.anonErr || CFG.limErr || CFG.toErr || CFG.rtShow){
     drawCfg();
     /* 화면 순서상 첫 오류 필드 — 레플리카 수 → 최대 컨텍스트 길이 → 가속기 메모리 사용률 → 키 없는 요청 분당 한도 */
-    const el=document.getElementById(CFG.repErr? 'cfgRep' : CFG.err? 'cfgMaxLen' : CFG.utilErr? 'cfgGpuUtil' : CFG.anonErr? 'cfgAnon' : 'cfgLimReq'); if(el) el.focus();
+    const el=document.getElementById(CFG.repErr? 'cfgRep' : CFG.err? 'cfgMaxLen' : CFG.utilErr? 'cfgGpuUtil' : CFG.anonErr? 'cfgAnon' : CFG.limErr? 'cfgLimReq' : 'cfgTo'); if(el) el.focus();
     return;
   }
   /* v0.46 · 재기동 필요 구간의 값을 바꿨는데 운영룸 잔여가 모자라면, 배포를 내린 뒤 반영할지 확인받는다(배포 정책 2.6 · DEP-L01 5.3 · CON-1263).
@@ -5993,11 +6286,18 @@ function submitCfg(){
       function(){ CFG_SHORT_OK=true; submitCfg(); CFG_SHORT_OK=false; }, '반영');
     return;
   }
+  /* v0.47 · 재기동이 따르는 저장은 가속기를 다시 잡는다. 그 종류가 클러스터에서 사라졌으면 서버가 거절한다(DEP-L01 5.3).
+     실패 토스트로 알리고 모달과 입력값은 그대로 둔다. 일부 값만 반영되지 않게 저장 전에 막는다 */
+  if(chg.rest && accGone(d.acc)){ toast('cr', accGoneMsg(d.acc)); return; }
   closeCfg();
 
   /* 인증 · 요청 수 제한은 재기동이 따르지 않는다. 재기동 필요 값과 함께 저장하면 다시 기동이 끝날 때 함께 적용된다(DEP-L01 7.7) */
   if(chg.auth){ d.auth=CFG.auth; if(!CFG.auth) d.anon=parseInt(CFG.anon,10); }
   if(chg.lim){ d.lim = CFG.lim? {on:true, n:parseInt(CFG.limReq,10), unit:CFG.limUnit} : null; }
+  if(chg.to){ d.timeout = String(CFG.timeout).trim(); }
+  if(chg.rtc){ d.rt=CFG.rt; d.rw=rtClone(CFG.rw); }
+  /* v0.47 · 검토용: 게이트웨이 값만 바꾼 저장이 반영되면 반영 실패 사유를 지운다(DEP-L01 5.3) */
+  if((chg.to||chg.lim) && !chg.rest) d.gwFail=false;
 
   if(chg.rest){
     d.tgt=parseInt(CFG.rep)||d.tgt;
