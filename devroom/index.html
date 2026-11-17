@@ -1,5 +1,14 @@
 <!--
-  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.37 (2026-11-12)
+  콘체르토 매니저 — 개발룸·CDE 화면 목업 v0.38 (2026-11-16)
+
+  ── v0.38 (2026-11-16) ──
+  · WKSP-CDE-D01 v0.38 · CDE 정책 v0.38 과 같은 버전이다.
+  · 클러스터에 없는 가속기 종류(개발룸에 배정은 남아 있으나 클러스터에서 사라진 종류)를 두었다(WKSP-CDE-D01 5.2 · CDE 정책 3.2 · CON-1307).
+    CDE 신청 `가속기 추가` 선택지에서 비활성 + ` · 클러스터에 없음`. 개발룸 자원 섹션 · 개발룸 설정의 그 종류에 `클러스터에 없음`, 설정에서는 줄일 수만 있다.
+    잔여 · 배분 가능은 0으로 보인다(워크스페이스 정책 5.1). 개발룸 자원 섹션 · 신청 선택지 · 설정 모두 같다.
+    신청 제출이 이 이유로 거절되면 실패 토스트 `요청한 가속기({종류})가 지금 클러스터에 없습니다. 관리자에게 문의해 주세요.` 승인 거절은 내 작업함 목업 v0.21 에 있다.
+    데모 바 `클러스터 가속기` 로 확인한다. 실제 화면에는 없는 검토용 처리다.
+  · 작업 상세 `모델로 등록` 안내를 학습 이력의 원본 모델 · 학습 작업만 채우고 데이터셋은 직접 입력하는 것으로 고쳤다(REQ-CDE-053 · 모델 정책 3.7 · CON-1290).
 
   ── v0.37 (2026-11-12) ──
   · 패널이 열려 목록 폭이 줄면 덜 중요한 열부터 숨기던 처리를 뺐다. 열은 그대로 두고 표가 가로로 스크롤된다. 기획서 · 공통정책에 없는 목업 전용 처리였다(공통정책 4.2.4는 패널이 목록을 덮지 않는다는 것까지만 정한다).
@@ -57,7 +66,7 @@
   · 작업 잔여 자원 기준 정정(CDE 정책 2.3 · 4.7 — CDE-JOB-HEADROOM-1). CDE는 켜져 있는 동안 신청한 CPU · Memory의 4분의 1을 쓰고, 작업은 그 나머지 범위에서 실행된다.
     CDE 신청 자원 칸 아래 보조 문구 `CDE가 켜져 있는 동안 CPU {n} Cores · Memory {n} Gi를 씁니다. 작업은 나머지 범위에서 실행됩니다.` — 입력값에 따라 바뀐다(개발룸 기획서 7.3).
     CDE 상세 자원 섹션 도움말 `작업에 쓸 수 있는 양은 CPU {n} Cores · Memory {n} Gi입니다. 배정값에서 CDE가 쓰는 양과 실행 중인 작업을 뺀 값입니다.`(7.2).
-    상세 값은 백엔드 응답으로 받을 값이다. 목업은 배정값의 4분의 3에서 실행 중인 작업 몫을 빼지 않은 검토용 값이다. 회수된 CDE에는 두지 않는다.
+    상세 값은 서버 응답으로 받을 값이다. 목업은 배정값의 4분의 3에서 실행 중인 작업 몫을 빼지 않은 검토용 값이다. 회수된 CDE에는 두지 않는다.
 
   ── v0.31 (2026-10-28) ──
   · 10-28 재검증 정정(3차). 조회 오류 재조회 버튼을 `재시도` 로(공통정책 4.1 — 실패한 작업 재실행의 `다시 시도` 와 가른다).
@@ -348,7 +357,7 @@
       · 개발룸 설정 — 가속기 행을 종류별로 반복한다
       · CDE 신청 — 유형을 먼저 고르고 그 종류의 잔여가 개수 상한이 된다
       · 목록·패널 — 개수 옆에 종류를 함께 보인다
-    ⚠ 백엔드가 종류별로 내려주는지 확인 대상(정책 9. 20번).
+    ⚠ 서버가 종류별로 내려주는지 확인 대상(정책 9. 20번).
   · 뷰어에게도 목록을 그대로 두되 내역이 비고 안내 문구가 갈린다.
     조회 범위가 본인 것뿐인데 신청할 수 없어 목록이 늘 빈다.
     워크스페이스 목업과 같은 방식으로 제목을 상황에 맞게 바꾸고 본문은 요청 문장으로 둔다.
@@ -453,7 +462,7 @@
          산출물을 모델로 넘길 자리도 없었다. 패널이 아니라 페이지로 둔다 — 지표 차트가
          들어가 패널 폭으로 수용할 수 없다(공통정책 4.2). 작업 ID 에 밑줄을 두어
          다른 목록과 규격을 맞췄다.
-         ⚠ 사전 진단·학습 지표·산출물 셋 다 백엔드 제공 여부가 확인 대상이다.
+         ⚠ 사전 진단·학습 지표·산출물 셋 다 서버 제공 여부가 확인 대상이다.
            값이 없으면 섹션을 비우고 안내 문구를 둔다.
          ⚠ 학습 지표 키가 사용자 정의라 Loss·Accuracy 로 고정할 수 없다 — 확인 대상.
          ⚠ 산출물이 S3 인지 CDE 볼륨인지에 따라 모델 등록 소스가 갈린다 — 확인 대상.
@@ -2127,7 +2136,7 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
   <div class="modal" style="width:460px">
     <div class="mdhead"><h3>데이터 가져오기</h3><p id="dlTarget"></p></div>
     <div class="mdbody">
-      <!-- 백엔드 source_type 세 값과 1:1 로 맞춘다. 내부 값을 그대로 쓰지 않고
+      <!-- 서버 source_type 세 값과 1:1 로 맞춘다. 내부 값을 그대로 쓰지 않고
            읽는 말로 바꿔 보인다(공통정책 7.9) -->
       <div class="fld"><label>소스<span class="req">*</span></label>
         <select class="inp" id="dlSrc" onchange="dlValid()">
@@ -2194,6 +2203,10 @@ body.panel-on .cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 <div class="toasts" id="toasts"></div>
 
 <div class="demo-bar" id="demoBar">
+  <!-- v0.38 · 클러스터에서 사라진 가속기 종류. 검토용 처리. 실제 화면에는 없다 -->
+  <span class="dgrp"><span class="demo-label">클러스터 가속기:</span>
+  <button class="ga on" onclick="setGoneAcc('',this)">정상</button>
+  <button class="ga" onclick="setGoneAcc('nvidia-mig',this)">MIG 없음</button></span>
   <!-- 라벨과 버튼을 그룹으로 묶는다. 따로 두면 줄바꿈 지점에서 갈려 라벨만 남는다 -->
   <!-- 화면 전환 — 신청·설정·연장은 조건이 맞아야 정상 동선으로 열린다 -->
   <span class="dgrp"><span class="demo-label">화면:</span>
@@ -2257,7 +2270,7 @@ document.addEventListener('mouseover', disTipFit, true);
 /* 개발룸 자원 — 워크스페이스 할당량에서 이관받은 몫(워크스페이스 정책 5.2) */
 /* 개발룸에 배정된 가속기 — 벤더별·유형별로 구분한다(8/10 회의 2.2).
    MIG 로 분할된 것도 별도 타입으로 둔다. 워크스페이스 목업 CLUSTER.gpu 와 같은 구조다.
-   한 장당 vRAM 은 백엔드가 디바이스 모델 스펙으로 내려준다 */
+   한 장당 vRAM 은 서버가 디바이스 모델 스펙으로 내려준다 */
 /* 배정은 워크스페이스 할당량(WSQ) 안에서 정한다. 종류마다 잔여를 남겨 둬야
    종류를 둘 이상 고르는 신청을 확인할 수 있다 — 검토용 샘플 값이다 */
 const ACC = [
@@ -2265,10 +2278,20 @@ const ACC = [
   {k:'furiosa',    n:'Furiosa RNGD',     vram:48,  q:2, use:1},
   {k:'nvidia-mig', n:'NVIDIA-H200 MIG',  vram:16,  q:4, use:0}
 ];
+/* v0.38 · 검토용: 클러스터에서 사라진 종류. 실제 화면에는 없는 검토용 처리다(WKSP-CDE-D01 5.2) */
+let GONE_ACC='';
+function accGone(k){ return !!GONE_ACC && k===GONE_ACC; }
+function accGoneMsg(k){ return '요청한 가속기('+accOf(k).n+')가 지금 클러스터에 없습니다. 관리자에게 문의해 주세요.'; }
+function setGoneAcc(v,btn){
+  GONE_ACC=v;
+  document.querySelectorAll('#demoBar .ga').forEach(function(b){ b.classList.remove('on'); });
+  if(btn) btn.classList.add('on');
+  render(); if(formOpen) drawForm();
+}
 function accSum(f){ return ACC.reduce(function(a,g){ return a+g[f]; },0); }
 function accOf(k){ return ACC.find(function(g){ return g.k===k; }); }
 /* 직접 할당 판정용 서버 구성 — 한 서버가 요청한 종류와 장수를 모두 갖춰야 직접 할당이 성립한다
-   (CON-596 A-4). 백엔드는 장치 목록으로 판정하고, 목록이 비면 신청을 받지 않는다.
+   (CON-596 A-4). 서버는 장치 목록으로 판정하고, 목록이 비면 신청을 받지 않는다.
    ⚠ 서버별 장치 구성은 문서에 없다. 성립·불성립 두 갈래를 확인하려고 둔 검토용 값이다 —
      실제 화면에는 이 목록을 노출하지 않는다. `노드` 는 내부 용어라 화면 문구에는 `서버` 로 쓴다(공통정책 7.9) */
 const SRV = [
@@ -2852,9 +2875,10 @@ function drawQuota(){
   /* 가속기는 종류별로 보인다(REQ-CDE-009 · CON-596 A-2). 합계 한 줄로 두면 어느 종류가
      남아 있는지 알 수 없어 신청할 수 있는지 판단이 서지 않는다 */
   const accRows=ACC.map(function(g){
-    const free=g.q-g.use, p=g.q? Math.round(g.use/g.q*100) : 0, none=free<=0;
+    /* v0.38 · 클러스터에 없는 종류는 잔여 0(워크스페이스 정책 5.1). 배정은 그대로 두고 쓸 수 있는 양만 0이다 */
+    const free=accGone(g.k)? 0 : g.q-g.use, p=g.q? Math.round(g.use/g.q*100) : 0, none=free<=0;
     return '<div class="clacc'+(none?' none':'')+'">'
-     + '<span class="can">'+g.n+' <span class="cav">'+g.vram+'GB</span></span>'
+     + '<span class="can">'+g.n+' <span class="cav">'+g.vram+'GB</span>'+(accGone(g.k)? ' <span class="cav">· 클러스터에 없음</span>' : '')+'</span>'
      + '<span class="caf">'+g.use+'<span class="clq"> / '+g.q+' 장</span></span>'
      + '<span class="cab"><span class="clbar"><span class="clfill '+(p>=100?'cr':p>=75?'wa':'')+'" style="width:'+Math.min(100,Math.max(2,p))+'%"></span></span></span>'
      + '<span class="cas">잔여 '+free+'장 <span class="clpc">('+p+'% 사용)</span></span>'
@@ -3391,9 +3415,12 @@ function drawRoomCfg(){
    /* 가속기는 종류별로 배정한다. 워크스페이스에서 종류별로 나눈 것이
       개발룸으로 넘어오면서 뭉뚱그려지면 계산이 맞지 않는다(8/10 회의 2.2) */
    /* vRAM 은 라벨이 아니라 툴팁에 둔다. 라벨 폭(150px)을 넘으면 줄이 바뀌어 행 높이가 갈린다 */
+   /* v0.38 · 클러스터에 없는 종류는 이름에 `클러스터에 없음`, 지금 값에서 줄일 수만 있다(WKSP-CDE-D01 7.7 · 5.2) */
    + ACC.map(function(g,i){
-       return rcRow('acc_'+g.k, g.n, '장', rcCap('acc_'+g.k), rcNew?0:g.use, 1,
+       const h=rcRow('acc_'+g.k, g.n+(accGone(g.k)? ' · 클러스터에 없음' : ''), '장', accGone(g.k)? Math.min(rcCap('acc_'+g.k), g.q) : rcCap('acc_'+g.k), rcNew?0:g.use, 1,
                     '한 장당 '+g.vram+'GB입니다.'+(i===0? ' 벤더·유형별로 구분해 배정합니다.' : ''));
+       /* 클러스터에 없는 종류는 배분 가능 0으로 보인다(워크스페이스 정책 5.1). 입력 상한은 지금 값이라 줄일 수만 있다 */
+       return accGone(g.k)? h.replace(/배분 가능 [0-9.]+장/, '배분 가능 0장') : h;
      }).join('') + '</div>')
    + '<div class="fsec"><h4>스토리지·네트워크</h4>'
    /* 공유 볼륨은 생성 시에만 정한다(8/12 회의 1.5 `생성 후 변경 불가. 관리자만 설정`).
@@ -3542,7 +3569,7 @@ function openIde(name){
   if(m.st==='절전') return;
   act('웹 IDE를 새 탭으로 엽니다.');
 }
-/* 공유 볼륨 하위 폴더명만 받는다. 절대경로·상위 폴더 이탈은 백엔드가 422 로 막으므로
+/* 공유 볼륨 하위 폴더명만 받는다. 절대경로·상위 폴더 이탈은 서버가 422 로 막으므로
    화면에서 먼저 걸러 알린다(공통정책 7.8) */
 function dirErr(v){
   if(!v) return '';
@@ -3598,7 +3625,7 @@ function logBtn(j, cls, stop){
    ⚠ 아래 로그 내용은 형태를 보이기 위한 예시다. 실제로는 스크립트 표준 출력에
      플랫폼 기록이 섞일 수 있고 유형 구분이 오는지도 확인되지 않았다(정책 9. 14번).
    원문 텍스트로 두면 유형별로 걸러 볼 수 없다. 일시·유형·메시지로 나눠 테이블로 둔다.
-   ⚠ 백엔드가 구조화된 항목으로 내려주는지 확인 대상(정책 확인 항목) */
+   ⚠ 서버가 구조화된 항목으로 내려주는지 확인 대상(정책 확인 항목) */
 function logLines(j){
   return j.err
     ? [['2026-08-19 14:02:03','정보','작업을 시작합니다.'],
@@ -3819,11 +3846,12 @@ function drawJobDetail(){
    모델 화면의 등록 모달이 산출물 경로가 채워진 상태로 열린다(모델 기획서 REQ-MODEL-062).
    ⚠ 산출물이 S3 인지 CDE 볼륨인지에 따라 등록 소스가 갈린다 — 확인 대상(5.3 C-13) */
 /* 모델 등록 모달(MODEL-L01.M01)을 이 자리에서 연다. 화면을 옮기지 않는다(REQ-CDE-053).
-   소스·소스 경로·학습 이력은 이 작업의 값으로 채운 읽기 전용이다(REQ-MODEL-062·063·070).
+   소스·소스 경로와 학습 이력의 원본 모델 · 학습 작업은 이 작업의 값으로 채운 읽기 전용이다(REQ-MODEL-062·063·070 · v0.38).
    모달 본체는 모델 목업에 있어 여기서는 무엇이 열리는지만 알린다. 실제 화면에는 없는 검토용 처리다 */
 function toModel(){
   if(!jdCur || !jdCur.out) return;
-  act('[검토용] 모델 등록 모달이 열립니다. 소스 경로 ' + jdCur.out.path + ' 와 학습 이력이 이 작업의 값으로 채워집니다.');
+  /* v0.38 · 학습 이력은 원본 모델 · 학습 작업만 채운다. 데이터셋 이름 · 버전은 직접 입력한다(REQ-CDE-053 · 모델 정책 3.7) */
+  act('[검토용] 모델 등록 모달이 열립니다. 소스 경로 ' + jdCur.out.path + ' 와 학습 이력의 원본 모델 · 학습 작업이 이 작업의 값으로 채워지고, 데이터셋은 직접 입력합니다.');
 }
 
 /* 기술문서 6.2 — 스크립트 오류나 오동작이 감지되면 강제 취소한다.
@@ -4080,7 +4108,7 @@ function drawCdeDetail(){
 
   /* 상세는 신청·승인된 배정값이다. 회수된 뒤에도 얼마를 쓰던 것인지 확인할 자리가 필요하다 */
   /* 작업에 쓸 수 있는 양 — 배정값에서 CDE가 쓰는 양(4분의 1)과 실행 중인 작업을 뺀 값(CDE 정책 4.7 · 개발룸 기획서 7.2).
-     ⚠ 값은 백엔드 응답으로 받는다. 목업은 실행 중인 작업 몫을 빼지 않은 검토용 값이다. 회수된 CDE는 작업을 받지 않아 두지 않는다 */
+     ⚠ 값은 서버 응답으로 받는다. 목업은 실행 중인 작업 몫을 빼지 않은 검토용 값이다. 회수된 CDE는 작업을 받지 않아 두지 않는다 */
   const jobFree = m.st==='회수'? '' : '작업에 쓸 수 있는 양은 CPU '+(Math.round(m.cpu*0.75*100)/100)+' Cores · Memory '+(Math.round(m.ram*0.75*100)/100)+' Gi입니다. 배정값에서 CDE가 쓰는 양과 실행 중인 작업을 뺀 값입니다.';
   h += '<div class="dsec"><h4>자원'+(jobFree? tip(jobFree) : '')+'</h4><dl class="dl two">'
     + '<dt>CPU</dt><dd>'+m.cpu+' Cores</dd>'
@@ -4239,9 +4267,10 @@ function accBlock(){
     /* 잔여가 없는 종류는 숨기지 않고 막아 둔다. 왜 못 고르는지 그 자리에서 드러난다 */
     add='<div class="accadd"><button type="button" class="btn ghost sm" onclick="accMenu(event)">＋ 가속기 추가</button>'
      + (accMenuOpen? '<div class="accpop">'+rest.map(function(g){
-         const free=g.q-g.use;
-         return '<button type="button" onclick="accAddRow(\''+g.k+'\')"'+(free<=0?' disabled':'')+'>'
-          + g.n+' '+g.vram+'GB<span class="af">'+(free<=0? '잔여 없음' : '잔여 '+free+'장')+'</span></button>';
+         const gn=accGone(g.k), free=gn? 0 : g.q-g.use;
+         /* v0.38 · 클러스터에 없는 종류는 비활성 + ` · 클러스터에 없음`(WKSP-CDE-D01 5.2) */
+         return '<button type="button" onclick="accAddRow(\''+g.k+'\')"'+(free<=0||gn?' disabled':'')+'>'
+          + g.n+' '+g.vram+'GB'+(gn?' · 클러스터에 없음':'')+'<span class="af">'+(free<=0? '잔여 없음' : '잔여 '+free+'장')+'</span></button>';
        }).join('')+'</div>' : '')
      + '</div>';
   }
@@ -4564,6 +4593,9 @@ function submitForm(){
     if(el) el.focus();
     return;
   }
+  /* v0.38 · 고른 뒤 그 종류가 클러스터에서 사라지면 서버가 거절한다(WKSP-CDE-D01 5.2). 입력값은 둔다 */
+  const gk=NF.accRows.find(function(k){ return accGone(k); });
+  if(gk){ toast('cr', accGoneMsg(gk)); return; }
   CDE.unshift({n:ME.split('.')[0]+'-new-01', by:'성유진', id:ME, st:'승인 대기',
     ide:NF.ide, fw:NF.fw, mode:NF.mode, cpu:+NF.cpu, ram:+NF.ram, accs:accWant(),
     vol:+NF.vol,
@@ -4609,7 +4641,7 @@ function askReturn(name){
 function leaveCde(name){ if(cdCur && cdCur.n===name) closeCde(); }
 /* 파드를 내리는 데 시간이 걸린다. 요청과 완료를 갈라 보이려고 종료 중을 거친다.
    종료되면 목록에서 빠진다(CDE 정책 6장). 완료는 알림으로 안내한다(REQ-CDE-044). 아래 토스트는 알림 대신이다.
-   ⚠ 대기 시간은 데모용이다. 실제로는 백엔드가 완료를 알린다 */
+   ⚠ 대기 시간은 데모용이다. 실제로는 서버가 완료를 알린다 */
 function finishRelease(name){
   setTimeout(function(){
     const m=CDE.find(x=>x.n===name);
