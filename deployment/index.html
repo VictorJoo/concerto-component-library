@@ -1,8 +1,16 @@
 <!--
-  콘체르토 매니저 · 배포 화면 목업 v0.47 (2026-11-16)
+  콘체르토 매니저 · 배포 화면 목업 v0.48 (2026-11-18)
   색·컴포넌트 규격은 워크스페이스 목업 v0.33 를 그대로 따른다. 이 파일에서 토큰을 새로 만들지 않는다.
 
   ── 변경 ────────────────────────────────────────
+  ── v0.48 (2026-11-18) ──
+  · DEP-L01 v0.48 · 배포 정책 v0.37 과 같은 버전이다.
+  · 엔진 인자 목록(처리량·배치)에서 `--pipeline-parallel-size` · `--data-parallel-size` 를 뺐다. 4.0에서 받지 않는 인자로 막는다.
+    배포 차트가 텐서 병렬 크기를 레플리카당 가속기 수로 정해 이 값을 올바르게 나타낼 수 없고, 서버도 거절하지 않는다(배포 정책 5.3).
+    목록 밖 인자 칸에 넣으면 `이 인자는 지원하지 않습니다.` 를 띄운다. 화면 문구에는 버전 번호를 쓰지 않는다(공통정책 7.9). 줄임 표기 -dp · -pp 도 같이 막는다. 전문가 병렬은 그대로 둔다.
+  · 시스템이 직접 설정하는 인자에서 `--disable-log-requests` 를 뺐다. 사용하는 vLLM 이 지원하지 않는 인자다(배포 정책 5.3 · 11-09 TUI 정합 회의 2.4).
+  · 가속기 공유 도움말(생성 02 자원 · 설정 변경)에서 시분할 설명을 4.0 지원 구성으로 바꿨다. 단일 서빙 · 레플리카 1개 · 레플리카당 가속기 1장만 지원한다(배포 정책 4.6 · DEP-L01 7.3 · 4.0 지원 범위 2.2).
+    화면에서 값을 잠그지는 않는다. 그 밖의 구성은 4.0에서 동작을 보장하지 않는 범위로 둔다.
   ── v0.47 (2026-11-16) ──
   · DEP-L01 v0.47 · 배포 정책 v0.36 과 같은 버전이다.
   · 배포 일시중지 확인 알럿의 [일시중지] 를 기본 버튼으로 바꿨다. 다시 시작할 수 있어 파괴적 액션이 아니다(컴포넌트 라이브러리 4.5).
@@ -4333,10 +4341,6 @@ const EARGS=[
   x:'긴 프롬프트를 나눠 처리해 응답 지연을 줄입니다.'},
  {s:'처리량·배치', k:'--scheduling-policy',      t:'text',
   x:'요청을 처리할 순서를 정하는 정책입니다.'},
- {s:'처리량·배치', k:'--pipeline-parallel-size', t:'num',
-  x:'모델을 층 단위로 나눠 여러 장에 올립니다.'},
- {s:'처리량·배치', k:'--data-parallel-size',     t:'num',
-  x:'동일 모델 복제본을 데이터 병렬로 몇 개 둘지 정합니다.'},
  {s:'처리량·배치', k:'--enable-expert-parallel', t:'flag',
   x:'MoE 모델의 전문가 층을 나눠 배치합니다.'},
  {s:'처리량·배치', k:'--tensor-parallel-size',   t:'lock', w:'02 자원',
@@ -4377,8 +4381,11 @@ function argCount(){ let n=0; for(const k in WF.args){ if(String(WF.args[k]).tri
 const RESERVED_ARGS=['--model','--served-model-name','--tensor-parallel-size',
   '--tp','--port','--gpu-memory-utilization','--max-model-len'];
 /* 시스템이 직접 설정하는 인자 — 차트가 컨테이너 인자로 싣는다. 넣으면 두 번 실려 서버가 거절한다(CON-931) */
-const SYSTEM_ARGS=['--kv-transfer-config','--kv-events-config','--disable-log-requests',
+const SYSTEM_ARGS=['--kv-transfer-config','--kv-events-config',
   '--otlp-traces-endpoint','--collect-detailed-traces'];
+/* v0.48 · 4.0에서 받지 않는 인자 — 데이터 병렬 · 파이프라인 병렬. 차트가 텐서 병렬 크기를 레플리카당 가속기 수로 정해
+   올바르게 나타낼 수 없고 서버도 거절하지 않아 화면에서 막는다. 줄임 표기(-dp · -pp)는 앞의 -- 로 맞춘 뒤 비교한다(배포 정책 5.3) */
+const UNSUPPORTED_ARGS=['--data-parallel-size','--dp','--pipeline-parallel-size','--pp'];
 
 /* v0.40 · 서빙 엔진이 Furiosa-LLM인 배포가 받는 엔진 인자(배포 정책 5.3 · REQ-DEP-095).
    모델 설정의 최대 컨텍스트 길이와 아래 둘만 둔다. 가속기 메모리 사용률 · 그 밖의 인자 · 직접 입력은 두지 않는다 */
@@ -4418,6 +4425,8 @@ function commitCustomKey(i){
             : '이 인자는 시스템이 설정하므로 넣을 수 없습니다.';
   } else if(SYSTEM_ARGS.indexOf(k)>=0){
     row.err='이 인자는 시스템이 설정하므로 넣을 수 없습니다.';
+  } else if(UNSUPPORTED_ARGS.indexOf(k)>=0){
+    row.err='이 인자는 지원하지 않습니다.';
   } else {
     row.key=k; row.err='';
   }
@@ -5415,7 +5424,7 @@ function ngField(){
 function shareFields(){
   if(CL_ALLOC!=='dra') return '';
   const ok=accShareOk(WF.acc);
-  return fld('가속기 공유'+tip('가속기 한 장을 나눠 쓰는 방식입니다. 시분할은 같은 배포의 레플리카끼리 시간으로 번갈아 쓰고, 할당량을 레플리카 수와 관계없이 레플리카당 가속기 수만큼 셉니다. MPS는 같은 운영룸의 배포 여럿이 지분으로 나눠 동시에 쓰고, 새 공유 가속기를 열 때만 할당량 1장을 셉니다.'),'share',
+  return fld('가속기 공유'+tip('가속기 한 장을 나눠 쓰는 방식입니다. 시분할은 시간으로 번갈아 쓰며, 단일 서빙 · 레플리카 1개 · 레플리카당 가속기 1장 구성만 지원합니다. MPS는 같은 운영룸의 배포 여럿이 지분으로 나눠 동시에 쓰고, 새 공유 가속기를 열 때만 할당량 1장을 셉니다.'),'share',
         selBox('share',[{v:'none',t:'없음'},{v:'ts',t:'시분할',dis:!ok},{v:'mps',t:'MPS',dis:!ok}], WF.share),
         !ok? SHARE_NO
           : WF.share==='mps'? '같은 가속기를 쓰는 다른 배포의 오류가 이 배포에 영향을 줄 수 있습니다. 배포한 뒤에는 MPS 설정을 바꿀 수 없습니다.' : '')
@@ -6167,7 +6176,7 @@ function drawCfg(){
   /* 없음 · 시분할 배포만. MPS 는 선택지에 없다. 개수 할당 클러스터는 두지 않는다(DEP-L01 7.7 · 5.3 · 배포 정책 4.6) */
   if(CL_ALLOC==='dra' && !depMps(d)){
     const sok=accShareOk(d.acc);
-    r+=cfgF('가속기 공유','가속기 한 장을 나눠 쓰는 방식입니다. 시분할은 같은 배포의 레플리카끼리 시간으로 번갈아 쓰고, 할당량을 레플리카 수와 관계없이 레플리카당 가속기 수만큼 셉니다. MPS는 같은 운영룸의 배포 여럿이 지분으로 나눠 동시에 쓰고, 새 공유 가속기를 열 때만 할당량 1장을 셉니다.',cfgSel('share',[['none','없음'],['ts','시분할',!sok]])+(sok?'':'<div class="hint">'+SHARE_NO+'</div>'));
+    r+=cfgF('가속기 공유','가속기 한 장을 나눠 쓰는 방식입니다. 시분할은 시간으로 번갈아 쓰며, 단일 서빙 · 레플리카 1개 · 레플리카당 가속기 1장 구성만 지원합니다. MPS는 같은 운영룸의 배포 여럿이 지분으로 나눠 동시에 쓰고, 새 공유 가속기를 열 때만 할당량 1장을 셉니다.',cfgSel('share',[['none','없음'],['ts','시분할',!sok]])+(sok?'':'<div class="hint">'+SHARE_NO+'</div>'));
     if(CFG.share==='ts')
       r+=cfgF('시간 간격 등급','가속기가 레플리카 사이에서 번갈아 실행하는 시간 조각의 길이입니다. 짧을수록 응답이 고르고, 길수록 처리량이 좋습니다. 드라이버 기본은 가속기 드라이버가 정한 길이를 씁니다.',
          cfgSel('tsInt',TS_INT.map(function(o){ return [o.v,o.t]; })));
